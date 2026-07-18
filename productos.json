@@ -1,18 +1,29 @@
 [
-    {
-        "id": "prod_001",
-        "name": "Sistema de Concesionario V2",
-        "price": 15.00,
-        "category": "Scripts",
-        "description": "Sistema completo para vender autos.",
-        "image_url": "https://via.placeholder.com/400x300"
-    },
-    {
-        "id": "prod_002",
-        "name": "Pack de Mappings HQ",
-        "price": 8.50,
-        "category": "Mappings",
-        "description": "Colección de mapas de alta calidad.",
-        "image_url": "https://via.placeholder.com/400x300"
-    }
+  {
+    "id": "prod_001",
+    "name": "Sistema de Concesionario Premium",
+    "description": "Sistema completo de concesionario con UI moderna, base de datos SQL y configuración fácil.",
+    "price": 15.00,
+    "category": "Scripts",
+    "image_url": "https://via.placeholder.com/400x300/4c1d95/ffffff?text=Concesionario",
+    "file_url": "#"
+  },
+  {
+    "id": "prod_002",
+    "name": "Pack de Mappings Ciudad",
+    "description": "Más de 500 objetos nuevos para decorar tu servidor de Roleplay.",
+    "price": 10.50,
+    "category": "Mappings",
+    "image_url": "https://via.placeholder.com/400x300/4c1d95/ffffff?text=Mappings",
+    "file_url": "#"
+  },
+  {
+    "id": "prod_003",
+    "name": "Bot de Moderación Discord",
+    "description": "Bot avanzado con logs, tickets y sistema de niveles.",
+    "price": 5.00,
+    "category": "Bots",
+    "image_url": "https://via.placeholder.com/400x300/4c1d95/ffffff?text=Bot+Discord",
+    "file_url": "#"
+  }
 ]
