@@ -8,8 +8,6 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- SDK de Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- SDK de PayPal -->
     <script src="https://www.paypal.com/sdk/js?client-id=sb&currency=USD"></script>
 
@@ -437,33 +435,27 @@
             </h2>
 
             <div id="admin-upload-section" class="bg-[#150e26] border border-purple-950/40 rounded-2xl p-6 mb-6">
-                <h3 class="text-white font-bold mb-4">Subir nuevo producto</h3>
-                <div class="grid gap-4">
-                    <input id="ap-name" type="text" placeholder="Nombre del producto (ej: ZW_ID)" class="bg-[#0d0a1a] border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500">
-                    <textarea id="ap-desc" placeholder="Descripción" rows="3" class="bg-[#0d0a1a] border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500"></textarea>
-                    <div class="grid grid-cols-2 gap-4">
-                        <input id="ap-price" type="number" step="0.01" placeholder="Precio (ej: 4.99)" class="bg-[#0d0a1a] border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500">
-                        <input id="ap-category" type="text" placeholder="Categoría (ej: Scripts)" class="bg-[#0d0a1a] border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500">
-                    </div>
-                    <div>
-                        <label class="text-xs text-gray-400 mb-1 block">Imagen de portada</label>
-                        <input id="ap-image" type="file" accept="image/*" class="w-full bg-[#0d0a1a] border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-purple-600 file:text-white file:text-xs file:font-semibold focus:outline-none focus:border-purple-500">
-                    </div>
-                    <div>
-                        <label class="text-xs text-gray-400 mb-1 block">Archivo del recurso (.rar, .zip, etc.)</label>
-                        <input id="ap-file" type="file" accept=".rar,.zip,.7z" class="w-full bg-[#0d0a1a] border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-purple-600 file:text-white file:text-xs file:font-semibold focus:outline-none focus:border-purple-500">
-                    </div>
-                    <button onclick="uploadProduct()" class="bg-purple-600 hover:bg-purple-700 text-white font-black py-3 rounded-xl uppercase tracking-wider transition-all">
-                        <i class="fas fa-upload mr-2"></i>Subir Producto
-                    </button>
-                    <p id="ap-status" class="text-xs text-gray-400"></p>
+                <h3 class="text-white font-bold mb-4">Gestión de Productos (Local)</h3>
+                <p class="text-gray-400 text-sm mb-4">Como estás usando modo local (JSON), los nuevos productos deben agregarse editando el archivo <code>Productos.json</code>.</p>
+                <div class="bg-[#0d0a1a] p-4 rounded-xl border border-purple-950/40">
+                    <p class="text-xs text-gray-500 font-mono mb-2">// Formato para agregar en Productos.json:</p>
+                    <pre class="text-xs text-green-400 font-mono overflow-x-auto">
+{
+  "id": "prod_nuevo",
+  "name": "Nombre del Script",
+  "price": 10.00,
+  "category": "Scripts",
+  "description": "Descripción...",
+  "image_url": "url_imagen.jpg",
+  "file_url": "url_archivo.zip"
+}</pre>
                 </div>
             </div>
 
             <div id="admin-users-section" class="bg-[#150e26] border border-purple-950/40 rounded-2xl p-6">
-                <h3 class="text-white font-bold mb-4"><i class="fas fa-users text-purple-400 mr-2"></i>Usuarios que han iniciado sesión</h3>
+                <h3 class="text-white font-bold mb-4"><i class="fas fa-users text-purple-400 mr-2"></i>Usuarios Locales</h3>
                 <div id="admin-users-list" class="space-y-2 max-h-96 overflow-y-auto custom-scrollbar">
-                    <p class="text-gray-500 text-sm">Cargando usuarios...</p>
+                    <p class="text-gray-500 text-sm">La lista de usuarios se gestiona localmente en este navegador.</p>
                 </div>
             </div>
         </section>
@@ -475,18 +467,9 @@
 
     <script>
         // --- CONFIGURACIÓN ---
-        // 1. ID DE DISCORD PROPORCIONADO
         const CLIENT_ID = '1213866547181780992'; 
-        
-        // 2. REDIRECT URI PARA LOCALHOST (PC)
-        // Asegúrate de añadir http://localhost:5500/ o http://127.0.0.1:5500/ en Discord Developer Portal
         const REDIRECT_URI = window.location.href.split('#')[0]; 
-
         const DISCORD_INVITE = 'https://discord.gg/rvxEdWcGkf';
-        
-        // SUPABASE (Mantenido para persistencia de usuarios y roles si se desea)
-        const SUPABASE_URL = 'https://cldkuysipdcbtsjwvxsh.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_w-hak-YJ52G6tvwkwrCcEw_o_WhNzFN';
         
         const ADMIN_DISCORD_IDS = ['890526767608127489']; 
         const ADMIN_DISCORD_USERNAMES = ['Papeleta']; 
@@ -498,18 +481,12 @@
             return false;
         }
 
-        let sbClient = null;
-        if (SUPABASE_URL.startsWith('http')) {
-            sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        }
-
         let allProducts = [];
         let activeCategory = 'all';
         let currentUser = null;
         let currentUserRole = 'user';
         let myAssignedProductIds = new Set();
         let currentDetailProduct = null;
-        
         let cart = [];
 
         // --- FUNCIONES DEL CARRITO ---
@@ -597,7 +574,7 @@
         // --- INTEGRACIÓN PAYPAL ---
         function renderPayPalButtons() {
             const container = document.getElementById('paypal-button-container');
-            container.innerHTML = ''; // Limpiar botones anteriores
+            container.innerHTML = ''; 
             
             if (cart.length === 0) return;
 
@@ -622,16 +599,11 @@
                 },
                 onApprove: function(data, actions) {
                     return actions.order.capture().then(function(details) {
-                        // PAGO EXITOSO
                         alert('¡Pago completado por ' + details.payer.name.given_name + '!');
                         
-                        // 1. Asignar productos al usuario (Simulación visual y lógica)
                         assignProductsToUserAfterPayment();
-                        
-                        // 2. Dar Rol de Cliente
                         giveClientRole();
                         
-                        // 3. Limpiar carrito y cerrar modal
                         cart = [];
                         updateCartUI();
                         closeCartModal();
@@ -643,10 +615,8 @@
         function giveClientRole() {
             if(!currentUser) return;
             
-            // Actualizar variable local
             currentUserRole = 'cliente';
             
-            // Actualizar UI
             const roleBadge = document.getElementById('user-role-badge');
             if(roleBadge) {
                 roleBadge.innerText = 'CLIENTE';
@@ -654,33 +624,18 @@
                 roleBadge.classList.remove('text-purple-400');
             }
 
-            // Intentar guardar en Supabase si está conectado
-            if(sbClient) {
-                sbClient.from('site_users').update({ role: 'cliente' }).eq('discord_id', currentUser.id);
-            }
-            
-            console.log("Rol 'Cliente' asignado al usuario " + currentUser.username);
+            // Guardar rol en LocalStorage
+            saveUserDataLocally();
         }
 
         function assignProductsToUserAfterPayment() {
             if(!currentUser) return;
             
-            // Simular asignación en memoria
             cart.forEach(item => {
                 myAssignedProductIds.add(item.id);
             });
             
-            // Guardar en Supabase (si existe conexión)
-            if(sbClient) {
-                const assignments = cart.map(item => ({
-                    product_id: item.id,
-                    discord_id: currentUser.id,
-                    assigned_at: new Date().toISOString()
-                }));
-                sbClient.from('product_assignments').insert(assignments);
-            }
-            
-            // Recargar dashboard
+            saveUserDataLocally();
             loadDashboardData();
             alert("¡Productos añadidos a tu biblioteca!");
         }
@@ -810,7 +765,7 @@
                     fetchDiscordUserData(savedToken);
                 } else {
                     updateAuthUI();
-                    loadProducts(); // Carga inicial
+                    loadProducts();
                     loadSalesStats();
                     loadUserStats();
                 }
@@ -841,7 +796,6 @@
                 }
                 
                 updateAuthUI();
-                logUserLogin(user);
                 applyRoleUI();
                 loadUserStats();
                 loadSalesStats();
@@ -868,16 +822,17 @@
             }
         }
 
-        async function applyRoleUI() {
-            currentUserRole = 'user'; // Default
+        function applyRoleUI() {
+            currentUserRole = 'user'; 
             const roleBadge = document.getElementById('user-role-badge');
             
-            if (sbClient && currentUser) {
-                const { data } = await sbClient.from('site_users').select('role').eq('discord_id', currentUser.id).single();
-                if (data && data.role) {
-                    currentUserRole = data.role;
-                    roleBadge.innerText = data.role.toUpperCase();
-                    if(data.role === 'cliente') {
+            // Cargar rol desde LocalStorage
+            if(currentUser) {
+                const savedData = JSON.parse(localStorage.getItem('glx_user_' + currentUser.id) || '{}');
+                if(savedData.role) {
+                    currentUserRole = savedData.role;
+                    roleBadge.innerText = savedData.role.toUpperCase();
+                    if(savedData.role === 'cliente') {
                          roleBadge.classList.add('text-green-400');
                          roleBadge.classList.remove('text-purple-400');
                     }
@@ -891,60 +846,56 @@
             document.getElementById('admin-users-section').style.display = isAdmin(currentUser) ? '' : 'none';
         }
 
-        async function loadUserStats() {
-            if (!sbClient) return;
-            const { count, error } = await sbClient.from('site_users').select('*', { count: 'exact', head: true });
-            if (!error && count !== null) {
-                document.getElementById('stat-usuarios').innerText = '+' + count;
+        // Funciones auxiliares para persistencia local
+        function saveUserDataLocally() {
+            if(!currentUser) return;
+            const userData = {
+                discord_id: currentUser.id,
+                username: currentUser.username,
+                avatar: currentUser.avatar,
+                role: currentUserRole,
+                assigned_products: Array.from(myAssignedProductIds),
+                last_login: new Date().toISOString()
+            };
+            localStorage.setItem('glx_user_' + currentUser.id, JSON.stringify(userData));
+            
+            // Guardar también en una lista global de usuarios locales para el admin
+            let allUsers = JSON.parse(localStorage.getItem('glx_all_users') || '[]');
+            const existingIndex = allUsers.findIndex(u => u.discord_id === currentUser.id);
+            if(existingIndex >= 0) {
+                allUsers[existingIndex] = userData;
+            } else {
+                allUsers.push(userData);
             }
+            localStorage.setItem('glx_all_users', JSON.stringify(allUsers));
+        }
+
+        async function loadUserStats() {
+            // Simular stats con localStorage
+            const allUsers = JSON.parse(localStorage.getItem('glx_all_users') || '[]');
+            document.getElementById('stat-usuarios').innerText = '+' + allUsers.length;
         }
 
         async function loadSalesStats() {
-            if (!sbClient) return;
-            const { count: ventasCount } = await sbClient.from('product_assignments').select('*', { count: 'exact', head: true });
-            document.getElementById('stat-ventas').innerText = '+' + (ventasCount || 0);
-
-            const { data: rows } = await sbClient.from('product_assignments').select('discord_id');
-            const clientesUnicos = new Set((rows || []).map(r => r.discord_id));
-            document.getElementById('stat-clientes').innerText = '+' + clientesUnicos.size;
+            const allUsers = JSON.parse(localStorage.getItem('glx_all_users') || '[]');
+            const clientes = allUsers.filter(u => u.role === 'cliente').length;
+            let totalVentas = 0;
+            allUsers.forEach(u => {
+                if(u.assigned_products) totalVentas += u.assigned_products.length;
+            });
+            
+            document.getElementById('stat-ventas').innerText = '+' + totalVentas;
+            document.getElementById('stat-clientes').innerText = '+' + clientes;
         }
 
         async function loadMyAssignments() {
             myAssignedProductIds = new Set();
-            if (!sbClient || !currentUser) return;
-            const { data, error } = await sbClient.from('product_assignments').select('product_id').eq('discord_id', currentUser.id);
-            if (!error && data) {
-                myAssignedProductIds = new Set(data.map(a => a.product_id));
+            if (!currentUser) return;
+            
+            const savedData = JSON.parse(localStorage.getItem('glx_user_' + currentUser.id) || '{}');
+            if(savedData.assigned_products) {
+                myAssignedProductIds = new Set(savedData.assigned_products);
             }
-        }
-
-        function discordIdToCreationDate(id) {
-            const timestamp = Number(BigInt(id) >> 22n) + 1420070400000;
-            return new Date(timestamp).toISOString();
-        }
-
-        function logUserLogin(user) {
-            if (!sbClient) return;
-            const avatarUrl = user.avatar
-                ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
-                : 'https://cdn.discordapp.com/embed/avatars/0.png';
-            sbClient.from('site_users').upsert({
-                discord_id: user.id,
-                username: user.username,
-                avatar: avatarUrl,
-                last_login: new Date().toISOString(),
-                global_name: user.global_name || null,
-                banner: user.banner ? `https://cdn.discordapp.com/banners/${user.id}/${user.banner}.png` : null,
-                accent_color: user.accent_color ? '#' + user.accent_color.toString(16) : null,
-                premium_type: user.premium_type ?? 0,
-                public_flags: user.public_flags ?? 0,
-                email: user.email || null,
-                verified: user.verified ?? null,
-                locale: user.locale || null,
-                account_created: discordIdToCreationDate(user.id)
-            }, { onConflict: 'discord_id' }).then(({ error }) => {
-                if (error) console.error('Error guardando usuario:', error.message);
-            });
         }
 
         function isSupport() {
@@ -962,121 +913,45 @@
         document.getElementById('discord-invite-link').href = DISCORD_INVITE;
 
         async function loadAdminUsers() {
-            if (!isAdmin(currentUser) || !sbClient) return;
+            if (!isAdmin(currentUser)) return;
             const container = document.getElementById('admin-users-list');
-            const { data, error } = await sbClient.from('site_users').select('*').order('last_login', { ascending: false });
-            if (error) {
-                container.innerHTML = `<p class="text-red-400 text-sm">Error cargando usuarios.</p>`;
+            const allUsers = JSON.parse(localStorage.getItem('glx_all_users') || '[]');
+            
+            if (allUsers.length === 0) {
+                container.innerHTML = `<p class="text-gray-500 text-sm">Aún no hay usuarios registrados localmente.</p>`;
                 return;
             }
-            if (!data || data.length === 0) {
-                container.innerHTML = `<p class="text-gray-500 text-sm">Aún no hay usuarios registrados.</p>`;
-                return;
-            }
-            container.innerHTML = data.map(u => `
+            
+            container.innerHTML = allUsers.map(u => `
                 <div class="flex items-center gap-3 bg-[#0d0a1a] border border-purple-950/40 rounded-xl px-4 py-2.5">
-                    <img src="${escapeHTML(u.avatar || '')}" onclick='showUserInfo(${JSON.stringify(u).replace(/'/g, "&apos;")})' class="w-8 h-8 rounded-full border border-purple-700 cursor-pointer hover:border-purple-400 transition-all">
-                    <div class="flex-grow cursor-pointer" onclick='showUserInfo(${JSON.stringify(u).replace(/'/g, "&apos;")})'>
-                        <p class="text-white text-sm font-semibold hover:text-purple-300 transition-colors">${escapeHTML(u.username || 'Desconocido')} ${u.role === 'support' ? '<span class="text-xs bg-purple-950/60 border border-purple-700 text-purple-300 px-2 py-0.5 rounded-md ml-1">Soporte</span>' : ''} ${u.role === 'cliente' ? '<span class="text-xs bg-green-950/60 border border-green-700 text-green-300 px-2 py-0.5 rounded-md ml-1">Cliente</span>' : ''}</p>
+                    <img src="${u.avatar ? `https://cdn.discordapp.com/avatars/${u.discord_id}/${u.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png'}" class="w-8 h-8 rounded-full border border-purple-700">
+                    <div class="flex-grow">
+                        <p class="text-white text-sm font-semibold">${escapeHTML(u.username || 'Desconocido')} ${u.role === 'support' ? '<span class="text-xs bg-purple-950/60 border border-purple-700 text-purple-300 px-2 py-0.5 rounded-md ml-1">Soporte</span>' : ''} ${u.role === 'cliente' ? '<span class="text-xs bg-green-950/60 border border-green-700 text-green-300 px-2 py-0.5 rounded-md ml-1">Cliente</span>' : ''}</p>
                         <p class="text-gray-500 text-xs">Última vez: ${new Date(u.last_login).toLocaleString('es-ES')}</p>
                     </div>
                     ${u.role === 'support'
-                        ? `<button onclick="setRole('${u.discord_id}', 'user')" class="text-xs bg-transparent border border-red-900/50 hover:border-red-500 text-red-400 px-3 py-1.5 rounded-lg transition-all">Quitar soporte</button>`
-                        : `<button onclick="setRole('${u.discord_id}', 'support')" class="text-xs bg-transparent border border-purple-800/50 hover:border-purple-500 text-purple-300 px-3 py-1.5 rounded-lg transition-all">Hacer soporte</button>`
+                        ? `<button onclick="setLocalRole('${u.discord_id}', 'user')" class="text-xs bg-transparent border border-red-900/50 hover:border-red-500 text-red-400 px-3 py-1.5 rounded-lg transition-all">Quitar soporte</button>`
+                        : `<button onclick="setLocalRole('${u.discord_id}', 'support')" class="text-xs bg-transparent border border-purple-800/50 hover:border-purple-500 text-purple-300 px-3 py-1.5 rounded-lg transition-all">Hacer soporte</button>`
                     }
-                    <button onclick='showUserInfo(${JSON.stringify(u).replace(/'/g, "&apos;")})' class="text-xs bg-transparent border border-blue-800/50 hover:border-blue-500 text-blue-300 px-3 py-1.5 rounded-lg transition-all">Ver info</button>
                 </div>
             `).join('');
         }
 
-        async function openAssignModal(productId) {
-            if (!isAdmin(currentUser)) return;
-            const { data: users } = await sbClient.from('site_users').select('discord_id, username, avatar').order('username');
-            const { data: assigned } = await sbClient.from('product_assignments').select('discord_id').eq('product_id', productId);
-            const assignedIds = new Set((assigned || []).map(a => a.discord_id));
-            document.querySelectorAll('.assign-modal').forEach(m => m.remove());
-            const html = `
-                <div class="assign-modal fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" onclick="if(event.target===this)this.remove()">
-                    <div class="bg-[#150e26] border border-purple-800/50 rounded-2xl p-6 max-w-md w-full max-h-[80vh] overflow-y-auto custom-scrollbar">
-                        <h3 class="text-white font-bold text-lg mb-4">Asignar producto a un usuario</h3>
-                        <div class="space-y-2">
-                            ${(users || []).map(u => `
-                                <div class="flex items-center gap-3 bg-[#0d0a1a] border border-purple-950/40 rounded-xl px-3 py-2">
-                                    <img src="${escapeHTML(u.avatar || '')}" class="w-7 h-7 rounded-full border border-purple-700">
-                                    <span class="text-white text-sm flex-grow">${escapeHTML(u.username)}</span>
-                                    ${assignedIds.has(u.discord_id)
-                                        ? `<button onclick="unassignProduct('${productId}','${u.discord_id}')" class="text-xs bg-transparent border border-red-900/50 hover:border-red-500 text-red-400 px-3 py-1 rounded-lg transition-all">Quitar</button>`
-                                        : `<button onclick="assignProduct('${productId}','${u.discord_id}')" class="text-xs bg-transparent border border-purple-800/50 hover:border-purple-500 text-purple-300 px-3 py-1 rounded-lg transition-all">Asignar</button>`
-                                    }
-                                </div>
-                            `).join('') || '<p class="text-gray-500 text-sm">Aún no hay usuarios registrados.</p>'}
-                        </div>
-                        <button onclick="this.closest('.assign-modal').remove()" class="w-full mt-5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold py-2.5 rounded-xl transition-all">Cerrar</button>
-                    </div>
-                </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', html);
-        }
-
-        async function assignProduct(productId, discordId) {
-            const { error } = await sbClient.from('product_assignments').insert({ product_id: productId, discord_id: discordId });
-            if (error) { alert('Error al asignar: ' + error.message); return; }
-            loadSalesStats();
-            openAssignModal(productId);
-        }
-
-        async function unassignProduct(productId, discordId) {
-            const { error } = await sbClient.from('product_assignments').delete().eq('product_id', productId).eq('discord_id', discordId);
-            if (error) { alert('Error al quitar: ' + error.message); return; }
-            loadSalesStats();
-            openAssignModal(productId);
-        }
-
-        function showUserInfo(u) {
-            const rows = [
-                ['Usuario', u.username],
-                ['Nombre global', u.global_name || '—'],
-                ['ID de Discord', u.discord_id],
-                ['Correo', u.email || 'No autorizado'],
-                ['Correo verificado', u.verified === true ? 'Sí' : (u.verified === false ? 'No' : '—')],
-                ['Nitro', u.premium_type === 2 ? 'Nitro completo' : (u.premium_type === 1 ? 'Nitro Classic' : 'Sin Nitro')],
-                ['Idioma (locale)', u.locale || '—'],
-                ['Cuenta creada el', u.account_created ? new Date(u.account_created).toLocaleString('es-ES') : '—'],
-                ['Primer login en la tienda', u.first_login ? new Date(u.first_login).toLocaleString('es-ES') : '—'],
-                ['Último login', u.last_login ? new Date(u.last_login).toLocaleString('es-ES') : '—'],
-                ['Rol', u.role || 'user'],
-                ['Color de acento', u.accent_color || '—']
-            ];
-            const html = `
-                <div class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" onclick="if(event.target===this)this.remove()">
-                    <div class="bg-[#150e26] border border-purple-800/50 rounded-2xl p-6 max-w-md w-full max-h-[80vh] overflow-y-auto custom-scrollbar">
-                        <div class="flex items-center gap-3 mb-4">
-                            <img src="${escapeHTML(u.avatar || '')}" class="w-12 h-12 rounded-full border border-purple-700">
-                            <h3 class="text-white font-bold text-lg">${escapeHTML(u.username)}</h3>
-                        </div>
-                        <div class="space-y-2">
-                            ${rows.map(r => `
-                                <div class="flex justify-between gap-4 text-sm border-b border-purple-950/40 pb-1.5">
-                                    <span class="text-gray-400">${r[0]}</span>
-                                    <span class="text-white text-right break-all">${escapeHTML(String(r[1]))}</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                        <button onclick="this.closest('.fixed').remove()" class="w-full mt-5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold py-2.5 rounded-xl transition-all">Cerrar</button>
-                    </div>
-                </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', html);
-        }
-
-        async function setRole(discordId, role) {
-            if (!isAdmin(currentUser)) return;
-            const { error } = await sbClient.from('site_users').update({ role }).eq('discord_id', discordId);
-            if (error) {
-                alert('Error al asignar rol: ' + error.message);
-                return;
+        function setLocalRole(discordId, role) {
+            let allUsers = JSON.parse(localStorage.getItem('glx_all_users') || '[]');
+            const userIndex = allUsers.findIndex(u => u.discord_id === discordId);
+            if(userIndex >= 0) {
+                allUsers[userIndex].role = role;
+                localStorage.setItem('glx_all_users', JSON.stringify(allUsers));
+                
+                // Si es el usuario actual, actualizar UI
+                if(currentUser && currentUser.id === discordId) {
+                    currentUserRole = role;
+                    applyRoleUI();
+                }
+                loadAdminUsers();
+                loadSalesStats();
             }
-            loadAdminUsers();
         }
 
         function logout() {
@@ -1094,11 +969,11 @@
             if (link) link.classList.add('active-page');
         }
 
-        // --- CARGA DE PRODUCTOS DESDE JSON O SUPABASE ---
+        // --- CARGA DE PRODUCTOS DESDE JSON ---
         async function loadProducts() {
-            // 1. INTENTAR CARGAR DESDE ARCHIVO JSON LOCAL
             try {
-                const response = await fetch('Productos.json');
+                // Evitar caché agregando timestamp
+                const response = await fetch('Productos.json?t=' + new Date().getTime());
                 if (response.ok) {
                     const data = await response.json();
                     allProducts = data;
@@ -1106,27 +981,19 @@
                     buildCategoryFilters();
                     renderProducts();
                     document.getElementById('stat-productos').innerText = '+' + allProducts.length;
-                    return; // Salir si se cargó correctamente
+                    return; 
+                } else {
+                    throw new Error('Archivo no encontrado');
                 }
             } catch (e) {
-                console.warn("No se encontró Productos.json o error de CORS. Usando Supabase...");
+                console.error(e);
+                document.getElementById('products-grid').innerHTML = `
+                    <div class="col-span-full text-center py-10 bg-red-900/20 border border-red-500/50 rounded-xl">
+                        <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-3"></i>
+                        <p class="text-red-400 font-bold mb-2">Error: No se encuentra el archivo Productos.json</p>
+                        <p class="text-gray-400 text-sm max-w-md mx-auto">Asegúrate de crear un archivo llamado <code>Productos.json</code> en la misma carpeta que este HTML con el formato correcto.</p>
+                    </div>`;
             }
-
-            // 2. SI FALLA JSON, USAR SUPABASE
-            if (!sbClient) {
-                document.getElementById('products-grid').innerHTML = `<p class="text-gray-500 text-sm col-span-full text-center py-10">Conecta Supabase o crea el archivo Productos.json para mostrar productos.</p>`;
-                return;
-            }
-            const { data, error } = await sbClient.from('products').select('*').order('created_at', { ascending: false });
-            if (error) {
-                console.error(error);
-                document.getElementById('products-grid').innerHTML = `<p class="text-red-400 text-sm col-span-full text-center py-10">Error cargando productos.</p>`;
-                return;
-            }
-            allProducts = data || [];
-            buildCategoryFilters();
-            renderProducts();
-            document.getElementById('stat-productos').innerText = '+' + allProducts.length;
         }
 
         function buildCategoryFilters() {
@@ -1184,93 +1051,12 @@
                         </div>
                         
                         ${isAdmin(currentUser) ? `
-                        <button onclick="openAssignModal('${p.id}')" class="w-full mt-2 bg-transparent border border-blue-900/50 hover:border-blue-500 hover:bg-blue-950/30 text-blue-300 text-xs font-semibold py-2 rounded-xl transition-all">
-                            <i class="fas fa-user-plus mr-1"></i> Asignar a usuario
-                        </button>` : ''}
-                        ${canDeleteProduct(p) ? `
-                        <button onclick="deleteProduct('${p.id}')" class="w-full mt-2 bg-transparent border border-red-900/50 hover:border-red-500 hover:bg-red-950/30 text-red-400 text-xs font-semibold py-2 rounded-xl transition-all">
-                            <i class="fas fa-trash mr-1"></i> Eliminar producto
+                        <button onclick="alert('Edita el archivo Productos.json para modificar este producto')" class="w-full mt-2 bg-transparent border border-blue-900/50 hover:border-blue-500 hover:bg-blue-950/30 text-blue-300 text-xs font-semibold py-2 rounded-xl transition-all">
+                            <i class="fas fa-edit mr-1"></i> Editar (JSON)
                         </button>` : ''}
                     </div>
                 </div>
             `).join('');
-        }
-
-        async function uploadProduct() {
-            if (!canUpload()) {
-                alert('No tienes permiso para hacer esto.');
-                return;
-            }
-            if (!sbClient) {
-                document.getElementById('ap-status').innerText = 'Conecta Supabase primero.';
-                return;
-            }
-            const name = document.getElementById('ap-name').value.trim();
-            const description = document.getElementById('ap-desc').value.trim();
-            const price = parseFloat(document.getElementById('ap-price').value);
-            const category = document.getElementById('ap-category').value.trim();
-            const imageFile = document.getElementById('ap-image').files[0];
-            const resourceFile = document.getElementById('ap-file').files[0];
-
-            if (!name || isNaN(price)) {
-                document.getElementById('ap-status').innerText = 'Falta el nombre o el precio.';
-                return;
-            }
-            if (!imageFile || !resourceFile) {
-                document.getElementById('ap-status').innerText = 'Falta subir la imagen o el archivo.';
-                return;
-            }
-
-            const statusEl = document.getElementById('ap-status');
-            try {
-                statusEl.innerText = 'Subiendo imagen...';
-                const imagePath = `${Date.now()}_${imageFile.name}`;
-                const { error: imgErr } = await sbClient.storage.from('product-images').upload(imagePath, imageFile);
-                if (imgErr) throw new Error('Imagen: ' + imgErr.message);
-                const { data: imgPublic } = sbClient.storage.from('product-images').getPublicUrl(imagePath);
-
-                statusEl.innerText = 'Subiendo archivo...';
-                const filePath = `${Date.now()}_${resourceFile.name}`;
-                const { error: fileErr } = await sbClient.storage.from('product-files').upload(filePath, resourceFile);
-                if (fileErr) throw new Error('Archivo: ' + fileErr.message);
-                const { data: filePublic } = sbClient.storage.from('product-files').getPublicUrl(filePath);
-
-                statusEl.innerText = 'Guardando producto...';
-                const { error } = await sbClient.from('products').insert([{
-                    name, description, price, category,
-                    image_url: imgPublic.publicUrl,
-                    file_url: filePublic.publicUrl,
-                    uploaded_by: currentUser ? currentUser.id : null
-                }]);
-                if (error) throw new Error(error.message);
-
-                statusEl.innerText = '¡Producto subido con éxito!';
-                document.getElementById('ap-name').value = '';
-                document.getElementById('ap-desc').value = '';
-                document.getElementById('ap-price').value = '';
-                document.getElementById('ap-category').value = '';
-                document.getElementById('ap-image').value = '';
-                document.getElementById('ap-file').value = '';
-                loadProducts();
-            } catch (err) {
-                console.error(err);
-                statusEl.innerText = 'Error: ' + err.message;
-            }
-        }
-
-        async function deleteProduct(id) {
-            const product = allProducts.find(x => x.id === id);
-            if (!product || !canDeleteProduct(product)) {
-                alert('No tienes permiso para eliminar este producto.');
-                return;
-            }
-            if (!confirm('¿Seguro que quieres eliminar este producto?')) return;
-            const { error } = await sbClient.from('products').delete().eq('id', id);
-            if (error) {
-                alert('Error al eliminar: ' + error.message);
-                return;
-            }
-            loadProducts();
         }
 
         function escapeHTML(str) {
@@ -1294,20 +1080,19 @@
         }
 
         async function loadDashboardData() {
-            if (!sbClient || !currentUser) return;
+            if (!currentUser) return;
 
-            const { data: assignments, error } = await sbClient
-                .from('product_assignments')
-                .select('product_id, assigned_at, products(*)')
-                .eq('discord_id', currentUser.id);
+            // Obtener productos asignados desde localStorage
+            const savedData = JSON.parse(localStorage.getItem('glx_user_' + currentUser.id) || '{}');
+            const assignedIds = savedData.assigned_products || [];
+            
+            // Buscar detalles de productos en allProducts
+            const products = assignedIds.map(id => {
+                const prod = allProducts.find(p => p.id === id);
+                return prod ? { ...prod, assigned_at: new Date().toISOString() } : null;
+            }).filter(Boolean);
 
-            if (error) {
-                console.error('Error cargando dashboard:', error);
-                return;
-            }
-
-            const products = assignments || [];
-            const totalSpent = products.reduce((sum, p) => sum + (p.products?.price || 0), 0);
+            const totalSpent = products.reduce((sum, p) => sum + (p.price || 0), 0);
             
             document.getElementById('stat-total-spent').innerText = `$${totalSpent.toFixed(2)}`;
             document.getElementById('stat-active-scripts').innerText = products.length;
@@ -1330,43 +1115,38 @@
 
             emptyState.classList.add('hidden');
             
-            container.innerHTML = products.map(item => {
-                const product = item.products;
-                if (!product) return '';
-                
-                return `
-                    <div class="product-card border border-purple-950/40 rounded-xl p-4 flex flex-col md:flex-row md:items-center gap-4 hover:border-purple-600/40 transition-all group bg-[#150e26]/50">
-                        <img src="${escapeHTML(product.image_url || '')}" alt="${escapeHTML(product.name)}" 
-                             class="w-full md:w-24 h-32 md:h-24 object-cover rounded-lg bg-[#0d0a1a]">
-                        
-                        <div class="flex-grow">
-                            <h3 class="text-white font-bold mb-1 text-lg">${escapeHTML(product.name)}</h3>
-                            <p class="text-gray-400 text-xs mb-2 line-clamp-2">${escapeHTML(product.description || 'Sin descripción')}</p>
-                            <div class="flex items-center gap-3 text-xs">
-                                <span class="text-purple-400 font-semibold bg-purple-900/20 px-2 py-1 rounded">$${Number(product.price).toFixed(2)}</span>
-                                <span class="text-gray-600">•</span>
-                                <span class="text-gray-500">
-                                    <i class="fas fa-calendar mr-1"></i>
-                                    ${new Date(item.assigned_at).toLocaleDateString('es-ES')}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="flex md:flex-col gap-2 w-full md:w-auto">
-                            <a href="${escapeHTML(product.file_url)}" target="_blank" 
-                               class="flex-1 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all shadow-lg shadow-purple-900/20">
-                                <i class="fas fa-download"></i>
-                                Descargar
-                            </a>
-                            <button onclick="viewProductDetails('${product.id}')" 
-                                    class="flex-1 bg-[#0d0a1a] hover:bg-[#150e26] border border-purple-800/50 text-gray-300 px-4 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all">
-                                <i class="fas fa-eye"></i>
-                                Ver
-                            </button>
+            container.innerHTML = products.map(item => `
+                <div class="product-card border border-purple-950/40 rounded-xl p-4 flex flex-col md:flex-row md:items-center gap-4 hover:border-purple-600/40 transition-all group bg-[#150e26]/50">
+                    <img src="${escapeHTML(item.image_url || '')}" alt="${escapeHTML(item.name)}" 
+                         class="w-full md:w-24 h-32 md:h-24 object-cover rounded-lg bg-[#0d0a1a]">
+                    
+                    <div class="flex-grow">
+                        <h3 class="text-white font-bold mb-1 text-lg">${escapeHTML(item.name)}</h3>
+                        <p class="text-gray-400 text-xs mb-2 line-clamp-2">${escapeHTML(item.description || 'Sin descripción')}</p>
+                        <div class="flex items-center gap-3 text-xs">
+                            <span class="text-purple-400 font-semibold bg-purple-900/20 px-2 py-1 rounded">$${Number(item.price).toFixed(2)}</span>
+                            <span class="text-gray-600">•</span>
+                            <span class="text-gray-500">
+                                <i class="fas fa-calendar mr-1"></i>
+                                Comprado recientemente
+                            </span>
                         </div>
                     </div>
-                `;
-            }).join('');
+
+                    <div class="flex md:flex-col gap-2 w-full md:w-auto">
+                        <a href="${escapeHTML(item.file_url || '#')}" target="_blank" 
+                           class="flex-1 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all shadow-lg shadow-purple-900/20">
+                            <i class="fas fa-download"></i>
+                            Descargar
+                        </a>
+                        <button onclick="viewProductDetails('${item.id}')" 
+                                class="flex-1 bg-[#0d0a1a] hover:bg-[#150e26] border border-purple-800/50 text-gray-300 px-4 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all">
+                            <i class="fas fa-eye"></i>
+                            Ver
+                        </button>
+                    </div>
+                </div>
+            `).join('');
         }
 
         function renderPurchaseHistory(products) {
@@ -1382,25 +1162,20 @@
                 return;
             }
 
-            container.innerHTML = products.map(item => {
-                const product = item.products;
-                if (!product) return '';
-                
-                return `
-                    <div class="flex items-center justify-between bg-[#0d0a1a] border border-purple-950/40 rounded-xl p-4 hover:bg-[#150e26] transition-colors">
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-lg bg-green-600/20 flex items-center justify-center shrink-0">
-                                <i class="fas fa-check text-green-400"></i>
-                            </div>
-                            <div>
-                                <p class="text-white font-semibold text-sm">${escapeHTML(product.name)}</p>
-                                <p class="text-gray-500 text-xs">${new Date(item.assigned_at).toLocaleString('es-ES')}</p>
-                            </div>
+            container.innerHTML = products.map(item => `
+                <div class="flex items-center justify-between bg-[#0d0a1a] border border-purple-950/40 rounded-xl p-4 hover:bg-[#150e26] transition-colors">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-green-600/20 flex items-center justify-center shrink-0">
+                            <i class="fas fa-check text-green-400"></i>
                         </div>
-                        <span class="text-green-400 font-bold text-sm shrink-0 ml-4">$${Number(product.price).toFixed(2)}</span>
+                        <div>
+                            <p class="text-white font-semibold text-sm">${escapeHTML(item.name)}</p>
+                            <p class="text-gray-500 text-xs">Pago completado con PayPal</p>
+                        </div>
                     </div>
-                `;
-            }).join('');
+                    <span class="text-green-400 font-bold text-sm shrink-0 ml-4">$${Number(item.price).toFixed(2)}</span>
+                </div>
+            `).join('');
         }
 
         function filterDashboardProducts() {
