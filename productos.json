@@ -1,0 +1,18 @@
+[
+    {
+        "id": "prod_001",
+        "name": "Sistema de Concesionario V2",
+        "price": 15.00,
+        "category": "Scripts",
+        "description": "Sistema completo para vender autos.",
+        "image_url": "https://via.placeholder.com/400x300"
+    },
+    {
+        "id": "prod_002",
+        "name": "Pack de Mappings HQ",
+        "price": 8.50,
+        "category": "Mappings",
+        "description": "Colección de mapas de alta calidad.",
+        "image_url": "https://via.placeholder.com/400x300"
+    }
+]
