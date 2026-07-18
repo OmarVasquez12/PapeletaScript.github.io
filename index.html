@@ -8,14 +8,23 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- PAYPAL SDK: Reemplaza 'sb' o 'test' con tu CLIENT ID real de PayPal Developer -->
-    <script src="https://www.paypal.com/sdk/js?client-id=test&currency=USD"></script>
+    <!-- SDK de Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- SDK de PayPal -->
+    <script src="https://www.paypal.com/sdk/js?client-id=sb&currency=USD"></script>
 
     <style>
-        body { background-color: #0a0714; color: #f3f4f6; font-family: 'Segoe UI', system-ui, sans-serif; }
-        .purple-glow { text-shadow: 0 0 18px rgba(168, 85, 247, 0.85), 0 0 36px rgba(147, 51, 234, 0.4); }
-        .purple-border { border-color: rgba(168, 85, 247, 0.25); }
+        body {
+            background-color: #0a0714;
+            color: #f3f4f6;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        .purple-glow {
+            text-shadow: 0 0 18px rgba(168, 85, 247, 0.85), 0 0 36px rgba(147, 51, 234, 0.4);
+        }
+        .purple-border {
+            border-color: rgba(168, 85, 247, 0.25);
+        }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #150e26; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #4c1d95; border-radius: 3px; }
@@ -26,12 +35,30 @@
         .nav-link.active-page { color: #c084fc; }
         
         .cart-badge {
-            position: absolute; top: -8px; right: -8px; background: #ef4444; color: white;
-            border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center;
-            justify-content: center; font-size: 11px; font-weight: bold; animation: bounce 0.3s ease;
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            animation: bounce 0.3s ease;
         }
-        @keyframes bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
-        .product-detail-modal { backdrop-filter: blur(10px); }
+        
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .product-detail-modal {
+            backdrop-filter: blur(10px);
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-gradient-to-b from-[#150e26] to-[#0a0714] relative">
@@ -41,14 +68,19 @@
     <!-- LOGIN MODAL -->
     <div id="login-modal" class="hidden fixed inset-0 bg-black/80 z-[60] flex items-center justify-center px-4 backdrop-blur-sm transition-opacity duration-300">
         <div class="max-w-md w-full bg-[#150e26] border purple-border rounded-2xl p-8 text-center shadow-[0_0_40px_rgba(168,85,247,0.2)] relative transform transition-all scale-100">
-            <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"><i class="fas fa-times text-xl"></i></button>
+            <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+            
             <div class="mx-auto w-20 h-20 rounded-xl mb-6 shadow-lg border-2 border-purple-600 bg-gradient-to-br from-purple-500 to-purple-800 flex items-center justify-center text-3xl font-black">G</div>
             <h1 class="text-3xl font-black text-white mb-2 tracking-wide uppercase">GLX <span class="text-purple-400 purple-glow">STORE</span></h1>
-            <p class="text-gray-400 text-sm mb-8">Debes iniciar sesión para realizar compras.</p>
+            <p class="text-gray-400 text-sm mb-8">Debes iniciar sesión para realizar compras y descargar archivos.</p>
+
             <button onclick="redirectToDiscord()" class="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-3.5 px-6 rounded-xl flex items-center justify-center gap-3 transition-all duration-200 shadow-lg transform hover:scale-[1.02]">
-                <i class="fab fa-discord text-xl"></i> Iniciar Sesión con Discord
+                <i class="fab fa-discord text-xl"></i>
+                Iniciar Sesión con Discord
             </button>
-            <p class="text-xs text-gray-500 mt-2 break-all">URL: <span id="debug-url"></span></p>
+            <p class="text-gray-500 text-xs mt-4">Tus datos están seguros. Solo usamos tu ID para asignarte los productos.</p>
         </div>
     </div>
 
@@ -56,15 +88,25 @@
     <div id="cart-modal" class="hidden fixed inset-0 bg-black/80 z-[80] flex items-end md:items-center justify-center backdrop-blur-sm">
         <div class="bg-[#150e26] w-full md:w-[480px] md:rounded-2xl rounded-t-2xl border border-purple-900/50 shadow-2xl flex flex-col max-h-[90vh]">
             <div class="bg-blue-600 px-6 py-4 rounded-t-2xl flex justify-between items-center shrink-0">
-                <div class="flex items-center gap-3"><i class="fas fa-shopping-bag text-white text-xl"></i><h2 class="text-white font-bold text-lg">Mi Carrito</h2></div>
-                <button onclick="closeCartModal()" class="text-white/80 hover:text-white w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center transition-all"><i class="fas fa-times"></i></button>
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-shopping-bag text-white text-xl"></i>
+                    <h2 class="text-white font-bold text-lg">Mi Carrito</h2>
+                </div>
+                <button onclick="closeCartModal()" class="text-white/80 hover:text-white w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center transition-all">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
 
             <div class="flex-grow overflow-y-auto custom-scrollbar p-4">
-                <div id="cart-items" class="space-y-3"></div>
+                <div id="cart-items" class="space-y-3">
+                </div>
+                
                 <div id="cart-empty" class="hidden text-center py-12">
-                    <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-[#0d0a1a] flex items-center justify-center"><i class="fas fa-shopping-cart text-gray-600 text-3xl"></i></div>
+                    <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-[#0d0a1a] flex items-center justify-center">
+                        <i class="fas fa-shopping-cart text-gray-600 text-3xl"></i>
+                    </div>
                     <p class="text-gray-400 mb-2">Tu carrito está vacío</p>
+                    <p class="text-gray-500 text-sm">Agrega productos para comenzar</p>
                 </div>
             </div>
             
@@ -73,8 +115,14 @@
                     <span class="text-gray-400 text-sm">Total a pagar:</span>
                     <span id="cart-total" class="text-2xl font-black text-white">$0.00</span>
                 </div>
-                <!-- Contenedor Botón PayPal -->
-                <div id="paypal-button-container" class="w-full min-h-[45px]"></div>
+                
+                <!-- PAYPAL BUTTON CONTAINER -->
+                <div id="paypal-button-container" class="mt-2"></div>
+                
+                <button id="manual-checkout-btn" onclick="checkoutManual()" class="w-full hidden bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-purple-900/30">
+                    <i class="fas fa-credit-card"></i>
+                    Pagar Manualmente (Discord)
+                </button>
             </div>
         </div>
     </div>
@@ -83,28 +131,68 @@
     <div id="product-detail-modal" class="hidden fixed inset-0 bg-black/90 z-[90] overflow-y-auto product-detail-modal">
         <div class="min-h-screen px-4 py-8">
             <div class="max-w-6xl mx-auto">
-                <button onclick="closeProductDetailModal()" class="mb-6 text-gray-400 hover:text-white flex items-center gap-2 transition-colors"><i class="fas fa-arrow-left"></i> Volver</button>
+                <button onclick="closeProductDetailModal()" class="mb-6 text-gray-400 hover:text-white flex items-center gap-2 transition-colors">
+                    <i class="fas fa-arrow-left"></i>
+                    Volver a la Tienda
+                </button>
+
                 <div class="grid md:grid-cols-2 gap-8 mb-8">
                     <div class="bg-[#150e26] border border-purple-900/50 rounded-2xl p-6 relative overflow-hidden">
-                        <img id="detail-image" src="" alt="Producto" class="w-full h-64 object-contain rounded-xl bg-gradient-to-br from-blue-900/30 to-purple-900/30 p-8">
+                        <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-blue-600/20 to-transparent"></div>
+                        <div class="relative z-10">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="flex gap-2">
+                                    <span class="bg-blue-600/20 text-blue-400 border border-blue-600/50 px-3 py-1 rounded-full text-xs font-semibold">BUNDLE</span>
+                                    <span class="bg-purple-600/20 text-purple-400 border border-purple-600/50 px-3 py-1 rounded-full text-xs font-semibold">ENTREGA INSTANTÁNEA</span>
+                                </div>
+                            </div>
+                            <img id="detail-image" src="" alt="Producto" class="w-full h-64 object-contain rounded-xl bg-gradient-to-br from-blue-900/30 to-purple-900/30 p-8">
+                            <div class="mt-4 flex justify-center">
+                                <button class="border border-blue-600/50 text-blue-400 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-600/10 transition-all">
+                                    <i class="fas fa-image mr-2"></i>IMAGEN
+                                </button>
+                            </div>
+                        </div>
                     </div>
+
                     <div class="space-y-6">
                         <div>
                             <h1 id="detail-title" class="text-4xl md:text-5xl font-black text-white mb-4"></h1>
                             <div class="flex items-baseline gap-4 mb-4">
                                 <span id="detail-price" class="text-5xl font-black text-white"></span>
+                                <div class="text-gray-400 text-sm max-w-xs">
+                                    <p>Pago único, acceso de por vida</p>
+                                    <p class="text-xs text-gray-500">(+ comisión PayPal calc. en botón de pago)</p>
+                                </div>
                             </div>
                         </div>
+
                         <div class="space-y-3">
                             <button id="detail-buy-btn" onclick="buyFromDetail()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 transition-all shadow-lg shadow-blue-900/30 text-lg">
-                                <i class="fab fa-discord text-xl"></i> Añadir al Carrito
+                                <i class="fab fa-discord text-xl"></i>
+                                Iniciar Sesión para Comprar
+                            </button>
+                            <button onclick="closeProductDetailModal()" class="w-full bg-[#150e26] border border-purple-900/50 hover:border-purple-600/50 text-gray-300 font-semibold py-4 rounded-xl transition-all">
+                                Volver a la Tienda
                             </button>
                         </div>
                     </div>
                 </div>
+
                 <div class="bg-[#150e26] border border-purple-900/50 rounded-2xl p-6 md:p-8">
-                    <h2 class="text-2xl font-bold text-white mb-4">Descripción</h2>
-                    <div id="detail-description" class="text-gray-300 space-y-4 leading-relaxed"></div>
+                    <div class="flex items-center gap-3 mb-6">
+                        <i class="fas fa-list-ul text-blue-500 text-2xl"></i>
+                        <h2 class="text-2xl font-bold text-white">Descripción del Producto</h2>
+                    </div>
+                    
+                    <div id="detail-description" class="text-gray-300 space-y-4 leading-relaxed">
+                    </div>
+
+                    <div class="mt-8 pt-8 border-t border-purple-900/50">
+                        <h3 class="text-xl font-bold text-white mb-4">Incluye:</h3>
+                        <div id="detail-features" class="grid md:grid-cols-2 gap-3">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -115,16 +203,117 @@
         <div class="min-h-screen px-4 py-8 max-w-7xl mx-auto">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
                 <div>
-                    <h1 class="text-3xl md:text-4xl font-black text-white mb-2">Bienvenido, <span id="dashboard-username" class="text-purple-400">usuario</span></h1>
-                    <p class="text-gray-400 text-sm">Tus productos comprados</p>
+                    <h1 class="text-3xl md:text-4xl font-black text-white mb-2">
+                        Bienvenido, <span id="dashboard-username" class="text-purple-400">usuario</span>
+                    </h1>
+                    <p class="text-gray-400 text-sm">Gestiona tus productos y licencias desde aquí</p>
                 </div>
                 <button onclick="closeUserDashboard()" class="bg-[#150e26] hover:bg-[#1a1430] border border-purple-800/50 text-white px-6 py-3 rounded-xl flex items-center gap-2 transition-all group">
-                    <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i> Volver
+                    <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
+                    Volver a la tienda
                 </button>
             </div>
-            <div id="dashboard-products-list" class="space-y-3 min-h-[200px]"></div>
-            <div id="dashboard-empty-state" class="hidden text-center py-12 border-2 border-dashed border-purple-950/40 rounded-xl mt-4">
-                <p class="text-gray-400 mb-4">No has comprado nada aún.</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+                <div class="bg-[#150e26]/80 border border-purple-950/40 rounded-2xl p-6 backdrop-blur relative overflow-hidden group">
+                    <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <i class="fas fa-wallet text-6xl text-blue-400"></i>
+                    </div>
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-lg bg-blue-600/20 flex items-center justify-center">
+                            <i class="fas fa-wallet text-blue-400"></i>
+                        </div>
+                        <span class="text-gray-400 text-xs uppercase font-semibold tracking-wider">Total Invertido</span>
+                    </div>
+                    <p id="stat-total-spent" class="text-2xl font-black text-white">$0.00</p>
+                </div>
+
+                <div class="bg-[#150e26]/80 border border-purple-950/40 rounded-2xl p-6 backdrop-blur relative overflow-hidden group">
+                    <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <i class="fas fa-box-open text-6xl text-green-400"></i>
+                    </div>
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-lg bg-green-600/20 flex items-center justify-center">
+                            <i class="fas fa-box-open text-green-400"></i>
+                        </div>
+                        <span class="text-gray-400 text-xs uppercase font-semibold tracking-wider">Scripts Activos</span>
+                    </div>
+                    <p id="stat-active-scripts" class="text-2xl font-black text-white">0</p>
+                </div>
+
+                <div class="bg-[#150e26]/80 border border-purple-950/40 rounded-2xl p-6 backdrop-blur relative overflow-hidden group">
+                    <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <i class="fas fa-download text-6xl text-purple-400"></i>
+                    </div>
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-lg bg-purple-600/20 flex items-center justify-center">
+                            <i class="fas fa-download text-purple-400"></i>
+                        </div>
+                        <span class="text-gray-400 text-xs uppercase font-semibold tracking-wider">Total Descargas</span>
+                    </div>
+                    <p id="stat-total-downloads" class="text-2xl font-black text-white">0</p>
+                </div>
+
+                <div class="bg-[#150e26]/80 border border-purple-950/40 rounded-2xl p-6 backdrop-blur relative overflow-hidden group">
+                    <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <i class="fas fa-key text-6xl text-yellow-400"></i>
+                    </div>
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-lg bg-yellow-600/20 flex items-center justify-center">
+                            <i class="fas fa-key text-yellow-400"></i>
+                        </div>
+                        <span class="text-gray-400 text-xs uppercase font-semibold tracking-wider">Licencias</span>
+                    </div>
+                    <p id="stat-total-licenses" class="text-2xl font-black text-white">0</p>
+                </div>
+            </div>
+
+            <div class="bg-[#150e26]/80 border border-purple-950/40 rounded-2xl p-6 backdrop-blur mb-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-8 h-8 rounded-lg bg-purple-600/20 flex items-center justify-center">
+                        <i class="fas fa-cube text-purple-400"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-white">Mis Productos Activos</h2>
+                </div>
+
+                <div class="mb-6">
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                        <input 
+                            type="text" 
+                            id="dashboard-search"
+                            oninput="filterDashboardProducts()"
+                            placeholder="Buscar entre tus recursos..." 
+                            class="w-full bg-[#0d0a1a] border border-purple-950/40 rounded-xl pl-12 pr-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-all"
+                        >
+                    </div>
+                </div>
+
+                <div id="dashboard-products-list" class="space-y-3 min-h-[200px]">
+                </div>
+
+                <div id="dashboard-empty-state" class="hidden text-center py-12 border-2 border-dashed border-purple-950/40 rounded-xl mt-4">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-[#0d0a1a] flex items-center justify-center">
+                        <i class="fas fa-search text-gray-600 text-2xl"></i>
+                    </div>
+                    <p class="text-gray-400 mb-4">No tienes productos activos.</p>
+                    <button onclick="closeUserDashboard(); showPage('productos');" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-lg transition-all">
+                        Ir a la tienda
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-[#150e26]/80 border border-purple-950/40 rounded-2xl p-6 backdrop-blur">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-8 h-8 rounded-lg bg-green-600/20 flex items-center justify-center">
+                        <i class="fas fa-history text-green-400"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-white">Historial de Compras</h2>
+                </div>
+
+                <div id="dashboard-purchase-history" class="space-y-3">
+
+                </div>
             </div>
         </div>
     </div>
@@ -132,25 +321,36 @@
     <!-- MAIN CONTENT -->
     <div id="main-content" class="relative z-10 flex-grow flex flex-col">
         <header class="bg-[#0d0a1a]/90 backdrop-blur border-b purple-border sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-3 cursor-pointer" onclick="location.reload()">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="location.reload()" title="Actualizar página">
                 <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-500 to-purple-800 flex items-center justify-center font-black">G</div>
                 <span class="text-white font-black tracking-widest text-lg">GLX <span class="text-purple-400">STORE</span></span>
             </div>
+
             <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-gray-300">
                 <a href="#" onclick="showPage('inicio')" data-page="inicio" class="nav-link hover:text-purple-400 transition-colors">Inicio</a>
                 <a href="#" onclick="showPage('productos')" data-page="productos" class="nav-link hover:text-purple-400 transition-colors">Productos</a>
+                <a href="#" onclick="showPage('preguntas')" data-page="preguntas" class="nav-link hover:text-purple-400 transition-colors">Preguntas</a>
+                <a href="#" onclick="showPage('admin'); loadAdminUsers();" data-page="admin" id="nav-admin" class="nav-link hover:text-purple-400 transition-colors hidden">Admin</a>
             </nav>
+
             <div class="flex items-center gap-3">
                 <button onclick="openCartModal()" class="relative bg-[#150e26] hover:bg-[#1a1430] border border-purple-900/50 w-10 h-10 rounded-full flex items-center justify-center transition-all group">
                     <i class="fas fa-shopping-cart text-gray-300 group-hover:text-white transition-colors"></i>
                     <span id="cart-count" class="cart-badge hidden">0</span>
                 </button>
+                
                 <button id="login-btn" onclick="openLoginModal()" class="bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-2 px-5 rounded-lg flex items-center gap-2 transition-all text-sm shadow-lg shadow-blue-900/20">
-                    <i class="fab fa-discord"></i> Acceder
+                    <i class="fab fa-discord"></i>
+                    Acceder
                 </button>
+                
                 <div id="user-section" class="hidden flex items-center gap-3 bg-[#150e26] px-3 py-1.5 rounded-full border border-purple-900/50 cursor-pointer hover:border-purple-600 transition-all group" onclick="openUserDashboard()">
-                    <img id="user-avatar" src="" alt="Avatar" class="w-8 h-8 rounded-full border border-purple-500">
-                    <span id="user-name" class="text-white font-semibold text-sm pr-2">...</span>
+                    <img id="user-avatar" src="" alt="Avatar" class="w-8 h-8 rounded-full border border-purple-500 group-hover:border-purple-400 transition-colors">
+                    <div class="flex flex-col items-start leading-none">
+                        <span id="user-name" class="text-white font-semibold text-sm pr-2 group-hover:text-purple-300 transition-colors">...</span>
+                        <span id="user-role-badge" class="text-[10px] text-purple-400 font-bold uppercase tracking-wider">Usuario</span>
+                    </div>
+                    <i class="fas fa-external-link-alt text-gray-500 text-xs group-hover:text-purple-400 transition-colors"></i>
                 </div>
             </div>
         </header>
@@ -159,19 +359,112 @@
             <div class="grid md:grid-cols-2 gap-10 items-center">
                 <div>
                     <h2 class="text-4xl md:text-5xl font-black text-white uppercase tracking-tight mb-4">GLX <span class="text-purple-400 purple-glow">STORE</span></h2>
-                    <p class="text-gray-300 text-sm md:text-base mb-8">Recursos premium para MTA:SA. Scripts, mappings y más.</p>
-                    <button onclick="showPage('productos')" class="bg-purple-600 hover:bg-purple-700 text-white font-black px-8 py-4 rounded-xl shadow-lg shadow-purple-600/20 transition-all transform hover:scale-[1.02]">
-                        Ver Recursos <i class="fas fa-arrow-right text-xs"></i>
-                    </button>
+                    <p class="text-gray-300 text-sm md:text-base mb-8">GLX Store es una tienda de scripts, modelajes, mappings, sitios web y bots de Discord para MTA:SA. Todo hecho a la medida para tu servidor.</p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button onclick="showPage('productos')" class="bg-purple-600 hover:bg-purple-700 text-white font-black px-8 py-4 rounded-xl shadow-lg shadow-purple-600/20 transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2 uppercase tracking-wider">
+                            Ver Recursos <i class="fas fa-arrow-right text-xs"></i>
+                        </button>
+                        <a href="#" id="discord-invite-link" target="_blank" class="bg-[#150e26] border border-purple-800/40 hover:border-purple-500 text-white font-bold px-8 py-4 rounded-xl transition-all flex items-center justify-center gap-2">
+                            <i class="fab fa-discord"></i> Discord
+                        </a>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-10">
+                        <div class="bg-[#150e26] border border-purple-950/40 rounded-2xl p-4 text-center">
+                            <i class="fas fa-user-check text-purple-400 text-xl mb-2"></i>
+                            <p id="stat-usuarios" class="text-2xl font-black text-white">+0</p>
+                            <p class="text-xs text-gray-400 uppercase">Usuarios Registrados</p>
+                        </div>
+                        <div class="bg-[#150e26] border border-purple-950/40 rounded-2xl p-4 text-center">
+                            <i class="fas fa-users text-purple-400 text-xl mb-2"></i>
+                            <p id="stat-clientes" class="text-2xl font-black text-white">+0</p>
+                            <p class="text-xs text-gray-400 uppercase">Clientes</p>
+                        </div>
+                        <div class="bg-[#150e26] border border-purple-950/40 rounded-2xl p-4 text-center">
+                            <i class="fas fa-box text-purple-400 text-xl mb-2"></i>
+                            <p id="stat-productos" class="text-2xl font-black text-white">+0</p>
+                            <p class="text-xs text-gray-400 uppercase">Productos</p>
+                        </div>
+                        <div class="bg-[#150e26] border border-purple-950/40 rounded-2xl p-4 text-center">
+                            <i class="fas fa-shopping-cart text-purple-400 text-xl mb-2"></i>
+                            <p id="stat-ventas" class="text-2xl font-black text-white">+0</p>
+                            <p class="text-xs text-gray-400 uppercase">Ventas</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="hidden md:flex justify-center">
+                    <div class="w-64 h-64 rounded-3xl bg-gradient-to-br from-purple-500 to-purple-900 flex items-center justify-center text-9xl font-black shadow-2xl shadow-purple-600/30">G</div>
                 </div>
             </div>
         </section>
 
         <section id="page-productos" class="page max-w-6xl w-full mx-auto px-6 py-12">
-            <h2 class="text-3xl md:text-4xl font-black text-white uppercase tracking-tight mb-8">Productos <span class="text-purple-400">Premium</span></h2>
-            <input id="search-input" oninput="renderProducts()" type="text" placeholder="Buscar productos..." class="w-full bg-[#150e26] border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 mb-8 focus:outline-none focus:border-purple-500">
+            <h2 class="text-3xl md:text-4xl font-black text-white uppercase tracking-tight mb-2 text-center md:text-left">Productos <span class="text-purple-400">Premium</span></h2>
+            <p class="text-gray-400 text-sm mb-8 text-center md:text-left">Descubre nuestra selección de productos de alta calidad para tu servidor.</p>
+
+            <div class="flex flex-col md:flex-row gap-3 mb-6">
+                <div id="category-filters" class="flex flex-wrap gap-2">
+                    <button onclick="filterCategory('all')" class="cat-btn bg-purple-600 text-white text-sm font-semibold px-4 py-2 rounded-full" data-cat="all">
+                        <i class="fas fa-th-large mr-1"></i> Todas las Categorías
+                    </button>
+                </div>
+            </div>
+
+            <input id="search-input" oninput="renderProducts()" type="text" placeholder="Pesquisar productos..." class="w-full bg-[#150e26] border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 mb-8 focus:outline-none focus:border-purple-500">
+
             <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <p class="text-gray-500 text-sm col-span-full text-center py-10">Cargando productos...</p>
+                <p class="text-gray-500 text-sm col-span-full text-center py-10"><i class="fas fa-spinner animate-spin text-purple-500 mr-2"></i>Cargando productos...</p>
+            </div>
+        </section>
+
+        <section id="page-preguntas" class="page max-w-4xl w-full mx-auto px-6 py-12">
+            <h2 class="text-3xl md:text-4xl font-black text-white uppercase tracking-tight mb-8 text-center md:text-left">Preguntas <span class="text-purple-400">Frecuentes</span></h2>
+            <div class="space-y-4">
+                <div class="bg-[#150e26] border border-purple-950/40 rounded-2xl p-5">
+                    <h3 class="text-white font-bold mb-2"><i class="fas fa-circle-question text-purple-400 mr-2"></i>¿Cómo compro un producto?</h3>
+                    <p class="text-gray-400 text-sm">Agrega productos al carrito y completa tu pago de forma segura con PayPal. Una vez confirmado, recibirás acceso inmediato y el rol de Cliente.</p>
+                </div>
+                <div class="bg-[#150e26] border border-purple-950/40 rounded-2xl p-5">
+                    <h3 class="text-white font-bold mb-2"><i class="fas fa-circle-question text-purple-400 mr-2"></i>¿Recibo soporte tras la compra?</h3>
+                    <p class="text-gray-400 text-sm">Sí, todos los productos incluyen soporte de instalación a través de nuestro Discord.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="page-admin" class="page max-w-3xl w-full mx-auto px-6 py-12">
+            <h2 class="text-3xl font-black text-white uppercase tracking-tight mb-8 flex items-center gap-3">
+                <i class="fas fa-user-shield text-purple-400"></i> Panel de Admin
+            </h2>
+
+            <div id="admin-upload-section" class="bg-[#150e26] border border-purple-950/40 rounded-2xl p-6 mb-6">
+                <h3 class="text-white font-bold mb-4">Subir nuevo producto</h3>
+                <div class="grid gap-4">
+                    <input id="ap-name" type="text" placeholder="Nombre del producto (ej: ZW_ID)" class="bg-[#0d0a1a] border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500">
+                    <textarea id="ap-desc" placeholder="Descripción" rows="3" class="bg-[#0d0a1a] border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500"></textarea>
+                    <div class="grid grid-cols-2 gap-4">
+                        <input id="ap-price" type="number" step="0.01" placeholder="Precio (ej: 4.99)" class="bg-[#0d0a1a] border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500">
+                        <input id="ap-category" type="text" placeholder="Categoría (ej: Scripts)" class="bg-[#0d0a1a] border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500">
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-400 mb-1 block">Imagen de portada</label>
+                        <input id="ap-image" type="file" accept="image/*" class="w-full bg-[#0d0a1a] border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-purple-600 file:text-white file:text-xs file:font-semibold focus:outline-none focus:border-purple-500">
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-400 mb-1 block">Archivo del recurso (.rar, .zip, etc.)</label>
+                        <input id="ap-file" type="file" accept=".rar,.zip,.7z" class="w-full bg-[#0d0a1a] border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-purple-600 file:text-white file:text-xs file:font-semibold focus:outline-none focus:border-purple-500">
+                    </div>
+                    <button onclick="uploadProduct()" class="bg-purple-600 hover:bg-purple-700 text-white font-black py-3 rounded-xl uppercase tracking-wider transition-all">
+                        <i class="fas fa-upload mr-2"></i>Subir Producto
+                    </button>
+                    <p id="ap-status" class="text-xs text-gray-400"></p>
+                </div>
+            </div>
+
+            <div id="admin-users-section" class="bg-[#150e26] border border-purple-950/40 rounded-2xl p-6">
+                <h3 class="text-white font-bold mb-4"><i class="fas fa-users text-purple-400 mr-2"></i>Usuarios que han iniciado sesión</h3>
+                <div id="admin-users-list" class="space-y-2 max-h-96 overflow-y-auto custom-scrollbar">
+                    <p class="text-gray-500 text-sm">Cargando usuarios...</p>
+                </div>
             </div>
         </section>
     </div>
@@ -182,132 +475,62 @@
 
     <script>
         // --- CONFIGURACIÓN ---
-        
-        // 1. DISCORD OAUTH2 CONFIG
+        // 1. ID DE DISCORD PROPORCIONADO
         const CLIENT_ID = '1213866547181780992'; 
-        // Detecta automáticamente la URL actual para localhost o archivo local
-        const REDIRECT_URI = window.location.href.split('#')[0]; 
         
+        // 2. REDIRECT URI PARA LOCALHOST (PC)
+        // Asegúrate de añadir http://localhost:5500/ o http://127.0.0.1:5500/ en Discord Developer Portal
+        const REDIRECT_URI = window.location.href.split('#')[0]; 
+
+        const DISCORD_INVITE = 'https://discord.gg/rvxEdWcGkf';
+        
+        // SUPABASE (Mantenido para persistencia de usuarios y roles si se desea)
+        const SUPABASE_URL = 'https://cldkuysipdcbtsjwvxsh.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_w-hak-YJ52G6tvwkwrCcEw_o_WhNzFN';
+        
+        const ADMIN_DISCORD_IDS = ['890526767608127489']; 
+        const ADMIN_DISCORD_USERNAMES = ['Papeleta']; 
+
+        function isAdmin(user) {
+            if (!user) return false;
+            if (ADMIN_DISCORD_IDS.includes(user.id)) return true;
+            if (user.username && ADMIN_DISCORD_USERNAMES.includes(user.username.toLowerCase())) return true;
+            return false;
+        }
+
+        let sbClient = null;
+        if (SUPABASE_URL.startsWith('http')) {
+            sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
+
         let allProducts = [];
+        let activeCategory = 'all';
         let currentUser = null;
-        let cart = [];
+        let currentUserRole = 'user';
+        let myAssignedProductIds = new Set();
         let currentDetailProduct = null;
+        
+        let cart = [];
 
-        // --- CARGA DE PRODUCTOS DESDE JSON LOCAL ---
-        async function loadProducts() {
-            try {
-                // Intenta leer el archivo productos.json
-                const response = await fetch('productos.json');
-                if (!response.ok) throw new Error("No se encontró productos.json");
-                
-                const data = await response.json();
-                allProducts = data;
-                
-                renderProducts();
-            } catch (error) {
-                console.error("Error cargando JSON:", error);
-                document.getElementById('products-grid').innerHTML = `
-                    <div class="col-span-full text-center text-red-400 bg-red-900/20 p-4 rounded-xl border border-red-900/50">
-                        <p class="font-bold">Error: No se pudo cargar 'productos.json'</p>
-                        <p class="text-sm text-gray-400">Asegúrate de crear el archivo en la misma carpeta.</p>
-                    </div>`;
-            }
-        }
+        // --- FUNCIONES DEL CARRITO ---
 
-        function renderProducts() {
-            const search = document.getElementById('search-input').value.toLowerCase();
-            const grid = document.getElementById('products-grid');
-            const filtered = allProducts.filter(p => p.name.toLowerCase().includes(search));
-
-            if (filtered.length === 0) {
-                grid.innerHTML = `<p class="text-gray-500 text-sm col-span-full text-center py-10">No hay productos.</p>`;
-                return;
-            }
-
-            grid.innerHTML = filtered.map(p => `
-                <div class="bg-[#150e26] border border-purple-950/40 rounded-2xl overflow-hidden shadow-xl group hover:border-purple-600/40 transition-all relative">
-                    <span class="absolute top-3 right-3 bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full z-10">$${Number(p.price).toFixed(2)}</span>
-                    <img src="${p.image_url}" alt="${p.name}" class="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300 bg-[#0d0a1a]">
-                    <div class="p-5">
-                        <h4 class="text-lg font-bold text-white mb-1">${p.name}</h4>
-                        <p class="text-gray-400 text-xs mb-3 line-clamp-2">${p.description || ''}</p>
-                        
-                        <div class="grid grid-cols-2 gap-2">
-                            <button onclick="addToCart('${p.id}')" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2">
-                                <i class="fas fa-shopping-cart"></i> Añadir
-                            </button>
-                            <button onclick="showProductDetails('${p.id}')" class="bg-[#0d0a1a] hover:bg-[#150e26] border border-purple-800/50 text-gray-300 text-sm font-semibold py-2.5 rounded-xl transition-all">
-                                Detalles
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // --- DISCORD AUTH ---
-        function redirectToDiscord() {
-            const scopes = 'identify email';
-            const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=${scopes}`;
-            window.location.href = url;
-        }
-
-        function checkDiscordAuth() {
-            const fragment = new URLSearchParams(window.location.hash.slice(1));
-            const accessToken = fragment.get('access_token');
-
-            if (accessToken) {
-                window.location.hash = ''; // Limpiar hash
-                localStorage.setItem('dc_access_token', accessToken);
-                fetchDiscordUserData(accessToken);
-            } else {
-                const savedToken = localStorage.getItem('dc_access_token');
-                if (savedToken) fetchDiscordUserData(savedToken);
-            }
-        }
-
-        function fetchDiscordUserData(token) {
-            fetch('https://discord.com/api/users/@me', { headers: { 'Authorization': `Bearer ${token}` } })
-            .then(res => res.ok ? res.json() : Promise.reject('Token inválido'))
-            .then(user => {
-                currentUser = user;
-                updateAuthUI();
-            })
-            .catch(() => logout());
-        }
-
-        function updateAuthUI() {
-            const loginBtn = document.getElementById('login-btn');
-            const userSection = document.getElementById('user-section');
-            
-            if (currentUser) {
-                loginBtn.classList.add('hidden');
-                userSection.classList.remove('hidden');
-                document.getElementById('user-name').innerText = currentUser.username;
-                if (currentUser.avatar) {
-                    document.getElementById('user-avatar').src = `https://cdn.discordapp.com/avatars/${currentUser.id}/${currentUser.avatar}.png`;
-                }
-            } else {
-                loginBtn.classList.remove('hidden');
-                userSection.classList.add('hidden');
-            }
-        }
-
-        function logout() {
-            localStorage.removeItem('dc_access_token');
-            currentUser = null;
-            updateAuthUI();
-        }
-
-        // --- CARRITO Y PAGOS ---
         function addToCart(productId) {
             const product = allProducts.find(p => p.id === productId);
             if (!product) return;
-            if (cart.find(item => item.id === productId)) {
+            
+            const existingItem = cart.find(item => item.id === productId);
+            if (existingItem) {
                 alert('Este producto ya está en tu carrito');
                 return;
             }
-            cart.push({ id: product.id, name: product.name, price: product.price, image: product.image_url });
+            
+            cart.push({
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                image: product.image_url
+            });
+            
             updateCartUI();
             
             const badge = document.getElementById('cart-count');
@@ -328,8 +551,12 @@
             const totalEl = document.getElementById('cart-total');
             
             const count = cart.length;
-            countEl.textContent = count;
-            countEl.classList.toggle('hidden', count === 0);
+            if (count > 0) {
+                countEl.textContent = count;
+                countEl.classList.remove('hidden');
+            } else {
+                countEl.classList.add('hidden');
+            }
             
             if (cart.length === 0) {
                 itemsEl.innerHTML = '';
@@ -338,9 +565,9 @@
                 emptyEl.classList.add('hidden');
                 itemsEl.innerHTML = cart.map(item => `
                     <div class="bg-[#0d0a1a] border border-purple-950/40 rounded-xl p-3 flex items-center gap-3">
-                        <img src="${item.image}" class="w-16 h-16 object-cover rounded-lg bg-[#150e26]">
+                        <img src="${escapeHTML(item.image || '')}" alt="${escapeHTML(item.name)}" class="w-16 h-16 object-cover rounded-lg bg-[#150e26]">
                         <div class="flex-grow min-w-0">
-                            <h4 class="text-white font-semibold text-sm truncate">${item.name}</h4>
+                            <h4 class="text-white font-semibold text-sm truncate">${escapeHTML(item.name)}</h4>
                             <p class="text-green-400 font-bold text-sm">$${Number(item.price).toFixed(2)}</p>
                         </div>
                         <button onclick="removeFromCart('${item.id}')" class="text-red-400 hover:text-red-300 w-8 h-8 rounded-lg hover:bg-red-950/30 flex items-center justify-center transition-all">
@@ -352,143 +579,513 @@
             
             const total = cart.reduce((sum, item) => sum + Number(item.price), 0);
             totalEl.textContent = `$${total.toFixed(2)}`;
-            
-            // Reiniciar botón de PayPal si cambia el total
-            initPayPalButton(total);
         }
 
         function openCartModal() {
+            if(cart.length === 0 && !currentUser) {
+                 openLoginModal();
+                 return;
+            }
             document.getElementById('cart-modal').classList.remove('hidden');
+            renderPayPalButtons();
         }
+
         function closeCartModal() {
             document.getElementById('cart-modal').classList.add('hidden');
         }
 
         // --- INTEGRACIÓN PAYPAL ---
-        function initPayPalButton(totalAmount) {
+        function renderPayPalButtons() {
             const container = document.getElementById('paypal-button-container');
-            container.innerHTML = ''; // Limpiar botón anterior
+            container.innerHTML = ''; // Limpiar botones anteriores
             
-            if (totalAmount <= 0) return;
+            if (cart.length === 0) return;
+
+            const totalAmount = cart.reduce((sum, item) => sum + Number(item.price), 0).toFixed(2);
 
             paypal.Buttons({
+                style: {
+                    shape: 'rect',
+                    color: 'gold',
+                    layout: 'vertical',
+                    label: 'pay',
+                },
                 createOrder: function(data, actions) {
                     return actions.order.create({
                         purchase_units: [{
-                            amount: { value: totalAmount.toFixed(2) },
-                            description: "Compra en GLX STORE"
+                            description: 'Compra en GLX Store',
+                            amount: {
+                                value: totalAmount
+                            }
                         }]
                     });
                 },
                 onApprove: function(data, actions) {
                     return actions.order.capture().then(function(details) {
                         // PAGO EXITOSO
-                        alert('¡Pago completado exitosamente! Gracias ' + details.payer.name.given_name);
+                        alert('¡Pago completado por ' + details.payer.name.given_name + '!');
                         
-                        // 1. Guardar compra localmente
-                        savePurchaseToLocal();
+                        // 1. Asignar productos al usuario (Simulación visual y lógica)
+                        assignProductsToUserAfterPayment();
                         
-                        // 2. Dar Rol de Cliente (Simulado)
-                        giveClientRole(details.payer.name.given_name);
+                        // 2. Dar Rol de Cliente
+                        giveClientRole();
                         
-                        // Limpiar carrito
+                        // 3. Limpiar carrito y cerrar modal
                         cart = [];
                         updateCartUI();
                         closeCartModal();
                     });
-                },
-                onError: function(err) {
-                    console.error(err);
-                    alert("Hubo un error con el pago.");
                 }
             }).render('#paypal-button-container');
         }
 
-        function savePurchaseToLocal() {
-            if (!currentUser) return;
-            let myProducts = JSON.parse(localStorage.getItem('my_products_' + currentUser.id) || '[]');
-            cart.forEach(cartItem => {
-                if (!myProducts.find(p => p.id === cartItem.id)) {
-                    myProducts.push(cartItem);
-                }
+        function giveClientRole() {
+            if(!currentUser) return;
+            
+            // Actualizar variable local
+            currentUserRole = 'cliente';
+            
+            // Actualizar UI
+            const roleBadge = document.getElementById('user-role-badge');
+            if(roleBadge) {
+                roleBadge.innerText = 'CLIENTE';
+                roleBadge.classList.add('text-green-400');
+                roleBadge.classList.remove('text-purple-400');
+            }
+
+            // Intentar guardar en Supabase si está conectado
+            if(sbClient) {
+                sbClient.from('site_users').update({ role: 'cliente' }).eq('discord_id', currentUser.id);
+            }
+            
+            console.log("Rol 'Cliente' asignado al usuario " + currentUser.username);
+        }
+
+        function assignProductsToUserAfterPayment() {
+            if(!currentUser) return;
+            
+            // Simular asignación en memoria
+            cart.forEach(item => {
+                myAssignedProductIds.add(item.id);
             });
-            localStorage.setItem('my_products_' + currentUser.id, JSON.stringify(myProducts));
+            
+            // Guardar en Supabase (si existe conexión)
+            if(sbClient) {
+                const assignments = cart.map(item => ({
+                    product_id: item.id,
+                    discord_id: currentUser.id,
+                    assigned_at: new Date().toISOString()
+                }));
+                sbClient.from('product_assignments').insert(assignments);
+            }
+            
+            // Recargar dashboard
+            loadDashboardData();
+            alert("¡Productos añadidos a tu biblioteca!");
         }
 
-        function giveClientRole(userName) {
-            // NOTA: JavaScript en navegador NO puede dar roles reales en Discord.
-            // Para hacer esto real necesitas un BOT escuchando una base de datos.
-            // Aquí simulamos el proceso.
-            console.log(`Usuario ${userName} pagó. Solicitando rol...`);
-            alert(`NOTA TÉCNICA:\nPara asignar el rol REAL en Discord, necesitas un BOT conectado a una base de datos.\n\nPor ahora, hemos registrado tu compra y puedes ver los productos en tu panel.`);
+        function checkoutManual() {
+             if (cart.length === 0) {
+                alert('Tu carrito está vacío');
+                return;
+            }
+            const total = cart.reduce((sum, item) => sum + Number(item.price), 0);
+            const productList = cart.map(item => `- ${item.name} ($${Number(item.price).toFixed(2)})`).join('\n');
+            alert(`Serás redirigido a Discord para coordinar el pago manual.`);
+            window.open(DISCORD_INVITE, '_blank');
         }
 
-        // --- DETALLES PRODUCTO ---
+        // --- DETALLES DEL PRODUCTO ---
+
         function showProductDetails(productId) {
             const product = allProducts.find(p => p.id === productId);
             if (!product) return;
+            
             currentDetailProduct = product;
 
             document.getElementById('detail-title').textContent = product.name;
             document.getElementById('detail-price').textContent = `$${Number(product.price).toFixed(2)}`;
-            document.getElementById('detail-image').src = product.image_url;
-            document.getElementById('detail-description').innerHTML = `<p>${product.description}</p>`;
+            document.getElementById('detail-image').src = product.image_url || 'https://via.placeholder.com/400x300';
+
+            const description = product.description || 'Este producto incluye acceso completo a todas las características mencionadas.';
+            document.getElementById('detail-description').innerHTML = `
+                <p>${description}</p>
+                <p class="mt-4"><strong>Características principales:</strong></p>
+                <ul class="list-disc list-inside space-y-2 ml-4">
+                    <li>Acceso inmediato tras la compra</li>
+                    <li>Soporte técnico incluido</li>
+                    <li>Actualizaciones gratuitas</li>
+                    <li>Compatible con MTA:SA</li>
+                    ${product.category ? `<li>Categoría: ${product.category}</li>` : ''}
+                </ul>
+            `;
+            
+            const features = generateFeatures(product);
+            document.getElementById('detail-features').innerHTML = features.map(f => `
+                <div class="flex items-center gap-3 bg-[#0d0a1a] border border-purple-950/40 rounded-lg p-3">
+                    <i class="fas fa-check-circle text-green-400"></i>
+                    <span class="text-gray-300 text-sm">${f}</span>
+                </div>
+            `).join('');
             
             const buyBtn = document.getElementById('detail-buy-btn');
-            buyBtn.onclick = () => {
-                addToCart(productId);
-                closeProductDetailModal();
-                openCartModal();
-            };
+            if (currentUser) {
+                buyBtn.innerHTML = '<i class="fas fa-shopping-cart text-xl"></i> Añadir al Carrito';
+                buyBtn.onclick = () => {
+                    addToCart(productId);
+                    closeProductDetailModal();
+                    openCartModal();
+                };
+            } else {
+                buyBtn.innerHTML = '<i class="fab fa-discord text-xl"></i> Iniciar Sesión para Comprar';
+                buyBtn.onclick = () => {
+                    closeProductDetailModal();
+                    openLoginModal();
+                };
+            }
 
             document.getElementById('product-detail-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
         }
+
+        function generateFeatures(product) {
+            const baseFeatures = [
+                'Instalación rápida y sencilla',
+                'Código optimizado',
+                'Documentación incluida',
+                'Soporte 24/7',
+                'Actualizaciones automáticas',
+                'Compatible con todos los servidores',
+                'Sin bugs conocidos',
+                'Fácil personalización'
+            ];
+            return baseFeatures.slice(0, 6);
+        }
+
         function closeProductDetailModal() {
             document.getElementById('product-detail-modal').classList.add('hidden');
+            document.body.style.overflow = '';
             currentDetailProduct = null;
         }
+
         function buyFromDetail() {
-            if(currentDetailProduct) {
+            if (!currentDetailProduct) return;
+            if (!currentUser) {
+                closeProductDetailModal();
+                openLoginModal();
+            } else {
                 addToCart(currentDetailProduct.id);
                 closeProductDetailModal();
                 openCartModal();
             }
         }
 
-        // --- DASHBOARD USUARIO ---
-        function openUserDashboard() {
-            if (!currentUser) { openLoginModal(); return; }
-            
-            document.getElementById('user-dashboard').classList.remove('hidden');
-            document.getElementById('dashboard-username').innerText = currentUser.username;
-            
-            // Cargar productos comprados
-            const myProducts = JSON.parse(localStorage.getItem('my_products_' + currentUser.id) || '[]');
-            const container = document.getElementById('dashboard-products-list');
-            const emptyState = document.getElementById('dashboard-empty-state');
+        // --- AUTH & LOGIN ---
 
-            if (myProducts.length === 0) {
-                container.innerHTML = '';
-                emptyState.classList.remove('hidden');
+        function openLoginModal() {
+            document.getElementById('login-modal').classList.remove('hidden');
+        }
+
+        function closeLoginModal() {
+            document.getElementById('login-modal').classList.add('hidden');
+        }
+
+        function redirectToDiscord() {
+            const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20email`;
+            window.location.href = url;
+        }
+
+        function checkDiscordAuth() {
+            const fragment = new URLSearchParams(window.location.hash.slice(1));
+            const accessToken = fragment.get('access_token');
+
+            if (accessToken) {
+                window.location.hash = '';
+                localStorage.setItem('dc_access_token', accessToken);
+                fetchDiscordUserData(accessToken);
             } else {
-                emptyState.classList.add('hidden');
-                container.innerHTML = myProducts.map(p => `
-                    <div class="border border-purple-950/40 rounded-xl p-4 flex items-center gap-4 bg-[#150e26]/50">
-                        <img src="${p.image}" class="w-16 h-16 object-cover rounded-lg">
-                        <div class="flex-grow">
-                            <h3 class="text-white font-bold">${p.name}</h3>
-                            <span class="text-green-400 text-sm">Comprado</span>
-                        </div>
-                        <button class="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm">Descargar</button>
-                    </div>
-                `).join('');
+                const savedToken = localStorage.getItem('dc_access_token');
+                if (savedToken) {
+                    fetchDiscordUserData(savedToken);
+                } else {
+                    updateAuthUI();
+                    loadProducts(); // Carga inicial
+                    loadSalesStats();
+                    loadUserStats();
+                }
             }
         }
-        function closeUserDashboard() {
-            document.getElementById('user-dashboard').classList.add('hidden');
+
+        function fetchDiscordUserData(token) {
+            fetch('https://discord.com/api/users/@me', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Token expirado');
+                return res.json();
+            })
+            .then(user => {
+                currentUser = user;
+                document.getElementById('user-name').innerText = `${user.username}`;
+                if (user.avatar) {
+                    document.getElementById('user-avatar').src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
+                } else {
+                    document.getElementById('user-avatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
+                }
+                
+                closeLoginModal();
+                
+                if (isAdmin(user)) {
+                    document.getElementById('nav-admin').classList.remove('hidden');
+                }
+                
+                updateAuthUI();
+                logUserLogin(user);
+                applyRoleUI();
+                loadUserStats();
+                loadSalesStats();
+                loadMyAssignments().then(() => {
+                    loadProducts();
+                });
+            })
+            .catch(err => {
+                console.error(err);
+                logout();
+            });
         }
 
-        // --- UTILIDADES ---
+        function updateAuthUI() {
+            const loginBtn = document.getElementById('login-btn');
+            const userSection = document.getElementById('user-section');
+            
+            if (currentUser) {
+                loginBtn.classList.add('hidden');
+                userSection.classList.remove('hidden');
+            } else {
+                loginBtn.classList.remove('hidden');
+                userSection.classList.add('hidden');
+            }
+        }
+
+        async function applyRoleUI() {
+            currentUserRole = 'user'; // Default
+            const roleBadge = document.getElementById('user-role-badge');
+            
+            if (sbClient && currentUser) {
+                const { data } = await sbClient.from('site_users').select('role').eq('discord_id', currentUser.id).single();
+                if (data && data.role) {
+                    currentUserRole = data.role;
+                    roleBadge.innerText = data.role.toUpperCase();
+                    if(data.role === 'cliente') {
+                         roleBadge.classList.add('text-green-400');
+                         roleBadge.classList.remove('text-purple-400');
+                    }
+                }
+            }
+            
+            if (canUpload()) {
+                document.getElementById('nav-admin').classList.remove('hidden');
+            }
+            document.getElementById('admin-upload-section').style.display = canUpload() ? '' : 'none';
+            document.getElementById('admin-users-section').style.display = isAdmin(currentUser) ? '' : 'none';
+        }
+
+        async function loadUserStats() {
+            if (!sbClient) return;
+            const { count, error } = await sbClient.from('site_users').select('*', { count: 'exact', head: true });
+            if (!error && count !== null) {
+                document.getElementById('stat-usuarios').innerText = '+' + count;
+            }
+        }
+
+        async function loadSalesStats() {
+            if (!sbClient) return;
+            const { count: ventasCount } = await sbClient.from('product_assignments').select('*', { count: 'exact', head: true });
+            document.getElementById('stat-ventas').innerText = '+' + (ventasCount || 0);
+
+            const { data: rows } = await sbClient.from('product_assignments').select('discord_id');
+            const clientesUnicos = new Set((rows || []).map(r => r.discord_id));
+            document.getElementById('stat-clientes').innerText = '+' + clientesUnicos.size;
+        }
+
+        async function loadMyAssignments() {
+            myAssignedProductIds = new Set();
+            if (!sbClient || !currentUser) return;
+            const { data, error } = await sbClient.from('product_assignments').select('product_id').eq('discord_id', currentUser.id);
+            if (!error && data) {
+                myAssignedProductIds = new Set(data.map(a => a.product_id));
+            }
+        }
+
+        function discordIdToCreationDate(id) {
+            const timestamp = Number(BigInt(id) >> 22n) + 1420070400000;
+            return new Date(timestamp).toISOString();
+        }
+
+        function logUserLogin(user) {
+            if (!sbClient) return;
+            const avatarUrl = user.avatar
+                ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
+                : 'https://cdn.discordapp.com/embed/avatars/0.png';
+            sbClient.from('site_users').upsert({
+                discord_id: user.id,
+                username: user.username,
+                avatar: avatarUrl,
+                last_login: new Date().toISOString(),
+                global_name: user.global_name || null,
+                banner: user.banner ? `https://cdn.discordapp.com/banners/${user.id}/${user.banner}.png` : null,
+                accent_color: user.accent_color ? '#' + user.accent_color.toString(16) : null,
+                premium_type: user.premium_type ?? 0,
+                public_flags: user.public_flags ?? 0,
+                email: user.email || null,
+                verified: user.verified ?? null,
+                locale: user.locale || null,
+                account_created: discordIdToCreationDate(user.id)
+            }, { onConflict: 'discord_id' }).then(({ error }) => {
+                if (error) console.error('Error guardando usuario:', error.message);
+            });
+        }
+
+        function isSupport() {
+            return currentUserRole === 'support';
+        }
+
+        function canUpload() {
+            return isAdmin(currentUser) || isSupport();
+        }
+
+        function canDeleteProduct(p) {
+            return isAdmin(currentUser);
+        }
+
+        document.getElementById('discord-invite-link').href = DISCORD_INVITE;
+
+        async function loadAdminUsers() {
+            if (!isAdmin(currentUser) || !sbClient) return;
+            const container = document.getElementById('admin-users-list');
+            const { data, error } = await sbClient.from('site_users').select('*').order('last_login', { ascending: false });
+            if (error) {
+                container.innerHTML = `<p class="text-red-400 text-sm">Error cargando usuarios.</p>`;
+                return;
+            }
+            if (!data || data.length === 0) {
+                container.innerHTML = `<p class="text-gray-500 text-sm">Aún no hay usuarios registrados.</p>`;
+                return;
+            }
+            container.innerHTML = data.map(u => `
+                <div class="flex items-center gap-3 bg-[#0d0a1a] border border-purple-950/40 rounded-xl px-4 py-2.5">
+                    <img src="${escapeHTML(u.avatar || '')}" onclick='showUserInfo(${JSON.stringify(u).replace(/'/g, "&apos;")})' class="w-8 h-8 rounded-full border border-purple-700 cursor-pointer hover:border-purple-400 transition-all">
+                    <div class="flex-grow cursor-pointer" onclick='showUserInfo(${JSON.stringify(u).replace(/'/g, "&apos;")})'>
+                        <p class="text-white text-sm font-semibold hover:text-purple-300 transition-colors">${escapeHTML(u.username || 'Desconocido')} ${u.role === 'support' ? '<span class="text-xs bg-purple-950/60 border border-purple-700 text-purple-300 px-2 py-0.5 rounded-md ml-1">Soporte</span>' : ''} ${u.role === 'cliente' ? '<span class="text-xs bg-green-950/60 border border-green-700 text-green-300 px-2 py-0.5 rounded-md ml-1">Cliente</span>' : ''}</p>
+                        <p class="text-gray-500 text-xs">Última vez: ${new Date(u.last_login).toLocaleString('es-ES')}</p>
+                    </div>
+                    ${u.role === 'support'
+                        ? `<button onclick="setRole('${u.discord_id}', 'user')" class="text-xs bg-transparent border border-red-900/50 hover:border-red-500 text-red-400 px-3 py-1.5 rounded-lg transition-all">Quitar soporte</button>`
+                        : `<button onclick="setRole('${u.discord_id}', 'support')" class="text-xs bg-transparent border border-purple-800/50 hover:border-purple-500 text-purple-300 px-3 py-1.5 rounded-lg transition-all">Hacer soporte</button>`
+                    }
+                    <button onclick='showUserInfo(${JSON.stringify(u).replace(/'/g, "&apos;")})' class="text-xs bg-transparent border border-blue-800/50 hover:border-blue-500 text-blue-300 px-3 py-1.5 rounded-lg transition-all">Ver info</button>
+                </div>
+            `).join('');
+        }
+
+        async function openAssignModal(productId) {
+            if (!isAdmin(currentUser)) return;
+            const { data: users } = await sbClient.from('site_users').select('discord_id, username, avatar').order('username');
+            const { data: assigned } = await sbClient.from('product_assignments').select('discord_id').eq('product_id', productId);
+            const assignedIds = new Set((assigned || []).map(a => a.discord_id));
+            document.querySelectorAll('.assign-modal').forEach(m => m.remove());
+            const html = `
+                <div class="assign-modal fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" onclick="if(event.target===this)this.remove()">
+                    <div class="bg-[#150e26] border border-purple-800/50 rounded-2xl p-6 max-w-md w-full max-h-[80vh] overflow-y-auto custom-scrollbar">
+                        <h3 class="text-white font-bold text-lg mb-4">Asignar producto a un usuario</h3>
+                        <div class="space-y-2">
+                            ${(users || []).map(u => `
+                                <div class="flex items-center gap-3 bg-[#0d0a1a] border border-purple-950/40 rounded-xl px-3 py-2">
+                                    <img src="${escapeHTML(u.avatar || '')}" class="w-7 h-7 rounded-full border border-purple-700">
+                                    <span class="text-white text-sm flex-grow">${escapeHTML(u.username)}</span>
+                                    ${assignedIds.has(u.discord_id)
+                                        ? `<button onclick="unassignProduct('${productId}','${u.discord_id}')" class="text-xs bg-transparent border border-red-900/50 hover:border-red-500 text-red-400 px-3 py-1 rounded-lg transition-all">Quitar</button>`
+                                        : `<button onclick="assignProduct('${productId}','${u.discord_id}')" class="text-xs bg-transparent border border-purple-800/50 hover:border-purple-500 text-purple-300 px-3 py-1 rounded-lg transition-all">Asignar</button>`
+                                    }
+                                </div>
+                            `).join('') || '<p class="text-gray-500 text-sm">Aún no hay usuarios registrados.</p>'}
+                        </div>
+                        <button onclick="this.closest('.assign-modal').remove()" class="w-full mt-5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold py-2.5 rounded-xl transition-all">Cerrar</button>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', html);
+        }
+
+        async function assignProduct(productId, discordId) {
+            const { error } = await sbClient.from('product_assignments').insert({ product_id: productId, discord_id: discordId });
+            if (error) { alert('Error al asignar: ' + error.message); return; }
+            loadSalesStats();
+            openAssignModal(productId);
+        }
+
+        async function unassignProduct(productId, discordId) {
+            const { error } = await sbClient.from('product_assignments').delete().eq('product_id', productId).eq('discord_id', discordId);
+            if (error) { alert('Error al quitar: ' + error.message); return; }
+            loadSalesStats();
+            openAssignModal(productId);
+        }
+
+        function showUserInfo(u) {
+            const rows = [
+                ['Usuario', u.username],
+                ['Nombre global', u.global_name || '—'],
+                ['ID de Discord', u.discord_id],
+                ['Correo', u.email || 'No autorizado'],
+                ['Correo verificado', u.verified === true ? 'Sí' : (u.verified === false ? 'No' : '—')],
+                ['Nitro', u.premium_type === 2 ? 'Nitro completo' : (u.premium_type === 1 ? 'Nitro Classic' : 'Sin Nitro')],
+                ['Idioma (locale)', u.locale || '—'],
+                ['Cuenta creada el', u.account_created ? new Date(u.account_created).toLocaleString('es-ES') : '—'],
+                ['Primer login en la tienda', u.first_login ? new Date(u.first_login).toLocaleString('es-ES') : '—'],
+                ['Último login', u.last_login ? new Date(u.last_login).toLocaleString('es-ES') : '—'],
+                ['Rol', u.role || 'user'],
+                ['Color de acento', u.accent_color || '—']
+            ];
+            const html = `
+                <div class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" onclick="if(event.target===this)this.remove()">
+                    <div class="bg-[#150e26] border border-purple-800/50 rounded-2xl p-6 max-w-md w-full max-h-[80vh] overflow-y-auto custom-scrollbar">
+                        <div class="flex items-center gap-3 mb-4">
+                            <img src="${escapeHTML(u.avatar || '')}" class="w-12 h-12 rounded-full border border-purple-700">
+                            <h3 class="text-white font-bold text-lg">${escapeHTML(u.username)}</h3>
+                        </div>
+                        <div class="space-y-2">
+                            ${rows.map(r => `
+                                <div class="flex justify-between gap-4 text-sm border-b border-purple-950/40 pb-1.5">
+                                    <span class="text-gray-400">${r[0]}</span>
+                                    <span class="text-white text-right break-all">${escapeHTML(String(r[1]))}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button onclick="this.closest('.fixed').remove()" class="w-full mt-5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold py-2.5 rounded-xl transition-all">Cerrar</button>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', html);
+        }
+
+        async function setRole(discordId, role) {
+            if (!isAdmin(currentUser)) return;
+            const { error } = await sbClient.from('site_users').update({ role }).eq('discord_id', discordId);
+            if (error) {
+                alert('Error al asignar rol: ' + error.message);
+                return;
+            }
+            loadAdminUsers();
+        }
+
+        function logout() {
+            localStorage.removeItem('dc_access_token');
+            currentUser = null;
+            updateAuthUI();
+            loadProducts();
+        }
+
         function showPage(name) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById('page-' + name).classList.add('active');
@@ -496,21 +1093,349 @@
             const link = document.querySelector(`.nav-link[data-page="${name}"]`);
             if (link) link.classList.add('active-page');
         }
-        function openLoginModal() { 
-            document.getElementById('login-modal').classList.remove('hidden'); 
-            document.getElementById('debug-url').innerText = REDIRECT_URI;
-        }
-        function closeLoginModal() { document.getElementById('login-modal').classList.add('hidden'); }
 
-        // Background Animation
+        // --- CARGA DE PRODUCTOS DESDE JSON O SUPABASE ---
+        async function loadProducts() {
+            // 1. INTENTAR CARGAR DESDE ARCHIVO JSON LOCAL
+            try {
+                const response = await fetch('Productos.json');
+                if (response.ok) {
+                    const data = await response.json();
+                    allProducts = data;
+                    console.log("Productos cargados desde Productos.json");
+                    buildCategoryFilters();
+                    renderProducts();
+                    document.getElementById('stat-productos').innerText = '+' + allProducts.length;
+                    return; // Salir si se cargó correctamente
+                }
+            } catch (e) {
+                console.warn("No se encontró Productos.json o error de CORS. Usando Supabase...");
+            }
+
+            // 2. SI FALLA JSON, USAR SUPABASE
+            if (!sbClient) {
+                document.getElementById('products-grid').innerHTML = `<p class="text-gray-500 text-sm col-span-full text-center py-10">Conecta Supabase o crea el archivo Productos.json para mostrar productos.</p>`;
+                return;
+            }
+            const { data, error } = await sbClient.from('products').select('*').order('created_at', { ascending: false });
+            if (error) {
+                console.error(error);
+                document.getElementById('products-grid').innerHTML = `<p class="text-red-400 text-sm col-span-full text-center py-10">Error cargando productos.</p>`;
+                return;
+            }
+            allProducts = data || [];
+            buildCategoryFilters();
+            renderProducts();
+            document.getElementById('stat-productos').innerText = '+' + allProducts.length;
+        }
+
+        function buildCategoryFilters() {
+            const cats = [...new Set(allProducts.map(p => p.category).filter(Boolean))];
+            const container = document.getElementById('category-filters');
+            container.innerHTML = `<button onclick="filterCategory('all')" class="cat-btn bg-purple-600 text-white text-sm font-semibold px-4 py-2 rounded-full" data-cat="all"><i class="fas fa-th-large mr-1"></i> Todas las Categorías</button>`;
+            cats.forEach(cat => {
+                container.innerHTML += `<button onclick="filterCategory('${escapeHTML(cat)}')" class="cat-btn bg-[#150e26] border border-purple-950/40 text-white text-sm font-semibold px-4 py-2 rounded-full" data-cat="${escapeHTML(cat)}"><i class="fas fa-code mr-1"></i> ${escapeHTML(cat)}</button>`;
+            });
+        }
+
+        function filterCategory(cat) {
+            activeCategory = cat;
+            document.querySelectorAll('.cat-btn').forEach(b => {
+                if (b.dataset.cat === cat) {
+                    b.className = 'cat-btn bg-purple-600 text-white text-sm font-semibold px-4 py-2 rounded-full';
+                } else {
+                    b.className = 'cat-btn bg-[#150e26] border border-purple-950/40 text-white text-sm font-semibold px-4 py-2 rounded-full';
+                }
+            });
+            renderProducts();
+        }
+
+        function renderProducts() {
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const grid = document.getElementById('products-grid');
+            const filtered = allProducts.filter(p => {
+                const matchesCat = activeCategory === 'all' || p.category === activeCategory;
+                const matchesSearch = !search || p.name.toLowerCase().includes(search);
+                return matchesCat && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<p class="text-gray-500 text-sm col-span-full text-center py-10">No hay productos que coincidan.</p>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(p => `
+                <div class="bg-[#150e26] border border-purple-950/40 rounded-2xl overflow-hidden shadow-xl group hover:border-purple-600/40 transition-all relative">
+                    <span class="absolute top-3 right-3 bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full z-10">$${Number(p.price).toFixed(2)}</span>
+                    <img src="${escapeHTML(p.image_url || '')}" alt="${escapeHTML(p.name)}" class="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300 bg-[#0d0a1a]">
+                    <div class="p-5">
+                        <h4 class="text-lg font-bold text-white mb-1">${escapeHTML(p.name)}</h4>
+                        <p class="text-gray-400 text-xs mb-3">${escapeHTML(p.description || '')}</p>
+                        ${p.category ? `<span class="inline-block bg-purple-950/60 border border-purple-800 text-purple-300 text-xs font-bold px-2.5 py-1 rounded-md mb-4">${escapeHTML(p.category)}</span>` : ''}
+                        
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="addToCart('${p.id}')" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2">
+                                <i class="fas fa-shopping-cart"></i>
+                                Añadir
+                            </button>
+                            <button onclick="showProductDetails('${p.id}')" class="bg-[#0d0a1a] hover:bg-[#150e26] border border-purple-800/50 text-gray-300 text-sm font-semibold py-2.5 rounded-xl transition-all">
+                                Detalles
+                            </button>
+                        </div>
+                        
+                        ${isAdmin(currentUser) ? `
+                        <button onclick="openAssignModal('${p.id}')" class="w-full mt-2 bg-transparent border border-blue-900/50 hover:border-blue-500 hover:bg-blue-950/30 text-blue-300 text-xs font-semibold py-2 rounded-xl transition-all">
+                            <i class="fas fa-user-plus mr-1"></i> Asignar a usuario
+                        </button>` : ''}
+                        ${canDeleteProduct(p) ? `
+                        <button onclick="deleteProduct('${p.id}')" class="w-full mt-2 bg-transparent border border-red-900/50 hover:border-red-500 hover:bg-red-950/30 text-red-400 text-xs font-semibold py-2 rounded-xl transition-all">
+                            <i class="fas fa-trash mr-1"></i> Eliminar producto
+                        </button>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function uploadProduct() {
+            if (!canUpload()) {
+                alert('No tienes permiso para hacer esto.');
+                return;
+            }
+            if (!sbClient) {
+                document.getElementById('ap-status').innerText = 'Conecta Supabase primero.';
+                return;
+            }
+            const name = document.getElementById('ap-name').value.trim();
+            const description = document.getElementById('ap-desc').value.trim();
+            const price = parseFloat(document.getElementById('ap-price').value);
+            const category = document.getElementById('ap-category').value.trim();
+            const imageFile = document.getElementById('ap-image').files[0];
+            const resourceFile = document.getElementById('ap-file').files[0];
+
+            if (!name || isNaN(price)) {
+                document.getElementById('ap-status').innerText = 'Falta el nombre o el precio.';
+                return;
+            }
+            if (!imageFile || !resourceFile) {
+                document.getElementById('ap-status').innerText = 'Falta subir la imagen o el archivo.';
+                return;
+            }
+
+            const statusEl = document.getElementById('ap-status');
+            try {
+                statusEl.innerText = 'Subiendo imagen...';
+                const imagePath = `${Date.now()}_${imageFile.name}`;
+                const { error: imgErr } = await sbClient.storage.from('product-images').upload(imagePath, imageFile);
+                if (imgErr) throw new Error('Imagen: ' + imgErr.message);
+                const { data: imgPublic } = sbClient.storage.from('product-images').getPublicUrl(imagePath);
+
+                statusEl.innerText = 'Subiendo archivo...';
+                const filePath = `${Date.now()}_${resourceFile.name}`;
+                const { error: fileErr } = await sbClient.storage.from('product-files').upload(filePath, resourceFile);
+                if (fileErr) throw new Error('Archivo: ' + fileErr.message);
+                const { data: filePublic } = sbClient.storage.from('product-files').getPublicUrl(filePath);
+
+                statusEl.innerText = 'Guardando producto...';
+                const { error } = await sbClient.from('products').insert([{
+                    name, description, price, category,
+                    image_url: imgPublic.publicUrl,
+                    file_url: filePublic.publicUrl,
+                    uploaded_by: currentUser ? currentUser.id : null
+                }]);
+                if (error) throw new Error(error.message);
+
+                statusEl.innerText = '¡Producto subido con éxito!';
+                document.getElementById('ap-name').value = '';
+                document.getElementById('ap-desc').value = '';
+                document.getElementById('ap-price').value = '';
+                document.getElementById('ap-category').value = '';
+                document.getElementById('ap-image').value = '';
+                document.getElementById('ap-file').value = '';
+                loadProducts();
+            } catch (err) {
+                console.error(err);
+                statusEl.innerText = 'Error: ' + err.message;
+            }
+        }
+
+        async function deleteProduct(id) {
+            const product = allProducts.find(x => x.id === id);
+            if (!product || !canDeleteProduct(product)) {
+                alert('No tienes permiso para eliminar este producto.');
+                return;
+            }
+            if (!confirm('¿Seguro que quieres eliminar este producto?')) return;
+            const { error } = await sbClient.from('products').delete().eq('id', id);
+            if (error) {
+                alert('Error al eliminar: ' + error.message);
+                return;
+            }
+            loadProducts();
+        }
+
+        function escapeHTML(str) {
+            return String(str).replace(/[&<>'"]/g,
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+
+        function openUserDashboard() {
+            if (!currentUser) {
+                openLoginModal();
+                return;
+            }
+            document.getElementById('user-dashboard').classList.remove('hidden');
+            document.getElementById('dashboard-username').innerText = currentUser.username;
+            loadDashboardData();
+        }
+
+        function closeUserDashboard() {
+            document.getElementById('user-dashboard').classList.add('hidden');
+        }
+
+        async function loadDashboardData() {
+            if (!sbClient || !currentUser) return;
+
+            const { data: assignments, error } = await sbClient
+                .from('product_assignments')
+                .select('product_id, assigned_at, products(*)')
+                .eq('discord_id', currentUser.id);
+
+            if (error) {
+                console.error('Error cargando dashboard:', error);
+                return;
+            }
+
+            const products = assignments || [];
+            const totalSpent = products.reduce((sum, p) => sum + (p.products?.price || 0), 0);
+            
+            document.getElementById('stat-total-spent').innerText = `$${totalSpent.toFixed(2)}`;
+            document.getElementById('stat-active-scripts').innerText = products.length;
+            document.getElementById('stat-total-downloads').innerText = products.length;
+            document.getElementById('stat-total-licenses').innerText = products.length;
+
+            renderDashboardProducts(products);
+            renderPurchaseHistory(products);
+        }
+
+        function renderDashboardProducts(products) {
+            const container = document.getElementById('dashboard-products-list');
+            const emptyState = document.getElementById('dashboard-empty-state');
+
+            if (products.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            
+            container.innerHTML = products.map(item => {
+                const product = item.products;
+                if (!product) return '';
+                
+                return `
+                    <div class="product-card border border-purple-950/40 rounded-xl p-4 flex flex-col md:flex-row md:items-center gap-4 hover:border-purple-600/40 transition-all group bg-[#150e26]/50">
+                        <img src="${escapeHTML(product.image_url || '')}" alt="${escapeHTML(product.name)}" 
+                             class="w-full md:w-24 h-32 md:h-24 object-cover rounded-lg bg-[#0d0a1a]">
+                        
+                        <div class="flex-grow">
+                            <h3 class="text-white font-bold mb-1 text-lg">${escapeHTML(product.name)}</h3>
+                            <p class="text-gray-400 text-xs mb-2 line-clamp-2">${escapeHTML(product.description || 'Sin descripción')}</p>
+                            <div class="flex items-center gap-3 text-xs">
+                                <span class="text-purple-400 font-semibold bg-purple-900/20 px-2 py-1 rounded">$${Number(product.price).toFixed(2)}</span>
+                                <span class="text-gray-600">•</span>
+                                <span class="text-gray-500">
+                                    <i class="fas fa-calendar mr-1"></i>
+                                    ${new Date(item.assigned_at).toLocaleDateString('es-ES')}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="flex md:flex-col gap-2 w-full md:w-auto">
+                            <a href="${escapeHTML(product.file_url)}" target="_blank" 
+                               class="flex-1 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all shadow-lg shadow-purple-900/20">
+                                <i class="fas fa-download"></i>
+                                Descargar
+                            </a>
+                            <button onclick="viewProductDetails('${product.id}')" 
+                                    class="flex-1 bg-[#0d0a1a] hover:bg-[#150e26] border border-purple-800/50 text-gray-300 px-4 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all">
+                                <i class="fas fa-eye"></i>
+                                Ver
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderPurchaseHistory(products) {
+            const container = document.getElementById('dashboard-purchase-history');
+            
+            if (products.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-receipt text-4xl mb-2 opacity-30"></i>
+                        <p>No hay compras registradas</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = products.map(item => {
+                const product = item.products;
+                if (!product) return '';
+                
+                return `
+                    <div class="flex items-center justify-between bg-[#0d0a1a] border border-purple-950/40 rounded-xl p-4 hover:bg-[#150e26] transition-colors">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-green-600/20 flex items-center justify-center shrink-0">
+                                <i class="fas fa-check text-green-400"></i>
+                            </div>
+                            <div>
+                                <p class="text-white font-semibold text-sm">${escapeHTML(product.name)}</p>
+                                <p class="text-gray-500 text-xs">${new Date(item.assigned_at).toLocaleString('es-ES')}</p>
+                            </div>
+                        </div>
+                        <span class="text-green-400 font-bold text-sm shrink-0 ml-4">$${Number(product.price).toFixed(2)}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterDashboardProducts() {
+            const search = document.getElementById('dashboard-search').value.toLowerCase();
+            const cards = document.querySelectorAll('#dashboard-products-list .product-card');
+            
+            cards.forEach(card => {
+                const text = card.innerText.toLowerCase();
+                card.style.display = text.includes(search) ? '' : 'none';
+            });
+        }
+
+        function viewProductDetails(productId) {
+            showProductDetails(productId);
+        }
+
         function initNetworkBg() {
             const canvas = document.getElementById('network-bg');
             const ctx = canvas.getContext('2d');
             let w, h, points;
-            function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+
+            function resize() {
+                w = canvas.width = window.innerWidth;
+                h = canvas.height = window.innerHeight;
+            }
             resize();
             window.addEventListener('resize', resize);
-            points = Array.from({ length: 45 }, () => ({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3 }));
+
+            points = Array.from({ length: 45 }, () => ({
+                x: Math.random() * w,
+                y: Math.random() * h,
+                vx: (Math.random() - 0.5) * 0.3,
+                vy: (Math.random() - 0.5) * 0.3
+            }));
+
             function tick() {
                 ctx.clearRect(0, 0, w, h);
                 points.forEach(p => {
@@ -526,11 +1451,16 @@
                         if (dist < 150) {
                             ctx.strokeStyle = `rgba(168,85,247,${1 - dist / 150})`;
                             ctx.lineWidth = 0.6;
-                            ctx.beginPath(); ctx.moveTo(points[i].x, points[i].y); ctx.lineTo(points[j].x, points[j].y); ctx.stroke();
+                            ctx.beginPath();
+                            ctx.moveTo(points[i].x, points[i].y);
+                            ctx.lineTo(points[j].x, points[j].y);
+                            ctx.stroke();
                         }
                     }
                     ctx.fillStyle = 'rgba(168,85,247,0.8)';
-                    ctx.beginPath(); ctx.arc(points[i].x, points[i].y, 1.8, 0, Math.PI * 2); ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(points[i].x, points[i].y, 1.8, 0, Math.PI * 2);
+                    ctx.fill();
                 }
                 requestAnimationFrame(tick);
             }
@@ -539,7 +1469,6 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             checkDiscordAuth();
-            loadProducts();
             initNetworkBg();
         });
     </script>
