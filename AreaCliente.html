@@ -497,15 +497,16 @@
             }
         }
 
-        function updateLicenseCode() {
-            if (allLicenses.length > 0) {
-                const license = allLicenses[0];
-                const code = `license = {
-    key = "PIXEL(${currentUser.id})"
+     function updateLicenseCode() {
+    if (allLicenses.length > 0) {
+        const license = allLicenses[0];
+        const code = `configLicense = {
+    ["User"] = "${currentUser.username}", 
+    ["Key"] = "PapeletaStore(${license.key || currentUser.id})"
 }`;
-                document.getElementById('license-code').textContent = code;
-            }
-        }
+        document.getElementById('license-code').textContent = code;
+    }
+}
 
         function copyLicenseCode() {
             const code = document.getElementById('license-code').textContent;
