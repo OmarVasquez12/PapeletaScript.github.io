@@ -89,16 +89,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
-        .product-card {
-            transition: all 0.3s ease;
-        }
-        
-        .product-card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(59, 130, 246, 0.4);
-            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2);
-        }
     </style>
 </head>
 <body class="min-h-screen flex">
@@ -126,9 +116,14 @@
                     <span>Tienda</span>
                 </a>
                 
-                <a href="#" onclick="showSection('licenses')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:text-white">
-                    <i class="fas fa-key w-5"></i>
-                    <span>Mis Licencias</span>
+                <a href="#" onclick="showSection('reviews')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:text-white">
+                    <i class="fas fa-star w-5"></i>
+                    <span>Mis Reseñas</span>
+                </a>
+                
+                <a href="#" onclick="showSection('support')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:text-white">
+                    <i class="fas fa-headset w-5"></i>
+                    <span>Soporte</span>
                 </a>
                 
                 <a href="https://discord.gg/rvxEdWcGkf" target="_blank" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:text-white">
@@ -164,7 +159,7 @@
                 
                 <a href="index.html" class="btn-primary px-4 py-2 rounded-lg text-white font-medium flex items-center gap-2">
                     <i class="fas fa-shopping-cart"></i>
-                    Ir a la Tienda
+                    Catálogo
                 </a>
             </div>
         </header>
@@ -187,11 +182,11 @@
                 <div class="stat-card rounded-xl p-6">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-gray-400 text-xs uppercase font-semibold mb-1">Productos Activos</p>
-                            <p id="stat-active-products" class="text-2xl font-bold text-white">0</p>
+                            <p class="text-gray-400 text-xs uppercase font-semibold mb-1">Scripts Activos</p>
+                            <p id="stat-active-scripts" class="text-2xl font-bold text-white">0</p>
                         </div>
                         <div class="w-12 h-12 rounded-lg bg-green-500/20 flex items-center justify-center">
-                            <i class="fas fa-box text-green-400 text-xl"></i>
+                            <i class="fas fa-lock text-green-400 text-xl"></i>
                         </div>
                     </div>
                 </div>
@@ -209,38 +204,93 @@
                 </div>
             </div>
 
-            <!-- PRODUCTS SECTION -->
-            <div class="card rounded-xl p-6">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
-                        <i class="fas fa-cube text-blue-400"></i>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- PRODUCTS SECTION -->
+                <div class="lg:col-span-2 card rounded-xl p-6">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                            <i class="fas fa-cube text-blue-400"></i>
+                        </div>
+                        <h2 class="text-lg font-bold text-white">Mis Productos Activos</h2>
                     </div>
-                    <h2 class="text-lg font-bold text-white">Mis Productos Activos</h2>
-                </div>
 
-                <div class="mb-6">
-                    <div class="relative">
-                        <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
-                        <input 
-                            type="text" 
-                            id="dashboard-search"
-                            oninput="filterDashboardProducts()"
-                            placeholder="Buscar entre tus recursos..." 
-                            class="input-field w-full pl-12 pr-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none"
-                        >
+                    <div class="mb-6">
+                        <div class="relative">
+                            <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                            <input 
+                                type="text" 
+                                id="dashboard-search"
+                                oninput="filterDashboardProducts()"
+                                placeholder="Buscar entre tus recursos..." 
+                                class="input-field w-full pl-12 pr-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none"
+                            >
+                        </div>
+                    </div>
+
+                    <div id="dashboard-products-list" class="space-y-3">
+                        <!-- Products will be loaded here -->
+                    </div>
+
+                    <div id="dashboard-empty-state" class="hidden text-center py-12 border-2 border-dashed border-blue-900/30 rounded-xl">
+                        <i class="fas fa-search text-gray-600 text-4xl mb-3"></i>
+                        <p class="text-gray-400 mb-4">No tienes productos activos.</p>
+                        <a href="index.html" class="btn-primary inline-block px-6 py-2 rounded-lg text-white font-medium">
+                            Ir a la tienda
+                        </a>
                     </div>
                 </div>
 
-                <div id="dashboard-products-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <!-- Products will be loaded here -->
-                </div>
+                <!-- SETUP SERVER SECTION -->
+                <div class="card rounded-xl p-6">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                            <i class="fas fa-server text-blue-400"></i>
+                        </div>
+                        <h2 class="text-lg font-bold text-white">Setup Servidor MTA</h2>
+                    </div>
 
-                <div id="dashboard-empty-state" class="hidden text-center py-12 border-2 border-dashed border-blue-900/30 rounded-xl">
-                    <i class="fas fa-search text-gray-600 text-4xl mb-3"></i>
-                    <p class="text-gray-400 mb-4">No tienes productos activos.</p>
-                    <a href="index.html" class="btn-primary inline-block px-6 py-2 rounded-lg text-white font-medium">
-                        Ir a la tienda
-                    </a>
+                    <div class="space-y-4 mb-6">
+                        <div>
+                            <label class="block text-gray-400 text-xs uppercase font-semibold mb-2">Server IP</label>
+                            <input type="text" id="server-ip" value="213.181.88.154" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-400 text-xs uppercase font-semibold mb-2">Puerto</label>
+                            <input type="text" id="server-port" value="22003" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="block text-gray-400 text-xs uppercase font-semibold">Código de Licencia</label>
+                            <span class="text-xs text-gray-500">LUA CONFIG</span>
+                        </div>
+                        <div class="code-block rounded-lg p-4 font-mono text-sm">
+                            <pre class="text-blue-300"><code id="license-code">configLicense = {
+    ["User"] = "usuario", 
+    ["Key"] = "PapeletaStore(key)"
+}</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        <button onclick="saveServerConfig()" class="btn-primary px-4 py-2.5 rounded-lg text-white font-medium flex items-center justify-center gap-2">
+                            <i class="fas fa-save"></i>
+                            Guardar
+                        </button>
+                        <button onclick="copyLicenseCode()" class="px-4 py-2.5 rounded-lg border border-blue-500/30 text-blue-400 hover:bg-blue-500/10 font-medium flex items-center justify-center gap-2 transition-all">
+                            <i class="fas fa-copy"></i>
+                            Copiar Código
+                        </button>
+                    </div>
+
+                    <div class="bg-blue-900/20 border border-blue-500/20 rounded-lg p-3">
+                        <div class="flex items-start gap-2">
+                            <i class="fas fa-info-circle text-blue-400 mt-0.5"></i>
+                            <p class="text-xs text-gray-400">Copia este código en tu server .lua para activar tus licencias en este servidor.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -265,6 +315,8 @@
         const CLIENT_ID = '1213866547181780992'; 
         const REDIRECT_URI = window.location.href.split('#')[0]; 
         
+        const ADMIN_DISCORD_IDS = ['890526767608127489']; 
+
         // --- FIREBASE CONFIGURATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
@@ -284,7 +336,7 @@
 
         let currentUser = null;
         let allProducts = [];
-        let myPurchasedProducts = [];
+        let myAssignedProductIds = new Set();
         let allLicenses = [];
 
         // --- AUTH FUNCTIONS ---
@@ -330,7 +382,8 @@
                 }
                 
                 document.getElementById('login-modal').classList.add('hidden');
-                loadAllData();
+                loadDashboardData();
+                loadLicenses();
             })
             .catch(err => {
                 console.error(err);
@@ -345,97 +398,93 @@
         }
 
         function showSection(section) {
-            // Implement navigation if needed
+            if (section === 'store') {
+                window.location.href = 'index.html';
+            }
         }
 
-        // --- LOAD ALL DATA ---
-        async function loadAllData() {
+        // --- DASHBOARD FUNCTIONS ---
+        async function loadDashboardData() {
             if (!currentUser) return;
-            
+
             try {
-                // Load products
+                // Primero cargar todos los productos disponibles
                 const productsSnapshot = await db.collection("Productos").get();
                 allProducts = [];
                 productsSnapshot.forEach((doc) => {
                     allProducts.push({ id: doc.id, ...doc.data() });
                 });
-                
-                // Load purchases from Clientes collection
+
+                // Luego consultar las compras del usuario en la colección "Clientes"
                 const clientesSnapshot = await db.collection("Clientes")
                     .where("discord_id", "==", currentUser.id)
                     .get();
-                
-                myPurchasedProducts = [];
+
+                let purchasedProducts = [];
                 let totalSpent = 0;
-                
+
                 clientesSnapshot.forEach((doc) => {
                     const purchase = doc.data();
                     if (purchase.products && Array.isArray(purchase.products)) {
                         purchase.products.forEach(prod => {
+                            // Buscar el producto completo en allProducts
                             const productData = allProducts.find(p => p.id === prod.id);
                             if (productData) {
-                                myPurchasedProducts.push({
+                                purchasedProducts.push({
                                     ...productData,
                                     purchaseDate: purchase.date?.toDate() || new Date(),
                                     status: purchase.status || 'Activo',
                                     price: prod.price
                                 });
                                 
-                                if (prod.price !== "Gratis" && prod.price !== "Gratis") {
+                                // Calcular total gastado
+                                if (prod.price !== "Gratis") {
                                     totalSpent += parseFloat(prod.price.replace('$', '')) || 0;
                                 }
                             }
                         });
                     }
                 });
-                
-                // Update stats
+
+                // Actualizar estadísticas
                 document.getElementById('stat-total-spent').innerText = '$' + totalSpent.toFixed(2);
-                document.getElementById('stat-active-products').innerText = myPurchasedProducts.length;
+                document.getElementById('stat-active-scripts').innerText = purchasedProducts.length;
                 
-                // Render products
-                renderDashboardProducts();
+                // Renderizar productos
+                renderDashboardProducts(purchasedProducts);
+                
+                // Mostrar/ocultar estado vacío
+                if (purchasedProducts.length === 0) {
+                    document.getElementById('dashboard-empty-state').classList.remove('hidden');
+                } else {
+                    document.getElementById('dashboard-empty-state').classList.add('hidden');
+                }
                 
             } catch (error) {
-                console.error("Error loading data:", error);
+                console.error("Error cargando datos del dashboard:", error);
             }
         }
 
-        function renderDashboardProducts() {
+        function renderDashboardProducts(products) {
             const container = document.getElementById('dashboard-products-list');
-            const emptyState = document.getElementById('dashboard-empty-state');
             
-            if (myPurchasedProducts.length === 0) {
+            if (products.length === 0) {
                 container.innerHTML = '';
-                emptyState.classList.remove('hidden');
                 return;
             }
             
-            emptyState.classList.add('hidden');
-            
-            container.innerHTML = myPurchasedProducts.map(item => `
-                <div class="product-card bg-blue-900/10 border border-blue-500/20 rounded-xl p-4 flex flex-col">
-                    <div class="flex items-start gap-4 mb-4">
-                        <img src="${item.image_url || ''}" alt="${item.name}" class="w-20 h-20 object-cover rounded-lg bg-blue-900/30">
-                        <div class="flex-1 min-w-0">
-                            <h3 class="text-white font-semibold text-lg mb-1">${item.name}</h3>
-                            <p class="text-gray-400 text-sm mb-2">${item.category || 'Producto'}</p>
-                            <span class="inline-block ${item.price === 'Gratis' || item.price === 0 ? 'bg-green-500/20 text-green-400' : 'bg-blue-500/20 text-blue-400'} text-xs font-bold px-2 py-1 rounded">
-                                ${item.price === 'Gratis' || item.price === 0 ? 'GRATIS' : item.price}
-                            </span>
+            container.innerHTML = products.map(item => `
+                <div class="bg-blue-900/10 border border-blue-500/20 rounded-lg p-4 flex items-center justify-between hover:border-blue-500/40 transition-all">
+                    <div class="flex items-center gap-4">
+                        <img src="${item.image_url || ''}" alt="${item.name}" class="w-16 h-16 object-cover rounded-lg">
+                        <div>
+                            <h3 class="text-white font-semibold">${item.name}</h3>
+                            <p class="text-gray-400 text-sm">${item.price === 'Gratis' ? 'GRATIS' : '$' + Number(item.price).toFixed(2)}</p>
                         </div>
                     </div>
-                    
-                    <div class="mt-auto space-y-2">
-                        <button onclick="downloadProduct('${item.id}')" class="w-full btn-primary px-4 py-2.5 rounded-lg text-white text-sm font-medium flex items-center justify-center gap-2">
-                            <i class="fas fa-download"></i>
-                            Descargar
-                        </button>
-                        <button onclick="viewLicense('${item.id}')" class="w-full px-4 py-2.5 rounded-lg border border-blue-500/30 text-blue-400 hover:bg-blue-500/10 text-sm font-medium flex items-center justify-center gap-2 transition-all">
-                            <i class="fas fa-key"></i>
-                            Ver Licencia
-                        </button>
-                    </div>
+                    <button onclick="downloadProduct('${item.id}')" class="btn-primary px-4 py-2 rounded-lg text-white text-sm font-medium">
+                        <i class="fas fa-download mr-2"></i>Descargar
+                    </button>
                 </div>
             `).join('');
         }
@@ -451,41 +500,22 @@
         }
 
         function downloadProduct(productId) {
-            const product = myPurchasedProducts.find(p => p.id === productId);
+            const product = allProducts.find(p => p.id === productId);
             if (!product) return;
             
             if (product.file_data) {
-                // Create download link
                 const link = document.createElement('a');
                 link.href = product.file_data;
-                link.download = product.file_name || `papeleta_${productId}.zip`;
+                link.download = product.file_name || 'archivo.zip';
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-                
-                // Show success message
-                alert(`Descargando ${product.name}...`);
             } else {
-                alert('Este producto no tiene archivo disponible para descargar. Contacta al soporte.');
+                alert('Este producto no tiene archivo disponible. Contacta al soporte.');
             }
         }
 
-        function viewLicense(productId) {
-            const license = allLicenses.find(l => l.product_id === productId);
-            if (license) {
-                const licenseText = `ConfigLicense = {
-    ["User"] = "${currentUser.username}", 
-    ["Key"] = "PapeletaStore(${license.key})"
-}`;
-                navigator.clipboard.writeText(licenseText).then(() => {
-                    alert('Licencia copiada al portapapeles:\n\n' + licenseText);
-                });
-            } else {
-                alert('No se encontró una licencia para este producto.');
-            }
-        }
-
-        // --- LOAD LICENSES ---
+        // --- LICENSE FUNCTIONS ---
         async function loadLicenses() {
             if (!currentUser) return;
             
@@ -498,14 +528,49 @@
                 snapshot.forEach((doc) => {
                     allLicenses.push({ id: doc.id, ...doc.data() });
                 });
+                
+                if (allLicenses.length > 0) {
+                    updateLicenseCode();
+                }
             } catch (error) {
                 console.error("Error cargando licencias:", error);
             }
         }
 
+        function updateLicenseCode() {
+            if (allLicenses.length > 0) {
+                const license = allLicenses[0];
+                const code = `configLicense = {
+    ["User"] = "${currentUser.username}", 
+    ["Key"] = "PapeletaStore(${license.key || currentUser.id})"
+}`;
+                document.getElementById('license-code').textContent = code;
+            }
+        }
+
+        function copyLicenseCode() {
+            const code = document.getElementById('license-code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('¡Código copiado al portapapeles!');
+            });
+        }
+
+        function saveServerConfig() {
+            const ip = document.getElementById('server-ip').value;
+            const port = document.getElementById('server-port').value;
+            
+            localStorage.setItem('server_config', JSON.stringify({ ip, port }));
+            alert('Configuración guardada correctamente');
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             checkDiscordAuth();
+            
+            // Load saved server config
+            const savedConfig = JSON.parse(localStorage.getItem('server_config') || '{}');
+            if (savedConfig.ip) document.getElementById('server-ip').value = savedConfig.ip;
+            if (savedConfig.port) document.getElementById('server-port').value = savedConfig.port;
         });
     </script>
 </body>
