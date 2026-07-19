@@ -11,6 +11,10 @@
     <!-- SDK de PayPal -->
     <script src="https://www.paypal.com/sdk/js?client-id=sb&currency=USD"></script>
 
+    <!-- FIREBASE SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
     <style>
         :root {
             --bg-body: #050507;
@@ -543,9 +547,9 @@
                 </form>
                 
                 <div class="mt-6 pt-6 border-t border-red-950/40">
-                    <h4 class="text-white font-semibold mb-3 text-sm">Productos Agregados (LocalStorage):</h4>
+                    <h4 class="text-white font-semibold mb-3 text-sm">Productos Agregados (Firebase):</h4>
                     <div id="admin-products-list" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
-                        <p class="text-gray-500 text-sm">No hay productos locales aún.</p>
+                        <p class="text-gray-500 text-sm">Cargando productos...</p>
                     </div>
                 </div>
             </div>
@@ -587,6 +591,21 @@
         let currentDetailProduct = null;
         let cart = [];
         let localProducts = JSON.parse(localStorage.getItem('papeleta_local_products') || '[]');
+
+        const firebaseConfig = {
+           apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
+            authDomain: "papeletalicencia.firebaseapp.com",
+            databaseURL: "https://papeletalicencia-default-rtdb.firebaseio.com",
+            projectId: "papeletalicencia",
+            storageBucket: "papeletalicencia.appspot.com",
+            messagingSenderId: "677208314051",
+          appId: "1:677208314051:web:a27c04f31d402e83f29276",
+            measurementId: "G-RPJ4KQ6EQ4"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
         // --- FUNCIONES DE SUBIDA DE PRODUCTOS ---
         
@@ -681,41 +700,38 @@
                     category: category,
                     description: description,
                     image_url: resizedImage,
-                    file_data: fileBase64, // Guardamos el archivo en base64
-                    file_name: downloadFile.name
+                    file_data: fileBase64,
+                    file_name: downloadFile.name,
+                    created_at: firebase.firestore.FieldValue.serverTimestamp()
                 };
                 
-                localProducts.push(newProduct);
-                localStorage.setItem('papeleta_local_products', JSON.stringify(localProducts));
+                // Guardar en Firebase Collection "Productos"
+                await db.collection("Productos").doc(newProduct.id).set(newProduct);
                 
-                // Agregar a allProducts
-                allProducts.push(newProduct);
-                
-                alert('Producto agregado exitosamente');
+                alert('Producto guardado en Firebase (Productos.json virtual) exitosamente');
                 document.getElementById('product-form').reset();
                 document.getElementById('image-preview').classList.add('hidden');
                 document.getElementById('file-label-text').innerText = 'Haz clic para subir el archivo descargable';
                 document.getElementById('file-label-text').classList.remove('text-white', 'font-bold');
                 
-                renderProducts();
-                loadAdminProductsList();
-                document.getElementById('stat-productos').innerText = '+' + allProducts.length;
+                loadProducts(); // Recargar lista
                 
             } catch (error) {
                 console.error(error);
-                alert('Error al procesar los archivos. Intenta con archivos más pequeños.');
+                alert('Error al guardar en Firebase: ' + error.message);
             }
         }
         
         function loadAdminProductsList() {
             const container = document.getElementById('admin-products-list');
             
-            if (localProducts.length === 0) {
+            // Usamos allProducts que ya viene de Firebase
+            if (allProducts.length === 0) {
                 container.innerHTML = '<p class="text-gray-500 text-sm">No hay productos locales aún.</p>';
                 return;
             }
             
-            container.innerHTML = localProducts.map(p => `
+            container.innerHTML = allProducts.map(p => `
                 <div class="flex items-center gap-3 bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-2.5">
                     <img src="${p.image_url}" class="w-10 h-10 rounded-lg object-cover">
                     <div class="flex-grow min-w-0">
@@ -723,24 +739,31 @@
                         <p class="${Number(p.price) === 0 ? 'text-green-400' : 'text-red-400'} text-xs font-bold">${Number(p.price) === 0 ? 'GRATIS' : '$' + Number(p.price).toFixed(2)}</p>
                         <p class="text-gray-500 text-[10px] truncate"><i class="fas fa-file-archive mr-1"></i>${escapeHTML(p.file_name || 'Sin archivo')}</p>
                     </div>
-                    <button onclick="deleteLocalProduct('${p.id}')" class="text-red-400 hover:text-red-300 w-8 h-8 rounded-lg hover:bg-red-950/30 flex items-center justify-center transition-all">
+                    <button onclick="deleteProduct('${p.id}')" class="text-red-400 hover:text-red-300 w-8 h-8 rounded-lg hover:bg-red-950/30 flex items-center justify-center transition-all">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
             `).join('');
         }
         
-        function deleteLocalProduct(id) {
-            if (!confirm('¿Eliminar este producto?')) return;
+        async function deleteProduct(id) {
+            if (!confirm('¿Eliminar este producto de la tienda? (Los clientes que ya lo compraron NO perderán su acceso)')) return;
             
-            localProducts = localProducts.filter(p => p.id !== id);
-            localStorage.setItem('papeleta_local_products', JSON.stringify(localProducts));
-            
-            allProducts = allProducts.filter(p => p.id !== id);
-            
-            loadAdminProductsList();
-            renderProducts();
-            document.getElementById('stat-productos').innerText = '+' + allProducts.length;
+            try {
+                // Borrar de Firebase
+                await db.collection("Productos").doc(id).delete();
+                
+                // Actualizar vista local
+                allProducts = allProducts.filter(p => p.id !== id);
+                
+                loadAdminProductsList();
+                renderProducts();
+                document.getElementById('stat-productos').innerText = '+' + allProducts.length;
+                alert('Producto eliminado de la tienda.');
+            } catch (error) {
+                console.error(error);
+                alert('Error al eliminar: ' + error.message);
+            }
         }
 
         // --- FUNCIONES DEL CARRITO ---
@@ -835,7 +858,7 @@
         }
 
         // --- FUNCIÓN PARA RECLAMAR PRODUCTOS GRATIS ---
-        function claimFreeProducts() {
+        async function claimFreeProducts() {
             if (!currentUser) {
                 alert('Debes iniciar sesión para reclamar productos gratis');
                 openLoginModal();
@@ -854,20 +877,42 @@
                 return;
             }
             
-            // Agregar productos al usuario
-            cart.forEach(item => {
-                myAssignedProductIds.add(item.id);
-            });
-            
-            saveUserDataLocally();
-            loadDashboardData();
-            
-            alert('¡Productos reclamados exitosamente! Ya están disponibles en tu biblioteca.');
-            
-            // Limpiar carrito
-            cart = [];
-            updateCartUI();
-            closeCartModal();
+            // Guardar en Firebase Colección "Clientes"
+            try {
+                const purchaseData = {
+                    discord_id: currentUser.id,
+                    username: currentUser.username,
+                    avatar: currentUser.avatar,
+                    products: cart.map(item => ({
+                        id: item.id,
+                        name: item.name,
+                        price: "Gratis"
+                    })),
+                    total_price: "Gratis",
+                    date: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: "Reclamado Exitosamente"
+                };
+
+                await db.collection("Clientes").add(purchaseData);
+                
+                // Agregar productos al usuario localmente para visualización inmediata
+                cart.forEach(item => {
+                    myAssignedProductIds.add(item.id);
+                });
+                
+                saveUserDataLocally();
+                loadDashboardData();
+                
+                alert('¡Productos reclamados exitosamente! Ya están disponibles en tu biblioteca.\n\nGracias por seguir confiando en nuestra tienda y en cada uno de nuestros productos digitales. Seguimos trabajando para brindar la mejor calidad a toda nuestra comunidad.');
+                
+                // Limpiar carrito
+                cart = [];
+                updateCartUI();
+                closeCartModal();
+            } catch (error) {
+                console.error(error);
+                alert('Error al registrar la reclamación: ' + error.message);
+            }
         }
 
         function openCartModal() {
@@ -919,7 +964,7 @@
                     return actions.order.capture().then(function(details) {
                         alert('¡Pago completado por ' + details.payer.name.given_name + '!');
                         
-                        assignProductsToUserAfterPayment();
+                        assignProductsToUserAfterPayment(details);
                         giveClientRole();
                         
                         cart = [];
@@ -946,16 +991,41 @@
             saveUserDataLocally();
         }
 
-        function assignProductsToUserAfterPayment() {
+        async function assignProductsToUserAfterPayment(paymentDetails) {
             if(!currentUser) return;
             
-            cart.forEach(item => {
-                myAssignedProductIds.add(item.id);
-            });
-            
-            saveUserDataLocally();
-            loadDashboardData();
-            alert("¡Productos añadidos a tu biblioteca!");
+            // Guardar en Firebase Colección "Clientes"
+            try {
+                const purchaseData = {
+                    discord_id: currentUser.id,
+                    username: currentUser.username,
+                    avatar: currentUser.avatar,
+                    products: cart.map(item => ({
+                        id: item.id,
+                        name: item.name,
+                        price: "$" + Number(item.price).toFixed(2)
+                    })),
+                    total_price: "$" + cart.reduce((sum, item) => sum + Number(item.price), 0).toFixed(2),
+                    payment_id: paymentDetails.id,
+                    payer_email: paymentDetails.payer.email_address,
+                    date: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: "Pagado"
+                };
+
+                await db.collection("Clientes").add(purchaseData);
+                
+                // Agregar productos al usuario localmente
+                cart.forEach(item => {
+                    myAssignedProductIds.add(item.id);
+                });
+                
+                saveUserDataLocally();
+                loadDashboardData();
+                alert("¡Productos añadidos a tu biblioteca!");
+            } catch (error) {
+                console.error(error);
+                alert('Error al registrar la compra en la base de datos: ' + error.message);
+            }
         }
 
         function checkoutManual() {
@@ -1309,22 +1379,19 @@
             if (link) link.classList.add('active-page');
         }
 
-        // --- CARGA DE PRODUCTOS DESDE JSON ---
+        // --- CARGA DE PRODUCTOS DESDE FIREBASE ---
         async function loadProducts() {
             try {
-                // Combinar productos locales con JSON
-                let jsonProducts = [];
-                try {
-                    const response = await fetch('Productos.json?t=' + new Date().getTime());
-                    if (response.ok) {
-                        jsonProducts = await response.json();
-                        console.log("Productos cargados desde Productos.json");
-                    }
-                } catch (e) {
-                    console.log("No se encontró Productos.json, usando solo productos locales");
-                }
+                // Obtener productos desde Firebase Collection "Productos"
+                const snapshot = await db.collection("Productos").get();
+                const jsonProducts = [];
+                snapshot.forEach((doc) => {
+                    jsonProducts.push(doc.data());
+                });
                 
-                // Combinar ambos arrays
+                console.log("Productos cargados desde Firebase");
+                
+                // Combinar ambos arrays (prioridad a Firebase)
                 allProducts = [...jsonProducts, ...localProducts];
                 
                 buildCategoryFilters();
@@ -1338,7 +1405,7 @@
                     <div class="col-span-full text-center py-10 bg-red-900/20 border border-red-500/50 rounded-xl">
                         <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-3"></i>
                         <p class="text-red-400 font-bold mb-2">Error al cargar productos</p>
-                        <p class="text-gray-400 text-sm max-w-md mx-auto">Verifica la conexión o el archivo Productos.json</p>
+                        <p class="text-gray-400 text-sm max-w-md mx-auto">Verifica la conexión o la configuración de Firebase</p>
                     </div>`;
             }
         }
@@ -1402,7 +1469,7 @@
                         </div>
                         
                         ${isAdmin(currentUser) ? `
-                        <button onclick="deleteLocalProduct('${p.id}')" class="w-full mt-2 bg-transparent border border-red-900/50 hover:border-red-500 hover:bg-red-950/30 text-red-300 text-xs font-semibold py-2 rounded-xl transition-all">
+                        <button onclick="deleteProduct('${p.id}')" class="w-full mt-2 bg-transparent border border-red-900/50 hover:border-red-500 hover:bg-red-950/30 text-red-300 text-xs font-semibold py-2 rounded-xl transition-all">
                             <i class="fas fa-trash mr-1"></i> Eliminar
                         </button>` : ''}
                     </div>
