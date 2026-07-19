@@ -592,21 +592,23 @@
         let cart = [];
         let localProducts = JSON.parse(localStorage.getItem('papeleta_local_products') || '[]');
 
-        const firebaseConfig = {
-           apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
-            authDomain: "papeletalicencia.firebaseapp.com",
-            databaseURL: "https://papeletalicencia-default-rtdb.firebaseio.com",
-            projectId: "papeletalicencia",
-            storageBucket: "papeletalicencia.appspot.com",
-            messagingSenderId: "677208314051",
-          appId: "1:677208314051:web:a27c04f31d402e83f29276",
-            measurementId: "G-RPJ4KQ6EQ4"
-        };
+// --- FIREBASE CONFIGURATION ---
+const firebaseConfig = {
+    apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
+    authDomain: "papeletalicencia.firebaseapp.com",
+    databaseURL: "https://papeletalicencia-default-rtdb.firebaseio.com",
+    projectId: "papeletalicencia",
+    storageBucket: "papeletalicencia.firebasestorage.app",
+    messagingSenderId: "677208314051",
+    appId: "1:677208314051:web:a27c04f31d402e83f29276",
+    measurementId: "G-RPJ4KQ6EQ4"
+};
 
-        // Inicializar Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
+// Inicializar Firebase
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.firestore();
         // --- FUNCIONES DE SUBIDA DE PRODUCTOS ---
         
         function previewImage(input) {
