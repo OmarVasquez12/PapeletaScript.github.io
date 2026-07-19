@@ -522,10 +522,18 @@
                             <img id="image-preview" class="image-preview hidden mx-auto">
                         </div>
                     </div>
-                    
+
+                    <!-- NUEVO CAMPO PARA SUBIR ARCHIVO -->
                     <div>
-                        <label class="block text-gray-300 text-sm font-semibold mb-2">URL de Descarga (opcional)</label>
-                        <input type="url" id="prod-file-url" class="w-full bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500" placeholder="https://...">
+                        <label class="block text-gray-300 text-sm font-semibold mb-2">Archivo del Producto (Zip/Rar/Lua) *</label>
+                        <div class="border-2 border-dashed border-red-900/40 rounded-xl p-4 text-center hover:border-red-500/50 transition-colors bg-[#0d0505]">
+                            <input type="file" id="prod-file" accept=".zip,.rar,.7z,.lua,.txt" required onchange="updateFileName(this)" class="hidden">
+                            <label for="prod-file" class="cursor-pointer block">
+                                <i class="fas fa-file-archive text-3xl text-red-400 mb-2"></i>
+                                <p id="file-label-text" class="text-gray-400 text-sm">Haz clic para subir el archivo descargable</p>
+                                <p class="text-gray-500 text-xs mt-1">El usuario podrá descargar este archivo tras comprarlo</p>
+                            </label>
+                        </div>
                     </div>
                     
                     <button type="submit" class="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-red-900/30">
@@ -593,6 +601,14 @@
                 reader.readAsDataURL(input.files[0]);
             }
         }
+
+        function updateFileName(input) {
+            const label = document.getElementById('file-label-text');
+            if (input.files && input.files[0]) {
+                label.innerText = input.files[0].name;
+                label.classList.add('text-white', 'font-bold');
+            }
+        }
         
         function resizeImage(file, maxWidth = 800, maxHeight = 600) {
             return new Promise((resolve) => {
@@ -629,6 +645,15 @@
                 reader.readAsDataURL(file);
             });
         }
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
         
         async function handleProductSubmit(e) {
             e.preventDefault();
@@ -637,16 +662,17 @@
             const price = parseFloat(document.getElementById('prod-price').value);
             const category = document.getElementById('prod-category').value;
             const description = document.getElementById('prod-description').value;
-            const fileUrl = document.getElementById('prod-file-url').value;
             const imageFile = document.getElementById('prod-image').files[0];
+            const downloadFile = document.getElementById('prod-file').files[0];
             
-            if (!imageFile) {
-                alert('Por favor selecciona una imagen');
+            if (!imageFile || !downloadFile) {
+                alert('Por favor selecciona tanto la imagen como el archivo de descarga');
                 return;
             }
             
             try {
                 const resizedImage = await resizeImage(imageFile);
+                const fileBase64 = await fileToBase64(downloadFile);
                 
                 const newProduct = {
                     id: 'prod_' + Date.now(),
@@ -655,7 +681,8 @@
                     category: category,
                     description: description,
                     image_url: resizedImage,
-                    file_url: fileUrl || '#'
+                    file_data: fileBase64, // Guardamos el archivo en base64
+                    file_name: downloadFile.name
                 };
                 
                 localProducts.push(newProduct);
@@ -667,6 +694,8 @@
                 alert('Producto agregado exitosamente');
                 document.getElementById('product-form').reset();
                 document.getElementById('image-preview').classList.add('hidden');
+                document.getElementById('file-label-text').innerText = 'Haz clic para subir el archivo descargable';
+                document.getElementById('file-label-text').classList.remove('text-white', 'font-bold');
                 
                 renderProducts();
                 loadAdminProductsList();
@@ -674,7 +703,7 @@
                 
             } catch (error) {
                 console.error(error);
-                alert('Error al procesar la imagen');
+                alert('Error al procesar los archivos. Intenta con archivos más pequeños.');
             }
         }
         
@@ -692,6 +721,7 @@
                     <div class="flex-grow min-w-0">
                         <p class="text-white text-sm font-semibold truncate">${escapeHTML(p.name)}</p>
                         <p class="${Number(p.price) === 0 ? 'text-green-400' : 'text-red-400'} text-xs font-bold">${Number(p.price) === 0 ? 'GRATIS' : '$' + Number(p.price).toFixed(2)}</p>
+                        <p class="text-gray-500 text-[10px] truncate"><i class="fas fa-file-archive mr-1"></i>${escapeHTML(p.file_name || 'Sin archivo')}</p>
                     </div>
                     <button onclick="deleteLocalProduct('${p.id}')" class="text-red-400 hover:text-red-300 w-8 h-8 rounded-lg hover:bg-red-950/30 flex items-center justify-center transition-all">
                         <i class="fas fa-trash"></i>
@@ -1459,11 +1489,11 @@
                     </div>
 
                     <div class="flex md:flex-col gap-2 w-full md:w-auto">
-                        <a href="${escapeHTML(item.file_url || '#')}" target="_blank" 
+                        <button onclick="downloadProduct('${item.id}')" 
                            class="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all shadow-lg shadow-red-900/20">
                             <i class="fas fa-download"></i>
                             Descargar
-                        </a>
+                        </button>
                         <button onclick="viewProductDetails('${item.id}')" 
                                 class="flex-1 bg-[#0d0505] hover:bg-[#150a0a] border border-red-800/50 text-gray-300 px-4 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all">
                             <i class="fas fa-eye"></i>
@@ -1505,6 +1535,24 @@
                     <span class="${Number(item.price) === 0 ? 'text-green-400' : 'text-green-400'} font-bold text-sm shrink-0 ml-4">${priceDisplay}</span>
                 </div>
             `}).join('');
+        }
+
+        // --- FUNCIÓN DE DESCARGA DIRECTA ---
+        function downloadProduct(productId) {
+            const product = allProducts.find(p => p.id === productId);
+            if (!product) return;
+            
+            if (product.file_data) {
+                // Crear enlace temporal para descargar el archivo base64
+                const link = document.createElement('a');
+                link.href = product.file_data;
+                link.download = product.file_name || 'archivo_descarga.zip';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else {
+                alert('Este producto no tiene un archivo adjunto disponible.');
+            }
         }
 
         function filterDashboardProducts() {
