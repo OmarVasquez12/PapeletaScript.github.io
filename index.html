@@ -450,7 +450,7 @@
     <script>
         // --- CONFIGURACIÓN ---
         const CLIENT_ID = '1213866547181780992'; 
-        const REDIRECT_URI = window.location.href.split('#')[0]; 
+       const REDIRECT_URI = 'https://papeleta-script-github-io.vercel.app/index.html#';
         const DISCORD_INVITE = 'https://discord.gg/rvxEdWcGkf';
         
         const ADMIN_DISCORD_IDS = ['890526767608127489']; 
@@ -1346,9 +1346,12 @@ const db = firebase.firestore();
                                 <i class="fas fa-shopping-cart"></i>
                                 ${Number(p.price) === 0 ? 'Reclamar' : 'Añadir'}
                             </button>
+                            
+                            <!-- AQUÍ ESTÁ EL CAMBIO: ENLACE A Producto.html -->
                             <a href="Producto.html?id=${p.id}" class="block w-full bg-[#0d0505] hover:bg-[#150a0a] border border-red-800/50 text-gray-300 text-sm font-semibold py-2.5 rounded-xl transition-all text-center no-underline">
                                 Ver Detalles
                             </a>
+                            
                         </div>
                         
                         ${isAdmin(currentUser) ? `
