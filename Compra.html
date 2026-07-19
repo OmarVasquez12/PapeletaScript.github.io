@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Area De Clientes | Papeleta Store</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%233b82f6'/%3E%3Cstop offset='1' stop-color='%231e40af'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Ctext x='50' y='70' font-family='Arial, sans-serif' font-size='58' font-weight='900' fill='white' text-anchor='middle'%3EP%3C/text%3E%3C/svg%3E">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- FIREBASE SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            color: #e2e8f0;
+        }
+        
+        .sidebar {
+            background: rgba(10, 14, 39, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        
+        .main-content {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+        
+        .card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .nav-item {
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .nav-item.active {
+            background: rgba(59, 130, 246, 0.2);
+            border-left: 3px solid #3b82f6;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.8) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+        
+        .input-field {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .input-field:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .code-block {
+            background: rgba(10, 14, 39, 0.9);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar w-64 fixed left-0 top-0 h-full border-r border-blue-900/20 z-50">
+        <div class="p-6">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center font-black text-white">
+                    P
+                </div>
+                <span class="text-white font-bold text-lg">Area De Clientes</span>
+            </div>
+
+            <nav class="space-y-2">
+                <div class="text-xs text-gray-500 uppercase font-semibold mb-4 px-3">Principal</div>
+                
+                <a href="#" onclick="showSection('dashboard')" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:text-white">
+                    <i class="fas fa-home w-5"></i>
+                    <span>Dashboard</span>
+                </a>
+                
+                <a href="#" onclick="showSection('store')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:text-white">
+                    <i class="fas fa-store w-5"></i>
+                    <span>Tienda</span>
+                </a>
+                
+                <a href="#" onclick="showSection('reviews')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:text-white">
+                    <i class="fas fa-star w-5"></i>
+                    <span>Mis Reseñas</span>
+                </a>
+                
+                <a href="#" onclick="showSection('support')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:text-white">
+                    <i class="fas fa-headset w-5"></i>
+                    <span>Soporte</span>
+                </a>
+                
+                <a href="https://discord.gg/rvxEdWcGkf" target="_blank" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:text-white">
+                    <i class="fab fa-discord w-5"></i>
+                    <span>Discord</span>
+                </a>
+            </nav>
+        </div>
+
+        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-blue-900/20">
+            <div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-blue-900/10">
+                <img id="sidebar-avatar" src="" alt="User" class="w-10 h-10 rounded-full border-2 border-blue-500">
+                <div class="flex-1 min-w-0">
+                    <p id="sidebar-username" class="text-white font-medium text-sm truncate">Usuario</p>
+                    <p class="text-blue-400 text-xs">Cliente</p>
+                </div>
+                <button onclick="logout()" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content flex-1 ml-64 min-h-screen">
+        <!-- HEADER -->
+        <header class="border-b border-blue-900/20 px-8 py-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl font-bold text-white mb-1">Bienvenido, <span id="header-username" class="gradient-text">usuario</span></h1>
+                    <p class="text-gray-400 text-sm">Gestiona tus productos y licencias desde aquí</p>
+                </div>
+                
+                <button onclick="showSection('store')" class="btn-primary px-4 py-2 rounded-lg text-white font-medium flex items-center gap-2">
+                    <i class="fas fa-shopping-cart"></i>
+                    Catálogo
+                </button>
+            </div>
+        </header>
+
+        <div class="p-8">
+            <!-- STATS CARDS -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="stat-card rounded-xl p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-xs uppercase font-semibold mb-1">Total Invertido</p>
+                            <p id="stat-total-spent" class="text-2xl font-bold text-white">$0.00</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                            <i class="fas fa-wallet text-blue-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card rounded-xl p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-xs uppercase font-semibold mb-1">Scripts Activos</p>
+                            <p id="stat-active-scripts" class="text-2xl font-bold text-white">0</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-lg bg-green-500/20 flex items-center justify-center">
+                            <i class="fas fa-lock text-green-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card rounded-xl p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-xs uppercase font-semibold mb-1">Estado de Cuenta</p>
+                            <p id="stat-account-status" class="text-lg font-bold text-cyan-400">Cliente</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-lg bg-cyan-500/20 flex items-center justify-center">
+                            <i class="fas fa-user text-cyan-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- PRODUCTS SECTION -->
+                <div class="lg:col-span-2 card rounded-xl p-6">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                            <i class="fas fa-cube text-blue-400"></i>
+                        </div>
+                        <h2 class="text-lg font-bold text-white">Mis Productos Activos</h2>
+                    </div>
+
+                    <div class="mb-6">
+                        <div class="relative">
+                            <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                            <input 
+                                type="text" 
+                                id="dashboard-search"
+                                oninput="filterDashboardProducts()"
+                                placeholder="Buscar entre tus recursos..." 
+                                class="input-field w-full pl-12 pr-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none"
+                            >
+                        </div>
+                    </div>
+
+                    <div id="dashboard-products-list" class="space-y-3">
+                        <!-- Products will be loaded here -->
+                    </div>
+
+                    <div id="dashboard-empty-state" class="hidden text-center py-12 border-2 border-dashed border-blue-900/30 rounded-xl">
+                        <i class="fas fa-search text-gray-600 text-4xl mb-3"></i>
+                        <p class="text-gray-400 mb-4">No tienes productos activos.</p>
+                        <button onclick="showSection('store')" class="btn-primary px-6 py-2 rounded-lg text-white font-medium">
+                            Ir a la tienda
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SETUP SERVER SECTION -->
+                <div class="card rounded-xl p-6">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                            <i class="fas fa-server text-blue-400"></i>
+                        </div>
+                        <h2 class="text-lg font-bold text-white">Setup Servidor MTA</h2>
+                    </div>
+
+                    <div class="space-y-4 mb-6">
+                        <div>
+                            <label class="block text-gray-400 text-xs uppercase font-semibold mb-2">Server IP</label>
+                            <input type="text" id="server-ip" value="213.181.88.154" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-400 text-xs uppercase font-semibold mb-2">Puerto</label>
+                            <input type="text" id="server-port" value="22003" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="block text-gray-400 text-xs uppercase font-semibold">Código de Licencia</label>
+                            <span class="text-xs text-gray-500">LUA CONFIG</span>
+                        </div>
+                        <div class="code-block rounded-lg p-4 font-mono text-sm">
+                            <pre class="text-blue-300"><code id="license-code">license = {
+    key = "PIXEL(890526767608127489)"
+}</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        <button onclick="saveServerConfig()" class="btn-primary px-4 py-2.5 rounded-lg text-white font-medium flex items-center justify-center gap-2">
+                            <i class="fas fa-save"></i>
+                            Guardar
+                        </button>
+                        <button onclick="copyLicenseCode()" class="px-4 py-2.5 rounded-lg border border-blue-500/30 text-blue-400 hover:bg-blue-500/10 font-medium flex items-center justify-center gap-2 transition-all">
+                            <i class="fas fa-copy"></i>
+                            Copiar Código
+                        </button>
+                    </div>
+
+                    <div class="bg-blue-900/20 border border-blue-500/20 rounded-lg p-3">
+                        <div class="flex items-start gap-2">
+                            <i class="fas fa-info-circle text-blue-400 mt-0.5"></i>
+                            <p class="text-xs text-gray-400">Copia este código en tu server .lua para activar tus licencias en este servidor.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- LOGIN MODAL -->
+    <div id="login-modal" class="hidden fixed inset-0 bg-black/80 z-[60] flex items-center justify-center px-4 backdrop-blur-sm">
+        <div class="max-w-md w-full bg-[#0f172a] border border-blue-900/30 rounded-2xl p-8 text-center shadow-2xl">
+            <div class="mx-auto w-20 h-20 rounded-xl mb-6 shadow-lg border-2 border-blue-500 bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-3xl font-black">P</div>
+            <h1 class="text-3xl font-black text-white mb-2">PAPELETA <span class="text-blue-400">STORE</span></h1>
+            <p class="text-gray-400 text-sm mb-8">Debes iniciar sesión para acceder al área de clientes</p>
+
+            <button onclick="redirectToDiscord()" class="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-3.5 px-6 rounded-xl flex items-center justify-center gap-3 transition-all">
+                <i class="fab fa-discord text-xl"></i>
+                Iniciar Sesión con Discord
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIGURACIÓN ---
+        const CLIENT_ID = '1213866547181780992'; 
+        const REDIRECT_URI = window.location.href.split('#')[0]; 
+        
+        const ADMIN_DISCORD_IDS = ['890526767608127489']; 
+
+        // --- FIREBASE CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
+            authDomain: "papeletalicencia.firebaseapp.com",
+            databaseURL: "https://papeletalicencia-default-rtdb.firebaseio.com",
+            projectId: "papeletalicencia",
+            storageBucket: "papeletalicencia.firebasestorage.app",
+            messagingSenderId: "677208314051",
+            appId: "1:677208314051:web:a27c04f31d402e83f29276",
+            measurementId: "G-RPJ4KQ6EQ4"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+
+        let currentUser = null;
+        let allProducts = [];
+        let myAssignedProductIds = new Set();
+        let allLicenses = [];
+
+        // --- AUTH FUNCTIONS ---
+        function redirectToDiscord() {
+            const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20email`;
+            window.location.href = url;
+        }
+
+        function checkDiscordAuth() {
+            const fragment = new URLSearchParams(window.location.hash.slice(1));
+            const accessToken = fragment.get('access_token');
+
+            if (accessToken) {
+                window.location.hash = '';
+                localStorage.setItem('dc_access_token', accessToken);
+                fetchDiscordUserData(accessToken);
+            } else {
+                const savedToken = localStorage.getItem('dc_access_token');
+                if (savedToken) {
+                    fetchDiscordUserData(savedToken);
+                } else {
+                    document.getElementById('login-modal').classList.remove('hidden');
+                }
+            }
+        }
+
+        function fetchDiscordUserData(token) {
+            fetch('https://discord.com/api/users/@me', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Token expirado');
+                return res.json();
+            })
+            .then(user => {
+                currentUser = user;
+                document.getElementById('header-username').innerText = user.username;
+                document.getElementById('sidebar-username').innerText = user.username;
+                
+                if (user.avatar) {
+                    const avatarUrl = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
+                    document.getElementById('sidebar-avatar').src = avatarUrl;
+                }
+                
+                document.getElementById('login-modal').classList.add('hidden');
+                loadDashboardData();
+                loadLicenses();
+            })
+            .catch(err => {
+                console.error(err);
+                logout();
+            });
+        }
+
+        function logout() {
+            localStorage.removeItem('dc_access_token');
+            currentUser = null;
+            location.reload();
+        }
+
+        function showSection(section) {
+            if (section === 'store') {
+                window.location.href = '/'; // Redirige a la tienda principal
+            }
+            // Otras secciones pueden implementarse aquí
+        }
+
+        // --- DASHBOARD FUNCTIONS ---
+        async function loadDashboardData() {
+            if (!currentUser) return;
+
+            const savedData = JSON.parse(localStorage.getItem('papeleta_user_' + currentUser.id) || '{}');
+            const assignedIds = savedData.assigned_products || [];
+            
+            const products = assignedIds.map(id => {
+                const prod = allProducts.find(p => p.id === id);
+                return prod ? { ...prod, assigned_at: new Date().toISOString() } : null;
+            }).filter(Boolean);
+
+            const totalSpent = products.reduce((sum, p) => sum + (p.price || 0), 0);
+            
+            document.getElementById('stat-total-spent').innerText = '$' + totalSpent.toFixed(2);
+            document.getElementById('stat-active-scripts').innerText = products.length;
+            
+            renderDashboardProducts(products);
+            
+            if (products.length === 0) {
+                document.getElementById('dashboard-empty-state').classList.remove('hidden');
+            }
+        }
+
+        function renderDashboardProducts(products) {
+            const container = document.getElementById('dashboard-products-list');
+            
+            if (products.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            container.innerHTML = products.map(item => `
+                <div class="bg-blue-900/10 border border-blue-500/20 rounded-lg p-4 flex items-center justify-between hover:border-blue-500/40 transition-all">
+                    <div class="flex items-center gap-4">
+                        <img src="${item.image_url || ''}" alt="${item.name}" class="w-16 h-16 object-cover rounded-lg">
+                        <div>
+                            <h3 class="text-white font-semibold">${item.name}</h3>
+                            <p class="text-gray-400 text-sm">$${Number(item.price).toFixed(2)}</p>
+                        </div>
+                    </div>
+                    <button onclick="downloadProduct('${item.id}')" class="btn-primary px-4 py-2 rounded-lg text-white text-sm font-medium">
+                        <i class="fas fa-download mr-2"></i>Descargar
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function filterDashboardProducts() {
+            const search = document.getElementById('dashboard-search').value.toLowerCase();
+            const cards = document.querySelectorAll('#dashboard-products-list > div');
+            
+            cards.forEach(card => {
+                const text = card.innerText.toLowerCase();
+                card.style.display = text.includes(search) ? '' : 'none';
+            });
+        }
+
+        function downloadProduct(productId) {
+            const product = allProducts.find(p => p.id === productId);
+            if (!product) return;
+            
+            if (product.file_data) {
+                const link = document.createElement('a');
+                link.href = product.file_data;
+                link.download = product.file_name || 'archivo.zip';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+
+        // --- LICENSE FUNCTIONS ---
+        async function loadLicenses() {
+            if (!currentUser) return;
+            
+            try {
+                const snapshot = await db.collection("Licencias")
+                    .where("discord_id", "==", currentUser.id)
+                    .get();
+                
+                allLicenses = [];
+                snapshot.forEach((doc) => {
+                    allLicenses.push({ id: doc.id, ...doc.data() });
+                });
+                
+                if (allLicenses.length > 0) {
+                    updateLicenseCode();
+                }
+            } catch (error) {
+                console.error("Error cargando licencias:", error);
+            }
+        }
+
+        function updateLicenseCode() {
+            if (allLicenses.length > 0) {
+                const license = allLicenses[0];
+                const code = `license = {
+    key = "PIXEL(${currentUser.id})"
+}`;
+                document.getElementById('license-code').textContent = code;
+            }
+        }
+
+        function copyLicenseCode() {
+            const code = document.getElementById('license-code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('¡Código copiado al portapapeles!');
+            });
+        }
+
+        function saveServerConfig() {
+            const ip = document.getElementById('server-ip').value;
+            const port = document.getElementById('server-port').value;
+            
+            localStorage.setItem('server_config', JSON.stringify({ ip, port }));
+            alert('Configuración guardada correctamente');
+        }
+
+        // --- LOAD PRODUCTS ---
+        async function loadProducts() {
+            try {
+                const snapshot = await db.collection("Productos").get();
+                allProducts = [];
+                snapshot.forEach((doc) => {
+                    allProducts.push(doc.data());
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            checkDiscordAuth();
+            loadProducts();
+            
+            // Load saved server config
+            const savedConfig = JSON.parse(localStorage.getItem('server_config') || '{}');
+            if (savedConfig.ip) document.getElementById('server-ip').value = savedConfig.ip;
+            if (savedConfig.port) document.getElementById('server-port').value = savedConfig.port;
+        });
+    </script>
+</body>
+</html>
