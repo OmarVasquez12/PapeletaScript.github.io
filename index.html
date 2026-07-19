@@ -143,6 +143,12 @@
                     <span id="cart-total" class="text-2xl font-black text-white">$0.00</span>
                 </div>
                 
+                <!-- BOTÓN RECLAMAR (para productos GRATIS) -->
+                <button id="claim-free-btn" onclick="claimFreeProducts()" class="hidden w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-green-900/30 mb-3">
+                    <i class="fas fa-gift"></i>
+                    Reclamar Productos Gratis
+                </button>
+                
                 <!-- PAYPAL BUTTON CONTAINER -->
                 <div id="paypal-button-container" class="mt-2"></div>
                 
@@ -685,7 +691,7 @@
                     <img src="${p.image_url}" class="w-10 h-10 rounded-lg object-cover">
                     <div class="flex-grow min-w-0">
                         <p class="text-white text-sm font-semibold truncate">${escapeHTML(p.name)}</p>
-                        <p class="text-red-400 text-xs font-bold">$${Number(p.price).toFixed(2)}</p>
+                        <p class="${Number(p.price) === 0 ? 'text-green-400' : 'text-red-400'} text-xs font-bold">${Number(p.price) === 0 ? 'GRATIS' : '$' + Number(p.price).toFixed(2)}</p>
                     </div>
                     <button onclick="deleteLocalProduct('${p.id}')" class="text-red-400 hover:text-red-300 w-8 h-8 rounded-lg hover:bg-red-950/30 flex items-center justify-center transition-all">
                         <i class="fas fa-trash"></i>
@@ -744,6 +750,9 @@
             const itemsEl = document.getElementById('cart-items');
             const emptyEl = document.getElementById('cart-empty');
             const totalEl = document.getElementById('cart-total');
+            const claimBtn = document.getElementById('claim-free-btn');
+            const paypalContainer = document.getElementById('paypal-button-container');
+            const manualBtn = document.getElementById('manual-checkout-btn');
             
             const count = cart.length;
             if (count > 0) {
@@ -756,6 +765,9 @@
             if (cart.length === 0) {
                 itemsEl.innerHTML = '';
                 emptyEl.classList.remove('hidden');
+                claimBtn.classList.add('hidden');
+                paypalContainer.innerHTML = '';
+                manualBtn.classList.add('hidden');
             } else {
                 emptyEl.classList.add('hidden');
                 itemsEl.innerHTML = cart.map(item => `
@@ -763,17 +775,69 @@
                         <img src="${escapeHTML(item.image || '')}" alt="${escapeHTML(item.name)}" class="w-16 h-16 object-cover rounded-lg bg-[#150a0a]">
                         <div class="flex-grow min-w-0">
                             <h4 class="text-white font-semibold text-sm truncate">${escapeHTML(item.name)}</h4>
-                            <p class="text-green-400 font-bold text-sm">$${Number(item.price).toFixed(2)}</p>
+                            <p class="${Number(item.price) === 0 ? 'text-green-400' : 'text-green-400'} font-bold text-sm">${Number(item.price) === 0 ? 'GRATIS' : '$' + Number(item.price).toFixed(2)}</p>
                         </div>
                         <button onclick="removeFromCart('${item.id}')" class="text-red-400 hover:text-red-300 w-8 h-8 rounded-lg hover:bg-red-950/30 flex items-center justify-center transition-all">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
                 `).join('');
+                
+                // Calcular total
+                const total = cart.reduce((sum, item) => sum + Number(item.price), 0);
+                totalEl.textContent = total === 0 ? 'GRATIS' : '$' + total.toFixed(2);
+                
+                // Verificar si todos los productos son gratis
+                const allFree = cart.every(item => Number(item.price) === 0);
+                
+                if (allFree && total === 0) {
+                    // Mostrar botón de reclamar, ocultar PayPal y pago manual
+                    claimBtn.classList.remove('hidden');
+                    paypalContainer.innerHTML = '';
+                    manualBtn.classList.add('hidden');
+                } else {
+                    // Ocultar botón de reclamar, mostrar PayPal
+                    claimBtn.classList.add('hidden');
+                    renderPayPalButtons();
+                    manualBtn.classList.remove('hidden');
+                }
+            }
+        }
+
+        // --- FUNCIÓN PARA RECLAMAR PRODUCTOS GRATIS ---
+        function claimFreeProducts() {
+            if (!currentUser) {
+                alert('Debes iniciar sesión para reclamar productos gratis');
+                openLoginModal();
+                return;
             }
             
-            const total = cart.reduce((sum, item) => sum + Number(item.price), 0);
-            totalEl.textContent = `$${total.toFixed(2)}`;
+            if (cart.length === 0) {
+                alert('Tu carrito está vacío');
+                return;
+            }
+            
+            // Verificar que todos sean gratis
+            const allFree = cart.every(item => Number(item.price) === 0);
+            if (!allFree) {
+                alert('Algunos productos no son gratis');
+                return;
+            }
+            
+            // Agregar productos al usuario
+            cart.forEach(item => {
+                myAssignedProductIds.add(item.id);
+            });
+            
+            saveUserDataLocally();
+            loadDashboardData();
+            
+            alert('¡Productos reclamados exitosamente! Ya están disponibles en tu biblioteca.');
+            
+            // Limpiar carrito
+            cart = [];
+            updateCartUI();
+            closeCartModal();
         }
 
         function openCartModal() {
@@ -782,7 +846,9 @@
                  return;
             }
             document.getElementById('cart-modal').classList.remove('hidden');
-            renderPayPalButtons();
+            if (!cart.every(item => Number(item.price) === 0)) {
+                renderPayPalButtons();
+            }
         }
 
         function closeCartModal() {
@@ -795,6 +861,10 @@
             container.innerHTML = ''; 
             
             if (cart.length === 0) return;
+            
+            // Verificar si hay productos de pago
+            const hasPaidProducts = cart.some(item => Number(item.price) > 0);
+            if (!hasPaidProducts) return;
 
             const totalAmount = cart.reduce((sum, item) => sum + Number(item.price), 0).toFixed(2);
 
@@ -878,7 +948,8 @@
             currentDetailProduct = product;
 
             document.getElementById('detail-title').textContent = product.name;
-            document.getElementById('detail-price').textContent = `$${Number(product.price).toFixed(2)}`;
+            const priceDisplay = Number(product.price) === 0 ? 'GRATIS' : '$' + Number(product.price).toFixed(2);
+            document.getElementById('detail-price').textContent = priceDisplay;
             document.getElementById('detail-image').src = product.image_url || 'https://via.placeholder.com/400x300';
 
             const description = product.description || 'Este producto incluye acceso completo a todas las características mencionadas.';
@@ -904,14 +975,26 @@
             
             const buyBtn = document.getElementById('detail-buy-btn');
             if (currentUser) {
-                buyBtn.innerHTML = '<i class="fas fa-shopping-cart text-xl"></i> Añadir al Carrito';
-                buyBtn.onclick = () => {
-                    addToCart(productId);
-                    closeProductDetailModal();
-                    openCartModal();
-                };
+                if (Number(product.price) === 0) {
+                    buyBtn.innerHTML = '<i class="fas fa-gift text-xl"></i> Reclamar Gratis';
+                    buyBtn.className = 'w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 transition-all shadow-lg shadow-green-900/30 text-lg';
+                    buyBtn.onclick = () => {
+                        addToCart(productId);
+                        closeProductDetailModal();
+                        claimFreeProducts();
+                    };
+                } else {
+                    buyBtn.innerHTML = '<i class="fas fa-shopping-cart text-xl"></i> Añadir al Carrito';
+                    buyBtn.className = 'w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 transition-all shadow-lg shadow-red-900/30 text-lg';
+                    buyBtn.onclick = () => {
+                        addToCart(productId);
+                        closeProductDetailModal();
+                        openCartModal();
+                    };
+                }
             } else {
                 buyBtn.innerHTML = '<i class="fab fa-discord text-xl"></i> Iniciar Sesión para Comprar';
+                buyBtn.className = 'w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 transition-all shadow-lg shadow-red-900/30 text-lg';
                 buyBtn.onclick = () => {
                     closeProductDetailModal();
                     openLoginModal();
@@ -948,9 +1031,15 @@
                 closeProductDetailModal();
                 openLoginModal();
             } else {
-                addToCart(currentDetailProduct.id);
-                closeProductDetailModal();
-                openCartModal();
+                if (Number(currentDetailProduct.price) === 0) {
+                    addToCart(currentDetailProduct.id);
+                    closeProductDetailModal();
+                    claimFreeProducts();
+                } else {
+                    addToCart(currentDetailProduct.id);
+                    closeProductDetailModal();
+                    openCartModal();
+                }
             }
         }
 
@@ -1259,9 +1348,13 @@
                 return;
             }
 
-            grid.innerHTML = filtered.map(p => `
+            grid.innerHTML = filtered.map(p => {
+                const priceDisplay = Number(p.price) === 0 ? 'GRATIS' : '$' + Number(p.price).toFixed(2);
+                const priceClass = Number(p.price) === 0 ? 'bg-green-600' : 'bg-red-600';
+                
+                return `
                 <div class="bg-[#150a0a] border border-red-950/40 rounded-2xl overflow-hidden shadow-xl group hover:border-red-600/40 transition-all relative">
-                    <span class="absolute top-3 right-3 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full z-10">$${Number(p.price).toFixed(2)}</span>
+                    <span class="absolute top-3 right-3 ${priceClass} text-white text-xs font-bold px-3 py-1 rounded-full z-10">${priceDisplay}</span>
                     <img src="${escapeHTML(p.image_url || '')}" alt="${escapeHTML(p.name)}" class="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300 bg-[#0d0505]">
                     <div class="p-5">
                         <h4 class="text-lg font-bold text-white mb-1">${escapeHTML(p.name)}</h4>
@@ -1269,9 +1362,9 @@
                         ${p.category ? `<span class="inline-block bg-red-950/60 border border-red-800 text-red-300 text-xs font-bold px-2.5 py-1 rounded-md mb-4">${escapeHTML(p.category)}</span>` : ''}
                         
                         <div class="grid grid-cols-2 gap-2">
-                            <button onclick="addToCart('${p.id}')" class="bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2">
+                            <button onclick="addToCart('${p.id}')" class="${Number(p.price) === 0 ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'} text-white text-sm font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2">
                                 <i class="fas fa-shopping-cart"></i>
-                                Añadir
+                                ${Number(p.price) === 0 ? 'Reclamar' : 'Añadir'}
                             </button>
                             <button onclick="showProductDetails('${p.id}')" class="bg-[#0d0505] hover:bg-[#150a0a] border border-red-800/50 text-gray-300 text-sm font-semibold py-2.5 rounded-xl transition-all">
                                 Detalles
@@ -1284,7 +1377,7 @@
                         </button>` : ''}
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         function escapeHTML(str) {
@@ -1322,7 +1415,7 @@
 
             const totalSpent = products.reduce((sum, p) => sum + (p.price || 0), 0);
             
-            document.getElementById('stat-total-spent').innerText = `$${totalSpent.toFixed(2)}`;
+            document.getElementById('stat-total-spent').innerText = totalSpent === 0 ? 'GRATIS' : '$' + totalSpent.toFixed(2);
             document.getElementById('stat-active-scripts').innerText = products.length;
             document.getElementById('stat-total-downloads').innerText = products.length;
             document.getElementById('stat-total-licenses').innerText = products.length;
@@ -1343,7 +1436,11 @@
 
             emptyState.classList.add('hidden');
             
-            container.innerHTML = products.map(item => `
+            container.innerHTML = products.map(item => {
+                const priceDisplay = Number(item.price) === 0 ? 'GRATIS' : '$' + Number(item.price).toFixed(2);
+                const priceClass = Number(item.price) === 0 ? 'text-green-400 bg-green-900/20' : 'text-red-400 bg-red-900/20';
+                
+                return `
                 <div class="product-card border border-red-950/40 rounded-xl p-4 flex flex-col md:flex-row md:items-center gap-4 hover:border-red-600/40 transition-all group bg-[#150a0a]/50">
                     <img src="${escapeHTML(item.image_url || '')}" alt="${escapeHTML(item.name)}" 
                          class="w-full md:w-24 h-32 md:h-24 object-cover rounded-lg bg-[#0d0505]">
@@ -1352,11 +1449,11 @@
                         <h3 class="text-white font-bold mb-1 text-lg">${escapeHTML(item.name)}</h3>
                         <p class="text-gray-400 text-xs mb-2 line-clamp-2">${escapeHTML(item.description || 'Sin descripción')}</p>
                         <div class="flex items-center gap-3 text-xs">
-                            <span class="text-red-400 font-semibold bg-red-900/20 px-2 py-1 rounded">$${Number(item.price).toFixed(2)}</span>
+                            <span class="${priceClass} font-semibold px-2 py-1 rounded">${priceDisplay}</span>
                             <span class="text-gray-600">•</span>
                             <span class="text-gray-500">
                                 <i class="fas fa-calendar mr-1"></i>
-                                Comprado recientemente
+                                ${item.price === 0 ? 'Reclamado' : 'Comprado'} recientemente
                             </span>
                         </div>
                     </div>
@@ -1374,7 +1471,7 @@
                         </button>
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         function renderPurchaseHistory(products) {
@@ -1390,7 +1487,11 @@
                 return;
             }
 
-            container.innerHTML = products.map(item => `
+            container.innerHTML = products.map(item => {
+                const priceDisplay = Number(item.price) === 0 ? 'GRATIS' : '$' + Number(item.price).toFixed(2);
+                const statusText = item.price === 0 ? 'Reclamado gratuitamente' : 'Pago completado con PayPal';
+                
+                return `
                 <div class="flex items-center justify-between bg-[#0d0505] border border-red-950/40 rounded-xl p-4 hover:bg-[#150a0a] transition-colors">
                     <div class="flex items-center gap-4">
                         <div class="w-10 h-10 rounded-lg bg-green-600/20 flex items-center justify-center shrink-0">
@@ -1398,12 +1499,12 @@
                         </div>
                         <div>
                             <p class="text-white font-semibold text-sm">${escapeHTML(item.name)}</p>
-                            <p class="text-gray-500 text-xs">Pago completado con PayPal</p>
+                            <p class="text-gray-500 text-xs">${statusText}</p>
                         </div>
                     </div>
-                    <span class="text-green-400 font-bold text-sm shrink-0 ml-4">$${Number(item.price).toFixed(2)}</span>
+                    <span class="${Number(item.price) === 0 ? 'text-green-400' : 'text-green-400'} font-bold text-sm shrink-0 ml-4">${priceDisplay}</span>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         function filterDashboardProducts() {
