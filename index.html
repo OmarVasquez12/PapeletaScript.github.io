@@ -1377,32 +1377,30 @@ const db = firebase.firestore();
         }
 
         // --- LICENCIAS (Funciones necesarias para el flujo de compra) ---
-        function generateLicenseKey() {
+        
+        // Función para generar una key única de 20 caracteres
+        function generateUniqueKey() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             let key = '';
-            for (let i = 0; i < 24; i++) {
+            for (let i = 0; i < 20; i++) {
                 key += chars.charAt(Math.floor(Math.random() * chars.length));
             }
             return key;
         }
 
-        function generateLicenseIP() {
-            const ip = `188.93.139.${Math.floor(Math.random() * 255)}:${2000 + Math.floor(Math.random() * 100)}`;
-            return ip;
-        }
-
+        // Función para crear licencia (reemplaza la que tienes en index.html)
         async function createLicenseForProduct(productId, productName) {
             if (!currentUser) return null;
             try {
+                // Generar key única para este jugador
+                const uniqueKey = generateUniqueKey();
+                
                 const licenseData = {
                     discord_id: currentUser.id,
                     username: currentUser.username,
                     product_id: productId,
                     product_name: productName,
-                    ip_port: generateLicenseIP(),
-                    user: `papeleta${currentUser.id.slice(0, 8)}`,
-                    key: generateLicenseKey(),
-                    system_name: productName.toUpperCase().replace(/\s+/g, '_'),
+                    key: uniqueKey, // Key única tipo "UXETPDX351S76JI6APTF7C"
                     created_at: firebase.firestore.FieldValue.serverTimestamp(),
                     status: 'active'
                 };
