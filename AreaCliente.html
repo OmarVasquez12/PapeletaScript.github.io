@@ -457,7 +457,6 @@
                                     }
                                 } else {
                                     console.log("Producto NO encontrado en allProducts, creando básico:", prod.name);
-                                    // Si no encontramos el producto en allProducts, lo creamos con la info básica
                                     purchasedProducts.push({
                                         id: prod.id,
                                         name: prod.name || 'Producto',
@@ -579,9 +578,10 @@
         function updateLicenseCode() {
             if (allLicenses.length > 0) {
                 const license = allLicenses[0];
+                // Aquí usamos el username de Discord y la key única generada
                 const code = `configLicense = {
     ["User"] = "${currentUser.username}", 
-    ["Key"] = "PapeletaStore(${license.key || currentUser.id})"
+    ["Key"] = "PapeletaStore(${license.key})"
 }`;
                 document.getElementById('license-code').textContent = code;
             }
