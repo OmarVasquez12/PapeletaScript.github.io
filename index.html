@@ -295,7 +295,7 @@
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-10">
                         <div class="bg-[#150a0a] border border-red-950/40 rounded-2xl p-4 text-center">
                             <i class="fas fa-user-check text-red-400 text-xl mb-2"></i>
-                            <p id="stat-usuarios" class="text-2xl font-black text-white">+0</p>
+                            <p id="stat-usuarios" class="text-2xl font-black text-white">+1</p>
                             <p class="text-xs text-gray-400 uppercase">Usuarios Registrados</p>
                         </div>
                         <div class="bg-[#150a0a] border border-red-950/40 rounded-2xl p-4 text-center">
@@ -450,7 +450,7 @@
     <script>
         // --- CONFIGURACIÓN ---
         const CLIENT_ID = '1213866547181780992'; 
-         const REDIRECT_URI = 'https://papeleta-script-github-io.vercel.app';
+        const REDIRECT_URI = 'https://papeleta-script-github-io.vercel.app';
         const DISCORD_INVITE = 'https://discord.gg/rvxEdWcGkf';
         
         const ADMIN_DISCORD_IDS = ['890526767608127489']; 
@@ -472,23 +472,23 @@
         let cart = [];
         let localProducts = JSON.parse(localStorage.getItem('papeleta_local_products') || '[]');
 
-// --- FIREBASE CONFIGURATION ---
-const firebaseConfig = {
-    apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
-    authDomain: "papeletalicencia.firebaseapp.com",
-    databaseURL: "https://papeletalicencia-default-rtdb.firebaseio.com",
-    projectId: "papeletalicencia",
-    storageBucket: "papeletalicencia.firebasestorage.app",
-    messagingSenderId: "677208314051",
-    appId: "1:677208314051:web:a27c04f31d402e83f29276",
-    measurementId: "G-RPJ4KQ6EQ4"
-};
+        // --- FIREBASE CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
+            authDomain: "papeletalicencia.firebaseapp.com",
+            databaseURL: "https://papeletalicencia-default-rtdb.firebaseio.com",
+            projectId: "papeletalicencia",
+            storageBucket: "papeletalicencia.firebasestorage.app",
+            messagingSenderId: "677208314051",
+            appId: "1:677208314051:web:a27c04f31d402e83f29276",
+            measurementId: "G-RPJ4KQ6EQ4"
+        };
 
-// Inicializar Firebase
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
-const db = firebase.firestore();
+        // Inicializar Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
 
         // --- FUNCIONES DE SUBIDA DE PRODUCTOS ---
         
@@ -1170,7 +1170,15 @@ const db = firebase.firestore();
             // Contamos desde localStorage los usuarios únicos que han iniciado sesión
             const allUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
             const uniqueUsers = new Set(allUsers.map(u => u.discord_id));
-            document.getElementById('stat-usuarios').innerText = '+' + uniqueUsers.size;
+            
+            // MODIFICACIÓN: Inicia en +1 (representando la primera cuenta base: 890526767608127489)
+            // y se sigue sumando automáticamente cada vez que un usuario nuevo entra con Discord.
+            let userCount = uniqueUsers.size;
+            if (userCount === 0) {
+                userCount = 1; 
+            }
+            
+            document.getElementById('stat-usuarios').innerText = '+' + userCount;
         }
 
         async function loadSalesStats() {
