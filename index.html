@@ -340,6 +340,28 @@
                 </div>
             </div>
 
+            <!-- SECCIÓN DE LICENCIAS -->
+            <div class="bg-[#150a0a]/80 border border-red-950/40 rounded-2xl p-6 backdrop-blur mb-8">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-yellow-600/20 flex items-center justify-center">
+                            <i class="fas fa-key text-yellow-400"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-white">Licencias</h2>
+                    </div>
+                    <span id="license-count" class="bg-yellow-600/20 text-yellow-400 border border-yellow-600/50 px-3 py-1 rounded-full text-sm font-bold">0</span>
+                </div>
+
+                <div id="licenses-list" class="space-y-4">
+                    <!-- Las licencias se cargarán aquí dinámicamente -->
+                </div>
+
+                <div id="licenses-empty" class="hidden text-center py-8 text-gray-500">
+                    <i class="fas fa-key text-4xl mb-2 opacity-30"></i>
+                    <p>No tienes licencias activas</p>
+                </div>
+            </div>
+
             <div class="bg-[#150a0a]/80 border border-red-950/40 rounded-2xl p-6 backdrop-blur">
                 <div class="flex items-center gap-3 mb-6">
                     <div class="w-8 h-8 rounded-lg bg-green-600/20 flex items-center justify-center">
@@ -351,6 +373,107 @@
                 <div id="dashboard-purchase-history" class="space-y-3">
 
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PARA VER DETALLES DE LICENCIA -->
+    <div id="license-modal" class="hidden fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-[#150a0a] border border-red-900/50 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div class="bg-gradient-to-r from-yellow-600/20 to-red-600/20 px-6 py-4 rounded-t-2xl flex justify-between items-center border-b border-red-900/30">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-key text-yellow-400 text-xl"></i>
+                    <h3 class="text-white font-bold text-lg">Detalles de Licencia</h3>
+                </div>
+                <button onclick="closeLicenseModal()" class="text-gray-400 hover:text-white w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center transition-all">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-6">
+                <!-- Información de la licencia -->
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-400 text-xs uppercase font-semibold mb-2">IP:PUERTO</label>
+                        <div class="flex items-center gap-2 bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-3">
+                            <i class="fas fa-server text-red-400"></i>
+                            <code id="license-ip" class="text-white font-mono text-sm flex-grow">188.93.139.106:2000</code>
+                            <button onclick="copyToClipboard('license-ip')" class="text-gray-400 hover:text-white transition-colors" title="Copiar">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-400 text-xs uppercase font-semibold mb-2">USER</label>
+                        <div class="flex items-center gap-2 bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-3">
+                            <i class="fas fa-user text-red-400"></i>
+                            <code id="license-user" class="text-white font-mono text-sm flex-grow">papeletascript1</code>
+                            <button onclick="copyToClipboard('license-user')" class="text-gray-400 hover:text-white transition-colors" title="Copiar">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-400 text-xs uppercase font-semibold mb-2">KEY</label>
+                        <div class="flex items-center gap-2 bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-3">
+                            <i class="fas fa-key text-red-400"></i>
+                            <code id="license-key" class="text-white font-mono text-sm flex-grow break-all">WX13XJT0986UN2G5D12EWGGF</code>
+                            <button onclick="copyToClipboard('license-key')" class="text-gray-400 hover:text-white transition-colors" title="Copiar">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Código Lua -->
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="block text-gray-400 text-xs uppercase font-semibold">Código de Configuración</label>
+                        <button onclick="copyFullLicenseCode()" class="flex items-center gap-2 bg-[#0d0505] hover:bg-[#150a0a] border border-red-800/50 text-gray-300 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all">
+                            <i class="fas fa-copy"></i>
+                            COPIAR CÓDIGO
+                        </button>
+                    </div>
+                    <div class="bg-[#0a0505] border border-red-950/40 rounded-xl p-4 overflow-x-auto">
+                        <pre class="text-sm font-mono"><code id="license-code" class="text-green-400">
+-- Sistema: OMARSISTEMAGASOLINA
+configLicense = {
+    ["User"] = "papeletascript1",
+    ["Key"] = "WX13XJT0986UN2G5D12EWGGF"
+}
+                        </code></pre>
+                    </div>
+                </div>
+
+                <!-- Información adicional -->
+                <div class="bg-[#0d0505] border border-red-950/40 rounded-xl p-4">
+                    <h4 class="text-white font-semibold mb-3 flex items-center gap-2">
+                        <i class="fas fa-info-circle text-blue-400"></i>
+                        Información
+                    </h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-check text-green-400 mt-1"></i>
+                            <span>Esta licencia es única y personal</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-check text-green-400 mt-1"></i>
+                            <span>No compartas tu KEY con nadie</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-check text-green-400 mt-1"></i>
+                            <span>Usa estos datos en la configuración de tu script</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="px-6 py-4 border-t border-red-900/30 bg-[#0d0505]/50 rounded-b-2xl flex justify-end gap-3">
+                <button onclick="closeLicenseModal()" class="bg-[#150a0a] hover:bg-[#1a0a0a] border border-red-800/50 text-white px-6 py-2.5 rounded-xl font-semibold transition-all">
+                    Cerrar
+                </button>
             </div>
         </div>
     </div>
@@ -591,6 +714,7 @@
         let currentDetailProduct = null;
         let cart = [];
         let localProducts = JSON.parse(localStorage.getItem('papeleta_local_products') || '[]');
+        let allLicenses = [];
 
 // --- FIREBASE CONFIGURATION ---
 const firebaseConfig = {
@@ -609,6 +733,7 @@ if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
 const db = firebase.firestore();
+
         // --- FUNCIONES DE SUBIDA DE PRODUCTOS ---
         
         function previewImage(input) {
@@ -859,6 +984,181 @@ const db = firebase.firestore();
             }
         }
 
+        // --- FUNCIONES DE LICENCIAS ---
+
+        let currentLicenseData = null;
+
+        function generateLicenseKey() {
+            // Genera una key única aleatoria
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let key = '';
+            for (let i = 0; i < 24; i++) {
+                key += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return key;
+        }
+
+        function generateLicenseIP() {
+            // Genera una IP:PUERTO única
+            const ip = `188.93.139.${Math.floor(Math.random() * 255)}:${2000 + Math.floor(Math.random() * 100)}`;
+            return ip;
+        }
+
+        async function loadLicenses() {
+            if (!currentUser) return;
+            
+            try {
+                // Obtener licencias desde Firebase
+                const snapshot = await db.collection("Licencias")
+                    .where("discord_id", "==", currentUser.id)
+                    .get();
+                
+                const licenses = [];
+                snapshot.forEach((doc) => {
+                    licenses.push({ id: doc.id, ...doc.data() });
+                });
+                
+                allLicenses = licenses;
+                renderLicenses(licenses);
+            } catch (error) {
+                console.error("Error cargando licencias:", error);
+                // Si no hay licencias en Firebase, mostrar vacío
+                allLicenses = [];
+                renderLicenses([]);
+            }
+        }
+
+        function renderLicenses(licenses) {
+            const container = document.getElementById('licenses-list');
+            const emptyState = document.getElementById('licenses-empty');
+            const countBadge = document.getElementById('license-count');
+            
+            countBadge.textContent = licenses.length;
+            
+            if (licenses.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            emptyState.classList.add('hidden');
+            
+            container.innerHTML = licenses.map(license => `
+                <div class="bg-[#0d0505] border border-red-950/40 rounded-xl p-4 hover:border-yellow-600/40 transition-all group cursor-pointer" 
+                     onclick="showLicenseDetails('${license.id}')">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-yellow-600/20 to-red-600/20 border border-yellow-600/30 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i class="fas fa-key text-yellow-400 text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-bold">${escapeHTML(license.product_name || 'Producto')}</h4>
+                                <p class="text-gray-500 text-xs font-mono">${license.ip_port}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="bg-green-600/20 text-green-400 border border-green-600/50 px-3 py-1 rounded-full text-xs font-bold">
+                                <i class="fas fa-check-circle mr-1"></i>Activa
+                            </span>
+                            <i class="fas fa-chevron-right text-gray-600 group-hover:text-yellow-400 transition-colors"></i>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showLicenseDetails(licenseId) {
+            // Buscar la licencia en la lista
+            const license = allLicenses.find(l => l.id === licenseId);
+            if (!license) return;
+            
+            currentLicenseData = license;
+            
+            // Llenar los campos del modal
+            document.getElementById('license-ip').textContent = license.ip_port;
+            document.getElementById('license-user').textContent = license.user;
+            document.getElementById('license-key').textContent = license.key;
+            
+            // Generar el código Lua
+            const luaCode = `-- Sistema: ${license.system_name || 'PAPELETA_SYSTEM'}
+configLicense = {
+    ["User"] = "${license.user}",
+    ["Key"] = "${license.key}"
+}`;
+            
+            document.getElementById('license-code').textContent = luaCode;
+            
+            // Mostrar modal
+            document.getElementById('license-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLicenseModal() {
+            document.getElementById('license-modal').classList.add('hidden');
+            document.body.style.overflow = '';
+            currentLicenseData = null;
+        }
+
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                // Mostrar feedback visual
+                const btn = element.nextElementSibling;
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check text-green-400"></i>';
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                }, 2000);
+            }).catch(err => {
+                console.error('Error al copiar:', err);
+                alert('No se pudo copiar al portapapeles');
+            });
+        }
+
+        function copyFullLicenseCode() {
+            if (!currentLicenseData) return;
+            
+            const code = document.getElementById('license-code').textContent;
+            
+            navigator.clipboard.writeText(code).then(() => {
+                alert('¡Código copiado al portapapeles!');
+            }).catch(err => {
+                console.error('Error al copiar:', err);
+                alert('No se pudo copiar el código');
+            });
+        }
+
+        // Crear licencia para un producto (se llama cuando se compra un producto)
+        async function createLicenseForProduct(productId, productName) {
+            if (!currentUser) return null;
+            
+            try {
+                const licenseData = {
+                    discord_id: currentUser.id,
+                    username: currentUser.username,
+                    product_id: productId,
+                    product_name: productName,
+                    ip_port: generateLicenseIP(),
+                    user: `papeleta${currentUser.id.slice(0, 8)}`,
+                    key: generateLicenseKey(),
+                    system_name: productName.toUpperCase().replace(/\s+/g, '_'),
+                    created_at: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'active'
+                };
+                
+                // Guardar en Firebase
+                const docRef = await db.collection("Licencias").add(licenseData);
+                
+                return { id: docRef.id, ...licenseData };
+            } catch (error) {
+                console.error("Error creando licencia:", error);
+                return null;
+            }
+        }
+
         // --- FUNCIÓN PARA RECLAMAR PRODUCTOS GRATIS ---
         async function claimFreeProducts() {
             if (!currentUser) {
@@ -897,15 +1197,16 @@ const db = firebase.firestore();
 
                 await db.collection("Clientes").add(purchaseData);
                 
-                // Agregar productos al usuario localmente para visualización inmediata
-                cart.forEach(item => {
+                // Crear licencias para cada producto
+                for (const item of cart) {
+                    await createLicenseForProduct(item.id, item.name);
                     myAssignedProductIds.add(item.id);
-                });
+                }
                 
                 saveUserDataLocally();
                 loadDashboardData();
                 
-                alert('¡Productos reclamados exitosamente! Ya están disponibles en tu biblioteca.\n\nGracias por seguir confiando en nuestra tienda y en cada uno de nuestros productos digitales. Seguimos trabajando para brindar la mejor calidad a toda nuestra comunidad.');
+                alert('¡Productos reclamados exitosamente! Ya están disponibles en tu biblioteca.\n\nSe han generado tus licencias automáticamente.\n\nGracias por seguir confiando en nuestra tienda y en cada uno de nuestros productos digitales. Seguimos trabajando para brindar la mejor calidad a toda nuestra comunidad.');
                 
                 // Limpiar carrito
                 cart = [];
@@ -1016,14 +1317,15 @@ const db = firebase.firestore();
 
                 await db.collection("Clientes").add(purchaseData);
                 
-                // Agregar productos al usuario localmente
-                cart.forEach(item => {
+                // Crear licencias para cada producto
+                for (const item of cart) {
+                    await createLicenseForProduct(item.id, item.name);
                     myAssignedProductIds.add(item.id);
-                });
+                }
                 
                 saveUserDataLocally();
                 loadDashboardData();
-                alert("¡Productos añadidos a tu biblioteca!");
+                alert("¡Productos añadidos a tu biblioteca!\n\nSe han generado tus licencias automáticamente.");
             } catch (error) {
                 console.error(error);
                 alert('Error al registrar la compra en la base de datos: ' + error.message);
@@ -1521,6 +1823,9 @@ const db = firebase.firestore();
 
             renderDashboardProducts(products);
             renderPurchaseHistory(products);
+            
+            // Cargar licencias
+            await loadLicenses();
         }
 
         function renderDashboardProducts(products) {
@@ -1603,7 +1908,7 @@ const db = firebase.firestore();
                     </div>
                     <span class="${Number(item.price) === 0 ? 'text-green-400' : 'text-green-400'} font-bold text-sm shrink-0 ml-4">${priceDisplay}</span>
                 </div>
-            `}).join('');
+            `).join('');
         }
 
         // --- FUNCIÓN DE DESCARGA DIRECTA ---
