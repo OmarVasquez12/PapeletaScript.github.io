@@ -408,43 +408,78 @@
             if (!currentUser) return;
 
             try {
+                console.log("Cargando datos para usuario:", currentUser.id);
+                
                 // Primero cargar todos los productos disponibles
                 const productsSnapshot = await db.collection("Productos").get();
                 allProducts = [];
                 productsSnapshot.forEach((doc) => {
                     allProducts.push({ id: doc.id, ...doc.data() });
                 });
+                console.log("Productos cargados:", allProducts.length);
 
-                // Luego consultar las compras del usuario en la colección "Clientes"
-                const clientesSnapshot = await db.collection("Clientes")
-                    .where("discord_id", "==", currentUser.id)
-                    .get();
+                // Consultar TODOS los clientes y filtrar manualmente
+                const clientesSnapshot = await db.collection("Clientes").get();
+                console.log("Total documentos en Clientes:", clientesSnapshot.size);
 
                 let purchasedProducts = [];
                 let totalSpent = 0;
+                let foundUser = false;
 
                 clientesSnapshot.forEach((doc) => {
                     const purchase = doc.data();
-                    if (purchase.products && Array.isArray(purchase.products)) {
-                        purchase.products.forEach(prod => {
-                            // Buscar el producto completo en allProducts
-                            const productData = allProducts.find(p => p.id === prod.id);
-                            if (productData) {
-                                purchasedProducts.push({
-                                    ...productData,
-                                    purchaseDate: purchase.date?.toDate() || new Date(),
-                                    status: purchase.status || 'Activo',
-                                    price: prod.price
-                                });
+                    console.log("Revisando documento:", doc.id, "discord_id:", purchase.discord_id);
+                    
+                    // Comparar como strings para evitar problemas de tipo
+                    if (String(purchase.discord_id) === String(currentUser.id)) {
+                        foundUser = true;
+                        console.log("¡Usuario encontrado! Datos de compra:", purchase);
+                        
+                        // Verificar si existe el campo products y es un array
+                        if (purchase.products && Array.isArray(purchase.products)) {
+                            console.log("Productos en la compra:", purchase.products);
+                            
+                            purchase.products.forEach(prod => {
+                                console.log("Buscando producto con ID:", prod.id);
+                                const productData = allProducts.find(p => p.id === prod.id);
                                 
-                                // Calcular total gastado
-                                if (prod.price !== "Gratis") {
-                                    totalSpent += parseFloat(prod.price.replace('$', '')) || 0;
+                                if (productData) {
+                                    console.log("Producto encontrado:", productData.name);
+                                    purchasedProducts.push({
+                                        ...productData,
+                                        purchaseDate: purchase.date?.toDate ? purchase.date.toDate() : new Date(),
+                                        status: purchase.status || 'Activo',
+                                        price: prod.price || purchase.total_price || 'Gratis'
+                                    });
+                                    
+                                    if (prod.price !== "Gratis" && prod.price !== "Gratis") {
+                                        totalSpent += parseFloat(String(prod.price).replace('$', '')) || 0;
+                                    }
+                                } else {
+                                    console.log("Producto NO encontrado en allProducts, creando básico:", prod.name);
+                                    // Si no encontramos el producto en allProducts, lo creamos con la info básica
+                                    purchasedProducts.push({
+                                        id: prod.id,
+                                        name: prod.name || 'Producto',
+                                        price: prod.price || purchase.total_price || 'Gratis',
+                                        image_url: '',
+                                        purchaseDate: purchase.date?.toDate ? purchase.date.toDate() : new Date(),
+                                        status: prod.status || purchase.status || 'Activo'
+                                    });
                                 }
-                            }
-                        });
+                            });
+                        } else {
+                            console.log("No hay campo products o no es array. purchase:", purchase);
+                        }
                     }
                 });
+
+                if (!foundUser) {
+                    console.log("No se encontró ningún documento para el usuario:", currentUser.id);
+                }
+
+                console.log("Total productos comprados:", purchasedProducts.length);
+                console.log("Total gastado:", totalSpent);
 
                 // Actualizar estadísticas
                 document.getElementById('stat-total-spent').innerText = '$' + totalSpent.toFixed(2);
@@ -462,6 +497,7 @@
                 
             } catch (error) {
                 console.error("Error cargando datos del dashboard:", error);
+                alert("Error al cargar: " + error.message);
             }
         }
 
@@ -479,7 +515,7 @@
                         <img src="${item.image_url || ''}" alt="${item.name}" class="w-16 h-16 object-cover rounded-lg">
                         <div>
                             <h3 class="text-white font-semibold">${item.name}</h3>
-                            <p class="text-gray-400 text-sm">${item.price === 'Gratis' ? 'GRATIS' : '$' + Number(item.price).toFixed(2)}</p>
+                            <p class="text-gray-400 text-sm">${item.price === 'Gratis' || item.price === 0 ? 'GRATIS' : '$' + Number(item.price).toFixed(2)}</p>
                         </div>
                     </div>
                     <button onclick="downloadProduct('${item.id}')" class="btn-primary px-4 py-2 rounded-lg text-white text-sm font-medium">
@@ -501,7 +537,10 @@
 
         function downloadProduct(productId) {
             const product = allProducts.find(p => p.id === productId);
-            if (!product) return;
+            if (!product) {
+                alert('Producto no encontrado');
+                return;
+            }
             
             if (product.file_data) {
                 const link = document.createElement('a');
