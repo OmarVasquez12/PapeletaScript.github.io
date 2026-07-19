@@ -235,249 +235,6 @@
         </div>
     </div>
 
-    <!-- USER DASHBOARD -->
-    <div id="user-dashboard" class="hidden fixed inset-0 bg-[#0a0505]/95 z-[70] overflow-y-auto backdrop-blur-md">
-        <div class="min-h-screen px-4 py-8 max-w-7xl mx-auto">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
-                <div>
-                    <h1 class="text-3xl md:text-4xl font-black text-white mb-2">
-                        Bienvenido, <span id="dashboard-username" class="text-red-400">usuario</span>
-                    </h1>
-                    <p class="text-gray-400 text-sm">Gestiona tus productos y licencias desde aquí</p>
-                </div>
-                <button onclick="closeUserDashboard()" class="bg-[#150a0a] hover:bg-[#1a0a0a] border border-red-800/50 text-white px-6 py-3 rounded-xl flex items-center gap-2 transition-all group">
-                    <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
-                    Volver a la tienda
-                </button>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-                <div class="bg-[#150a0a]/80 border border-red-950/40 rounded-2xl p-6 backdrop-blur relative overflow-hidden group">
-                    <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <i class="fas fa-wallet text-6xl text-red-400"></i>
-                    </div>
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 rounded-lg bg-red-600/20 flex items-center justify-center">
-                            <i class="fas fa-wallet text-red-400"></i>
-                        </div>
-                        <span class="text-gray-400 text-xs uppercase font-semibold tracking-wider">Total Invertido</span>
-                    </div>
-                    <p id="stat-total-spent" class="text-2xl font-black text-white">$0.00</p>
-                </div>
-
-                <div class="bg-[#150a0a]/80 border border-red-950/40 rounded-2xl p-6 backdrop-blur relative overflow-hidden group">
-                    <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <i class="fas fa-box-open text-6xl text-green-400"></i>
-                    </div>
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 rounded-lg bg-green-600/20 flex items-center justify-center">
-                            <i class="fas fa-box-open text-green-400"></i>
-                        </div>
-                        <span class="text-gray-400 text-xs uppercase font-semibold tracking-wider">Scripts Activos</span>
-                    </div>
-                    <p id="stat-active-scripts" class="text-2xl font-black text-white">0</p>
-                </div>
-
-                <div class="bg-[#150a0a]/80 border border-red-950/40 rounded-2xl p-6 backdrop-blur relative overflow-hidden group">
-                    <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <i class="fas fa-download text-6xl text-red-400"></i>
-                    </div>
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 rounded-lg bg-red-600/20 flex items-center justify-center">
-                            <i class="fas fa-download text-red-400"></i>
-                        </div>
-                        <span class="text-gray-400 text-xs uppercase font-semibold tracking-wider">Total Descargas</span>
-                    </div>
-                    <p id="stat-total-downloads" class="text-2xl font-black text-white">0</p>
-                </div>
-
-                <div class="bg-[#150a0a]/80 border border-red-950/40 rounded-2xl p-6 backdrop-blur relative overflow-hidden group">
-                    <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <i class="fas fa-key text-6xl text-yellow-400"></i>
-                    </div>
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 rounded-lg bg-yellow-600/20 flex items-center justify-center">
-                            <i class="fas fa-key text-yellow-400"></i>
-                        </div>
-                        <span class="text-gray-400 text-xs uppercase font-semibold tracking-wider">Licencias</span>
-                    </div>
-                    <p id="stat-total-licenses" class="text-2xl font-black text-white">0</p>
-                </div>
-            </div>
-
-            <div class="bg-[#150a0a]/80 border border-red-950/40 rounded-2xl p-6 backdrop-blur mb-8">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center">
-                        <i class="fas fa-cube text-red-400"></i>
-                    </div>
-                    <h2 class="text-xl font-bold text-white">Mis Productos Activos</h2>
-                </div>
-
-                <div class="mb-6">
-                    <div class="relative">
-                        <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
-                        <input 
-                            type="text" 
-                            id="dashboard-search"
-                            oninput="filterDashboardProducts()"
-                            placeholder="Buscar entre tus recursos..." 
-                            class="w-full bg-[#0d0505] border border-red-950/40 rounded-xl pl-12 pr-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition-all"
-                        >
-                    </div>
-                </div>
-
-                <div id="dashboard-products-list" class="space-y-3 min-h-[200px]">
-                </div>
-
-                <div id="dashboard-empty-state" class="hidden text-center py-12 border-2 border-dashed border-red-950/40 rounded-xl mt-4">
-                    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-[#0d0505] flex items-center justify-center">
-                        <i class="fas fa-search text-gray-600 text-2xl"></i>
-                    </div>
-                    <p class="text-gray-400 mb-4">No tienes productos activos.</p>
-                    <button onclick="closeUserDashboard(); showPage('productos');" class="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2.5 rounded-lg transition-all">
-                        Ir a la tienda
-                    </button>
-                </div>
-            </div>
-
-            <!-- SECCIÓN DE LICENCIAS -->
-            <div class="bg-[#150a0a]/80 border border-red-950/40 rounded-2xl p-6 backdrop-blur mb-8">
-                <div class="flex items-center justify-between mb-6">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-lg bg-yellow-600/20 flex items-center justify-center">
-                            <i class="fas fa-key text-yellow-400"></i>
-                        </div>
-                        <h2 class="text-xl font-bold text-white">Licencias</h2>
-                    </div>
-                    <span id="license-count" class="bg-yellow-600/20 text-yellow-400 border border-yellow-600/50 px-3 py-1 rounded-full text-sm font-bold">0</span>
-                </div>
-
-                <div id="licenses-list" class="space-y-4">
-                    <!-- Las licencias se cargarán aquí dinámicamente -->
-                </div>
-
-                <div id="licenses-empty" class="hidden text-center py-8 text-gray-500">
-                    <i class="fas fa-key text-4xl mb-2 opacity-30"></i>
-                    <p>No tienes licencias activas</p>
-                </div>
-            </div>
-
-            <div class="bg-[#150a0a]/80 border border-red-950/40 rounded-2xl p-6 backdrop-blur">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-8 h-8 rounded-lg bg-green-600/20 flex items-center justify-center">
-                        <i class="fas fa-history text-green-400"></i>
-                    </div>
-                    <h2 class="text-xl font-bold text-white">Historial de Compras</h2>
-                </div>
-
-                <div id="dashboard-purchase-history" class="space-y-3">
-
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL PARA VER DETALLES DE LICENCIA -->
-    <div id="license-modal" class="hidden fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-[#150a0a] border border-red-900/50 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div class="bg-gradient-to-r from-yellow-600/20 to-red-600/20 px-6 py-4 rounded-t-2xl flex justify-between items-center border-b border-red-900/30">
-                <div class="flex items-center gap-3">
-                    <i class="fas fa-key text-yellow-400 text-xl"></i>
-                    <h3 class="text-white font-bold text-lg">Detalles de Licencia</h3>
-                </div>
-                <button onclick="closeLicenseModal()" class="text-gray-400 hover:text-white w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center transition-all">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-
-            <div class="p-6 space-y-6">
-                <!-- Información de la licencia -->
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-gray-400 text-xs uppercase font-semibold mb-2">IP:PUERTO</label>
-                        <div class="flex items-center gap-2 bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-3">
-                            <i class="fas fa-server text-red-400"></i>
-                            <code id="license-ip" class="text-white font-mono text-sm flex-grow">188.93.139.106:2000</code>
-                            <button onclick="copyToClipboard('license-ip')" class="text-gray-400 hover:text-white transition-colors" title="Copiar">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-gray-400 text-xs uppercase font-semibold mb-2">USER</label>
-                        <div class="flex items-center gap-2 bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-3">
-                            <i class="fas fa-user text-red-400"></i>
-                            <code id="license-user" class="text-white font-mono text-sm flex-grow">papeletascript1</code>
-                            <button onclick="copyToClipboard('license-user')" class="text-gray-400 hover:text-white transition-colors" title="Copiar">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-gray-400 text-xs uppercase font-semibold mb-2">KEY</label>
-                        <div class="flex items-center gap-2 bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-3">
-                            <i class="fas fa-key text-red-400"></i>
-                            <code id="license-key" class="text-white font-mono text-sm flex-grow break-all">WX13XJT0986UN2G5D12EWGGF</code>
-                            <button onclick="copyToClipboard('license-key')" class="text-gray-400 hover:text-white transition-colors" title="Copiar">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Código Lua -->
-                <div>
-                    <div class="flex items-center justify-between mb-2">
-                        <label class="block text-gray-400 text-xs uppercase font-semibold">Código de Configuración</label>
-                        <button onclick="copyFullLicenseCode()" class="flex items-center gap-2 bg-[#0d0505] hover:bg-[#150a0a] border border-red-800/50 text-gray-300 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all">
-                            <i class="fas fa-copy"></i>
-                            COPIAR CÓDIGO
-                        </button>
-                    </div>
-                    <div class="bg-[#0a0505] border border-red-950/40 rounded-xl p-4 overflow-x-auto">
-                        <pre class="text-sm font-mono"><code id="license-code" class="text-green-400">
--- Sistema: OMARSISTEMAGASOLINA
-configLicense = {
-    ["User"] = "papeletascript1",
-    ["Key"] = "WX13XJT0986UN2G5D12EWGGF"
-}
-                        </code></pre>
-                    </div>
-                </div>
-
-                <!-- Información adicional -->
-                <div class="bg-[#0d0505] border border-red-950/40 rounded-xl p-4">
-                    <h4 class="text-white font-semibold mb-3 flex items-center gap-2">
-                        <i class="fas fa-info-circle text-blue-400"></i>
-                        Información
-                    </h4>
-                    <ul class="space-y-2 text-sm text-gray-400">
-                        <li class="flex items-start gap-2">
-                            <i class="fas fa-check text-green-400 mt-1"></i>
-                            <span>Esta licencia es única y personal</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <i class="fas fa-check text-green-400 mt-1"></i>
-                            <span>No compartas tu KEY con nadie</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <i class="fas fa-check text-green-400 mt-1"></i>
-                            <span>Usa estos datos en la configuración de tu script</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="px-6 py-4 border-t border-red-900/30 bg-[#0d0505]/50 rounded-b-2xl flex justify-end gap-3">
-                <button onclick="closeLicenseModal()" class="bg-[#150a0a] hover:bg-[#1a0a0a] border border-red-800/50 text-white px-6 py-2.5 rounded-xl font-semibold transition-all">
-                    Cerrar
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- MAIN CONTENT -->
     <div id="main-content" class="relative z-10 flex-grow flex flex-col">
         <header class="bg-[#0d0505]/90 backdrop-blur border-b red-border sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
@@ -714,7 +471,6 @@ configLicense = {
         let currentDetailProduct = null;
         let cart = [];
         let localProducts = JSON.parse(localStorage.getItem('papeleta_local_products') || '[]');
-        let allLicenses = [];
 
 // --- FIREBASE CONFIGURATION ---
 const firebaseConfig = {
@@ -984,181 +740,6 @@ const db = firebase.firestore();
             }
         }
 
-        // --- FUNCIONES DE LICENCIAS ---
-
-        let currentLicenseData = null;
-
-        function generateLicenseKey() {
-            // Genera una key única aleatoria
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let key = '';
-            for (let i = 0; i < 24; i++) {
-                key += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return key;
-        }
-
-        function generateLicenseIP() {
-            // Genera una IP:PUERTO única
-            const ip = `188.93.139.${Math.floor(Math.random() * 255)}:${2000 + Math.floor(Math.random() * 100)}`;
-            return ip;
-        }
-
-        async function loadLicenses() {
-            if (!currentUser) return;
-            
-            try {
-                // Obtener licencias desde Firebase
-                const snapshot = await db.collection("Licencias")
-                    .where("discord_id", "==", currentUser.id)
-                    .get();
-                
-                const licenses = [];
-                snapshot.forEach((doc) => {
-                    licenses.push({ id: doc.id, ...doc.data() });
-                });
-                
-                allLicenses = licenses;
-                renderLicenses(licenses);
-            } catch (error) {
-                console.error("Error cargando licencias:", error);
-                // Si no hay licencias en Firebase, mostrar vacío
-                allLicenses = [];
-                renderLicenses([]);
-            }
-        }
-
-        function renderLicenses(licenses) {
-            const container = document.getElementById('licenses-list');
-            const emptyState = document.getElementById('licenses-empty');
-            const countBadge = document.getElementById('license-count');
-            
-            countBadge.textContent = licenses.length;
-            
-            if (licenses.length === 0) {
-                container.innerHTML = '';
-                emptyState.classList.remove('hidden');
-                return;
-            }
-            
-            emptyState.classList.add('hidden');
-            
-            container.innerHTML = licenses.map(license => `
-                <div class="bg-[#0d0505] border border-red-950/40 rounded-xl p-4 hover:border-yellow-600/40 transition-all group cursor-pointer" 
-                     onclick="showLicenseDetails('${license.id}')">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-yellow-600/20 to-red-600/20 border border-yellow-600/30 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <i class="fas fa-key text-yellow-400 text-xl"></i>
-                            </div>
-                            <div>
-                                <h4 class="text-white font-bold">${escapeHTML(license.product_name || 'Producto')}</h4>
-                                <p class="text-gray-500 text-xs font-mono">${license.ip_port}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="bg-green-600/20 text-green-400 border border-green-600/50 px-3 py-1 rounded-full text-xs font-bold">
-                                <i class="fas fa-check-circle mr-1"></i>Activa
-                            </span>
-                            <i class="fas fa-chevron-right text-gray-600 group-hover:text-yellow-400 transition-colors"></i>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function showLicenseDetails(licenseId) {
-            // Buscar la licencia en la lista
-            const license = allLicenses.find(l => l.id === licenseId);
-            if (!license) return;
-            
-            currentLicenseData = license;
-            
-            // Llenar los campos del modal
-            document.getElementById('license-ip').textContent = license.ip_port;
-            document.getElementById('license-user').textContent = license.user;
-            document.getElementById('license-key').textContent = license.key;
-            
-            // Generar el código Lua
-            const luaCode = `-- Sistema: ${license.system_name || 'PAPELETA_SYSTEM'}
-configLicense = {
-    ["User"] = "${license.user}",
-    ["Key"] = "${license.key}"
-}`;
-            
-            document.getElementById('license-code').textContent = luaCode;
-            
-            // Mostrar modal
-            document.getElementById('license-modal').classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeLicenseModal() {
-            document.getElementById('license-modal').classList.add('hidden');
-            document.body.style.overflow = '';
-            currentLicenseData = null;
-        }
-
-        function copyToClipboard(elementId) {
-            const element = document.getElementById(elementId);
-            const text = element.textContent;
-            
-            navigator.clipboard.writeText(text).then(() => {
-                // Mostrar feedback visual
-                const btn = element.nextElementSibling;
-                const originalHTML = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check text-green-400"></i>';
-                
-                setTimeout(() => {
-                    btn.innerHTML = originalHTML;
-                }, 2000);
-            }).catch(err => {
-                console.error('Error al copiar:', err);
-                alert('No se pudo copiar al portapapeles');
-            });
-        }
-
-        function copyFullLicenseCode() {
-            if (!currentLicenseData) return;
-            
-            const code = document.getElementById('license-code').textContent;
-            
-            navigator.clipboard.writeText(code).then(() => {
-                alert('¡Código copiado al portapapeles!');
-            }).catch(err => {
-                console.error('Error al copiar:', err);
-                alert('No se pudo copiar el código');
-            });
-        }
-
-        // Crear licencia para un producto (se llama cuando se compra un producto)
-        async function createLicenseForProduct(productId, productName) {
-            if (!currentUser) return null;
-            
-            try {
-                const licenseData = {
-                    discord_id: currentUser.id,
-                    username: currentUser.username,
-                    product_id: productId,
-                    product_name: productName,
-                    ip_port: generateLicenseIP(),
-                    user: `papeleta${currentUser.id.slice(0, 8)}`,
-                    key: generateLicenseKey(),
-                    system_name: productName.toUpperCase().replace(/\s+/g, '_'),
-                    created_at: firebase.firestore.FieldValue.serverTimestamp(),
-                    status: 'active'
-                };
-                
-                // Guardar en Firebase
-                const docRef = await db.collection("Licencias").add(licenseData);
-                
-                return { id: docRef.id, ...licenseData };
-            } catch (error) {
-                console.error("Error creando licencia:", error);
-                return null;
-            }
-        }
-
         // --- FUNCIÓN PARA RECLAMAR PRODUCTOS GRATIS ---
         async function claimFreeProducts() {
             if (!currentUser) {
@@ -1204,7 +785,6 @@ configLicense = {
                 }
                 
                 saveUserDataLocally();
-                loadDashboardData();
                 
                 alert('¡Productos reclamados exitosamente! Ya están disponibles en tu biblioteca.\n\nSe han generado tus licencias automáticamente.\n\nGracias por seguir confiando en nuestra tienda y en cada uno de nuestros productos digitales. Seguimos trabajando para brindar la mejor calidad a toda nuestra comunidad.');
                 
@@ -1324,7 +904,6 @@ configLicense = {
                 }
                 
                 saveUserDataLocally();
-                loadDashboardData();
                 alert("¡Productos añadidos a tu biblioteca!\n\nSe han generado tus licencias automáticamente.");
             } catch (error) {
                 console.error(error);
@@ -1787,160 +1366,52 @@ configLicense = {
             );
         }
 
+        // --- REDIRECCIÓN A ÁREA DE CLIENTE ---
         function openUserDashboard() {
             if (!currentUser) {
                 openLoginModal();
                 return;
             }
-            document.getElementById('user-dashboard').classList.remove('hidden');
-            document.getElementById('dashboard-username').innerText = currentUser.username;
-            loadDashboardData();
+            // Redirigir al archivo externo
+            window.location.href = 'AreaCliente.html';
         }
 
-        function closeUserDashboard() {
-            document.getElementById('user-dashboard').classList.add('hidden');
-        }
-
-        async function loadDashboardData() {
-            if (!currentUser) return;
-
-            // Obtener productos asignados desde localStorage
-            const savedData = JSON.parse(localStorage.getItem('papeleta_user_' + currentUser.id) || '{}');
-            const assignedIds = savedData.assigned_products || [];
-            
-            // Buscar detalles de productos en allProducts
-            const products = assignedIds.map(id => {
-                const prod = allProducts.find(p => p.id === id);
-                return prod ? { ...prod, assigned_at: new Date().toISOString() } : null;
-            }).filter(Boolean);
-
-            const totalSpent = products.reduce((sum, p) => sum + (p.price || 0), 0);
-            
-            document.getElementById('stat-total-spent').innerText = totalSpent === 0 ? 'GRATIS' : '$' + totalSpent.toFixed(2);
-            document.getElementById('stat-active-scripts').innerText = products.length;
-            document.getElementById('stat-total-downloads').innerText = products.length;
-            document.getElementById('stat-total-licenses').innerText = products.length;
-
-            renderDashboardProducts(products);
-            renderPurchaseHistory(products);
-            
-            // Cargar licencias
-            await loadLicenses();
-        }
-
-        function renderDashboardProducts(products) {
-            const container = document.getElementById('dashboard-products-list');
-            const emptyState = document.getElementById('dashboard-empty-state');
-
-            if (products.length === 0) {
-                container.innerHTML = '';
-                emptyState.classList.remove('hidden');
-                return;
+        // --- LICENCIAS (Funciones necesarias para el flujo de compra) ---
+        function generateLicenseKey() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let key = '';
+            for (let i = 0; i < 24; i++) {
+                key += chars.charAt(Math.floor(Math.random() * chars.length));
             }
-
-            emptyState.classList.add('hidden');
-            
-            container.innerHTML = products.map(item => {
-                const priceDisplay = Number(item.price) === 0 ? 'GRATIS' : '$' + Number(item.price).toFixed(2);
-                const priceClass = Number(item.price) === 0 ? 'text-green-400 bg-green-900/20' : 'text-red-400 bg-red-900/20';
-                
-                return `
-                <div class="product-card border border-red-950/40 rounded-xl p-4 flex flex-col md:flex-row md:items-center gap-4 hover:border-red-600/40 transition-all group bg-[#150a0a]/50">
-                    <img src="${escapeHTML(item.image_url || '')}" alt="${escapeHTML(item.name)}" 
-                         class="w-full md:w-24 h-32 md:h-24 object-cover rounded-lg bg-[#0d0505]">
-                    
-                    <div class="flex-grow">
-                        <h3 class="text-white font-bold mb-1 text-lg">${escapeHTML(item.name)}</h3>
-                        <p class="text-gray-400 text-xs mb-2 line-clamp-2">${escapeHTML(item.description || 'Sin descripción')}</p>
-                        <div class="flex items-center gap-3 text-xs">
-                            <span class="${priceClass} font-semibold px-2 py-1 rounded">${priceDisplay}</span>
-                            <span class="text-gray-600">•</span>
-                            <span class="text-gray-500">
-                                <i class="fas fa-calendar mr-1"></i>
-                                ${item.price === 0 ? 'Reclamado' : 'Comprado'} recientemente
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="flex md:flex-col gap-2 w-full md:w-auto">
-                        <button onclick="downloadProduct('${item.id}')" 
-                           class="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all shadow-lg shadow-red-900/20">
-                            <i class="fas fa-download"></i>
-                            Descargar
-                        </button>
-                        <button onclick="viewProductDetails('${item.id}')" 
-                                class="flex-1 bg-[#0d0505] hover:bg-[#150a0a] border border-red-800/50 text-gray-300 px-4 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all">
-                            <i class="fas fa-eye"></i>
-                            Ver
-                        </button>
-                    </div>
-                </div>
-            `}).join('');
+            return key;
         }
 
-        function renderPurchaseHistory(products) {
-            const container = document.getElementById('dashboard-purchase-history');
-            
-            if (products.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-8 text-gray-500">
-                        <i class="fas fa-receipt text-4xl mb-2 opacity-30"></i>
-                        <p>No hay compras registradas</p>
-                    </div>
-                `;
-                return;
+        function generateLicenseIP() {
+            const ip = `188.93.139.${Math.floor(Math.random() * 255)}:${2000 + Math.floor(Math.random() * 100)}`;
+            return ip;
+        }
+
+        async function createLicenseForProduct(productId, productName) {
+            if (!currentUser) return null;
+            try {
+                const licenseData = {
+                    discord_id: currentUser.id,
+                    username: currentUser.username,
+                    product_id: productId,
+                    product_name: productName,
+                    ip_port: generateLicenseIP(),
+                    user: `papeleta${currentUser.id.slice(0, 8)}`,
+                    key: generateLicenseKey(),
+                    system_name: productName.toUpperCase().replace(/\s+/g, '_'),
+                    created_at: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'active'
+                };
+                const docRef = await db.collection("Licencias").add(licenseData);
+                return { id: docRef.id, ...licenseData };
+            } catch (error) {
+                console.error("Error creando licencia:", error);
+                return null;
             }
-
-            container.innerHTML = products.map(item => {
-                const priceDisplay = Number(item.price) === 0 ? 'GRATIS' : '$' + Number(item.price).toFixed(2);
-                const statusText = item.price === 0 ? 'Reclamado gratuitamente' : 'Pago completado con PayPal';
-                
-                return `
-                <div class="flex items-center justify-between bg-[#0d0505] border border-red-950/40 rounded-xl p-4 hover:bg-[#150a0a] transition-colors">
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-lg bg-green-600/20 flex items-center justify-center shrink-0">
-                            <i class="fas fa-check text-green-400"></i>
-                        </div>
-                        <div>
-                            <p class="text-white font-semibold text-sm">${escapeHTML(item.name)}</p>
-                            <p class="text-gray-500 text-xs">${statusText}</p>
-                        </div>
-                    </div>
-                    <span class="${Number(item.price) === 0 ? 'text-green-400' : 'text-green-400'} font-bold text-sm shrink-0 ml-4">${priceDisplay}</span>
-                </div>
-            `}).join('');
-        }
-
-        // --- FUNCIÓN DE DESCARGA DIRECTA ---
-        function downloadProduct(productId) {
-            const product = allProducts.find(p => p.id === productId);
-            if (!product) return;
-            
-            if (product.file_data) {
-                // Crear enlace temporal para descargar el archivo base64
-                const link = document.createElement('a');
-                link.href = product.file_data;
-                link.download = product.file_name || 'archivo_descarga.zip';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            } else {
-                alert('Este producto no tiene un archivo adjunto disponible.');
-            }
-        }
-
-        function filterDashboardProducts() {
-            const search = document.getElementById('dashboard-search').value.toLowerCase();
-            const cards = document.querySelectorAll('#dashboard-products-list .product-card');
-            
-            cards.forEach(card => {
-                const text = card.innerText.toLowerCase();
-                card.style.display = text.includes(search) ? '' : 'none';
-            });
-        }
-
-        function viewProductDetails(productId) {
-            showProductDetails(productId);
         }
 
         function initNetworkBg() {
