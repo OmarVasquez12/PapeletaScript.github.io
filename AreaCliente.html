@@ -267,8 +267,9 @@
                             <span class="text-xs text-gray-500">LUA CONFIG</span>
                         </div>
                         <div class="code-block rounded-lg p-4 font-mono text-sm">
-                            <pre class="text-blue-300"><code id="license-code">license = {
-    key = "PIXEL(890526767608127489)"
+                            <pre class="text-blue-300"><code id="license-code">configLicense = {
+    ["User"] = "usuario", 
+    ["Key"] = "PapeletaStore(key)"
 }</code></pre>
                         </div>
                     </div>
@@ -497,16 +498,16 @@
             }
         }
 
-     function updateLicenseCode() {
-    if (allLicenses.length > 0) {
-        const license = allLicenses[0];
-        const code = `configLicense = {
+        function updateLicenseCode() {
+            if (allLicenses.length > 0) {
+                const license = allLicenses[0];
+                const code = `configLicense = {
     ["User"] = "${currentUser.username}", 
     ["Key"] = "PapeletaStore(${license.key || currentUser.id})"
 }`;
-        document.getElementById('license-code').textContent = code;
-    }
-}
+                document.getElementById('license-code').textContent = code;
+            }
+        }
 
         function copyLicenseCode() {
             const code = document.getElementById('license-code').textContent;
