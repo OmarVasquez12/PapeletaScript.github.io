@@ -383,7 +383,7 @@
                 
                 document.getElementById('login-modal').classList.add('hidden');
                 loadDashboardData();
-                loadLicenses();
+                loadLicenses(); // Cargar licencias después de autenticar
             })
             .catch(err => {
                 console.error(err);
@@ -558,17 +558,24 @@
             if (!currentUser) return;
             
             try {
+                console.log("Cargando licencias para:", currentUser.id);
                 const snapshot = await db.collection("Licencias")
                     .where("discord_id", "==", currentUser.id)
                     .get();
                 
                 allLicenses = [];
                 snapshot.forEach((doc) => {
-                    allLicenses.push({ id: doc.id, ...doc.data() });
+                    const licenseData = { id: doc.id, ...doc.data() };
+                    allLicenses.push(licenseData);
+                    console.log("Licencia encontrada:", licenseData);
                 });
+                
+                console.log("Total licencias cargadas:", allLicenses.length);
                 
                 if (allLicenses.length > 0) {
                     updateLicenseCode();
+                } else {
+                    console.log("No se encontraron licencias para este usuario");
                 }
             } catch (error) {
                 console.error("Error cargando licencias:", error);
@@ -576,13 +583,18 @@
         }
 
         function updateLicenseCode() {
-            if (allLicenses.length > 0) {
+            if (allLicenses.length > 0 && currentUser) {
                 const license = allLicenses[0];
+                console.log("Actualizando código con license:", license);
+                console.log("Username:", currentUser.username);
+                console.log("Key:", license.key);
+                
                 // Aquí usamos el username de Discord y la key única generada
                 const code = `configLicense = {
     ["User"] = "${currentUser.username}", 
     ["Key"] = "PapeletaStore(${license.key})"
 }`;
+                console.log("Código generado:", code);
                 document.getElementById('license-code').textContent = code;
             }
         }
