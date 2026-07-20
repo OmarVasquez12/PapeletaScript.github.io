@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesión - Papeleta Store</title>
+    <title>Iniciar Sesión - Pixel Store</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
         * {
             margin: 0;
             padding: 0;
@@ -13,181 +15,178 @@
         }
 
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: linear-gradient(135deg, #1a0a0a 0%, #0d0505 100%);
+            font-family: 'Inter', sans-serif;
+            background-color: #09090b; /* Fondo muy oscuro */
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            color: white;
         }
 
-        /* Network Background Animation */
+        /* Network Background Animation (Mantenido del original) */
         #network-bg {
             position: fixed;
             inset: 0;
             z-index: 0;
-            opacity: 0.3;
+            opacity: 0.2; /* Más sutil para este diseño */
             pointer-events: none;
         }
 
         .modal-container {
             position: relative;
             z-index: 10;
-            background: rgba(13, 5, 5, 0.95);
-            border: 1px solid rgba(255, 26, 26, 0.3);
-            border-radius: 20px;
-            padding: 3rem 2.5rem;
-            max-width: 480px;
-            width: 90%;
+            background: #0f0f11; /* Color de tarjeta oscuro */
+            border: 1px solid #27272a; /* Borde gris sutil */
+            border-radius: 24px;
+            padding: 3rem 2rem;
+            max-width: 500px;
+            width: 95%;
             text-align: center;
-            box-shadow: 0 0 60px rgba(255, 26, 26, 0.2), 
-                        inset 0 0 60px rgba(255, 26, 26, 0.05);
-            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
         }
 
-        .close-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: transparent;
-            border: none;
-            color: #6b7280;
-            font-size: 1.5rem;
-            cursor: pointer;
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-
-        .close-btn:hover {
-            background: rgba(255, 26, 26, 0.1);
-            color: #ff1a1a;
-            transform: rotate(90deg);
-        }
-
-        .logo-container {
+        /* Logo Pixelado */
+        .logo-wrapper {
             margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: center;
         }
 
-        .logo {
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(135deg, #ff1a1a 0%, #cc1b1b 100%);
-            border-radius: 20px;
+        .pixel-logo {
+            width: 80px;
+            height: 80px;
+            background: #000;
+            border: 1px solid #333;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto;
-            box-shadow: 0 10px 30px rgba(255, 26, 26, 0.4),
-                        0 0 60px rgba(255, 26, 26, 0.2);
-            font-size: 3rem;
-            font-weight: 900;
-            color: white;
-            animation: logoPulse 2s ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
         }
 
-        @keyframes logoPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        .store-title {
+        .pixel-logo i {
             font-size: 2.5rem;
-            font-weight: 900;
-            margin-bottom: 1rem;
-            letter-spacing: 1px;
+            color: #fff;
+            text-shadow: 2px 2px 0px #3b82f6; /* Efecto glitch azul */
         }
 
-        .store-title .papeleta {
+        .main-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            letter-spacing: -0.5px;
+        }
+
+        .main-title span.white {
             color: #ffffff;
         }
 
-        .store-title .store {
-            color: #ff4444;
-            text-shadow: 0 0 20px rgba(255, 26, 26, 0.8),
-                         0 0 40px rgba(204, 27, 27, 0.4);
+        .main-title span.blue {
+            color: #3b82f6; /* Azul brillante */
         }
 
         .subtitle {
-            color: #9496a1;
-            font-size: 1rem;
-            line-height: 1.6;
-            margin-bottom: 2.5rem;
+            color: #a1a1aa;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 2rem;
+            padding: 0 1rem;
         }
 
+        /* Grid de Características */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .feature-card {
+            background: #18181b;
+            border: 1px solid #27272a;
+            border-radius: 12px;
+            padding: 1rem 0.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s;
+        }
+
+        .feature-card:hover {
+            border-color: #3f3f46;
+            transform: translateY(-2px);
+        }
+
+        .feature-icon {
+            color: #3b82f6;
+            font-size: 1.2rem;
+        }
+
+        .feature-text {
+            color: #e4e4e7;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* Botón Discord */
         .discord-btn {
             width: 100%;
-            background: linear-gradient(135deg, #5865F2 0%, #4752C4 100%);
+            background: #5865F2; /* Color oficial Discord */
             color: white;
             border: none;
-            padding: 1rem 2rem;
-            font-size: 1.1rem;
-            font-weight: 700;
-            border-radius: 12px;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.75rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(88, 101, 242, 0.4);
-            text-decoration: none;
+            gap: 10px;
+            transition: all 0.2s ease;
+            margin-bottom: 1.5rem;
         }
 
         .discord-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(88, 101, 242, 0.6);
-            background: linear-gradient(135deg, #6b75ff 0%, #5865F2 100%);
-        }
-
-        .discord-btn:active {
-            transform: translateY(0);
+            background: #4752C4;
+            transform: scale(1.02);
+            box-shadow: 0 0 15px rgba(88, 101, 242, 0.4);
         }
 
         .discord-btn i {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
         }
 
-        .security-note {
-            margin-top: 1.5rem;
-            color: #6b7280;
-            font-size: 0.85rem;
-            line-height: 1.5;
+        /* Footer Link */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #71717a;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+            border-top: 1px solid #27272a;
+            padding-top: 1.5rem;
+            width: 100%;
+            justify-content: center;
         }
 
-        .security-note i {
-            color: #10b981;
-            margin-right: 0.5rem;
-        }
-
-        /* Responsive */
-        @media (max-width: 640px) {
-            .modal-container {
-                padding: 2rem 1.5rem;
-            }
-
-            .store-title {
-                font-size: 2rem;
-            }
-
-            .logo {
-                width: 80px;
-                height: 80px;
-                font-size: 2.5rem;
-            }
+        .back-link:hover {
+            color: #e4e4e7;
         }
 
         /* Loading animation */
         .loading {
             display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
             border-top-color: white;
             animation: spin 1s ease-in-out infinite;
@@ -196,39 +195,71 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        @media (max-width: 480px) {
+            .features-grid {
+                gap: 8px;
+            }
+            .feature-text {
+                font-size: 0.7rem;
+            }
+            .main-title {
+                font-size: 1.8rem;
+            }
+        }
     </style>
 </head>
 <body>
 
+    <!-- Fondo de red (se mantiene de tu código original) -->
     <canvas id="network-bg"></canvas>
 
     <div class="modal-container">
-        <button class="close-btn" onclick="window.close()" title="Cerrar">
-            <i class="fas fa-times"></i>
-        </button>
-
-        <div class="logo-container">
-            <div class="logo">P</div>
+        
+        <!-- Logo Pixelado Simulado -->
+        <div class="logo-wrapper">
+            <div class="pixel-logo">
+                <i class="fas fa-cube"></i> <!-- Icono genérico pixelado -->
+            </div>
         </div>
 
-        <h1 class="store-title">
-            <span class="papeleta">PAPELETA</span> 
-            <span class="store">STORE</span>
+        <!-- Título Principal -->
+        <h1 class="main-title">
+            <span class="white">Iniciar</span> <span class="blue">Sesión</span>
         </h1>
 
+        <!-- Subtítulo -->
         <p class="subtitle">
-            Debes iniciar sesión para realizar compras y descargar archivos.
+            Gestiona tus aplicaciones y licencias desde<br>un solo lugar de forma segura.
         </p>
 
-        <a href="#" class="discord-btn" onclick="handleDiscordLogin(event)">
+        <!-- Tarjetas de Características -->
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="fas fa-shield-alt feature-icon"></i>
+                <span class="feature-text">Seguro</span>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-bolt feature-icon"></i>
+                <span class="feature-text">Rápido</span>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-cog feature-icon"></i>
+                <span class="feature-text">Oficial</span>
+            </div>
+        </div>
+
+        <!-- Botón de Acción -->
+        <button class="discord-btn" onclick="handleDiscordLogin(event)">
             <i class="fab fa-discord"></i>
-            <span>Iniciar Sesión con Discord</span>
-        </a>
+            <span>Acceder con Discord</span>
+        </button>
 
-        <p class="security-note">
-            <i class="fas fa-shield-alt"></i>
-            Tus datos están seguros. Solo usamos tu ID para asignarte los productos.
-        </p>
+        <!-- Enlace Volver -->
+        <a href="#" class="back-link" onclick="window.close()">
+            <i class="fas fa-arrow-left"></i>
+            Volver a la web
+        </a>
     </div>
 
     <script>
@@ -254,7 +285,7 @@
             }, 500);
         }
 
-        // Network Background Animation
+        // Network Background Animation (Tu script original)
         function initNetworkBg() {
             const canvas = document.getElementById('network-bg');
             const ctx = canvas.getContext('2d');
@@ -289,7 +320,8 @@
                         const dy = points[i].y - points[j].y;
                         const dist = Math.sqrt(dx * dx + dy * dy);
                         if (dist < 150) {
-                            ctx.strokeStyle = `rgba(255,26,26,${1 - dist / 150})`;
+                            // Cambié el color a un gris azulado muy tenue para combinar mejor
+                            ctx.strokeStyle = `rgba(100,116,139,${1 - dist / 150})`; 
                             ctx.lineWidth = 0.6;
                             ctx.beginPath();
                             ctx.moveTo(points[i].x, points[i].y);
@@ -297,7 +329,7 @@
                             ctx.stroke();
                         }
                     }
-                    ctx.fillStyle = 'rgba(255,26,26,0.8)';
+                    ctx.fillStyle = 'rgba(100,116,139,0.5)';
                     ctx.beginPath();
                     ctx.arc(points[i].x, points[i].y, 1.8, 0, Math.PI * 2);
                     ctx.fill();
@@ -307,23 +339,13 @@
             tick();
         }
 
-        // Close modal with Escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 window.close();
             }
         });
 
-        // Initialize
         document.addEventListener('DOMContentLoaded', initNetworkBg);
-
-        // Check if opened as popup
-        if (window.opener) {
-            // If user closes this window, we could communicate back to opener
-            window.onbeforeunload = () => {
-                // Optional: notify opener that login was cancelled
-            };
-        }
     </script>
 </body>
 </html>
