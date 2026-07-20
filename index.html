@@ -633,12 +633,10 @@
             }
         }
 
-        // ✅ MODIFICADA: Sin alert, simplemente redirige a AreaCliente.html
         function addToCart(productId) {
             const product = allProducts.find(p => p.id === productId);
             if (!product) return;
             
-            // Si ya lo tiene, redirige directamente a AreaCliente.html sin alert
             if (currentUser && myAssignedProductIds.has(productId)) {
                 window.location.href = 'AreaCliente.html';
                 return;
@@ -1364,7 +1362,6 @@
             renderProducts();
         }
 
-        // ✅ MODIFICADA: Botón "Biblioteca" en lugar de "Ya lo tienes"
         function renderProducts() {
             const search = document.getElementById('search-input').value.toLowerCase();
             const grid = document.getElementById('products-grid');
