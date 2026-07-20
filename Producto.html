@@ -86,6 +86,117 @@
             background: rgba(255, 0, 0, 0.1);
             border-color: rgba(255, 0, 0, 0.6);
         }
+
+        /* Gallery Styles */
+        .gallery-container {
+            position: relative;
+            background: rgba(13, 5, 5, 0.8);
+        }
+
+        .gallery-main-image {
+            width: 100%;
+            height: 400px;
+            object-fit: contain;
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(153, 27, 27, 0.1));
+        }
+
+        .gallery-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(220, 38, 38, 0.9);
+            color: white;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            font-size: 18px;
+            z-index: 10;
+        }
+
+        .gallery-nav:hover {
+            background: rgba(220, 38, 38, 1);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .gallery-nav.prev {
+            left: 15px;
+        }
+
+        .gallery-nav.next {
+            right: 15px;
+        }
+
+        .gallery-nav:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .gallery-thumbnails {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            overflow-x: auto;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+        }
+
+        .gallery-thumbnail {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            flex-shrink: 0;
+            opacity: 0.6;
+        }
+
+        .gallery-thumbnail:hover {
+            opacity: 1;
+            border-color: rgba(220, 38, 38, 0.5);
+            transform: scale(1.05);
+        }
+
+        .gallery-thumbnail.active {
+            opacity: 1;
+            border-color: #dc2626;
+            box-shadow: 0 0 15px rgba(220, 38, 38, 0.6);
+        }
+
+        .image-counter {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .gallery-main-image {
+                height: 300px;
+            }
+            .gallery-nav {
+                width: 35px;
+                height: 35px;
+                font-size: 14px;
+            }
+            .gallery-thumbnail {
+                width: 60px;
+                height: 60px;
+            }
+        }
     </style>
 </head>
 <body class="relative">
@@ -111,14 +222,25 @@
         <!-- Product Card -->
         <div class="product-card rounded-2xl overflow-hidden shadow-2xl">
             
-            <!-- Product Image Container -->
-            <div class="relative">
-                <img id="product-image" src="" alt="Producto" class="w-full h-64 md:h-80 object-cover">
+            <!-- Gallery Container -->
+            <div class="gallery-container relative">
+                <img id="product-image" src="" alt="Producto" class="gallery-main-image">
                 
-                <!-- Badge GRATIS -->
-                <span id="price-badge" class="absolute top-4 right-4 badge-gratis text-black font-black px-4 py-2 rounded-full text-sm uppercase tracking-wider">
-                    GRATIS
-                </span>
+                <!-- Image Counter -->
+                <span id="image-counter" class="image-counter hidden">1 / 1</span>
+                
+                <!-- Navigation Buttons -->
+                <button id="gallery-prev" class="gallery-nav prev" onclick="changeImage(-1)">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button id="gallery-next" class="gallery-nav next" onclick="changeImage(1)">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <!-- Thumbnails -->
+            <div id="gallery-thumbnails" class="px-6 pt-4 hidden">
+                <!-- Thumbnails will be inserted here -->
             </div>
 
             <!-- Product Info -->
@@ -141,9 +263,9 @@
                         <i class="fas fa-gift"></i>
                         Reclamar
                     </button>
-                    <button onclick="verDetalles()" class="btn-detalles text-gray-300 font-semibold py-4 rounded-xl flex items-center justify-center gap-2">
-                        <i class="fas fa-info-circle"></i>
-                        Detalles
+                    <button onclick="downloadProduct()" class="btn-detalles text-gray-300 font-semibold py-4 rounded-xl flex items-center justify-center gap-2">
+                        <i class="fas fa-download"></i>
+                        Descargar
                     </button>
                 </div>
 
@@ -204,6 +326,8 @@
 
         let currentProduct = null;
         let currentUser = null;
+        let currentImageIndex = 0;
+        let productImages = [];
 
         // Load product data
         async function loadProduct() {
@@ -224,11 +348,22 @@
 
                 currentProduct = doc.data();
                 
+                // Setup images array
+                if (currentProduct.images && currentProduct.images.length > 0) {
+                    productImages = currentProduct.images;
+                } else if (currentProduct.image_url) {
+                    productImages = [currentProduct.image_url];
+                } else {
+                    productImages = ['https://via.placeholder.com/800x600'];
+                }
+
                 // Update UI
-                document.getElementById('product-image').src = currentProduct.image_url || 'https://via.placeholder.com/800x600';
                 document.getElementById('product-title').textContent = currentProduct.name;
                 document.getElementById('product-description').textContent = currentProduct.description || 'Sin descripción';
                 document.getElementById('product-category').textContent = currentProduct.category || 'General';
+                
+                // Setup gallery
+                setupGallery();
                 
                 // Check if free or paid
                 if (Number(currentProduct.price) === 0) {
@@ -247,6 +382,83 @@
                 console.error('Error loading product:', error);
                 alert('Error al cargar el producto');
             }
+        }
+
+        // Setup gallery
+        function setupGallery() {
+            const mainImage = document.getElementById('product-image');
+            const thumbnailsContainer = document.getElementById('gallery-thumbnails');
+            const counter = document.getElementById('image-counter');
+            const prevBtn = document.getElementById('gallery-prev');
+            const nextBtn = document.getElementById('gallery-next');
+
+            // Set first image
+            mainImage.src = productImages[0];
+            
+            // Show/hide counter
+            if (productImages.length > 1) {
+                counter.classList.remove('hidden');
+                counter.textContent = `1 / ${productImages.length}`;
+                prevBtn.style.display = 'flex';
+                nextBtn.style.display = 'flex';
+            } else {
+                counter.classList.add('hidden');
+                prevBtn.style.display = 'none';
+                nextBtn.style.display = 'none';
+            }
+
+            // Create thumbnails if more than 1 image
+            if (productImages.length > 1) {
+                thumbnailsContainer.classList.remove('hidden');
+                thumbnailsContainer.innerHTML = productImages.map((img, idx) => `
+                    <img src="${img}" 
+                         alt="Imagen ${idx + 1}" 
+                         class="gallery-thumbnail ${idx === 0 ? 'active' : ''}" 
+                         onclick="jumpToImage(${idx})">
+                `).join('');
+            } else {
+                thumbnailsContainer.classList.add('hidden');
+            }
+        }
+
+        // Change image
+        function changeImage(direction) {
+            currentImageIndex += direction;
+            
+            if (currentImageIndex < 0) {
+                currentImageIndex = productImages.length - 1;
+            } else if (currentImageIndex >= productImages.length) {
+                currentImageIndex = 0;
+            }
+            
+            updateGallery();
+        }
+
+        // Jump to specific image
+        function jumpToImage(index) {
+            currentImageIndex = index;
+            updateGallery();
+        }
+
+        // Update gallery display
+        function updateGallery() {
+            const mainImage = document.getElementById('product-image');
+            const thumbnails = document.querySelectorAll('.gallery-thumbnail');
+            const counter = document.getElementById('image-counter');
+
+            mainImage.src = productImages[currentImageIndex];
+            
+            // Update counter
+            counter.textContent = `${currentImageIndex + 1} / ${productImages.length}`;
+            
+            // Update thumbnails
+            thumbnails.forEach((thumb, idx) => {
+                if (idx === currentImageIndex) {
+                    thumb.classList.add('active');
+                } else {
+                    thumb.classList.remove('active');
+                }
+            });
         }
 
         // Check if user is admin
@@ -325,6 +537,66 @@
             }
         }
 
+        // Download product
+        async function downloadProduct() {
+            if (!currentProduct) return;
+
+            const token = localStorage.getItem('dc_access_token');
+            
+            if (!token) {
+                alert('Debes iniciar sesión para descargar este producto');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            try {
+                // Check if user has this product
+                const userResponse = await fetch('https://discord.com/api/users/@me', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!userResponse.ok) throw new Error('Not authenticated');
+                
+                const user = await userResponse.json();
+
+                // Check if user owns this product
+                const purchases = await db.collection("Clientes")
+                    .where("discord_id", "==", user.id)
+                    .get();
+
+                let ownsProduct = false;
+                purchases.forEach(doc => {
+                    const data = doc.data();
+                    if (data.products && data.products.some(p => p.id === productId)) {
+                        ownsProduct = true;
+                    }
+                });
+
+                if (!ownsProduct && Number(currentProduct.price) !== 0) {
+                    alert('Debes comprar este producto primero');
+                    return;
+                }
+
+                // If product has file_data, create download
+                if (currentProduct.file_data) {
+                    const link = document.createElement('a');
+                    link.href = currentProduct.file_data;
+                    link.download = currentProduct.file_name || 'producto.zip';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    alert('Descarga iniciada');
+                } else {
+                    alert('Este producto no tiene archivo disponible para descargar');
+                }
+
+            } catch (error) {
+                console.error('Error downloading product:', error);
+                alert('Error al descargar: ' + error.message);
+            }
+        }
+
         // Create license
         async function createLicense(productId, productName, user) {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -345,11 +617,6 @@
 
             await db.collection("Licencias").add(licenseData);
             return licenseData;
-        }
-
-        // View details
-        function verDetalles() {
-            alert(`Detalles del Producto:\n\nNombre: ${currentProduct.name}\nCategoría: ${currentProduct.category}\nPrecio: ${Number(currentProduct.price) === 0 ? 'GRATIS' : '$' + currentProduct.price}\n\nDescripción:\n${currentProduct.description}\n\nArchivo: ${currentProduct.file_name || 'No disponible'}`);
         }
 
         // Delete product (Admin only)
