@@ -51,9 +51,7 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: #150a0a; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #951d1d; border-radius: 3px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #ff1a1a; }
-        
-        /* ✅ ELIMINADO: #network-bg ya no existe */
-        
+        #network-bg { position: fixed; inset: 0; z-index: 0; opacity: 0.5; pointer-events: none; }
         .page { display: none; }
         .page.active { display: block; }
         .nav-link.active-page { color: #ff6b6b; }
@@ -94,7 +92,7 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-gradient-to-b from-[#150a0a] to-[#0a0505] relative">
 
-    <!-- ✅ ELIMINADO: <canvas id="network-bg"></canvas> -->
+    <canvas id="network-bg"></canvas>
 
     <!-- LOGIN MODAL -->
     <div id="login-modal" class="hidden fixed inset-0 bg-black/80 z-[60] flex items-center justify-center px-4 backdrop-blur-sm transition-opacity duration-300">
@@ -312,9 +310,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="hidden md:flex justify-center">
-                    <div class="w-64 h-64 rounded-3xl bg-gradient-to-br from-red-500 to-red-900 flex items-center justify-center text-9xl font-black shadow-2xl shadow-red-600/30">P</div>
-                </div>
+                <!-- La P grande ha sido eliminada aquí -->
             </div>
         </section>
 
@@ -635,6 +631,7 @@
             }
         }
 
+        // ✅ MODIFICADA: Sin alert, redirige directo a AreaCliente.html
         function addToCart(productId) {
             const product = allProducts.find(p => p.id === productId);
             if (!product) return;
@@ -1364,6 +1361,7 @@
             renderProducts();
         }
 
+        // ✅ MODIFICADA: Lógica exacta de botones según estado del producto
         function renderProducts() {
             const search = document.getElementById('search-input').value.toLowerCase();
             const grid = document.getElementById('products-grid');
@@ -1470,11 +1468,59 @@
             }
         }
 
-        // ✅ ELIMINADA: Función initNetworkBg() ya no existe
-        
+        function initNetworkBg() {
+            const canvas = document.getElementById('network-bg');
+            const ctx = canvas.getContext('2d');
+            let w, h, points;
+
+            function resize() {
+                w = canvas.width = window.innerWidth;
+                h = canvas.height = window.innerHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            points = Array.from({ length: 45 }, () => ({
+                x: Math.random() * w,
+                y: Math.random() * h,
+                vx: (Math.random() - 0.5) * 0.3,
+                vy: (Math.random() - 0.5) * 0.3
+            }));
+
+            function tick() {
+                ctx.clearRect(0, 0, w, h);
+                points.forEach(p => {
+                    p.x += p.vx; p.y += p.vy;
+                    if (p.x < 0 || p.x > w) p.vx *= -1;
+                    if (p.y < 0 || p.y > h) p.vy *= -1;
+                });
+                for (let i = 0; i < points.length; i++) {
+                    for (let j = i + 1; j < points.length; j++) {
+                        const dx = points[i].x - points[j].x;
+                        const dy = points[i].y - points[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 150) {
+                            ctx.strokeStyle = `rgba(255,26,26,${1 - dist / 150})`;
+                            ctx.lineWidth = 0.6;
+                            ctx.beginPath();
+                            ctx.moveTo(points[i].x, points[i].y);
+                            ctx.lineTo(points[j].x, points[j].y);
+                            ctx.stroke();
+                        }
+                    }
+                    ctx.fillStyle = 'rgba(255,26,26,0.8)';
+                    ctx.beginPath();
+                    ctx.arc(points[i].x, points[i].y, 1.8, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                requestAnimationFrame(tick);
+            }
+            tick();
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             checkDiscordAuth();
-            // ✅ ELIMINADA: initNetworkBg() ya no se llama
+            initNetworkBg();
         });
     </script>
 </body>
