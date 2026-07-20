@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Papeleta Store</title>
+    <title>Papeleta Store | Recursos para MTA:SA</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff1a1a'/%3E%3Cstop offset='1' stop-color='%23cc1b1b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Ctext x='50' y='70' font-family='Arial, sans-serif' font-size='58' font-weight='900' fill='white' text-anchor='middle'%3EP%3C/text%3E%3C/svg%3E">
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -118,6 +118,119 @@
             border-radius: 8px;
             margin-top: 10px;
         }
+
+        /* Estilos para la galería de imágenes */
+        .gallery-container {
+            position: relative;
+        }
+        
+        .gallery-main-image {
+            width: 100%;
+            height: 400px;
+            object-fit: contain;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(153, 27, 27, 0.1));
+        }
+        
+        .gallery-thumbnails {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            overflow-x: auto;
+            padding: 5px;
+        }
+        
+        .gallery-thumbnail {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+        
+        .gallery-thumbnail:hover {
+            border-color: #dc2626;
+            transform: scale(1.05);
+        }
+        
+        .gallery-thumbnail.active {
+            border-color: #dc2626;
+            box-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
+        }
+        
+        .gallery-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(220, 38, 38, 0.8);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .gallery-nav:hover {
+            background: rgba(220, 38, 38, 1);
+        }
+        
+        .gallery-nav.prev {
+            left: 10px;
+        }
+        
+        .gallery-nav.next {
+            right: 10px;
+        }
+
+        /* Preview múltiple en admin */
+        .multiple-preview-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .preview-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid rgba(220, 38, 38, 0.3);
+        }
+        
+        .preview-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+        
+        .preview-item .remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(220, 38, 38, 0.9);
+            color: white;
+            border: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .preview-item .remove-btn:hover {
+            background: rgba(220, 38, 38, 1);
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-gradient-to-b from-[#150a0a] to-[#0a0505] relative">
@@ -209,11 +322,19 @@
                                     <span class="bg-red-600/20 text-red-400 border border-red-600/50 px-3 py-1 rounded-full text-xs font-semibold">ENTREGA INSTANTÁNEA</span>
                                 </div>
                             </div>
-                            <img id="detail-image" src="" alt="Producto" class="w-full h-64 object-contain rounded-xl bg-gradient-to-br from-red-900/30 to-red-900/30 p-8">
-                            <div class="mt-4 flex justify-center">
-                                <button class="border border-red-600/50 text-red-400 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-red-600/10 transition-all">
-                                    <i class="fas fa-image mr-2"></i>IMAGEN
+                            
+                            <!-- Galería de Imágenes -->
+                            <div class="gallery-container relative">
+                                <img id="detail-image" src="" alt="Producto" class="gallery-main-image">
+                                <button class="gallery-nav prev" onclick="changeImage(-1)" id="gallery-prev">
+                                    <i class="fas fa-chevron-left"></i>
                                 </button>
+                                <button class="gallery-nav next" onclick="changeImage(1)" id="gallery-next">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                            <div id="gallery-thumbnails" class="gallery-thumbnails">
+                                <!-- Thumbnails se generan dinámicamente -->
                             </div>
                         </div>
                     </div>
@@ -416,15 +537,15 @@
                     </div>
                     
                     <div>
-                        <label class="block text-gray-300 text-sm font-semibold mb-2">Foto del Producto *</label>
+                        <label class="block text-gray-300 text-sm font-semibold mb-2">Fotos del Producto (Múltiples) *</label>
                         <div class="border-2 border-dashed border-red-900/40 rounded-xl p-4 text-center hover:border-red-500/50 transition-colors">
-                            <input type="file" id="prod-image" accept="image/*" required onchange="previewImage(this)" class="hidden">
-                            <label for="prod-image" class="cursor-pointer block">
+                            <input type="file" id="prod-images" accept="image/*" multiple required onchange="previewMultipleImages(this)" class="hidden">
+                            <label for="prod-images" class="cursor-pointer block">
                                 <i class="fas fa-cloud-upload-alt text-3xl text-red-400 mb-2"></i>
-                                <p class="text-gray-400 text-sm">Haz clic para subir una imagen</p>
-                                <p class="text-gray-500 text-xs mt-1">Se adaptará automáticamente (máx. 800x600)</p>
+                                <p class="text-gray-400 text-sm">Haz clic para subir imágenes</p>
+                                <p class="text-gray-500 text-xs mt-1">Puedes seleccionar varias imágenes a la vez (máx. 800x600)</p>
                             </label>
-                            <img id="image-preview" class="image-preview hidden mx-auto">
+                            <div id="multiple-images-preview" class="multiple-preview-container"></div>
                         </div>
                     </div>
 
@@ -488,8 +609,10 @@
         let currentUserRole = 'user';
         let myAssignedProductIds = new Set();
         let currentDetailProduct = null;
+        let currentImageIndex = 0;
         let cart = [];
         let localProducts = JSON.parse(localStorage.getItem('papeleta_local_products') || '[]');
+        let tempImages = []; // Para almacenar imágenes temporales en el admin
 
         const firebaseConfig = {
             apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
@@ -506,6 +629,53 @@
             firebase.initializeApp(firebaseConfig);
         }
         const db = firebase.firestore();
+
+        // Preview de múltiples imágenes
+        function previewMultipleImages(input) {
+            const previewContainer = document.getElementById('multiple-images-preview');
+            previewContainer.innerHTML = '';
+            tempImages = [];
+            
+            if (input.files && input.files.length > 0) {
+                Array.from(input.files).forEach((file, index) => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        tempImages.push(e.target.result);
+                        
+                        const div = document.createElement('div');
+                        div.className = 'preview-item';
+                        div.innerHTML = `
+                            <img src="${e.target.result}" alt="Preview ${index + 1}">
+                            <button type="button" class="remove-btn" onclick="removeImage(${index})">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        `;
+                        previewContainer.appendChild(div);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+        }
+
+        function removeImage(index) {
+            tempImages.splice(index, 1);
+            const input = document.getElementById('prod-images');
+            const previewContainer = document.getElementById('multiple-images-preview');
+            
+            // Recrear el preview
+            previewContainer.innerHTML = '';
+            tempImages.forEach((img, idx) => {
+                const div = document.createElement('div');
+                div.className = 'preview-item';
+                div.innerHTML = `
+                    <img src="${img}" alt="Preview ${idx + 1}">
+                    <button type="button" class="remove-btn" onclick="removeImage(${idx})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                previewContainer.appendChild(div);
+            });
+        }
 
         function previewImage(input) {
             const preview = document.getElementById('image-preview');
@@ -579,16 +749,28 @@
             const price = parseFloat(document.getElementById('prod-price').value);
             const category = document.getElementById('prod-category').value;
             const description = document.getElementById('prod-description').value;
-            const imageFile = document.getElementById('prod-image').files[0];
             const downloadFile = document.getElementById('prod-file').files[0];
             
-            if (!imageFile || !downloadFile) {
-                alert('Por favor selecciona tanto la imagen como el archivo de descarga');
+            if (tempImages.length === 0) {
+                alert('Por favor selecciona al menos una imagen');
+                return;
+            }
+            
+            if (!downloadFile) {
+                alert('Por favor selecciona el archivo de descarga');
                 return;
             }
             
             try {
-                const resizedImage = await resizeImage(imageFile);
+                // Redimensionar todas las imágenes
+                const resizedImages = [];
+                const imageFiles = Array.from(document.getElementById('prod-images').files);
+                
+                for (let i = 0; i < imageFiles.length; i++) {
+                    const resized = await resizeImage(imageFiles[i]);
+                    resizedImages.push(resized);
+                }
+                
                 const fileBase64 = await fileToBase64(downloadFile);
                 
                 const newProduct = {
@@ -597,7 +779,8 @@
                     price: price,
                     category: category,
                     description: description,
-                    image_url: resizedImage,
+                    image_url: resizedImages[0], // Primera imagen como principal
+                    images: resizedImages, // Array con todas las imágenes
                     file_data: fileBase64,
                     file_name: downloadFile.name,
                     created_at: firebase.firestore.FieldValue.serverTimestamp()
@@ -607,9 +790,10 @@
                 
                 alert('Producto guardado en Firebase exitosamente');
                 document.getElementById('product-form').reset();
-                document.getElementById('image-preview').classList.add('hidden');
+                document.getElementById('multiple-images-preview').innerHTML = '';
                 document.getElementById('file-label-text').innerText = 'Haz clic para subir el archivo descargable';
                 document.getElementById('file-label-text').classList.remove('text-white', 'font-bold');
+                tempImages = [];
                 
                 loadProducts();
                 
@@ -660,7 +844,6 @@
             }
         }
 
-        // ✅ MODIFICADA: Sin alert, redirige directo a AreaCliente.html
         function addToCart(productId) {
             const product = allProducts.find(p => p.id === productId);
             if (!product) return;
@@ -921,16 +1104,72 @@
             window.open(DISCORD_INVITE, '_blank');
         }
 
+        // Funciones para la galería
+        function changeImage(direction) {
+            if (!currentDetailProduct || !currentDetailProduct.images) return;
+            
+            currentImageIndex += direction;
+            
+            if (currentImageIndex < 0) {
+                currentImageIndex = currentDetailProduct.images.length - 1;
+            } else if (currentImageIndex >= currentDetailProduct.images.length) {
+                currentImageIndex = 0;
+            }
+            
+            updateGallery();
+        }
+
+        function updateGallery() {
+            if (!currentDetailProduct || !currentDetailProduct.images) return;
+            
+            const mainImage = document.getElementById('detail-image');
+            const thumbnails = document.getElementById('gallery-thumbnails');
+            
+            mainImage.src = currentDetailProduct.images[currentImageIndex];
+            
+            // Actualizar thumbnails
+            const thumbElements = thumbnails.querySelectorAll('.gallery-thumbnail');
+            thumbElements.forEach((thumb, idx) => {
+                if (idx === currentImageIndex) {
+                    thumb.classList.add('active');
+                } else {
+                    thumb.classList.remove('active');
+                }
+            });
+        }
+
         function showProductDetails(productId) {
             const product = allProducts.find(p => p.id === productId);
             if (!product) return;
             
             currentDetailProduct = product;
+            currentImageIndex = 0;
 
             document.getElementById('detail-title').textContent = product.name;
             const priceDisplay = Number(product.price) === 0 ? 'GRATIS' : '$' + Number(product.price).toFixed(2);
             document.getElementById('detail-price').textContent = priceDisplay;
-            document.getElementById('detail-image').src = product.image_url || 'https://via.placeholder.com/400x300';
+            
+            // Configurar galería
+            const mainImage = document.getElementById('detail-image');
+            const thumbnailsContainer = document.getElementById('gallery-thumbnails');
+            
+            if (product.images && product.images.length > 0) {
+                mainImage.src = product.images[0];
+                
+                // Crear thumbnails
+                thumbnailsContainer.innerHTML = product.images.map((img, idx) => `
+                    <img src="${img}" alt="Imagen ${idx + 1}" 
+                         class="gallery-thumbnail ${idx === 0 ? 'active' : ''}" 
+                         onclick="jumpToImage(${idx})">
+                `).join('');
+                
+                // Mostrar/ocultar navegación
+                document.getElementById('gallery-prev').style.display = product.images.length > 1 ? 'flex' : 'none';
+                document.getElementById('gallery-next').style.display = product.images.length > 1 ? 'flex' : 'none';
+            } else {
+                mainImage.src = product.image_url || 'https://via.placeholder.com/400x300';
+                thumbnailsContainer.innerHTML = '';
+            }
 
             const description = product.description || 'Este producto incluye acceso completo a todas las características mencionadas.';
             document.getElementById('detail-description').innerHTML = `
@@ -995,6 +1234,11 @@
             document.body.style.overflow = 'hidden';
         }
 
+        function jumpToImage(index) {
+            currentImageIndex = index;
+            updateGallery();
+        }
+
         function generateFeatures(product) {
             const baseFeatures = [
                 'Instalación rápida y sencilla',
@@ -1013,6 +1257,7 @@
             document.getElementById('product-detail-modal').classList.add('hidden');
             document.body.style.overflow = '';
             currentDetailProduct = null;
+            currentImageIndex = 0;
         }
 
         function buyFromDetail() {
@@ -1390,7 +1635,6 @@
             renderProducts();
         }
 
-        // ✅ MODIFICADA: Lógica exacta de botones según estado del producto
         function renderProducts() {
             const search = document.getElementById('search-input').value.toLowerCase();
             const grid = document.getElementById('products-grid');
