@@ -1,1 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Papeleta Store</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #1a0a0a 0%, #0d0505 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Network Background Animation */
+        #network-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .modal-container {
+            position: relative;
+            z-index: 10;
+            background: rgba(13, 5, 5, 0.95);
+            border: 1px solid rgba(255, 26, 26, 0.3);
+            border-radius: 20px;
+            padding: 3rem 2.5rem;
+            max-width: 480px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 0 60px rgba(255, 26, 26, 0.2), 
+                        inset 0 0 60px rgba(255, 26, 26, 0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: transparent;
+            border: none;
+            color: #6b7280;
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 26, 26, 0.1);
+            color: #ff1a1a;
+            transform: rotate(90deg);
+        }
+
+        .logo-container {
+            margin-bottom: 1.5rem;
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #ff1a1a 0%, #cc1b1b 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            box-shadow: 0 10px 30px rgba(255, 26, 26, 0.4),
+                        0 0 60px rgba(255, 26, 26, 0.2);
+            font-size: 3rem;
+            font-weight: 900;
+            color: white;
+            animation: logoPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .store-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            letter-spacing: 1px;
+        }
+
+        .store-title .papeleta {
+            color: #ffffff;
+        }
+
+        .store-title .store {
+            color: #ff4444;
+            text-shadow: 0 0 20px rgba(255, 26, 26, 0.8),
+                         0 0 40px rgba(204, 27, 27, 0.4);
+        }
+
+        .subtitle {
+            color: #9496a1;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 2.5rem;
+        }
+
+        .discord-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #5865F2 0%, #4752C4 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(88, 101, 242, 0.4);
+            text-decoration: none;
+        }
+
+        .discord-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(88, 101, 242, 0.6);
+            background: linear-gradient(135deg, #6b75ff 0%, #5865F2 100%);
+        }
+
+        .discord-btn:active {
+            transform: translateY(0);
+        }
+
+        .discord-btn i {
+            font-size: 1.5rem;
+        }
+
+        .security-note {
+            margin-top: 1.5rem;
+            color: #6b7280;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .security-note i {
+            color: #10b981;
+            margin-right: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .modal-container {
+                padding: 2rem 1.5rem;
+            }
+
+            .store-title {
+                font-size: 2rem;
+            }
+
+            .logo {
+                width: 80px;
+                height: 80px;
+                font-size: 2.5rem;
+            }
+        }
+
+        /* Loading animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="network-bg"></canvas>
+
+    <div class="modal-container">
+        <button class="close-btn" onclick="window.close()" title="Cerrar">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <div class="logo-container">
+            <div class="logo">P</div>
+        </div>
+
+        <h1 class="store-title">
+            <span class="papeleta">PAPELETA</span> 
+            <span class="store">STORE</span>
+        </h1>
+
+        <p class="subtitle">
+            Debes iniciar sesión para realizar compras y descargar archivos.
+        </p>
+
+        <a href="#" class="discord-btn" onclick="handleDiscordLogin(event)">
+            <i class="fab fa-discord"></i>
+            <span>Iniciar Sesión con Discord</span>
+        </a>
+
+        <p class="security-note">
+            <i class="fas fa-shield-alt"></i>
+            Tus datos están seguros. Solo usamos tu ID para asignarte los productos.
+        </p>
+    </div>
+
+    <script>
+        // Configuration
+        const CLIENT_ID = '1213866547181780992';
+        const REDIRECT_URI = 'https://papeleta-script-github-io.vercel.app';
+
+        // Handle Discord Login
+        function handleDiscordLogin(e) {
+            e.preventDefault();
+            
+            const btn = document.querySelector('.discord-btn');
+            const originalContent = btn.innerHTML;
+            
+            // Show loading state
+            btn.innerHTML = '<span class="loading"></span><span>Conectando...</span>';
+            btn.style.opacity = '0.8';
+            
+            // Redirect to Discord OAuth
+            setTimeout(() => {
+                const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20email`;
+                window.location.href = url;
+            }, 500);
+        }
+
+        // Network Background Animation
+        function initNetworkBg() {
+            const canvas = document.getElementById('network-bg');
+            const ctx = canvas.getContext('2d');
+            let w, h, points;
+
+            function resize() {
+                w = canvas.width = window.innerWidth;
+                h = canvas.height = window.innerHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            points = Array.from({ length: 45 }, () => ({
+                x: Math.random() * w,
+                y: Math.random() * h,
+                vx: (Math.random() - 0.5) * 0.3,
+                vy: (Math.random() - 0.5) * 0.3
+            }));
+
+            function tick() {
+                ctx.clearRect(0, 0, w, h);
+                points.forEach(p => {
+                    p.x += p.vx; 
+                    p.y += p.vy;
+                    if (p.x < 0 || p.x > w) p.vx *= -1;
+                    if (p.y < 0 || p.y > h) p.vy *= -1;
+                });
+
+                for (let i = 0; i < points.length; i++) {
+                    for (let j = i + 1; j < points.length; j++) {
+                        const dx = points[i].x - points[j].x;
+                        const dy = points[i].y - points[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 150) {
+                            ctx.strokeStyle = `rgba(255,26,26,${1 - dist / 150})`;
+                            ctx.lineWidth = 0.6;
+                            ctx.beginPath();
+                            ctx.moveTo(points[i].x, points[i].y);
+                            ctx.lineTo(points[j].x, points[j].y);
+                            ctx.stroke();
+                        }
+                    }
+                    ctx.fillStyle = 'rgba(255,26,26,0.8)';
+                    ctx.beginPath();
+                    ctx.arc(points[i].x, points[i].y, 1.8, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                requestAnimationFrame(tick);
+            }
+            tick();
+        }
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                window.close();
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', initNetworkBg);
+
+        // Check if opened as popup
+        if (window.opener) {
+            // If user closes this window, we could communicate back to opener
+            window.onbeforeunload = () => {
+                // Optional: notify opener that login was cancelled
+            };
+        }
+    </script>
+</body>
+</html>
