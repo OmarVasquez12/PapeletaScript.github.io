@@ -146,6 +146,46 @@
             color: #4ade80; /* Verde neón */
             text-shadow: 0 0 10px rgba(74, 222, 128, 0.3);
         }
+
+        /* Badge del Carrito Flotante */
+        .cart-float-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 50;
+            background: #dc2626;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 20px rgba(220, 38, 38, 0.5);
+            cursor: pointer;
+            transition: transform 0.3s;
+            text-decoration: none;
+        }
+        .cart-float-btn:hover {
+            transform: scale(1.1);
+        }
+        .cart-count-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: white;
+            color: #dc2626;
+            font-size: 12px;
+            font-weight: bold;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #dc2626;
+        }
     </style>
 </head>
 <body class="relative">
@@ -160,9 +200,17 @@
                 <div class="w-8 h-8 rounded bg-red-600 flex items-center justify-center font-bold text-white shadow-[0_0_10px_rgba(220,38,38,0.6)]">P</div>
                 <span class="font-bold tracking-wider text-lg">PAPELETA <span class="text-red-500">STORE</span></span>
             </div>
-            <button onclick="window.location.href='index.html'" class="text-gray-400 hover:text-white text-sm flex items-center gap-2 transition-colors">
-                <i class="fas fa-arrow-left"></i> Volver a la Tienda
-            </button>
+            
+            <!-- Botón Ver Carrito en Header -->
+            <div class="flex items-center gap-4">
+                <a href="index.html" class="text-gray-400 hover:text-white text-sm flex items-center gap-2 transition-colors">
+                    <i class="fas fa-arrow-left"></i> Volver a la Tienda
+                </a>
+                <a href="index.html" class="relative group">
+                    <i class="fas fa-shopping-cart text-xl text-gray-300 group-hover:text-red-500 transition-colors"></i>
+                    <span id="header-cart-count" class="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+                </a>
+            </div>
         </div>
     </header>
 
@@ -237,7 +285,7 @@
                 <div class="flex flex-col gap-4 mt-2">
                     
                     <!-- Botón Principal (Cambiará según sea Gratis o Pago) -->
-                    <button id="main-action-btn" onclick="handleAction()" class="btn-primary w-full py-4 rounded-xl text-white font-bold text-lg flex items-center justify-center gap-3 shadow-lg">
+                    <button id="main-action-btn" onclick="addToCartFromDetail()" class="btn-primary w-full py-4 rounded-xl text-white font-bold text-lg flex items-center justify-center gap-3 shadow-lg">
                         <!-- JS inyectará icono y texto aquí -->
                     </button>
 
@@ -302,6 +350,59 @@
         let currentIndex = 0;
         let isFree = false;
 
+        // --- LÓGICA DEL CARRITO (COMPARTIDA CON INDEX.HTML) ---
+        let cart = JSON.parse(localStorage.getItem('papeleta_cart') || '[]');
+
+        function saveCart() {
+            localStorage.setItem('papeleta_cart', JSON.stringify(cart));
+            updateCartBadge();
+        }
+
+        function updateCartBadge() {
+            const count = cart.length;
+            const badge = document.getElementById('header-cart-count');
+            if (count > 0) {
+                badge.textContent = count;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function addToCartFromDetail() {
+            if (!currentProduct) return;
+
+            // Verificar si ya está en el carrito
+            const exists = cart.find(item => item.id === currentProduct.id);
+            if (exists) {
+                alert("Este producto ya está en tu carrito.");
+                window.location.href = 'index.html'; // Redirigir al index para ver el carrito
+                return;
+            }
+
+            // Agregar al carrito
+            cart.push({
+                id: currentProduct.id,
+                name: currentProduct.name,
+                price: currentProduct.price,
+                image: currentProduct.image_url || (images.length > 0 ? images[0] : '')
+            });
+
+            saveCart();
+            
+            // Feedback visual
+            const btn = document.getElementById('main-action-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-check"></i> ¡Añadido!`;
+            btn.style.background = "#16a34a"; // Verde temporal
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.style.background = ""; // Volver al gradiente original
+                window.location.href = 'index.html'; // Redirigir al index para completar compra
+            }, 1000);
+        }
+
         // --- CARGAR PRODUCTO ---
         async function loadProduct() {
             if (!productId) return window.location.href = 'index.html';
@@ -329,23 +430,18 @@
                 const divider = document.getElementById('divider-buy');
 
                 if (isFree) {
-                    // ESTILO GRATIS (Como imagen 2)
+                    // ESTILO GRATIS
                     priceTag.innerHTML = `<span class="badge-gratis">GRATIS</span>`;
                     
                     mainBtn.className = "btn-primary w-full py-4 rounded-xl text-white font-bold text-lg flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(74,222,128,0.2)]";
-                    // Cambiamos el gradiente a verde solo para este botón si es gratis, o mantenemos rojo si prefieres TODO rojo.
-                    // Para seguir tu instrucción "solo es color igual que el mio", usaré ROJO pero con texto diferente.
-                    // Si quieres el botón verde como la foto 2, descomenta la línea de style abajo.
-                    // mainBtn.style.background = "linear-gradient(to right, #16a34a, #15803d)"; 
+                    mainBtn.innerHTML = `<i class="fas fa-gift"></i> Añadir al Carrito (Gratis)`;
                     
-                    mainBtn.innerHTML = `<i class="fas fa-gift"></i> Canjear Gratis`;
-                    
-                    // Ocultar botón secundario de tarjeta o cambiarlo a "Descargar"
+                    // Ocultar botón secundario de tarjeta
                     secBtn.innerHTML = `<i class="fas fa-info-circle"></i> Más Información`;
                     divider.classList.add('hidden');
 
                 } else {
-                    // ESTILO PAGO (Como imagen 1)
+                    // ESTILO PAGO
                     priceTag.textContent = `$${currentProduct.price}`;
                     
                     mainBtn.className = "btn-primary w-full py-4 rounded-xl text-white font-bold text-lg flex items-center justify-center gap-3";
@@ -357,6 +453,9 @@
 
                 // 4. Configurar Galería
                 setupGallery();
+                
+                // 5. Actualizar badge del carrito al cargar
+                updateCartBadge();
 
             } catch (error) {
                 console.error(error);
@@ -413,56 +512,11 @@
             updateGalleryUI();
         }
 
-        // --- ACCIONES ---
-        async function handleAction() {
-            // Lógica unificada para Comprar o Canjear
-            const token = localStorage.getItem('dc_access_token');
-            if (!token) {
-                alert("Debes iniciar sesión con Discord primero.");
-                return window.location.href = 'index.html'; // O tu página de login
-            }
-
-            try {
-                const res = await fetch('https://discord.com/api/users/@me', { headers: { 'Authorization': `Bearer ${token}` }});
-                if(!res.ok) throw new Error("Auth fail");
-                const user = await res.json();
-
-                // Guardar en Clientes
-                await db.collection("Clientes").add({
-                    discord_id: user.id,
-                    username: user.username,
-                    products: [{ id: productId, name: currentProduct.name }],
-                    total_price: isFree ? "Gratis" : "$" + currentProduct.price,
-                    date: firebase.firestore.FieldValue.serverTimestamp(),
-                    status: isFree ? "Canjeado" : "Comprado"
-                });
-
-                // Crear Licencia
-                await createLicense(user);
-
-                alert(isFree ? "¡Producto canjeado!" : "¡Compra exitosa!");
-                window.location.href = 'AreaCliente.html';
-
-            } catch(e) {
-                console.error(e);
-                alert("Error al procesar la solicitud.");
-            }
-        }
-
-        async function createLicense(user) {
-            const key = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-            await db.collection("Licencias").add({
-                discord_id: user.id,
-                product_id: productId,
-                key: key.toUpperCase(),
-                created_at: firebase.firestore.FieldValue.serverTimestamp()
-            });
-        }
-
+        // --- ACCIONES SECUNDARIAS ---
         async function downloadProduct() {
             // Solo permite descargar si ya lo tiene (lógica simple)
-            alert("Verificando propiedad... (Función demo)");
-            // Aquí iría tu lógica de descarga real
+            alert("Redirigiendo a pasarela de pago segura...");
+            // Aquí iría tu lógica de descarga real o redirección a PayPal directo
         }
 
         // --- FONDO ANIMADO (Red Network) ---
