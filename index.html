@@ -633,6 +633,7 @@
             }
         }
 
+        // ✅ MODIFICADA: Sin alert, redirige directo a AreaCliente.html
         function addToCart(productId) {
             const product = allProducts.find(p => p.id === productId);
             if (!product) return;
@@ -946,7 +947,7 @@
                         claimFreeProducts();
                     };
                 } else {
-                    buyBtn.innerHTML = '<i class="fas fa-shopping-cart text-xl"></i> Añadir al Carrito';
+                    buyBtn.innerHTML = '<i class="fas fa-credit-card text-xl"></i> Comprar';
                     buyBtn.className = 'w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 transition-all shadow-lg shadow-red-900/30 text-lg';
                     buyBtn.onclick = () => {
                         addToCart(productId);
@@ -1362,6 +1363,7 @@
             renderProducts();
         }
 
+        // ✅ MODIFICADA: Lógica exacta de botones según estado del producto
         function renderProducts() {
             const search = document.getElementById('search-input').value.toLowerCase();
             const grid = document.getElementById('products-grid');
@@ -1381,6 +1383,7 @@
                 const priceClass = Number(p.price) === 0 ? 'bg-green-600' : 'bg-red-600';
                 
                 const alreadyOwned = currentUser && myAssignedProductIds.has(p.id);
+                const isPaid = Number(p.price) > 0;
                 
                 return `
                 <div class="bg-[#150a0a] border ${alreadyOwned ? 'border-green-600/50' : 'border-red-950/40'} rounded-2xl overflow-hidden shadow-xl group hover:border-red-600/40 transition-all relative">
@@ -1396,13 +1399,16 @@
                         
                         <div class="grid grid-cols-2 gap-2">
                             ${alreadyOwned ? `
-                                <button onclick="window.location.href='AreaCliente.html'" class="col-span-2 bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2">
+                                <button onclick="window.location.href='AreaCliente.html'" class="bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2">
                                     <i class="fas fa-book"></i> Biblioteca
                                 </button>
+                                <a href="Producto.html?id=${p.id}" class="block w-full bg-[#0d0505] hover:bg-[#150a0a] border border-red-800/50 text-gray-300 text-sm font-semibold py-2.5 rounded-xl transition-all text-center no-underline">
+                                    Ver Detalles
+                                </a>
                             ` : `
-                                <button onclick="addToCart('${p.id}')" class="${Number(p.price) === 0 ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'} text-white text-sm font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2">
-                                    <i class="fas fa-shopping-cart"></i>
-                                    ${Number(p.price) === 0 ? 'Reclamar' : 'Añadir'}
+                                <button onclick="addToCart('${p.id}')" class="${isPaid ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'} text-white text-sm font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2">
+                                    <i class="fas ${isPaid ? 'fa-credit-card' : 'fa-gift'}"></i>
+                                    ${isPaid ? 'Comprar' : 'Reclamar'}
                                 </button>
                                 <a href="Producto.html?id=${p.id}" class="block w-full bg-[#0d0505] hover:bg-[#150a0a] border border-red-800/50 text-gray-300 text-sm font-semibold py-2.5 rounded-xl transition-all text-center no-underline">
                                     Ver Detalles
