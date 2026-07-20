@@ -16,7 +16,7 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #09090b; /* Fondo muy oscuro */
+            background-color: #09090b;
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -25,20 +25,19 @@
             color: white;
         }
 
-        /* Network Background Animation (Mantenido del original) */
         #network-bg {
             position: fixed;
             inset: 0;
             z-index: 0;
-            opacity: 0.2; /* Más sutil para este diseño */
+            opacity: 0.2;
             pointer-events: none;
         }
 
         .modal-container {
             position: relative;
             z-index: 10;
-            background: #0f0f11; /* Color de tarjeta oscuro */
-            border: 1px solid #27272a; /* Borde gris sutil */
+            background: #0f0f11;
+            border: 1px solid #27272a;
             border-radius: 24px;
             padding: 3rem 2rem;
             max-width: 500px;
@@ -47,7 +46,6 @@
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
         }
 
-        /* Logo Pixelado */
         .logo-wrapper {
             margin-bottom: 1.5rem;
             display: flex;
@@ -64,14 +62,12 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            position: relative;
-            overflow: hidden;
         }
 
         .pixel-logo i {
             font-size: 2.5rem;
             color: #fff;
-            text-shadow: 2px 2px 0px #3b82f6; /* Efecto glitch azul */
+            text-shadow: 2px 2px 0px #3b82f6;
         }
 
         .main-title {
@@ -86,7 +82,7 @@
         }
 
         .main-title span.blue {
-            color: #3b82f6; /* Azul brillante */
+            color: #3b82f6;
         }
 
         .subtitle {
@@ -97,7 +93,6 @@
             padding: 0 1rem;
         }
 
-        /* Grid de Características */
         .features-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -133,10 +128,9 @@
             font-weight: 500;
         }
 
-        /* Botón Discord */
         .discord-btn {
             width: 100%;
-            background: #5865F2; /* Color oficial Discord */
+            background: #5865F2;
             color: white;
             border: none;
             padding: 1rem;
@@ -162,7 +156,6 @@
             font-size: 1.3rem;
         }
 
-        /* Footer Link */
         .back-link {
             display: inline-flex;
             align-items: center;
@@ -175,13 +168,13 @@
             padding-top: 1.5rem;
             width: 100%;
             justify-content: center;
+            cursor: pointer;
         }
 
         .back-link:hover {
             color: #e4e4e7;
         }
 
-        /* Loading animation */
         .loading {
             display: inline-block;
             width: 18px;
@@ -211,29 +204,24 @@
 </head>
 <body>
 
-    <!-- Fondo de red (se mantiene de tu código original) -->
     <canvas id="network-bg"></canvas>
 
     <div class="modal-container">
         
-        <!-- Logo Pixelado Simulado -->
         <div class="logo-wrapper">
             <div class="pixel-logo">
-                <i class="fas fa-cube"></i> <!-- Icono genérico pixelado -->
+                <i class="fas fa-cube"></i>
             </div>
         </div>
 
-        <!-- Título Principal -->
         <h1 class="main-title">
             <span class="white">Iniciar</span> <span class="blue">Sesión</span>
         </h1>
 
-        <!-- Subtítulo -->
         <p class="subtitle">
             Gestiona tus aplicaciones y licencias desde<br>un solo lugar de forma segura.
         </p>
 
-        <!-- Tarjetas de Características -->
         <div class="features-grid">
             <div class="feature-card">
                 <i class="fas fa-shield-alt feature-icon"></i>
@@ -249,43 +237,46 @@
             </div>
         </div>
 
-        <!-- Botón de Acción -->
         <button class="discord-btn" onclick="handleDiscordLogin(event)">
             <i class="fab fa-discord"></i>
             <span>Acceder con Discord</span>
         </button>
 
-        <!-- Enlace Volver -->
-        <a href="#" class="back-link" onclick="window.close()">
+        <!-- CAMBIO: Ahora usa history.back() para volver atrás -->
+        <a class="back-link" onclick="goBack()">
             <i class="fas fa-arrow-left"></i>
             Volver a la web
         </a>
     </div>
 
     <script>
-        // Configuration
         const CLIENT_ID = '1213866547181780992';
         const REDIRECT_URI = 'https://papeleta-script-github-io.vercel.app';
 
-        // Handle Discord Login
         function handleDiscordLogin(e) {
             e.preventDefault();
             
             const btn = document.querySelector('.discord-btn');
             const originalContent = btn.innerHTML;
             
-            // Show loading state
             btn.innerHTML = '<span class="loading"></span><span>Conectando...</span>';
             btn.style.opacity = '0.8';
             
-            // Redirect to Discord OAuth
             setTimeout(() => {
                 const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20email`;
                 window.location.href = url;
             }, 500);
         }
 
-        // Network Background Animation (Tu script original)
+        // FUNCIÓN PARA VOLVER ATRÁS
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = '/'; // Si no hay historial, va al inicio
+            }
+        }
+
         function initNetworkBg() {
             const canvas = document.getElementById('network-bg');
             const ctx = canvas.getContext('2d');
@@ -320,8 +311,7 @@
                         const dy = points[i].y - points[j].y;
                         const dist = Math.sqrt(dx * dx + dy * dy);
                         if (dist < 150) {
-                            // Cambié el color a un gris azulado muy tenue para combinar mejor
-                            ctx.strokeStyle = `rgba(100,116,139,${1 - dist / 150})`; 
+                            ctx.strokeStyle = `rgba(100,116,139,${1 - dist / 150})`;
                             ctx.lineWidth = 0.6;
                             ctx.beginPath();
                             ctx.moveTo(points[i].x, points[i].y);
@@ -341,7 +331,7 @@
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                window.close();
+                goBack();
             }
         });
 
