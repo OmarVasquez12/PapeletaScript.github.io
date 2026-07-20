@@ -36,30 +36,30 @@
             z-index: 10;
             background: rgba(13, 5, 5, 0.95);
             border: 1px solid rgba(255, 26, 26, 0.3);
-            border-radius: 20px;
-            padding: 3rem 2.5rem;
-            max-width: 480px;
+            border-radius: 16px; /* Bordes un poco más cerrados */
+            padding: 2rem 1.5rem; /* Menos padding interno */
+            max-width: 360px; /* ANCHO REDUCIDO */
             width: 90%;
             text-align: center;
-            box-shadow: 0 0 60px rgba(255, 26, 26, 0.2), 
-                        inset 0 0 60px rgba(255, 26, 26, 0.05);
+            box-shadow: 0 0 40px rgba(255, 26, 26, 0.15), 
+                        inset 0 0 40px rgba(255, 26, 26, 0.05);
             backdrop-filter: blur(10px);
         }
 
         /* Back Button (Top Left) */
         .back-btn {
             position: absolute;
-            top: 20px;
-            left: 20px;
+            top: 12px;
+            left: 12px;
             background: transparent;
             border: none;
             color: #9496a1;
-            font-size: 1rem;
+            font-size: 0.85rem;
             font-weight: 500;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
             transition: all 0.3s ease;
         }
 
@@ -70,16 +70,16 @@
 
         .close-btn {
             position: absolute;
-            top: 15px;
-            right: 15px;
+            top: 10px;
+            right: 10px;
             background: transparent;
             border: none;
             color: #6b7280;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             cursor: pointer;
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -93,21 +93,21 @@
         }
 
         .logo-container {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
 
         .logo {
-            width: 100px;
-            height: 100px;
+            width: 70px; /* Logo más pequeño */
+            height: 70px;
             background: linear-gradient(135deg, #ff1a1a 0%, #cc1b1b 100%);
-            border-radius: 20px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto;
-            box-shadow: 0 10px 30px rgba(255, 26, 26, 0.4),
-                        0 0 60px rgba(255, 26, 26, 0.2);
-            font-size: 3rem;
+            box-shadow: 0 8px 20px rgba(255, 26, 26, 0.3),
+                        0 0 40px rgba(255, 26, 26, 0.15);
+            font-size: 2.2rem;
             font-weight: 900;
             color: white;
             animation: logoPulse 2s ease-in-out infinite;
@@ -119,10 +119,10 @@
         }
 
         .store-title {
-            font-size: 2.5rem;
+            font-size: 1.8rem; /* Título más pequeño */
             font-weight: 900;
-            margin-bottom: 1rem;
-            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.5px;
         }
 
         .store-title .papeleta {
@@ -131,54 +131,54 @@
 
         .store-title .store {
             color: #ff4444;
-            text-shadow: 0 0 20px rgba(255, 26, 26, 0.8),
-                         0 0 40px rgba(204, 27, 27, 0.4);
+            text-shadow: 0 0 15px rgba(255, 26, 26, 0.6),
+                         0 0 30px rgba(204, 27, 27, 0.3);
         }
 
         .subtitle {
             color: #9496a1;
-            font-size: 1rem;
-            line-height: 1.6;
-            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            margin-bottom: 1.2rem;
         }
 
-        /* Feature Badges (Seguro, Rápido, Oficial) */
+        /* Feature Badges (Seguro, Rápido, Oficial) - Compactos */
         .feature-badges {
             display: flex;
             justify-content: center;
-            gap: 1.5rem;
-            margin: 2rem 0;
+            gap: 0.8rem;
+            margin: 1.5rem 0;
             flex-wrap: wrap;
         }
 
         .feature-badge {
-            background: rgba(255, 26, 26, 0.1);
-            border: 1px solid rgba(255, 26, 26, 0.2);
-            border-radius: 12px;
-            padding: 1rem 1.5rem;
-            min-width: 120px;
+            background: rgba(255, 26, 26, 0.08);
+            border: 1px solid rgba(255, 26, 26, 0.15);
+            border-radius: 10px;
+            padding: 0.6rem 0.8rem;
+            min-width: 90px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.4rem;
             transition: all 0.3s ease;
         }
 
         .feature-badge:hover {
-            background: rgba(255, 26, 26, 0.15);
+            background: rgba(255, 26, 26, 0.12);
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(255, 26, 26, 0.1);
+            box-shadow: 0 4px 12px rgba(255, 26, 26, 0.08);
         }
 
         .feature-badge i {
-            font-size: 1.8rem;
+            font-size: 1.3rem;
             color: #38bdf8;
         }
 
         .feature-badge span {
             font-weight: 600;
             color: #e5e7eb;
-            font-size: 0.95rem;
+            font-size: 0.75rem;
         }
 
         .discord-btn {
@@ -186,23 +186,23 @@
             background: linear-gradient(135deg, #5865F2 0%, #4752C4 100%);
             color: white;
             border: none;
-            padding: 1rem 2rem;
-            font-size: 1.1rem;
+            padding: 0.8rem 1.5rem;
+            font-size: 0.95rem;
             font-weight: 700;
-            border-radius: 12px;
+            border-radius: 10px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.75rem;
+            gap: 0.6rem;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(88, 101, 242, 0.4);
+            box-shadow: 0 4px 12px rgba(88, 101, 242, 0.3);
             text-decoration: none;
         }
 
         .discord-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(88, 101, 242, 0.6);
+            box-shadow: 0 6px 16px rgba(88, 101, 242, 0.5);
             background: linear-gradient(135deg, #6b75ff 0%, #5865F2 100%);
         }
 
@@ -211,65 +211,27 @@
         }
 
         .discord-btn i {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
         }
 
         .security-note {
-            margin-top: 1.5rem;
+            margin-top: 1rem;
             color: #6b7280;
-            font-size: 0.85rem;
-            line-height: 1.5;
+            font-size: 0.75rem;
+            line-height: 1.4;
         }
 
         .security-note i {
             color: #10b981;
-            margin-right: 0.5rem;
-        }
-
-        /* Responsive */
-        @media (max-width: 640px) {
-            .modal-container {
-                padding: 2rem 1.5rem;
-            }
-
-            .store-title {
-                font-size: 2rem;
-            }
-
-            .logo {
-                width: 80px;
-                height: 80px;
-                font-size: 2.5rem;
-            }
-
-            .feature-badges {
-                gap: 1rem;
-            }
-
-            .feature-badge {
-                min-width: 100px;
-                padding: 0.9rem 1.2rem;
-            }
-
-            .feature-badge i {
-                font-size: 1.5rem;
-            }
-
-            .feature-badge span {
-                font-size: 0.85rem;
-            }
-
-            .back-btn {
-                font-size: 0.9rem;
-            }
+            margin-right: 0.4rem;
         }
 
         /* Loading animation */
         .loading {
             display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
             border-top-color: white;
             animation: spin 1s ease-in-out infinite;
@@ -287,7 +249,7 @@
     <div class="modal-container">
         <!-- Botón Volver a la web -->
         <button class="back-btn" onclick="goBack()" title="Volver a la web">
-            <i class="fas fa-arrow-left"></i> Volver a la web
+            <i class="fas fa-arrow-left"></i> Volver
         </button>
 
         <!-- Botón Cerrar -->
@@ -305,7 +267,7 @@
         </h1>
 
         <p class="subtitle">
-            Debes iniciar sesión para realizar compras y descargar archivos.
+            Inicia sesión para comprar y descargar archivos.
         </p>
 
         <!-- Badges Seguro, Rápido, Oficial -->
@@ -331,7 +293,7 @@
 
         <p class="security-note">
             <i class="fas fa-shield-alt"></i>
-            Tus datos están seguros. Solo usamos tu ID para asignarte los productos.
+            Tus datos están seguros. Solo usamos tu ID.
         </p>
     </div>
 
@@ -340,12 +302,12 @@
         const CLIENT_ID = '1213866547181780992';
         const REDIRECT_URI = 'https://papeleta-script-github-io.vercel.app';
 
-        // Volver a la web (cierra popup y enfoca opener)
+        // Volver a la web
         function goBack() {
             if (window.history.length > 1) {
                 window.history.back();
             } else {
-                window.location.href = '/'; // Si no hay historial, va al inicio
+                window.location.href = '/';
             }
         }
 
