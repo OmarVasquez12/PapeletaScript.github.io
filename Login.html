@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesion</title>
+    <title>Iniciar Sesión - Papeleta Store</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-
         * {
             margin: 0;
             padding: 0;
@@ -15,171 +13,263 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #09090b;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #1a0a0a 0%, #0d0505 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            color: white;
         }
 
+        /* Network Background Animation */
         #network-bg {
             position: fixed;
             inset: 0;
             z-index: 0;
-            opacity: 0.2;
+            opacity: 0.3;
             pointer-events: none;
         }
 
         .modal-container {
             position: relative;
             z-index: 10;
-            background: #0f0f11;
-            border: 1px solid #27272a;
-            border-radius: 24px;
-            padding: 3rem 2rem;
-            max-width: 500px;
-            width: 95%;
+            background: rgba(13, 5, 5, 0.95);
+            border: 1px solid rgba(255, 26, 26, 0.3);
+            border-radius: 20px;
+            padding: 3rem 2.5rem;
+            max-width: 480px;
+            width: 90%;
             text-align: center;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 60px rgba(255, 26, 26, 0.2), 
+                        inset 0 0 60px rgba(255, 26, 26, 0.05);
+            backdrop-filter: blur(10px);
         }
 
-        .logo-wrapper {
-            margin-bottom: 1.5rem;
+        /* Back Button (Top Left) */
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: transparent;
+            border: none;
+            color: #9496a1;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
             display: flex;
-            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
         }
 
-        .pixel-logo {
-            width: 80px;
-            height: 80px;
-            background: #000;
-            border: 1px solid #333;
-            border-radius: 12px;
+        .back-btn:hover {
+            color: #ffffff;
+            transform: translateX(-2px);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: transparent;
+            border: none;
+            color: #6b7280;
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
         }
 
-        .pixel-logo i {
+        .close-btn:hover {
+            background: rgba(255, 26, 26, 0.1);
+            color: #ff1a1a;
+            transform: rotate(90deg);
+        }
+
+        .logo-container {
+            margin-bottom: 1.5rem;
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #ff1a1a 0%, #cc1b1b 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            box-shadow: 0 10px 30px rgba(255, 26, 26, 0.4),
+                        0 0 60px rgba(255, 26, 26, 0.2);
+            font-size: 3rem;
+            font-weight: 900;
+            color: white;
+            animation: logoPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .store-title {
             font-size: 2.5rem;
-            color: #fff;
-            text-shadow: 2px 2px 0px #3b82f6;
-        }
-
-        .main-title {
-            font-size: 2.2rem;
-            font-weight: 800;
+            font-weight: 900;
             margin-bottom: 1rem;
-            letter-spacing: -0.5px;
+            letter-spacing: 1px;
         }
 
-        .main-title span.white {
+        .store-title .papeleta {
             color: #ffffff;
         }
 
-        .main-title span.blue {
-            color: #3b82f6;
+        .store-title .store {
+            color: #ff4444;
+            text-shadow: 0 0 20px rgba(255, 26, 26, 0.8),
+                         0 0 40px rgba(204, 27, 27, 0.4);
         }
 
         .subtitle {
-            color: #a1a1aa;
-            font-size: 0.95rem;
-            line-height: 1.5;
-            margin-bottom: 2rem;
-            padding: 0 1rem;
+            color: #9496a1;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
         }
 
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 2rem;
+        /* Feature Badges (Seguro, Rápido, Oficial) */
+        .feature-badges {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
         }
 
-        .feature-card {
-            background: #18181b;
-            border: 1px solid #27272a;
+        .feature-badge {
+            background: rgba(255, 26, 26, 0.1);
+            border: 1px solid rgba(255, 26, 26, 0.2);
             border-radius: 12px;
-            padding: 1rem 0.5rem;
+            padding: 1rem 1.5rem;
+            min-width: 120px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
-            transition: transform 0.2s;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
         }
 
-        .feature-card:hover {
-            border-color: #3f3f46;
+        .feature-badge:hover {
+            background: rgba(255, 26, 26, 0.15);
             transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 26, 26, 0.1);
         }
 
-        .feature-icon {
-            color: #3b82f6;
-            font-size: 1.2rem;
+        .feature-badge i {
+            font-size: 1.8rem;
+            color: #38bdf8;
         }
 
-        .feature-text {
-            color: #e4e4e7;
-            font-size: 0.8rem;
-            font-weight: 500;
+        .feature-badge span {
+            font-weight: 600;
+            color: #e5e7eb;
+            font-size: 0.95rem;
         }
 
         .discord-btn {
             width: 100%;
-            background: #5865F2;
+            background: linear-gradient(135deg, #5865F2 0%, #4752C4 100%);
             color: white;
             border: none;
-            padding: 1rem;
-            font-size: 1rem;
-            font-weight: 600;
-            border-radius: 8px;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 12px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            transition: all 0.2s ease;
-            margin-bottom: 1.5rem;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(88, 101, 242, 0.4);
+            text-decoration: none;
         }
 
         .discord-btn:hover {
-            background: #4752C4;
-            transform: scale(1.02);
-            box-shadow: 0 0 15px rgba(88, 101, 242, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(88, 101, 242, 0.6);
+            background: linear-gradient(135deg, #6b75ff 0%, #5865F2 100%);
+        }
+
+        .discord-btn:active {
+            transform: translateY(0);
         }
 
         .discord-btn i {
-            font-size: 1.3rem;
+            font-size: 1.5rem;
         }
 
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: #71717a;
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.2s;
-            border-top: 1px solid #27272a;
-            padding-top: 1.5rem;
-            width: 100%;
-            justify-content: center;
-            cursor: pointer;
+        .security-note {
+            margin-top: 1.5rem;
+            color: #6b7280;
+            font-size: 0.85rem;
+            line-height: 1.5;
         }
 
-        .back-link:hover {
-            color: #e4e4e7;
+        .security-note i {
+            color: #10b981;
+            margin-right: 0.5rem;
         }
 
+        /* Responsive */
+        @media (max-width: 640px) {
+            .modal-container {
+                padding: 2rem 1.5rem;
+            }
+
+            .store-title {
+                font-size: 2rem;
+            }
+
+            .logo {
+                width: 80px;
+                height: 80px;
+                font-size: 2.5rem;
+            }
+
+            .feature-badges {
+                gap: 1rem;
+            }
+
+            .feature-badge {
+                min-width: 100px;
+                padding: 0.9rem 1.2rem;
+            }
+
+            .feature-badge i {
+                font-size: 1.5rem;
+            }
+
+            .feature-badge span {
+                font-size: 0.85rem;
+            }
+
+            .back-btn {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Loading animation */
         .loading {
             display: inline-block;
-            width: 18px;
-            height: 18px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
             border-top-color: white;
             animation: spin 1s ease-in-out infinite;
@@ -188,18 +278,6 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-
-        @media (max-width: 480px) {
-            .features-grid {
-                gap: 8px;
-            }
-            .feature-text {
-                font-size: 0.7rem;
-            }
-            .main-title {
-                font-size: 1.8rem;
-            }
-        }
     </style>
 </head>
 <body>
@@ -207,68 +285,62 @@
     <canvas id="network-bg"></canvas>
 
     <div class="modal-container">
-        
-        <div class="logo-wrapper">
-            <div class="pixel-logo">
-                <i class="fas fa-cube"></i>
-            </div>
+        <!-- Botón Volver a la web -->
+        <button class="back-btn" onclick="goBack()" title="Volver a la web">
+            <i class="fas fa-arrow-left"></i> Volver a la web
+        </button>
+
+        <!-- Botón Cerrar -->
+        <button class="close-btn" onclick="window.close()" title="Cerrar">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <div class="logo-container">
+            <div class="logo">P</div>
         </div>
 
-        <h1 class="main-title">
-            <span class="white">Iniciar</span> <span class="blue">Sesión</span>
+        <h1 class="store-title">
+            <span class="papeleta">PAPELETA</span> 
+            <span class="store">STORE</span>
         </h1>
 
         <p class="subtitle">
-            Gestiona tus aplicaciones y licencias desde<br>un solo lugar de forma segura.
+            Debes iniciar sesión para realizar compras y descargar archivos.
         </p>
 
-        <div class="features-grid">
-            <div class="feature-card">
-                <i class="fas fa-shield-alt feature-icon"></i>
-                <span class="feature-text">Seguro</span>
+        <!-- Badges Seguro, Rápido, Oficial -->
+        <div class="feature-badges">
+            <div class="feature-badge">
+                <i class="fas fa-shield-alt"></i>
+                <span>Seguro</span>
             </div>
-            <div class="feature-card">
-                <i class="fas fa-bolt feature-icon"></i>
-                <span class="feature-text">Rápido</span>
+            <div class="feature-badge">
+                <i class="fas fa-bolt"></i>
+                <span>Rápido</span>
             </div>
-            <div class="feature-card">
-                <i class="fas fa-cog feature-icon"></i>
-                <span class="feature-text">Oficial</span>
+            <div class="feature-badge">
+                <i class="fas fa-cog"></i>
+                <span>Oficial</span>
             </div>
         </div>
 
-        <button class="discord-btn" onclick="handleDiscordLogin(event)">
+        <a href="#" class="discord-btn" onclick="handleDiscordLogin(event)">
             <i class="fab fa-discord"></i>
-            <span>Acceder con Discord</span>
-        </button>
-
-        <!-- CAMBIO: Ahora usa history.back() para volver atrás -->
-        <a class="back-link" onclick="goBack()">
-            <i class="fas fa-arrow-left"></i>
-            Volver a la web
+            <span>Iniciar Sesión con Discord</span>
         </a>
+
+        <p class="security-note">
+            <i class="fas fa-shield-alt"></i>
+            Tus datos están seguros. Solo usamos tu ID para asignarte los productos.
+        </p>
     </div>
 
     <script>
+        // Configuration
         const CLIENT_ID = '1213866547181780992';
         const REDIRECT_URI = 'https://papeleta-script-github-io.vercel.app';
 
-        function handleDiscordLogin(e) {
-            e.preventDefault();
-            
-            const btn = document.querySelector('.discord-btn');
-            const originalContent = btn.innerHTML;
-            
-            btn.innerHTML = '<span class="loading"></span><span>Conectando...</span>';
-            btn.style.opacity = '0.8';
-            
-            setTimeout(() => {
-                const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20email`;
-                window.location.href = url;
-            }, 500);
-        }
-
-        // FUNCIÓN PARA VOLVER ATRÁS
+        // Volver a la web (cierra popup y enfoca opener)
         function goBack() {
             if (window.history.length > 1) {
                 window.history.back();
@@ -277,6 +349,25 @@
             }
         }
 
+        // Handle Discord Login
+        function handleDiscordLogin(e) {
+            e.preventDefault();
+            
+            const btn = document.querySelector('.discord-btn');
+            const originalContent = btn.innerHTML;
+            
+            // Show loading state
+            btn.innerHTML = '<span class="loading"></span><span>Conectando...</span>';
+            btn.style.opacity = '0.8';
+            
+            // Redirect to Discord OAuth
+            setTimeout(() => {
+                const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20email`;
+                window.location.href = url;
+            }, 500);
+        }
+
+        // Network Background Animation
         function initNetworkBg() {
             const canvas = document.getElementById('network-bg');
             const ctx = canvas.getContext('2d');
@@ -311,7 +402,7 @@
                         const dy = points[i].y - points[j].y;
                         const dist = Math.sqrt(dx * dx + dy * dy);
                         if (dist < 150) {
-                            ctx.strokeStyle = `rgba(100,116,139,${1 - dist / 150})`;
+                            ctx.strokeStyle = `rgba(255,26,26,${1 - dist / 150})`;
                             ctx.lineWidth = 0.6;
                             ctx.beginPath();
                             ctx.moveTo(points[i].x, points[i].y);
@@ -319,7 +410,7 @@
                             ctx.stroke();
                         }
                     }
-                    ctx.fillStyle = 'rgba(100,116,139,0.5)';
+                    ctx.fillStyle = 'rgba(255,26,26,0.8)';
                     ctx.beginPath();
                     ctx.arc(points[i].x, points[i].y, 1.8, 0, Math.PI * 2);
                     ctx.fill();
@@ -329,13 +420,22 @@
             tick();
         }
 
+        // Close modal with Escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                goBack();
+                window.close();
             }
         });
 
+        // Initialize
         document.addEventListener('DOMContentLoaded', initNetworkBg);
+
+        // Check if opened as popup
+        if (window.opener) {
+            window.onbeforeunload = () => {
+                // Optional: notify opener that login was cancelled
+            };
+        }
     </script>
 </body>
 </html>
