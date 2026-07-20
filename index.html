@@ -164,7 +164,7 @@
         </div>
     </div>
 
-    <!-- PRODUCT DETAIL MODAL (Ya no se usa si vas a Producto.html, pero lo dejo por si acaso) -->
+    <!-- PRODUCT DETAIL MODAL -->
     <div id="product-detail-modal" class="hidden fixed inset-0 bg-black/90 z-[90] overflow-y-auto product-detail-modal">
         <div class="min-h-screen px-4 py-8">
             <div class="max-w-6xl mx-auto">
@@ -1087,6 +1087,10 @@
                 
                 updateAuthUI();
                 applyRoleUI();
+                
+                // ✅ REGISTRAR USUARIO EN FIREBASE (aquí se hace el +1 global)
+                registerUserInFirebase(user);
+                
                 loadUserStats();
                 loadSalesStats();
                 loadMyAssignments().then(() => {
@@ -1163,22 +1167,63 @@
             localStorage.setItem('papeleta_all_users', JSON.stringify(allUsers));
         }
 
+        // ✅ NUEVA FUNCIÓN: Registra al usuario en Firebase si no existe aún
+        async function registerUserInFirebase(user) {
+            try {
+                const userDocRef = db.collection("UsuariosRegistrados").doc(user.id);
+                const docSnap = await userDocRef.get();
+                
+                if (!docSnap.exists) {
+                    // Es un usuario NUEVO → se crea el documento (+1 automático)
+                    await userDocRef.set({
+                        discord_id: user.id,
+                        username: user.username,
+                        avatar: user.avatar || null,
+                        registered_at: firebase.firestore.FieldValue.serverTimestamp(),
+                        last_login: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    console.log("✅ Nuevo usuario registrado en Firebase:", user.username);
+                } else {
+                    // Ya existe → solo actualizar última conexión
+                    await userDocRef.update({
+                        last_login: firebase.firestore.FieldValue.serverTimestamp(),
+                        username: user.username, // por si cambió nombre
+                        avatar: user.avatar || null
+                    });
+                    console.log("🔄 Usuario existente actualizado:", user.username);
+                }
+                
+                // También guardar localmente (para el panel admin local)
+                saveUserDataLocally();
+                
+            } catch (error) {
+                console.error("Error registrando usuario en Firebase:", error);
+            }
+        }
+
         // --- ESTADÍSTICAS CORREGIDAS ---
         
+        // ✅ MODIFICADA: Ahora cuenta desde Firebase (global, no local)
         async function loadUserStats() {
-            // 1. USUARIOS REGISTRADOS = Jugadores que entraron y se loguearon con Discord
-            // Contamos desde localStorage los usuarios únicos que han iniciado sesión
-            const allUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
-            const uniqueUsers = new Set(allUsers.map(u => u.discord_id));
-            
-            // MODIFICACIÓN: Inicia en +1 (representando la primera cuenta base: 890526767608127489)
-            // y se sigue sumando automáticamente cada vez que un usuario nuevo entra con Discord.
-            let userCount = uniqueUsers.size;
-            if (userCount === 0) {
-                userCount = 1; 
+            try {
+                const snapshot = await db.collection("UsuariosRegistrados").get();
+                let userCount = snapshot.size;
+                
+                // Empieza en +1 como mínimo (cuenta base del admin)
+                if (userCount === 0) {
+                    userCount = 1;
+                }
+                
+                document.getElementById('stat-usuarios').innerText = '+' + userCount;
+                
+            } catch (error) {
+                console.error("Error cargando estadísticas de usuarios:", error);
+                // Fallback a localStorage
+                const allUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
+                const uniqueUsers = new Set(allUsers.map(u => u.discord_id));
+                let userCount = uniqueUsers.size || 1;
+                document.getElementById('stat-usuarios').innerText = '+' + userCount;
             }
-            
-            document.getElementById('stat-usuarios').innerText = '+' + userCount;
         }
 
         async function loadSalesStats() {
