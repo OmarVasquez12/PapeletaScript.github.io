@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Area De Clientes | Papeleta Store</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%233b82f6'/%3E%3Cstop offset='1' stop-color='%231e40af'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Ctext x='50' y='70' font-family='Arial, sans-serif' font-size='58' font-weight='900' fill='white' text-anchor='middle'%3EP%3C/text%3E%3C/svg%3E">
+    <!-- Icono Rojo -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff1a1a'/%3E%3Cstop offset='1' stop-color='%23cc1b1b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Ctext x='50' y='70' font-family='Arial, sans-serif' font-size='58' font-weight='900' fill='white' text-anchor='middle'%3EP%3C/text%3E%3C/svg%3E">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -21,22 +22,24 @@
         }
         
         body {
-            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            /* Fondo oscuro de la tienda */
+            background: linear-gradient(135deg, #050507 0%, #150a0a 100%);
             color: #e2e8f0;
         }
         
         .sidebar {
-            background: rgba(10, 14, 39, 0.95);
+            background: rgba(10, 5, 5, 0.95);
             backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(255, 26, 26, 0.1);
         }
         
         .main-content {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            background: transparent;
         }
         
         .card {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(59, 130, 246, 0.1);
+            background: rgba(21, 10, 10, 0.6);
+            border: 1px solid rgba(255, 26, 26, 0.15);
             backdrop-filter: blur(10px);
         }
         
@@ -45,102 +48,121 @@
         }
         
         .nav-item:hover {
-            background: rgba(59, 130, 246, 0.1);
+            background: rgba(255, 26, 26, 0.1);
+            color: white;
         }
         
         .nav-item.active {
-            background: rgba(59, 130, 246, 0.2);
-            border-left: 3px solid #3b82f6;
+            background: rgba(255, 26, 26, 0.15);
+            border-left: 3px solid #ff1a1a;
+            color: #ff6b6b;
         }
         
         .stat-card {
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.8) 100%);
-            border: 1px solid rgba(59, 130, 246, 0.1);
+            background: linear-gradient(135deg, rgba(21, 10, 10, 0.8) 0%, rgba(13, 5, 5, 0.8) 100%);
+            border: 1px solid rgba(255, 26, 26, 0.15);
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
             transition: all 0.3s ease;
         }
         
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 10px 25px rgba(220, 38, 38, 0.3);
+            filter: brightness(1.1);
         }
         
         .input-field {
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid rgba(59, 130, 246, 0.2);
+            background: rgba(13, 5, 5, 0.8);
+            border: 1px solid rgba(255, 26, 26, 0.2);
             transition: all 0.3s ease;
         }
         
         .input-field:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #ff1a1a;
+            box-shadow: 0 0 0 3px rgba(255, 26, 26, 0.1);
+            outline: none;
         }
         
         .code-block {
-            background: rgba(10, 14, 39, 0.9);
-            border: 1px solid rgba(59, 130, 246, 0.2);
+            background: rgba(5, 5, 7, 0.9);
+            border: 1px solid rgba(255, 26, 26, 0.2);
         }
         
         .gradient-text {
-            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+            background: linear-gradient(135deg, #ff1a1a 0%, #ff6b6b 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+        }
+
+        /* Scrollbar personalizada roja */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0505; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #7f1d1d; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ef4444; 
         }
     </style>
 </head>
 <body class="min-h-screen flex">
 
     <!-- SIDEBAR -->
-    <aside class="sidebar w-64 fixed left-0 top-0 h-full border-r border-blue-900/20 z-50">
+    <aside class="sidebar w-64 fixed left-0 top-0 h-full z-50 hidden md:block">
         <div class="p-6">
-            <div class="flex items-center gap-3 mb-8">
-                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center font-black text-white">
+            <div class="flex items-center gap-3 mb-8 cursor-pointer" onclick="window.location.href='index.html'">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center font-black text-white shadow-lg shadow-red-900/50">
                     P
                 </div>
-                <span class="text-white font-bold text-lg">Area De Clientes</span>
+                <span class="text-white font-bold text-lg tracking-wide">AREA CLIENTES</span>
             </div>
 
             <nav class="space-y-2">
-                <div class="text-xs text-gray-500 uppercase font-semibold mb-4 px-3">Principal</div>
+                <div class="text-xs text-gray-500 uppercase font-semibold mb-4 px-3 tracking-wider">Principal</div>
                 
-                <a href="#" onclick="showSection('dashboard')" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:text-white">
+                <a href="#" onclick="showSection('dashboard')" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
                     <i class="fas fa-home w-5"></i>
                     <span>Inicio</span>
                 </a>
                 
-                <a href="index.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:text-white">
+                <a href="index.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
                     <i class="fas fa-store w-5"></i>
                     <span>Tienda</span>
                 </a>
                 
-                <a href="#" onclick="showSection('reviews')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:text-white">
+                <a href="#" onclick="showSection('reviews')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
                     <i class="fas fa-star w-5"></i>
                     <span>Mis Reseñas</span>
                 </a>
                 
-                <a href="#" onclick="showSection('support')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:text-white">
+                <a href="#" onclick="showSection('support')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
                     <i class="fas fa-headset w-5"></i>
                     <span>Soporte</span>
                 </a>
                 
-                <a href="https://discord.gg/rvxEdWcGkf" target="_blank" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:text-white">
+                <a href="https://discord.gg/rvxEdWcGkf" target="_blank" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
                     <i class="fab fa-discord w-5"></i>
                     <span>Discord</span>
                 </a>
             </nav>
         </div>
 
-        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-blue-900/20">
-            <div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-blue-900/10">
-                <img id="sidebar-avatar" src="" alt="User" class="w-10 h-10 rounded-full border-2 border-blue-500">
+        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-red-900/20 bg-[#0a0505]/50">
+            <div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-red-900/10 border border-red-900/20">
+                <img id="sidebar-avatar" src="" alt="User" class="w-10 h-10 rounded-full border-2 border-red-600 object-cover">
                 <div class="flex-1 min-w-0">
                     <p id="sidebar-username" class="text-white font-medium text-sm truncate">Usuario</p>
-                    <p class="text-blue-400 text-xs">Cliente</p>
+                    <p class="text-red-400 text-xs font-bold uppercase">Cliente</p>
                 </div>
-                <button onclick="logout()" class="text-gray-400 hover:text-white">
+                <button onclick="logout()" class="text-gray-400 hover:text-red-400 transition-colors" title="Cerrar Sesión">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
             </div>
@@ -148,57 +170,69 @@
     </aside>
 
     <!-- MAIN CONTENT -->
-    <main class="main-content flex-1 ml-64 min-h-screen">
-        <!-- HEADER -->
-        <header class="border-b border-blue-900/20 px-8 py-6">
-            <div class="flex justify-between items-center">
+    <main class="main-content flex-1 md:ml-64 min-h-screen flex flex-col">
+        <!-- HEADER MOBILE -->
+        <div class="md:hidden p-4 bg-[#0a0505] border-b border-red-900/20 flex justify-between items-center">
+             <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded bg-red-600 flex items-center justify-center font-bold">P</div>
+                <span class="font-bold">Papeleta Store</span>
+             </div>
+             <button onclick="logout()" class="text-gray-400"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+
+        <!-- HEADER DESKTOP -->
+        <header class="border-b border-red-900/20 px-8 py-6 bg-[#0a0505]/30 backdrop-blur-sm sticky top-0 z-40">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h1 class="text-2xl font-bold text-white mb-1">Bienvenido, <span id="header-username" class="gradient-text">usuario</span></h1>
                     <p class="text-gray-400 text-sm">Gestiona tus productos y licencias desde aquí</p>
                 </div>
                 
-                <a href="index.html" class="btn-primary px-4 py-2 rounded-lg text-white font-medium flex items-center gap-2">
+                <a href="index.html" class="btn-primary px-5 py-2.5 rounded-lg text-white font-bold flex items-center gap-2 shadow-lg shadow-red-900/20">
                     <i class="fas fa-shopping-cart"></i>
-                    Catálogo
+                    Ir al Catálogo
                 </a>
             </div>
         </header>
 
-        <div class="p-8">
+        <div class="p-6 md:p-8 flex-grow">
             <!-- STATS CARDS -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="stat-card rounded-xl p-6">
-                    <div class="flex items-center justify-between">
+                <div class="stat-card rounded-xl p-6 relative overflow-hidden group">
+                    <div class="absolute right-0 top-0 w-24 h-24 bg-red-600/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
+                    <div class="flex items-center justify-between relative z-10">
                         <div>
-                            <p class="text-gray-400 text-xs uppercase font-semibold mb-1">Total Invertido</p>
+                            <p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Total Invertido</p>
                             <p id="stat-total-spent" class="text-2xl font-bold text-white">$0.00</p>
                         </div>
-                        <div class="w-12 h-12 rounded-lg bg-blue-500/20 flex items-center justify-center">
-                            <i class="fas fa-wallet text-blue-400 text-xl"></i>
+                        <div class="w-12 h-12 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                            <i class="fas fa-wallet text-red-400 text-xl"></i>
                         </div>
                     </div>
                 </div>
 
-                <div class="stat-card rounded-xl p-6">
-                    <div class="flex items-center justify-between">
+                <div class="stat-card rounded-xl p-6 relative overflow-hidden group">
+                    <div class="absolute right-0 top-0 w-24 h-24 bg-green-600/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
+                    <div class="flex items-center justify-between relative z-10">
                         <div>
-                            <p class="text-gray-400 text-xs uppercase font-semibold mb-1">Scripts Activos</p>
+                            <p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Scripts Activos</p>
                             <p id="stat-active-scripts" class="text-2xl font-bold text-white">0</p>
                         </div>
-                        <div class="w-12 h-12 rounded-lg bg-green-500/20 flex items-center justify-center">
+                        <div class="w-12 h-12 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center justify-center">
                             <i class="fas fa-lock text-green-400 text-xl"></i>
                         </div>
                     </div>
                 </div>
 
-                <div class="stat-card rounded-xl p-6">
-                    <div class="flex items-center justify-between">
+                <div class="stat-card rounded-xl p-6 relative overflow-hidden group">
+                    <div class="absolute right-0 top-0 w-24 h-24 bg-blue-600/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
+                    <div class="flex items-center justify-between relative z-10">
                         <div>
-                            <p class="text-gray-400 text-xs uppercase font-semibold mb-1">Estado de Cuenta</p>
-                            <p id="stat-account-status" class="text-lg font-bold text-cyan-400">Cliente</p>
+                            <p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Estado de Cuenta</p>
+                            <p id="stat-account-status" class="text-lg font-bold text-red-400">Cliente Verificado</p>
                         </div>
-                        <div class="w-12 h-12 rounded-lg bg-cyan-500/20 flex items-center justify-center">
-                            <i class="fas fa-user text-cyan-400 text-xl"></i>
+                        <div class="w-12 h-12 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                            <i class="fas fa-user-shield text-red-400 text-xl"></i>
                         </div>
                     </div>
                 </div>
@@ -208,8 +242,8 @@
                 <!-- PRODUCTS SECTION -->
                 <div class="lg:col-span-2 card rounded-xl p-6">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
-                            <i class="fas fa-cube text-blue-400"></i>
+                        <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                            <i class="fas fa-cube text-red-400"></i>
                         </div>
                         <h2 class="text-lg font-bold text-white">Mis Productos Activos</h2>
                     </div>
@@ -227,13 +261,13 @@
                         </div>
                     </div>
 
-                    <div id="dashboard-products-list" class="space-y-3">
+                    <div id="dashboard-products-list" class="space-y-3 max-h-[500px] overflow-y-auto custom-scrollbar pr-2">
                         <!-- Products will be loaded here -->
                     </div>
 
-                    <div id="dashboard-empty-state" class="hidden text-center py-12 border-2 border-dashed border-blue-900/30 rounded-xl">
-                        <i class="fas fa-search text-gray-600 text-4xl mb-3"></i>
-                        <p class="text-gray-400 mb-4">No tienes productos activos.</p>
+                    <div id="dashboard-empty-state" class="hidden text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5">
+                        <i class="fas fa-box-open text-gray-600 text-4xl mb-3"></i>
+                        <p class="text-gray-400 mb-4">No tienes productos activos aún.</p>
                         <a href="index.html" class="btn-primary inline-block px-6 py-2 rounded-lg text-white font-medium">
                             Ir a la tienda
                         </a>
@@ -241,54 +275,51 @@
                 </div>
 
                 <!-- SETUP SERVER SECTION -->
-                <div class="card rounded-xl p-6">
+                <div class="card rounded-xl p-6 h-fit">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
-                            <i class="fas fa-server text-blue-400"></i>
+                        <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                            <i class="fas fa-server text-red-400"></i>
                         </div>
-                        <h2 class="text-lg font-bold text-white">IP Y PUERTO MTA</h2>
+                        <h2 class="text-lg font-bold text-white">Configuración MTA</h2>
                     </div>
 
                     <div class="space-y-4 mb-6">
                         <div>
-                            <label class="block text-gray-400 text-xs uppercase font-semibold mb-2">Server IP</label>
-                            <input type="text" id="server-ip" value="213.181.88.154" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none">
+                            <label class="block text-gray-400 text-xs uppercase font-semibold mb-2 tracking-wider">Server IP</label>
+                            <input type="text" id="server-ip" value="213.181.88.154" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none font-mono text-sm">
                         </div>
                         
                         <div>
-                            <label class="block text-gray-400 text-xs uppercase font-semibold mb-2">Puerto</label>
-                            <input type="text" id="server-port" value="22003" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none">
+                            <label class="block text-gray-400 text-xs uppercase font-semibold mb-2 tracking-wider">Puerto</label>
+                            <input type="text" id="server-port" value="22003" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none font-mono text-sm">
                         </div>
                     </div>
 
                     <div class="mb-6">
                         <div class="flex items-center justify-between mb-2">
-                            <label class="block text-gray-400 text-xs uppercase font-semibold">Código de Licencia</label>
-                            <span class="text-xs text-gray-500">LUA CONFIG</span>
+                            <label class="block text-gray-400 text-xs uppercase font-semibold tracking-wider">Código de Licencia</label>
+                            <span class="text-[10px] text-red-400 font-mono bg-red-900/20 px-2 py-0.5 rounded">LUA CONFIG</span>
                         </div>
-                        <div class="code-block rounded-lg p-4 font-mono text-sm">
-                            <pre class="text-blue-300"><code id="license-code">configLicense = {
-    ["User"] = "usuario", 
-    ["Key"] = "PapeletaStore(key)"
-}</code></pre>
+                        <div class="code-block rounded-lg p-4 font-mono text-sm relative group">
+                            <pre class="text-red-300 whitespace-pre-wrap break-all"><code id="license-code">Inicia sesión para ver tu código...</code></pre>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-3 mb-4">
-                        <button onclick="saveServerConfig()" class="btn-primary px-4 py-2.5 rounded-lg text-white font-medium flex items-center justify-center gap-2">
+                        <button onclick="saveServerConfig()" class="btn-primary px-4 py-2.5 rounded-lg text-white font-medium flex items-center justify-center gap-2 text-sm">
                             <i class="fas fa-save"></i>
                             Guardar
                         </button>
-                        <button onclick="copyLicenseCode()" class="px-4 py-2.5 rounded-lg border border-blue-500/30 text-blue-400 hover:bg-blue-500/10 font-medium flex items-center justify-center gap-2 transition-all">
+                        <button onclick="copyLicenseCode()" class="px-4 py-2.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500/50 font-medium flex items-center justify-center gap-2 transition-all text-sm">
                             <i class="fas fa-copy"></i>
-                            Copiar Código
+                            Copiar
                         </button>
                     </div>
 
-                    <div class="bg-blue-900/20 border border-blue-500/20 rounded-lg p-3">
+                    <div class="bg-red-900/10 border border-red-500/10 rounded-lg p-3">
                         <div class="flex items-start gap-2">
-                            <i class="fas fa-info-circle text-blue-400 mt-0.5"></i>
-                            <p class="text-xs text-gray-400">Copia este código en tu server .lua para activar tus licencias en este servidor.</p>
+                            <i class="fas fa-info-circle text-red-400 mt-0.5 text-xs"></i>
+                            <p class="text-xs text-gray-400 leading-relaxed">Copia este código en tu archivo de configuración `.lua` para activar las licencias en este servidor.</p>
                         </div>
                     </div>
                 </div>
@@ -297,16 +328,17 @@
     </main>
 
     <!-- LOGIN MODAL -->
-    <div id="login-modal" class="hidden fixed inset-0 bg-black/80 z-[60] flex items-center justify-center px-4 backdrop-blur-sm">
-        <div class="max-w-md w-full bg-[#0f172a] border border-blue-900/30 rounded-2xl p-8 text-center shadow-2xl">
-            <div class="mx-auto w-20 h-20 rounded-xl mb-6 shadow-lg border-2 border-blue-500 bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-3xl font-black">P</div>
-            <h1 class="text-3xl font-black text-white mb-2">PAPELETA <span class="text-blue-400">STORE</span></h1>
+    <div id="login-modal" class="hidden fixed inset-0 bg-black/90 z-[60] flex items-center justify-center px-4 backdrop-blur-sm">
+        <div class="max-w-md w-full bg-[#150a0a] border border-red-600/30 rounded-2xl p-8 text-center shadow-[0_0_50px_rgba(220,38,38,0.2)]">
+            <div class="mx-auto w-20 h-20 rounded-xl mb-6 shadow-lg border-2 border-red-600 bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center text-3xl font-black text-white">P</div>
+            <h1 class="text-3xl font-black text-white mb-2 tracking-wide">PAPELETA <span class="text-red-500">STORE</span></h1>
             <p class="text-gray-400 text-sm mb-8">Debes iniciar sesión para acceder al área de clientes</p>
 
-            <button onclick="redirectToDiscord()" class="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-3.5 px-6 rounded-xl flex items-center justify-center gap-3 transition-all">
+            <button onclick="redirectToDiscord()" class="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-3.5 px-6 rounded-xl flex items-center justify-center gap-3 transition-all shadow-lg hover:shadow-blue-900/20 hover:-translate-y-1">
                 <i class="fab fa-discord text-xl"></i>
                 Iniciar Sesión con Discord
             </button>
+            <p class="text-gray-600 text-xs mt-4">Tus datos están seguros.</p>
         </div>
     </div>
 
@@ -379,11 +411,13 @@
                 if (user.avatar) {
                     const avatarUrl = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
                     document.getElementById('sidebar-avatar').src = avatarUrl;
+                } else {
+                     document.getElementById('sidebar-avatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
                 }
                 
                 document.getElementById('login-modal').classList.add('hidden');
                 loadDashboardData();
-                loadLicenses(); // Cargar licencias después de autenticar
+                loadLicenses();
             })
             .catch(err => {
                 console.error(err);
@@ -398,6 +432,7 @@
         }
 
         function showSection(section) {
+            // Placeholder for future sections
             if (section === 'store') {
                 window.location.href = 'index.html';
             }
@@ -410,41 +445,28 @@
             try {
                 console.log("Cargando datos para usuario:", currentUser.id);
                 
-                // Primero cargar todos los productos disponibles
+                // Cargar productos disponibles
                 const productsSnapshot = await db.collection("Productos").get();
                 allProducts = [];
                 productsSnapshot.forEach((doc) => {
                     allProducts.push({ id: doc.id, ...doc.data() });
                 });
-                console.log("Productos cargados:", allProducts.length);
 
-                // Consultar TODOS los clientes y filtrar manualmente
+                // Consultar compras
                 const clientesSnapshot = await db.collection("Clientes").get();
-                console.log("Total documentos en Clientes:", clientesSnapshot.size);
-
+                
                 let purchasedProducts = [];
                 let totalSpent = 0;
-                let foundUser = false;
 
                 clientesSnapshot.forEach((doc) => {
                     const purchase = doc.data();
-                    console.log("Revisando documento:", doc.id, "discord_id:", purchase.discord_id);
                     
-                    // Comparar como strings para evitar problemas de tipo
                     if (String(purchase.discord_id) === String(currentUser.id)) {
-                        foundUser = true;
-                        console.log("¡Usuario encontrado! Datos de compra:", purchase);
-                        
-                        // Verificar si existe el campo products y es un array
                         if (purchase.products && Array.isArray(purchase.products)) {
-                            console.log("Productos en la compra:", purchase.products);
-                            
                             purchase.products.forEach(prod => {
-                                console.log("Buscando producto con ID:", prod.id);
                                 const productData = allProducts.find(p => p.id === prod.id);
                                 
                                 if (productData) {
-                                    console.log("Producto encontrado:", productData.name);
                                     purchasedProducts.push({
                                         ...productData,
                                         purchaseDate: purchase.date?.toDate ? purchase.date.toDate() : new Date(),
@@ -452,42 +474,32 @@
                                         price: prod.price || purchase.total_price || 'Gratis'
                                     });
                                     
-                                    if (prod.price !== "Gratis" && prod.price !== "Gratis") {
+                                    if (prod.price !== "Gratis" && prod.price !== "GRATIS") {
                                         totalSpent += parseFloat(String(prod.price).replace('$', '')) || 0;
                                     }
                                 } else {
-                                    console.log("Producto NO encontrado en allProducts, creando básico:", prod.name);
+                                    // Fallback si el producto fue borrado de la tienda pero sigue en la compra
                                     purchasedProducts.push({
                                         id: prod.id,
-                                        name: prod.name || 'Producto',
+                                        name: prod.name || 'Producto Desconocido',
                                         price: prod.price || purchase.total_price || 'Gratis',
-                                        image_url: '',
+                                        image_url: '', // Sin imagen
                                         purchaseDate: purchase.date?.toDate ? purchase.date.toDate() : new Date(),
-                                        status: prod.status || purchase.status || 'Activo'
+                                        status: prod.status || purchase.status || 'Activo',
+                                        file_data: null // No se puede descargar si no existe en productos
                                     });
                                 }
                             });
-                        } else {
-                            console.log("No hay campo products o no es array. purchase:", purchase);
                         }
                     }
                 });
 
-                if (!foundUser) {
-                    console.log("No se encontró ningún documento para el usuario:", currentUser.id);
-                }
-
-                console.log("Total productos comprados:", purchasedProducts.length);
-                console.log("Total gastado:", totalSpent);
-
-                // Actualizar estadísticas
+                // Actualizar UI
                 document.getElementById('stat-total-spent').innerText = '$' + totalSpent.toFixed(2);
                 document.getElementById('stat-active-scripts').innerText = purchasedProducts.length;
                 
-                // Renderizar productos
                 renderDashboardProducts(purchasedProducts);
                 
-                // Mostrar/ocultar estado vacío
                 if (purchasedProducts.length === 0) {
                     document.getElementById('dashboard-empty-state').classList.remove('hidden');
                 } else {
@@ -496,7 +508,6 @@
                 
             } catch (error) {
                 console.error("Error cargando datos del dashboard:", error);
-                alert("Error al cargar: " + error.message);
             }
         }
 
@@ -509,17 +520,27 @@
             }
             
             container.innerHTML = products.map(item => `
-                <div class="bg-blue-900/10 border border-blue-500/20 rounded-lg p-4 flex items-center justify-between hover:border-blue-500/40 transition-all">
-                    <div class="flex items-center gap-4">
-                        <img src="${item.image_url || ''}" alt="${item.name}" class="w-16 h-16 object-cover rounded-lg">
+                <div class="bg-[#0d0505] border border-red-900/30 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between hover:border-red-600/50 transition-all group">
+                    <div class="flex items-center gap-4 w-full sm:w-auto mb-3 sm:mb-0">
+                        <div class="w-16 h-16 rounded-lg bg-[#150a0a] border border-red-900/20 overflow-hidden shrink-0">
+                            <img src="${item.image_url || ''}" alt="${item.name}" class="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity">
+                        </div>
                         <div>
-                            <h3 class="text-white font-semibold">${item.name}</h3>
-                            <p class="text-gray-400 text-sm">${item.price === 'Gratis' || item.price === 0 ? 'GRATIS' : '$' + Number(item.price).toFixed(2)}</p>
+                            <h3 class="text-white font-bold text-base">${item.name}</h3>
+                            <p class="text-gray-400 text-xs mt-1">${item.price === 'Gratis' || item.price === 0 || item.price === 'GRATIS' ? '<span class="text-green-400">GRATIS</span>' : '$' + Number(item.price).toFixed(2)}</p>
+                            <p class="text-red-500/60 text-[10px] mt-1 uppercase tracking-wider font-semibold">${item.status}</p>
                         </div>
                     </div>
-                    <button onclick="downloadProduct('${item.id}')" class="btn-primary px-4 py-2 rounded-lg text-white text-sm font-medium">
-                        <i class="fas fa-download mr-2"></i>Descargar
-                    </button>
+                    
+                    ${item.file_data ? `
+                        <button onclick="downloadProduct('${item.id}')" class="btn-primary w-full sm:w-auto px-5 py-2.5 rounded-lg text-white text-sm font-bold flex items-center justify-center gap-2 shadow-lg shadow-red-900/20">
+                            <i class="fas fa-download"></i> Descargar
+                        </button>
+                    ` : `
+                        <button disabled class="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-gray-800 text-gray-500 text-sm font-bold flex items-center justify-center gap-2 cursor-not-allowed border border-gray-700">
+                            <i class="fas fa-ban"></i> No disponible
+                        </button>
+                    `}
                 </div>
             `).join('');
         }
@@ -530,26 +551,26 @@
             
             cards.forEach(card => {
                 const text = card.innerText.toLowerCase();
-                card.style.display = text.includes(search) ? '' : 'none';
+                card.style.display = text.includes(search) ? 'flex' : 'none';
             });
         }
 
         function downloadProduct(productId) {
             const product = allProducts.find(p => p.id === productId);
             if (!product) {
-                alert('Producto no encontrado');
+                alert('Error: Producto no encontrado en la base de datos.');
                 return;
             }
             
             if (product.file_data) {
                 const link = document.createElement('a');
                 link.href = product.file_data;
-                link.download = product.file_name || 'archivo.zip';
+                link.download = product.file_name || 'papeleta_store_resource.zip';
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
             } else {
-                alert('Este producto no tiene archivo disponible. Contacta al soporte.');
+                alert('Este producto no tiene archivo adjunto. Contacta a soporte.');
             }
         }
 
@@ -558,24 +579,19 @@
             if (!currentUser) return;
             
             try {
-                console.log("Cargando licencias para:", currentUser.id);
                 const snapshot = await db.collection("Licencias")
                     .where("discord_id", "==", currentUser.id)
                     .get();
                 
                 allLicenses = [];
                 snapshot.forEach((doc) => {
-                    const licenseData = { id: doc.id, ...doc.data() };
-                    allLicenses.push(licenseData);
-                    console.log("Licencia encontrada:", licenseData);
+                    allLicenses.push({ id: doc.id, ...doc.data() });
                 });
-                
-                console.log("Total licencias cargadas:", allLicenses.length);
                 
                 if (allLicenses.length > 0) {
                     updateLicenseCode();
                 } else {
-                    console.log("No se encontraron licencias para este usuario");
+                    document.getElementById('license-code').textContent = "// No tienes licencias activas generadas.";
                 }
             } catch (error) {
                 console.error("Error cargando licencias:", error);
@@ -584,25 +600,29 @@
 
         function updateLicenseCode() {
             if (allLicenses.length > 0 && currentUser) {
-                const license = allLicenses[0];
-                console.log("Actualizando código con license:", license);
-                console.log("Username:", currentUser.username);
-                console.log("Key:", license.key);
+                const license = allLicenses[0]; // Tomamos la primera licencia como ejemplo
                 
-                // Aquí usamos el username de Discord y la key única generada
                 const code = `configLicense = {
     ["User"] = "${currentUser.username}", 
     ["Key"] = "PapeletaStore(${license.key})"
 }`;
-                console.log("Código generado:", code);
                 document.getElementById('license-code').textContent = code;
             }
         }
 
         function copyLicenseCode() {
             const code = document.getElementById('license-code').textContent;
+            if(code.includes("No tienes licencias")) return;
+
             navigator.clipboard.writeText(code).then(() => {
-                alert('¡Código copiado al portapapeles!');
+                const btn = event.currentTarget;
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> Copiado';
+                btn.classList.add('bg-green-600', 'text-white', 'border-green-500');
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.classList.remove('bg-green-600', 'text-white', 'border-green-500');
+                }, 2000);
             });
         }
 
@@ -611,14 +631,17 @@
             const port = document.getElementById('server-port').value;
             
             localStorage.setItem('server_config', JSON.stringify({ ip, port }));
-            alert('Configuración guardada correctamente');
+            
+            const btn = event.currentTarget;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Guardado';
+            setTimeout(() => btn.innerHTML = originalText, 2000);
         }
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             checkDiscordAuth();
             
-            // Load saved server config
             const savedConfig = JSON.parse(localStorage.getItem('server_config') || '{}');
             if (savedConfig.ip) document.getElementById('server-ip').value = savedConfig.ip;
             if (savedConfig.port) document.getElementById('server-port').value = savedConfig.port;
