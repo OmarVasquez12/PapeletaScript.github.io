@@ -633,12 +633,14 @@
             }
         }
 
+        // ✅ MODIFICADA: Sin alert, simplemente redirige a AreaCliente.html
         function addToCart(productId) {
             const product = allProducts.find(p => p.id === productId);
             if (!product) return;
             
+            // Si ya lo tiene, redirige directamente a AreaCliente.html sin alert
             if (currentUser && myAssignedProductIds.has(productId)) {
-                alert('⚠️ Ya tienes este producto en tu biblioteca.\n\nNo puedes comprarlo de nuevo.\n\nVe a "Mi Área de Cliente" para descargarlo.');
+                window.location.href = 'AreaCliente.html';
                 return;
             }
             
@@ -930,11 +932,11 @@
             const alreadyOwned = currentUser && myAssignedProductIds.has(product.id);
             
             if (alreadyOwned) {
-                buyBtn.innerHTML = '<i class="fas fa-check-circle text-xl"></i> Ya lo tienes - Ver en Biblioteca';
+                buyBtn.innerHTML = '<i class="fas fa-book text-xl"></i> Biblioteca';
                 buyBtn.className = 'w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 transition-all shadow-lg shadow-green-900/30 text-lg';
                 buyBtn.onclick = () => {
                     closeProductDetailModal();
-                    openUserDashboard();
+                    window.location.href = 'AreaCliente.html';
                 };
             } else if (currentUser) {
                 if (Number(product.price) === 0) {
@@ -991,9 +993,7 @@
             if (!currentDetailProduct) return;
             
             if (currentUser && myAssignedProductIds.has(currentDetailProduct.id)) {
-                alert('⚠️ Ya tienes este producto en tu biblioteca.\n\nNo puedes comprarlo de nuevo.');
-                closeProductDetailModal();
-                openUserDashboard();
+                window.location.href = 'AreaCliente.html';
                 return;
             }
             
@@ -1364,6 +1364,7 @@
             renderProducts();
         }
 
+        // ✅ MODIFICADA: Botón "Biblioteca" en lugar de "Ya lo tienes"
         function renderProducts() {
             const search = document.getElementById('search-input').value.toLowerCase();
             const grid = document.getElementById('products-grid');
@@ -1398,8 +1399,8 @@
                         
                         <div class="grid grid-cols-2 gap-2">
                             ${alreadyOwned ? `
-                                <button onclick="openUserDashboard()" class="col-span-2 bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2">
-                                    <i class="fas fa-download"></i> Ya lo tienes - Ver en Biblioteca
+                                <button onclick="window.location.href='AreaCliente.html'" class="col-span-2 bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2">
+                                    <i class="fas fa-book"></i> Biblioteca
                                 </button>
                             ` : `
                                 <button onclick="addToCart('${p.id}')" class="${Number(p.price) === 0 ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'} text-white text-sm font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2">
