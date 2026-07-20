@@ -51,7 +51,9 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: #150a0a; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #951d1d; border-radius: 3px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #ff1a1a; }
-        #network-bg { position: fixed; inset: 0; z-index: 0; opacity: 0.5; pointer-events: none; }
+        
+        /* ✅ ELIMINADO: #network-bg ya no existe */
+        
         .page { display: none; }
         .page.active { display: block; }
         .nav-link.active-page { color: #ff6b6b; }
@@ -92,7 +94,7 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-gradient-to-b from-[#150a0a] to-[#0a0505] relative">
 
-    <canvas id="network-bg"></canvas>
+    <!-- ✅ ELIMINADO: <canvas id="network-bg"></canvas> -->
 
     <!-- LOGIN MODAL -->
     <div id="login-modal" class="hidden fixed inset-0 bg-black/80 z-[60] flex items-center justify-center px-4 backdrop-blur-sm transition-opacity duration-300">
@@ -633,7 +635,6 @@
             }
         }
 
-        // ✅ MODIFICADA: Sin alert, redirige directo a AreaCliente.html
         function addToCart(productId) {
             const product = allProducts.find(p => p.id === productId);
             if (!product) return;
@@ -1363,7 +1364,6 @@
             renderProducts();
         }
 
-        // ✅ MODIFICADA: Lógica exacta de botones según estado del producto
         function renderProducts() {
             const search = document.getElementById('search-input').value.toLowerCase();
             const grid = document.getElementById('products-grid');
@@ -1470,59 +1470,11 @@
             }
         }
 
-        function initNetworkBg() {
-            const canvas = document.getElementById('network-bg');
-            const ctx = canvas.getContext('2d');
-            let w, h, points;
-
-            function resize() {
-                w = canvas.width = window.innerWidth;
-                h = canvas.height = window.innerHeight;
-            }
-            resize();
-            window.addEventListener('resize', resize);
-
-            points = Array.from({ length: 45 }, () => ({
-                x: Math.random() * w,
-                y: Math.random() * h,
-                vx: (Math.random() - 0.5) * 0.3,
-                vy: (Math.random() - 0.5) * 0.3
-            }));
-
-            function tick() {
-                ctx.clearRect(0, 0, w, h);
-                points.forEach(p => {
-                    p.x += p.vx; p.y += p.vy;
-                    if (p.x < 0 || p.x > w) p.vx *= -1;
-                    if (p.y < 0 || p.y > h) p.vy *= -1;
-                });
-                for (let i = 0; i < points.length; i++) {
-                    for (let j = i + 1; j < points.length; j++) {
-                        const dx = points[i].x - points[j].x;
-                        const dy = points[i].y - points[j].y;
-                        const dist = Math.sqrt(dx * dx + dy * dy);
-                        if (dist < 150) {
-                            ctx.strokeStyle = `rgba(255,26,26,${1 - dist / 150})`;
-                            ctx.lineWidth = 0.6;
-                            ctx.beginPath();
-                            ctx.moveTo(points[i].x, points[i].y);
-                            ctx.lineTo(points[j].x, points[j].y);
-                            ctx.stroke();
-                        }
-                    }
-                    ctx.fillStyle = 'rgba(255,26,26,0.8)';
-                    ctx.beginPath();
-                    ctx.arc(points[i].x, points[i].y, 1.8, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-                requestAnimationFrame(tick);
-            }
-            tick();
-        }
-
+        // ✅ ELIMINADA: Función initNetworkBg() ya no existe
+        
         document.addEventListener('DOMContentLoaded', () => {
             checkDiscordAuth();
-            initNetworkBg();
+            // ✅ ELIMINADA: initNetworkBg() ya no se llama
         });
     </script>
 </body>
