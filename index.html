@@ -1010,9 +1010,10 @@
             }
         }
 
-        function openLoginModal() {
-            document.getElementById('login-modal').classList.remove('hidden');
-        }
+        // En lugar de abrir el modal, redirige:
+      function openLoginModal() {
+       window.location.href = 'Login.html';
+       }
 
         function closeLoginModal() {
             document.getElementById('login-modal').classList.add('hidden');
