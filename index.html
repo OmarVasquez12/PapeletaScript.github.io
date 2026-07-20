@@ -8,10 +8,8 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- SDK de PayPal -->
     <script src="https://www.paypal.com/sdk/js?client-id=sb&currency=USD"></script>
 
-    <!-- FIREBASE SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
@@ -147,13 +145,11 @@
                     <span id="cart-total" class="text-2xl font-black text-white">$0.00</span>
                 </div>
                 
-                <!-- BOTÓN RECLAMAR (para productos GRATIS) -->
                 <button id="claim-free-btn" onclick="claimFreeProducts()" class="hidden w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-green-900/30 mb-3">
                     <i class="fas fa-gift"></i>
                     Reclamar Productos Gratis
                 </button>
                 
-                <!-- PAYPAL BUTTON CONTAINER -->
                 <div id="paypal-button-container" class="mt-2"></div>
                 
                 <button id="manual-checkout-btn" onclick="checkoutManual()" class="w-full hidden bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-red-900/30">
@@ -256,7 +252,6 @@
                     <span id="cart-count" class="cart-badge hidden">0</span>
                 </button>
                 
-                <!-- BOTÓN SALIR DE LA CUENTA - AL LADO DEL CARRITO -->
                 <button id="logout-btn" onclick="logout()" class="hidden bg-[#150a0a] hover:bg-[#1a0a0a] border border-red-900/50 text-red-400 hover:text-red-300 px-4 py-2 rounded-lg flex items-center gap-2 transition-all text-sm font-semibold">
                     <i class="fas fa-sign-out-alt"></i>
                     <span class="hidden sm:inline">Salir</span>
@@ -359,7 +354,6 @@
                 <i class="fas fa-user-shield text-red-400"></i> Panel de Admin
             </h2>
 
-            <!-- SECCIÓN DE SUBIDA DE PRODUCTOS -->
             <div id="admin-upload-section" class="bg-[#150a0a] border border-red-950/40 rounded-2xl p-6 mb-6">
                 <h3 class="text-white font-bold mb-4 flex items-center gap-2">
                     <i class="fas fa-plus-circle text-red-400"></i>
@@ -407,7 +401,6 @@
                         </div>
                     </div>
 
-                    <!-- NUEVO CAMPO PARA SUBIR ARCHIVO -->
                     <div>
                         <label class="block text-gray-300 text-sm font-semibold mb-2">Archivo del Producto (Zip/Rar/Lua) *</label>
                         <div class="border-2 border-dashed border-red-900/40 rounded-xl p-4 text-center hover:border-red-500/50 transition-colors bg-[#0d0505]">
@@ -448,7 +441,6 @@
     </footer>
 
     <script>
-        // --- CONFIGURACIÓN ---
         const CLIENT_ID = '1213866547181780992'; 
         const REDIRECT_URI = 'https://papeleta-script-github-io.vercel.app';
         const DISCORD_INVITE = 'https://discord.gg/rvxEdWcGkf';
@@ -472,7 +464,6 @@
         let cart = [];
         let localProducts = JSON.parse(localStorage.getItem('papeleta_local_products') || '[]');
 
-        // --- FIREBASE CONFIGURATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
             authDomain: "papeletalicencia.firebaseapp.com",
@@ -484,14 +475,11 @@
             measurementId: "G-RPJ4KQ6EQ4"
         };
 
-        // Inicializar Firebase
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
         const db = firebase.firestore();
 
-        // --- FUNCIONES DE SUBIDA DE PRODUCTOS ---
-        
         function previewImage(input) {
             const preview = document.getElementById('image-preview');
             if (input.files && input.files[0]) {
@@ -588,16 +576,15 @@
                     created_at: firebase.firestore.FieldValue.serverTimestamp()
                 };
                 
-                // Guardar en Firebase Collection "Productos"
                 await db.collection("Productos").doc(newProduct.id).set(newProduct);
                 
-                alert('Producto guardado en Firebase (Productos.json virtual) exitosamente');
+                alert('Producto guardado en Firebase exitosamente');
                 document.getElementById('product-form').reset();
                 document.getElementById('image-preview').classList.add('hidden');
                 document.getElementById('file-label-text').innerText = 'Haz clic para subir el archivo descargable';
                 document.getElementById('file-label-text').classList.remove('text-white', 'font-bold');
                 
-                loadProducts(); // Recargar lista
+                loadProducts();
                 
             } catch (error) {
                 console.error(error);
@@ -608,7 +595,6 @@
         function loadAdminProductsList() {
             const container = document.getElementById('admin-products-list');
             
-            // Usamos allProducts que ya viene de Firebase
             if (allProducts.length === 0) {
                 container.innerHTML = '<p class="text-gray-500 text-sm">No hay productos locales aún.</p>';
                 return;
@@ -630,13 +616,11 @@
         }
         
         async function deleteProduct(id) {
-            if (!confirm('¿Eliminar este producto de la tienda? (Los clientes que ya lo compraron NO perderán su acceso)')) return;
+            if (!confirm('¿Eliminar este producto de la tienda?')) return;
             
             try {
-                // Borrar de Firebase
                 await db.collection("Productos").doc(id).delete();
                 
-                // Actualizar vista local
                 allProducts = allProducts.filter(p => p.id !== id);
                 
                 loadAdminProductsList();
@@ -649,11 +633,14 @@
             }
         }
 
-        // --- FUNCIONES DEL CARRITO ---
-
         function addToCart(productId) {
             const product = allProducts.find(p => p.id === productId);
             if (!product) return;
+            
+            if (currentUser && myAssignedProductIds.has(productId)) {
+                alert('⚠️ Ya tienes este producto en tu biblioteca.\n\nNo puedes comprarlo de nuevo.\n\nVe a "Mi Área de Cliente" para descargarlo.');
+                return;
+            }
             
             const existingItem = cart.find(item => item.id === productId);
             if (existingItem) {
@@ -719,20 +706,16 @@
                     </div>
                 `).join('');
                 
-                // Calcular total
                 const total = cart.reduce((sum, item) => sum + Number(item.price), 0);
                 totalEl.textContent = total === 0 ? 'GRATIS' : '$' + total.toFixed(2);
                 
-                // Verificar si todos los productos son gratis
                 const allFree = cart.every(item => Number(item.price) === 0);
                 
                 if (allFree && total === 0) {
-                    // Mostrar botón de reclamar, ocultar PayPal y pago manual
                     claimBtn.classList.remove('hidden');
                     paypalContainer.innerHTML = '';
                     manualBtn.classList.add('hidden');
                 } else {
-                    // Ocultar botón de reclamar, mostrar PayPal
                     claimBtn.classList.add('hidden');
                     renderPayPalButtons();
                     manualBtn.classList.remove('hidden');
@@ -740,7 +723,6 @@
             }
         }
 
-        // --- FUNCIÓN PARA RECLAMAR PRODUCTOS GRATIS ---
         async function claimFreeProducts() {
             if (!currentUser) {
                 alert('Debes iniciar sesión para reclamar productos gratis');
@@ -753,14 +735,12 @@
                 return;
             }
             
-            // Verificar que todos sean gratis
             const allFree = cart.every(item => Number(item.price) === 0);
             if (!allFree) {
                 alert('Algunos productos no son gratis');
                 return;
             }
             
-            // Guardar en Firebase Colección "Clientes"
             try {
                 const purchaseData = {
                     discord_id: currentUser.id,
@@ -778,7 +758,6 @@
 
                 await db.collection("Clientes").add(purchaseData);
                 
-                // Crear licencias para cada producto
                 for (const item of cart) {
                     await createLicenseForProduct(item.id, item.name);
                     myAssignedProductIds.add(item.id);
@@ -786,9 +765,8 @@
                 
                 saveUserDataLocally();
                 
-                alert('¡Productos reclamados exitosamente! Ya están disponibles en tu biblioteca.\n\nSe han generado tus licencias automáticamente.\n\nGracias por seguir confiando en nuestra tienda y en cada uno de nuestros productos digitales. Seguimos trabajando para brindar la mejor calidad a toda nuestra comunidad.');
+                alert('¡Productos reclamados exitosamente! Ya están disponibles en tu biblioteca.\n\nSe han generado tus licencias automáticamente.\n\nGracias por seguir confiando en nuestra tienda.');
                 
-                // Limpiar carrito
                 cart = [];
                 updateCartUI();
                 closeCartModal();
@@ -813,14 +791,12 @@
             document.getElementById('cart-modal').classList.add('hidden');
         }
 
-        // --- INTEGRACIÓN PAYPAL ---
         function renderPayPalButtons() {
             const container = document.getElementById('paypal-button-container');
             container.innerHTML = ''; 
             
             if (cart.length === 0) return;
             
-            // Verificar si hay productos de pago
             const hasPaidProducts = cart.some(item => Number(item.price) > 0);
             if (!hasPaidProducts) return;
 
@@ -870,14 +846,12 @@
                 roleBadge.classList.remove('text-red-400');
             }
 
-            // Guardar rol en LocalStorage
             saveUserDataLocally();
         }
 
         async function assignProductsToUserAfterPayment(paymentDetails) {
             if(!currentUser) return;
             
-            // Guardar en Firebase Colección "Clientes"
             try {
                 const purchaseData = {
                     discord_id: currentUser.id,
@@ -897,7 +871,6 @@
 
                 await db.collection("Clientes").add(purchaseData);
                 
-                // Crear licencias para cada producto
                 for (const item of cart) {
                     await createLicenseForProduct(item.id, item.name);
                     myAssignedProductIds.add(item.id);
@@ -907,7 +880,7 @@
                 alert("¡Productos añadidos a tu biblioteca!\n\nSe han generado tus licencias automáticamente.");
             } catch (error) {
                 console.error(error);
-                alert('Error al registrar la compra en la base de datos: ' + error.message);
+                alert('Error al registrar la compra: ' + error.message);
             }
         }
 
@@ -916,13 +889,9 @@
                 alert('Tu carrito está vacío');
                 return;
             }
-            const total = cart.reduce((sum, item) => sum + Number(item.price), 0);
-            const productList = cart.map(item => `- ${item.name} ($${Number(item.price).toFixed(2)})`).join('\n');
             alert(`Serás redirigido a Discord para coordinar el pago manual.`);
             window.open(DISCORD_INVITE, '_blank');
         }
-
-        // --- DETALLES DEL PRODUCTO ---
 
         function showProductDetails(productId) {
             const product = allProducts.find(p => p.id === productId);
@@ -957,7 +926,17 @@
             `).join('');
             
             const buyBtn = document.getElementById('detail-buy-btn');
-            if (currentUser) {
+            
+            const alreadyOwned = currentUser && myAssignedProductIds.has(product.id);
+            
+            if (alreadyOwned) {
+                buyBtn.innerHTML = '<i class="fas fa-check-circle text-xl"></i> Ya lo tienes - Ver en Biblioteca';
+                buyBtn.className = 'w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 transition-all shadow-lg shadow-green-900/30 text-lg';
+                buyBtn.onclick = () => {
+                    closeProductDetailModal();
+                    openUserDashboard();
+                };
+            } else if (currentUser) {
                 if (Number(product.price) === 0) {
                     buyBtn.innerHTML = '<i class="fas fa-gift text-xl"></i> Reclamar Gratis';
                     buyBtn.className = 'w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 transition-all shadow-lg shadow-green-900/30 text-lg';
@@ -1010,6 +989,14 @@
 
         function buyFromDetail() {
             if (!currentDetailProduct) return;
+            
+            if (currentUser && myAssignedProductIds.has(currentDetailProduct.id)) {
+                alert('⚠️ Ya tienes este producto en tu biblioteca.\n\nNo puedes comprarlo de nuevo.');
+                closeProductDetailModal();
+                openUserDashboard();
+                return;
+            }
+            
             if (!currentUser) {
                 closeProductDetailModal();
                 openLoginModal();
@@ -1025,8 +1012,6 @@
                 }
             }
         }
-
-        // --- AUTH & LOGIN ---
 
         function openLoginModal() {
             document.getElementById('login-modal').classList.remove('hidden');
@@ -1088,7 +1073,6 @@
                 updateAuthUI();
                 applyRoleUI();
                 
-                // ✅ REGISTRAR USUARIO EN FIREBASE (aquí se hace el +1 global)
                 registerUserInFirebase(user);
                 
                 loadUserStats();
@@ -1123,7 +1107,6 @@
             currentUserRole = 'user'; 
             const roleBadge = document.getElementById('user-role-badge');
             
-            // Cargar rol desde LocalStorage
             if(currentUser) {
                 const savedData = JSON.parse(localStorage.getItem('papeleta_user_' + currentUser.id) || '{}');
                 if(savedData.role) {
@@ -1143,7 +1126,6 @@
             document.getElementById('admin-users-section').style.display = isAdmin(currentUser) ? '' : 'none';
         }
 
-        // Funciones auxiliares para persistencia local
         function saveUserDataLocally() {
             if(!currentUser) return;
             const userData = {
@@ -1156,7 +1138,6 @@
             };
             localStorage.setItem('papeleta_user_' + currentUser.id, JSON.stringify(userData));
             
-            // Guardar también en una lista global de usuarios locales para el admin
             let allUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
             const existingIndex = allUsers.findIndex(u => u.discord_id === currentUser.id);
             if(existingIndex >= 0) {
@@ -1167,14 +1148,12 @@
             localStorage.setItem('papeleta_all_users', JSON.stringify(allUsers));
         }
 
-        // ✅ NUEVA FUNCIÓN: Registra al usuario en Firebase si no existe aún
         async function registerUserInFirebase(user) {
             try {
                 const userDocRef = db.collection("UsuariosRegistrados").doc(user.id);
                 const docSnap = await userDocRef.get();
                 
                 if (!docSnap.exists) {
-                    // Es un usuario NUEVO → se crea el documento (+1 automático)
                     await userDocRef.set({
                         discord_id: user.id,
                         username: user.username,
@@ -1184,16 +1163,14 @@
                     });
                     console.log("✅ Nuevo usuario registrado en Firebase:", user.username);
                 } else {
-                    // Ya existe → solo actualizar última conexión
                     await userDocRef.update({
                         last_login: firebase.firestore.FieldValue.serverTimestamp(),
-                        username: user.username, // por si cambió nombre
+                        username: user.username,
                         avatar: user.avatar || null
                     });
                     console.log("🔄 Usuario existente actualizado:", user.username);
                 }
                 
-                // También guardar localmente (para el panel admin local)
                 saveUserDataLocally();
                 
             } catch (error) {
@@ -1201,15 +1178,11 @@
             }
         }
 
-        // --- ESTADÍSTICAS CORREGIDAS ---
-        
-        // ✅ MODIFICADA: Ahora cuenta desde Firebase (global, no local)
         async function loadUserStats() {
             try {
                 const snapshot = await db.collection("UsuariosRegistrados").get();
                 let userCount = snapshot.size;
                 
-                // Empieza en +1 como mínimo (cuenta base del admin)
                 if (userCount === 0) {
                     userCount = 1;
                 }
@@ -1218,7 +1191,6 @@
                 
             } catch (error) {
                 console.error("Error cargando estadísticas de usuarios:", error);
-                // Fallback a localStorage
                 const allUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
                 const uniqueUsers = new Set(allUsers.map(u => u.discord_id));
                 let userCount = uniqueUsers.size || 1;
@@ -1227,15 +1199,11 @@
         }
 
         async function loadSalesStats() {
-            // 2. CLIENTES = Jugadores que compraron (pagaron)
-            // 3. VENTAS = Jugadores que compraron O reclamaron (total de transacciones)
-            
             try {
-                // Obtener todas las compras/reclamaciones desde Firebase Colección "Clientes"
                 const snapshot = await db.collection("Clientes").get();
                 
-                let clientesQueCompraron = new Set(); // IDs únicos de clientes que PAGARON
-                let totalVentas = 0; // Total de transacciones (compras + reclamaciones)
+                let clientesQueCompraron = new Set();
+                let totalVentas = 0;
                 
                 snapshot.forEach((doc) => {
                     const data = doc.data();
@@ -1243,22 +1211,18 @@
                     const status = data.status;
                     const totalPrice = data.total_price;
                     
-                    // Contar cada transacción (venta)
                     totalVentas++;
                     
-                    // Si es un pago (no gratis), contar como cliente
                     if (status === "Pagado" || (totalPrice && totalPrice !== "Gratis" && totalPrice !== "GRATIS")) {
                         clientesQueCompraron.add(discordId);
                     }
                 });
                 
-                // Actualizar estadísticas
                 document.getElementById('stat-clientes').innerText = '+' + clientesQueCompraron.size;
                 document.getElementById('stat-ventas').innerText = '+' + totalVentas;
                 
             } catch (error) {
                 console.error("Error cargando estadísticas:", error);
-                // Fallback a localStorage si hay error
                 const allUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
                 const clientes = allUsers.filter(u => u.role === 'cliente').length;
                 let totalVentas = 0;
@@ -1327,7 +1291,6 @@
                 allUsers[userIndex].role = role;
                 localStorage.setItem('papeleta_all_users', JSON.stringify(allUsers));
                 
-                // Si es el usuario actual, actualizar UI
                 if(currentUser && currentUser.id === discordId) {
                     currentUserRole = role;
                     applyRoleUI();
@@ -1352,10 +1315,8 @@
             if (link) link.classList.add('active-page');
         }
 
-        // --- CARGA DE PRODUCTOS DESDE FIREBASE ---
         async function loadProducts() {
             try {
-                // Obtener productos desde Firebase Collection "Productos"
                 const snapshot = await db.collection("Productos").get();
                 const jsonProducts = [];
                 snapshot.forEach((doc) => {
@@ -1364,7 +1325,6 @@
                 
                 console.log("Productos cargados desde Firebase");
                 
-                // Combinar ambos arrays (prioridad a Firebase)
                 allProducts = [...jsonProducts, ...localProducts];
                 
                 buildCategoryFilters();
@@ -1422,9 +1382,14 @@
                 const priceDisplay = Number(p.price) === 0 ? 'GRATIS' : '$' + Number(p.price).toFixed(2);
                 const priceClass = Number(p.price) === 0 ? 'bg-green-600' : 'bg-red-600';
                 
+                const alreadyOwned = currentUser && myAssignedProductIds.has(p.id);
+                
                 return `
-                <div class="bg-[#150a0a] border border-red-950/40 rounded-2xl overflow-hidden shadow-xl group hover:border-red-600/40 transition-all relative">
+                <div class="bg-[#150a0a] border ${alreadyOwned ? 'border-green-600/50' : 'border-red-950/40'} rounded-2xl overflow-hidden shadow-xl group hover:border-red-600/40 transition-all relative">
                     <span class="absolute top-3 right-3 ${priceClass} text-white text-xs font-bold px-3 py-1 rounded-full z-10">${priceDisplay}</span>
+                    
+                    ${alreadyOwned ? '<span class="absolute top-3 left-3 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full z-10"><i class="fas fa-check mr-1"></i>OBTENIDO</span>' : ''}
+                    
                     <img src="${escapeHTML(p.image_url || '')}" alt="${escapeHTML(p.name)}" class="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300 bg-[#0d0505]">
                     <div class="p-5">
                         <h4 class="text-lg font-bold text-white mb-1">${escapeHTML(p.name)}</h4>
@@ -1432,16 +1397,19 @@
                         ${p.category ? `<span class="inline-block bg-red-950/60 border border-red-800 text-red-300 text-xs font-bold px-2.5 py-1 rounded-md mb-4">${escapeHTML(p.category)}</span>` : ''}
                         
                         <div class="grid grid-cols-2 gap-2">
-                            <button onclick="addToCart('${p.id}')" class="${Number(p.price) === 0 ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'} text-white text-sm font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2">
-                                <i class="fas fa-shopping-cart"></i>
-                                ${Number(p.price) === 0 ? 'Reclamar' : 'Añadir'}
-                            </button>
-                            
-                            <!-- AQUÍ ESTÁ EL CAMBIO: ENLACE A Producto.html -->
-                            <a href="Producto.html?id=${p.id}" class="block w-full bg-[#0d0505] hover:bg-[#150a0a] border border-red-800/50 text-gray-300 text-sm font-semibold py-2.5 rounded-xl transition-all text-center no-underline">
-                                Ver Detalles
-                            </a>
-                            
+                            ${alreadyOwned ? `
+                                <button onclick="openUserDashboard()" class="col-span-2 bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2">
+                                    <i class="fas fa-download"></i> Ya lo tienes - Ver en Biblioteca
+                                </button>
+                            ` : `
+                                <button onclick="addToCart('${p.id}')" class="${Number(p.price) === 0 ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'} text-white text-sm font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2">
+                                    <i class="fas fa-shopping-cart"></i>
+                                    ${Number(p.price) === 0 ? 'Reclamar' : 'Añadir'}
+                                </button>
+                                <a href="Producto.html?id=${p.id}" class="block w-full bg-[#0d0505] hover:bg-[#150a0a] border border-red-800/50 text-gray-300 text-sm font-semibold py-2.5 rounded-xl transition-all text-center no-underline">
+                                    Ver Detalles
+                                </a>
+                            `}
                         </div>
                         
                         ${isAdmin(currentUser) ? `
@@ -1459,19 +1427,14 @@
             );
         }
 
-        // --- REDIRECCIÓN A ÁREA DE CLIENTE ---
         function openUserDashboard() {
             if (!currentUser) {
                 openLoginModal();
                 return;
             }
-            // Redirigir al archivo externo
             window.location.href = 'AreaCliente.html';
         }
 
-        // --- LICENCIAS (Funciones necesarias para el flujo de compra) ---
-        
-        // Función para generar una key única de 20 caracteres
         function generateUniqueKey() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             let key = '';
@@ -1481,11 +1444,9 @@
             return key;
         }
 
-        // Función para crear licencia (reemplaza la que tienes en index.html)
         async function createLicenseForProduct(productId, productName) {
             if (!currentUser) return null;
             try {
-                // Generar key única para este jugador
                 const uniqueKey = generateUniqueKey();
                 
                 const licenseData = {
@@ -1493,7 +1454,7 @@
                     username: currentUser.username,
                     product_id: productId,
                     product_name: productName,
-                    key: uniqueKey, // Key única tipo "UXETPDX351S76JI6APTF7C"
+                    key: uniqueKey,
                     created_at: firebase.firestore.FieldValue.serverTimestamp(),
                     status: 'active'
                 };
