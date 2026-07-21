@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Area De Clientes</title>
+    <title>Area De Clientes | Papeleta Store</title>
     <!-- Icono Rojo -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff1a1a'/%3E%3Cstop offset='1' stop-color='%23cc1b1b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Ctext x='50' y='70' font-family='Arial, sans-serif' font-size='58' font-weight='900' fill='white' text-anchor='middle'%3EP%3C/text%3E%3C/svg%3E">
 
@@ -22,7 +22,6 @@
         }
         
         body {
-            /* Fondo oscuro de la tienda */
             background: linear-gradient(135deg, #050507 0%, #150a0a 100%);
             color: #e2e8f0;
         }
@@ -111,6 +110,24 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #ef4444; 
         }
+
+        /* Estilos para el Modal de Server.lua */
+        .lua-modal {
+            position: fixed; inset: 0; z-index: 100;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
+            display: none; align-items: center; justify-content: center; padding: 20px;
+        }
+        .lua-modal.active { display: flex; }
+        .lua-code-container {
+            max-height: 70vh; overflow-y: auto;
+            background: #0d0505; border: 1px solid #7f1d1d;
+            border-radius: 12px; padding: 20px; width: 100%; max-width: 900px;
+        }
+        .lua-pre {
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #ff6b6b; font-size: 13px; line-height: 1.6;
+            white-space: pre-wrap; word-break: break-all;
+        }
     </style>
 </head>
 <body class="min-h-screen flex">
@@ -141,6 +158,12 @@
                 <a href="#" onclick="showSection('reviews')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
                     <i class="fas fa-star w-5"></i>
                     <span>Mis Reseñas</span>
+                </a>
+                
+                <!-- NUEVO BOTÓN SERVER.LUA -->
+                <a href="#" onclick="openLuaModal()" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:text-red-400">
+                    <i class="fas fa-file-code w-5"></i>
+                    <span>Server.Lua</span>
                 </a>
                 
                 <a href="#" onclick="showSection('support')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
@@ -280,7 +303,7 @@
                         <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
                             <i class="fas fa-server text-red-400"></i>
                         </div>
-                        <h2 class="text-lg font-bold text-white">Configuracion MTA</h2>
+                        <h2 class="text-lg font-bold text-white">Configuración MTA</h2>
                     </div>
 
                     <div class="space-y-4 mb-6">
@@ -297,7 +320,7 @@
 
                     <div class="mb-6">
                         <div class="flex items-center justify-between mb-2">
-                            <label class="block text-gray-400 text-xs uppercase font-semibold tracking-wider">Codigo de Licencia</label>
+                            <label class="block text-gray-400 text-xs uppercase font-semibold tracking-wider">Código de Licencia</label>
                             <span class="text-[10px] text-red-400 font-mono bg-red-900/20 px-2 py-0.5 rounded">LUA CONFIG</span>
                         </div>
                         <div class="code-block rounded-lg p-4 font-mono text-sm relative group">
@@ -326,6 +349,26 @@
             </div>
         </div>
     </main>
+
+    <!-- MODAL SERVER.LUA -->
+    <div id="lua-modal" class="lua-modal">
+        <div class="lua-code-container relative">
+            <button onclick="closeLuaModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="flex items-center justify-between mb-4 pb-4 border-b border-red-900/30">
+                <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                    <i class="fas fa-file-code text-red-500"></i> Server.Lua - Sistema de Validación
+                </h3>
+                <button onclick="copyLuaCode()" class="btn-primary px-4 py-2 rounded-lg text-white text-sm font-bold flex items-center gap-2">
+                    <i class="fas fa-copy"></i> Copiar Código
+                </button>
+            </div>
+            
+            <pre id="lua-code-content" class="lua-pre"></pre>
+        </div>
+    </div>
 
     <!-- LOGIN MODAL -->
     <div id="login-modal" class="hidden fixed inset-0 bg-black/90 z-[60] flex items-center justify-center px-4 backdrop-blur-sm">
@@ -368,8 +411,131 @@
 
         let currentUser = null;
         let allProducts = [];
-        let myAssignedProductIds = new Set();
-        let userFixedLicenseKey = null; // Variable para guardar la licencia fija
+        let userFixedLicenseKey = null;
+
+        // --- CÓDIGO LUA COMPLETO ---
+        const SERVER_LUA_CODE = `local function clean(s)
+    if not s then return "" end
+    return tostring(s):gsub("%s+", ""):upper()
+end
+
+local function tienePermisoACL()
+    local resourceName = getResourceName(getThisResource())
+    local resObj = "resource." .. resourceName
+    
+    if not isObjectInACLGroup(resObj, aclGetGroup("Admin")) then
+        outputDebugString("[Papeleta Progamador] El resource '"..resourceName.."' NO tiene permiso en ACL 'Admin'", 1)
+        return false
+    end
+    return true
+end
+
+local function cargarScriptPrincipal()
+    if _G["ScriptYaCargado"] then return end
+    _G["ScriptYaCargado"] = true
+end
+
+local function validarLicencia()
+    if not configLicense or not configLicense["User"] or not configLicense["Key"] then
+        outputDebugString("[Papeleta Progamador] Faltan credenciales en config", 1)
+        stopResource(getThisResource())
+        return
+    end
+
+    local userLocal = clean(configLicense["User"])
+    local keyLocal = clean(configLicense["Key"])
+    local resourceName = clean(getResourceName(getThisResource()))
+    local portActual = tostring(getServerPort() or 22003)
+    
+    fetchRemote("https://api.ipify.org?format=json", function(ipData, ipErr)
+        local ipActual = ""
+        if ipErr == 0 then
+            local ipTable = fromJSON(ipData)
+            if ipTable and ipTable.ip then
+                ipActual = clean(ipTable.ip)
+            end
+        end
+        
+        if ipActual == "" or ipActual == "0.0.0.0" then
+            ipActual = clean(getServerConfigSetting("serverip") or "")
+            if ipActual == "auto" or ipActual == "" then
+                outputDebugString("[Papeleta Progamador] ADVERTENCIA: No se pudo detectar IP automáticamente", 2)
+            end
+        end
+        
+        local ipPortCompleto = ipActual .. ":" .. portActual
+        validarConFirebase(ipPortCompleto, userLocal, keyLocal, resourceName)
+    end)
+end
+
+function validarConFirebase(ipPortCompleto, userLocal, keyLocal, resourceName)
+    local urlBase = "https://firestore.googleapis.com/v1/projects/licenciapapeleta12/databases/(default)/documents/licencias"
+    
+    fetchRemote(urlBase, function(data, err)
+        if err ~= 0 then
+            outputDebugString("[Papeleta Progamador] Fallo de conexión a Firestore", 1)
+            stopResource(getThisResource())
+            return
+        end
+
+        local db = fromJSON(data)
+        local autorizado = false
+        local keyEncontradaPeroMalSistema = false
+
+        if db and db.documents then
+            for _, doc in ipairs(db.documents) do
+                local f = doc.fields
+                if f and f.user and f.key and f.ip and f.port and f.active and f.resource then
+                    local fireUser = clean(f.user.stringValue)
+                    local fireKey = clean(f.key.stringValue)
+                    local fireIp   = clean(f.ip.stringValue)
+                    local firePort = clean(f.port.stringValue)
+                    local fireResource = clean(f.resource.stringValue)
+                    local fireIpPort = fireIp .. ":" .. firePort
+                    local fireStatus = f.active.booleanValue
+
+                    if fireKey == keyLocal then
+                        if fireResource == resourceName then
+                            if fireUser == userLocal and fireIpPort == ipPortCompleto and fireStatus == true then
+                                autorizado = true
+                            end
+                        else
+                            keyEncontradaPeroMalSistema = true
+                            outputDebugString("[Papeleta Progamador] ERROR: Key válida pero pertenece al sistema '" .. fireResource .. "'", 1)
+                            outputDebugString("[Papeleta Progamador] Este sistema es '" .. resourceName .. "'. Licencia denegada.", 1)
+                        end
+                        break
+                    end
+                end
+            end
+        end
+
+        if autorizado then
+            if not _G["ScriptYaCargado"] then
+                outputDebugString("[Papeleta Progamador] LICENCIA VERIFICADA EXITOSAMENTE", 3)
+                cargarScriptPrincipal()
+            end
+        else
+            if keyEncontradaPeroMalSistema then
+                outputDebugString("[Papeleta Progamador] LICENCIA NO VALIDAD", 1)
+            else
+                outputDebugString("[Papeleta Progamador] LICENCIA NO VERIFICADA ", 1)
+            end
+            stopResource(getThisResource())
+        end
+    end)
+end
+
+addEventHandler("onResourceStart", resourceRoot, function()
+    if not tienePermisoACL() then
+        cancelEvent(true, "[Papeleta] Resource sin permiso en ACL 'Admin'")
+        setTimer(function() stopResource(getThisResource()) end, 50, 1)
+        return
+    end
+    outputDebugString("[Papeleta Progamador] INICIANDO VERIFICACION DE LICENCIA", 3)
+    validarLicencia()
+    setTimer(validarLicencia, 8996400000, 0)
+end, true, "high")`;
 
         // --- AUTH FUNCTIONS ---
         function redirectToDiscord() {
@@ -417,7 +583,6 @@
                 
                 document.getElementById('login-modal').classList.add('hidden');
                 
-                // Primero aseguramos la licencia fija, luego cargamos el resto
                 ensureFixedLicense().then(() => {
                     loadDashboardData();
                     updateLicenseDisplay();
@@ -441,6 +606,32 @@
             }
         }
 
+        // --- FUNCIONES MODAL SERVER.LUA ---
+        function openLuaModal() {
+            document.getElementById('lua-code-content').textContent = SERVER_LUA_CODE;
+            document.getElementById('lua-modal').classList.add('active');
+        }
+
+        function closeLuaModal() {
+            document.getElementById('lua-modal').classList.remove('active');
+        }
+
+        function copyLuaCode() {
+            navigator.clipboard.writeText(SERVER_LUA_CODE).then(() => {
+                const btn = event.currentTarget;
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> ¡Copiado!';
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                }, 2000);
+            });
+        }
+
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('lua-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeLuaModal();
+        });
+
         // --- LICENCIA FIJA GLOBAL ---
         function generateUniqueKey() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; 
@@ -453,7 +644,6 @@
             if (!currentUser) return;
             
             try {
-                // Buscar si ya tiene una licencia de tipo 'general'
                 const snapshot = await db.collection("Licencias")
                     .where("discord_id", "==", currentUser.id)
                     .where("type", "==", "general")
@@ -461,11 +651,9 @@
                     .get();
                 
                 if (!snapshot.empty) {
-                    // Ya tiene licencia fija, la guardamos
                     const doc = snapshot.docs[0];
                     userFixedLicenseKey = doc.data().key;
                 } else {
-                    // No tiene, creamos una nueva PERMANENTE
                     const newKey = generateUniqueKey();
                     const licenseData = {
                         discord_id: currentUser.id,
@@ -473,7 +661,7 @@
                         product_id: "GENERAL_ACCESS",
                         product_name: "Licencia Global Papeleta Store",
                         key: newKey,
-                        type: "general", // Marcador especial
+                        type: "general",
                         created_at: firebase.firestore.FieldValue.serverTimestamp(),
                         status: 'active'
                     };
@@ -490,10 +678,13 @@
             const codeBlock = document.getElementById('license-code');
             
             if (userFixedLicenseKey && currentUser) {
-                const code = `
+                const code = `-- Configuración de Licencia Papeleta Store
+-- Usuario: ${currentUser.username}
+-- ID: ${currentUser.id}
+
 configLicense = {
-["User"] = "${currentUser.username}", 
-["Key"] = "PapeletaStore(${userFixedLicenseKey})"
+    ["User"] = "${currentUser.username}", 
+    ["Key"] = "PapeletaStore(${userFixedLicenseKey})"
 }`;
                 codeBlock.textContent = code;
             } else {
@@ -506,14 +697,12 @@ configLicense = {
             if (!currentUser) return;
 
             try {
-                // Cargar productos disponibles
                 const productsSnapshot = await db.collection("Productos").get();
                 allProducts = [];
                 productsSnapshot.forEach((doc) => {
                     allProducts.push({ id: doc.id, ...doc.data() });
                 });
 
-                // Consultar compras
                 const clientesSnapshot = await db.collection("Clientes").get();
                 
                 let purchasedProducts = [];
@@ -554,7 +743,6 @@ configLicense = {
                     }
                 });
 
-                // Actualizar UI Stats
                 document.getElementById('stat-total-spent').innerText = '$' + totalSpent.toFixed(2);
                 document.getElementById('stat-active-scripts').innerText = purchasedProducts.length;
                 
