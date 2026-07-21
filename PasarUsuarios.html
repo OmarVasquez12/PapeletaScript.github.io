@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asignar Productos | Papeleta Store</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff1a1a'/%3E%3Cstop offset='1' stop-color='%23cc1b1b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Ctext x='50' y='70' font-family='Arial, sans-serif' font-size='58' font-weight='900' fill='white' text-anchor='middle'%3EP%3C/text%3E%3C/svg%3E">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #050507;
+            --card-bg: rgba(20, 10, 10, 0.6);
+            --primary: #ff1a1a;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #150a0a 0%, #0a0505 100%);
+            color: #f3f4f6;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #111111; }
+        ::-webkit-scrollbar-thumb { background: #6e6e6e; border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: #858585; }
+
+        .glass-panel {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 26, 26, 0.2);
+            border-radius: 16px;
+        }
+
+        .user-item {
+            background: rgba(13, 5, 5, 0.6);
+            border: 1px solid rgba(255, 26, 26, 0.15);
+            border-radius: 10px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .user-item:hover {
+            border-color: rgba(255, 26, 26, 0.4);
+            background: rgba(255, 26, 26, 0.05);
+        }
+        .user-item.selected {
+            border-color: #dc2626;
+            background: rgba(220, 38, 38, 0.1);
+            box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.3);
+        }
+
+        .product-card {
+            background: rgba(13, 5, 5, 0.6);
+            border: 2px solid rgba(255, 26, 26, 0.2);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .product-card:hover {
+            border-color: rgba(255, 26, 26, 0.5);
+            transform: translateY(-2px);
+        }
+        .product-card.selected {
+            border-color: #22c55e;
+            background: rgba(34, 197, 94, 0.1);
+            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3);
+        }
+
+        .btn-assign {
+            background: linear-gradient(to right, #16a34a, #15803d);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(22, 163, 74, 0.3);
+        }
+        .btn-assign:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(22, 163, 74, 0.5);
+        }
+    </style>
+</head>
+<body class="relative">
+
+    <!-- Header -->
+    <header class="bg-[#0d0505]/90 backdrop-blur border-b border-red-900/30 sticky top-0 z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-red-500 to-red-800 flex items-center justify-center font-black text-white">P</div>
+                <div>
+                    <h1 class="text-white font-black tracking-wider text-lg">PAPELETA <span class="text-red-400">STORE</span></h1>
+                    <p class="text-gray-400 text-xs">Asignar Productos a Usuarios</p>
+                </div>
+            </div>
+            <a href="index.html" class="text-gray-400 hover:text-white text-sm flex items-center gap-2 transition-colors">
+                <i class="fas fa-arrow-left"></i> Volver a la Tienda
+            </a>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="max-w-7xl mx-auto px-6 py-10">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- Paso 1: Seleccionar Usuario -->
+            <div class="glass-panel p-6">
+                <h2 class="text-2xl font-black text-white mb-4 flex items-center gap-2">
+                    <i class="fas fa-user text-red-500"></i>
+                    1. Seleccionar Usuario
+                </h2>
+                
+                <div class="mb-4">
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                        <input type="text" id="search-user" oninput="filterUsers()" 
+                            placeholder="Buscar usuario por nombre o Discord ID..." 
+                            class="w-full bg-[#0d0505] border border-red-950/40 rounded-xl pl-12 pr-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition-colors">
+                    </div>
+                </div>
+
+                <div id="users-list" class="space-y-2 max-h-96 overflow-y-auto custom-scrollbar">
+                    <div class="text-center py-8 text-gray-400">
+                        <i class="fas fa-spinner animate-spin text-2xl mb-2"></i>
+                        <p>Cargando usuarios...</p>
+                    </div>
+                </div>
+
+                <div id="selected-user-info" class="hidden mt-4 p-4 bg-green-600/10 border border-green-600/30 rounded-xl">
+                    <p class="text-green-400 text-sm font-semibold">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        Usuario seleccionado: <span id="selected-username" class="font-bold"></span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Paso 2: Seleccionar Producto -->
+            <div class="glass-panel p-6">
+                <h2 class="text-2xl font-black text-white mb-4 flex items-center gap-2">
+                    <i class="fas fa-box text-red-500"></i>
+                    2. Seleccionar Producto
+                </h2>
+
+                <div id="products-list" class="space-y-3 max-h-96 overflow-y-auto custom-scrollbar mb-6">
+                    <div class="text-center py-8 text-gray-400">
+                        <i class="fas fa-spinner animate-spin text-2xl mb-2"></i>
+                        <p>Cargando productos...</p>
+                    </div>
+                </div>
+
+                <!-- Botón Asignar -->
+                <button id="btn-assign" onclick="assignProduct()" 
+                    class="btn-assign w-full py-4 rounded-xl text-white font-bold text-lg flex items-center justify-center gap-3 opacity-50 cursor-not-allowed" 
+                    disabled>
+                    <i class="fas fa-gift"></i>
+                    Asignar Producto Gratis
+                </button>
+
+                <p class="text-gray-400 text-xs mt-3 text-center">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    El producto se asignará como GRATIS al usuario seleccionado
+                </p>
+            </div>
+        </div>
+
+        <!-- Historial de Asignaciones Recientes -->
+        <div class="glass-panel p-6 mt-8">
+            <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                <i class="fas fa-history text-red-500"></i>
+                Asignaciones Recientes
+            </h3>
+            <div id="recent-assignments" class="space-y-2">
+                <p class="text-gray-500 text-sm text-center py-4">No hay asignaciones recientes</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
+            authDomain: "papeletalicencia.firebaseapp.com",
+            databaseURL: "https://papeletalicencia-default-rtdb.firebaseio.com",
+            projectId: "papeletalicencia",
+            storageBucket: "papeletalicencia.firebasestorage.app",
+            messagingSenderId: "677208314051",
+            appId: "1:677208314051:web:a27c04f31d402e83f29276"
+        };
+
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let allUsers = [];
+        let allProducts = [];
+        let selectedUser = null;
+        let selectedProduct = null;
+        let recentAssignments = [];
+
+        // Cargar datos
+        async function loadData() {
+            await Promise.all([
+                loadUsers(),
+                loadProducts(),
+                loadRecentAssignments()
+            ]);
+        }
+
+        async function loadUsers() {
+            try {
+                // Cargar desde Firestore - Usuarios Registrados
+                const usersSnapshot = await db.collection("UsuariosRegistrados").get();
+                allUsers = [];
+                usersSnapshot.forEach((doc) => {
+                    allUsers.push(doc.data());
+                });
+
+                // También cargar desde Clientes (por si hay usuarios que compraron pero no están en UsuariosRegistrados)
+                const clientesSnapshot = await db.collection("Clientes").get();
+                const clientIds = new Set();
+                clientesSnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    if (!clientIds.has(data.discord_id)) {
+                        clientIds.add(data.discord_id);
+                        // Verificar si no está ya en allUsers
+                        const exists = allUsers.find(u => u.discord_id === data.discord_id);
+                        if (!exists) {
+                            allUsers.push({
+                                discord_id: data.discord_id,
+                                username: data.username,
+                                avatar: data.avatar
+                            });
+                        }
+                    }
+                });
+
+                renderUsers();
+            } catch (error) {
+                console.error("Error loading users:", error);
+                document.getElementById('users-list').innerHTML = `
+                    <div class="text-center py-8 text-red-400">
+                        <i class="fas fa-exclamation-triangle text-2xl mb-2"></i>
+                        <p>Error al cargar usuarios</p>
+                    </div>`;
+            }
+        }
+
+        async function loadProducts() {
+            try {
+                const productsSnapshot = await db.collection("Productos").get();
+                allProducts = [];
+                productsSnapshot.forEach((doc) => {
+                    allProducts.push(doc.data());
+                });
+                renderProducts();
+            } catch (error) {
+                console.error("Error loading products:", error);
+                document.getElementById('products-list').innerHTML = `
+                    <div class="text-center py-8 text-red-400">
+                        <i class="fas fa-exclamation-triangle text-2xl mb-2"></i>
+                        <p>Error al cargar productos</p>
+                    </div>`;
+            }
+        }
+
+        async function loadRecentAssignments() {
+            try {
+                // Cargar las últimas asignaciones (Clientes con status "Reclamado Exitosamente" o "Asignado")
+                const snapshot = await db.collection("Clientes")
+                    .orderBy('date', 'desc')
+                    .limit(10)
+                    .get();
+                
+                recentAssignments = [];
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    if (data.status === 'Reclamado Exitosamente' || data.status === 'Asignado Manualmente') {
+                        recentAssignments.push(data);
+                    }
+                });
+
+                renderRecentAssignments();
+            } catch (error) {
+                console.error("Error loading recent assignments:", error);
+            }
+        }
+
+        function renderUsers() {
+            const container = document.getElementById('users-list');
+            const searchTerm = document.getElementById('search-user').value.toLowerCase();
+
+            const filteredUsers = allUsers.filter(user => {
+                const username = (user.username || '').toLowerCase();
+                const discordId = (user.discord_id || '').toLowerCase();
+                return username.includes(searchTerm) || discordId.includes(searchTerm);
+            });
+
+            if (filteredUsers.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-user-slash text-2xl mb-2"></i>
+                        <p>No se encontraron usuarios</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = filteredUsers.map(user => `
+                <div class="user-item ${selectedUser && selectedUser.discord_id === user.discord_id ? 'selected' : ''}" 
+                     onclick="selectUser('${user.discord_id}')">
+                    <div class="flex items-center gap-3">
+                        <img src="${user.avatar ? `https://cdn.discordapp.com/avatars/${user.discord_id}/${user.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png'}" 
+                            alt="${user.username}" 
+                            class="w-10 h-10 rounded-full border border-red-500">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-white font-semibold text-sm truncate">${escapeHTML(user.username || 'Usuario sin nombre')}</p>
+                            <p class="text-gray-500 text-xs font-mono">${user.discord_id}</p>
+                        </div>
+                        ${selectedUser && selectedUser.discord_id === user.discord_id ? 
+                            '<i class="fas fa-check-circle text-green-500"></i>' : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderProducts() {
+            const container = document.getElementById('products-list');
+
+            if (allProducts.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-box-open text-2xl mb-2"></i>
+                        <p>No hay productos disponibles</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = allProducts.map(product => `
+                <div class="product-card ${selectedProduct && selectedProduct.id === product.id ? 'selected' : ''}" 
+                     onclick="selectProduct('${product.id}')">
+                    <div class="p-4">
+                        <div class="flex items-start gap-3">
+                            <img src="${product.image_url || 'https://via.placeholder.com/60'}" 
+                                alt="${product.name}" 
+                                class="w-16 h-16 rounded-lg object-cover border border-red-900/30">
+                            <div class="flex-1 min-w-0">
+                                <h4 class="text-white font-bold text-sm mb-1 truncate">${escapeHTML(product.name)}</h4>
+                                <p class="text-gray-400 text-xs mb-2 line-clamp-2">${escapeHTML(product.description || 'Sin descripción')}</p>
+                                <div class="flex items-center gap-2">
+                                    <span class="${Number(product.price) === 0 ? 'text-green-400' : 'text-red-400'} text-sm font-bold">
+                                        ${Number(product.price) === 0 ? 'GRATIS' : '$' + Number(product.price).toFixed(2)}
+                                    </span>
+                                    <span class="text-gray-600 text-xs">•</span>
+                                    <span class="text-gray-500 text-xs">${escapeHTML(product.category || 'General')}</span>
+                                </div>
+                            </div>
+                            ${selectedProduct && selectedProduct.id === product.id ? 
+                                '<i class="fas fa-check-circle text-green-500 self-center"></i>' : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectUser(discordId) {
+            selectedUser = allUsers.find(u => u.discord_id === discordId);
+            
+            if (selectedUser) {
+                document.getElementById('selected-username').textContent = selectedUser.username;
+                document.getElementById('selected-user-info').classList.remove('hidden');
+            }
+            
+            renderUsers();
+            updateAssignButton();
+        }
+
+        function selectProduct(productId) {
+            selectedProduct = allProducts.find(p => p.id === productId);
+            renderProducts();
+            updateAssignButton();
+        }
+
+        function updateAssignButton() {
+            const btn = document.getElementById('btn-assign');
+            
+            if (selectedUser && selectedProduct) {
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                btn.innerHTML = `
+                    <i class="fas fa-gift"></i>
+                    Asignar "${escapeHTML(selectedProduct.name)}" a ${escapeHTML(selectedUser.username)}
+                `;
+            } else {
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+                btn.innerHTML = `
+                    <i class="fas fa-gift"></i>
+                    Asignar Producto Gratis
+                `;
+            }
+        }
+
+        async function assignProduct() {
+            if (!selectedUser || !selectedProduct) {
+                alert('❌ Debes seleccionar un usuario y un producto');
+                return;
+            }
+
+            if (!confirm(`¿Estás seguro de asignar el producto "${selectedProduct.name}" al usuario ${selectedUser.username} de forma GRATIS?`)) {
+                return;
+            }
+
+            try {
+                // 1. Generar licencia
+                const licenseKey = generateUniqueKey();
+                await db.collection("Licencias").add({
+                    discord_id: selectedUser.discord_id,
+                    username: selectedUser.username,
+                    product_id: selectedProduct.id,
+                    product_name: selectedProduct.name,
+                    key: licenseKey,
+                    created_at: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'active',
+                    assigned_by: 'admin_manual',
+                    assigned_at: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // 2. Registrar en Clientes
+                await db.collection("Clientes").add({
+                    discord_id: selectedUser.discord_id,
+                    username: selectedUser.username,
+                    avatar: selectedUser.avatar,
+                    products: [{
+                        id: selectedProduct.id,
+                        name: selectedProduct.name,
+                        price: "Gratis (Asignado Manualmente)"
+                    }],
+                    total_price: "Gratis",
+                    date: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: "Asignado Manualmente",
+                    assigned_by_admin: true
+                });
+
+                alert(`✅ Producto asignado exitosamente!\n\nUsuario: ${selectedUser.username}\nProducto: ${selectedProduct.name}\nLicencia: ${licenseKey}`);
+
+                // Limpiar selección
+                selectedUser = null;
+                selectedProduct = null;
+                document.getElementById('selected-user-info').classList.add('hidden');
+                renderUsers();
+                renderProducts();
+                updateAssignButton();
+
+                // Recargar datos
+                await loadData();
+
+            } catch (error) {
+                console.error("Error assigning product:", error);
+                alert('❌ Error al asignar el producto: ' + error.message);
+            }
+        }
+
+        function renderRecentAssignments() {
+            const container = document.getElementById('recent-assignments');
+
+            if (recentAssignments.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">No hay asignaciones recientes</p>';
+                return;
+            }
+
+            container.innerHTML = recentAssignments.map(assignment => `
+                <div class="flex items-center gap-3 bg-[#0d0505] border border-red-950/30 rounded-lg px-4 py-3">
+                    <img src="${assignment.avatar ? `https://cdn.discordapp.com/avatars/${assignment.discord_id}/${assignment.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png'}" 
+                        class="w-8 h-8 rounded-full">
+                    <div class="flex-1 min-w-0">
+                        <p class="text-white text-sm font-semibold truncate">${escapeHTML(assignment.username)}</p>
+                        <p class="text-gray-500 text-xs truncate">
+                            ${assignment.products ? assignment.products.map(p => p.name).join(', ') : 'Producto'}
+                        </p>
+                    </div>
+                    <span class="text-xs text-gray-500">
+                        ${assignment.date ? new Date(assignment.date.seconds * 1000).toLocaleDateString('es-ES') : ''}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        function filterUsers() {
+            renderUsers();
+        }
+
+        function generateUniqueKey() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let key = '';
+            for (let i = 0; i < 20; i++) {
+                key += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return key;
+        }
+
+        function escapeHTML(str) {
+            return String(str).replace(/[&<>'"]/g, tag => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+            }[tag] || tag));
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+        });
+    </script>
+</body>
+</html>
