@@ -11,10 +11,11 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        * { font-family: 'Inter', sans-serif; }
+        * { font-family: 'Inter', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: linear-gradient(135deg, #050507 0%, #150a0a 100%);
             color: #e2e8f0;
+            min-height: 100vh;
         }
         .card {
             background: rgba(21, 10, 10, 0.6);
@@ -24,23 +25,30 @@
         .input-field {
             background: rgba(13, 5, 5, 0.8);
             border: 1px solid rgba(255, 26, 26, 0.2);
+            transition: all 0.3s ease;
         }
         .input-field:focus {
             border-color: #ff1a1a;
             outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 26, 26, 0.1);
         }
         .btn-primary {
             background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
             transition: all 0.3s ease;
         }
-        .btn-primary:hover {
+        .btn-primary:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(220, 38, 38, 0.3);
+        }
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
         .upload-zone {
             border: 2px dashed rgba(255, 26, 26, 0.3);
             background: rgba(255, 26, 26, 0.02);
             transition: all 0.3s ease;
+            cursor: pointer;
         }
         .upload-zone:hover {
             border-color: rgba(255, 26, 26, 0.6);
@@ -52,26 +60,38 @@
         }
         .product-item {
             transition: all 0.3s ease;
+            animation: slideIn 0.3s ease;
         }
         .product-item:hover {
             background: rgba(255, 26, 26, 0.05);
             transform: translateX(4px);
         }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .loading-spinner {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
-<body class="min-h-screen p-6">
+<body class="p-4 md:p-8">
 
 <div class="max-w-7xl mx-auto">
     <!-- Header -->
     <div class="flex items-center justify-between mb-8">
         <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center font-black text-white text-xl">P</div>
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center font-black text-white text-xl shadow-lg">P</div>
             <div>
                 <h1 class="text-2xl font-bold text-white">PAPELETA <span class="text-red-500">STORE</span></h1>
                 <p class="text-gray-400 text-sm">Panel de Administración</p>
             </div>
         </div>
-        <a href="AreaCliente.html" class="px-4 py-2 rounded-lg border border-red-600/30 text-red-400 hover:bg-red-600/10 transition-colors">
+        <a href="AreaCliente.html" class="px-4 py-2 rounded-lg border border-red-600/30 text-red-400 hover:bg-red-600/10 transition-colors text-sm font-semibold">
             <i class="fas fa-arrow-left mr-2"></i>Volver al Panel
         </a>
     </div>
@@ -88,13 +108,13 @@
                 <div>
                     <label class="block text-gray-300 text-sm font-semibold mb-2">Nombre del Producto *</label>
                     <input type="text" id="product-name" required
-                        class="input-field w-full rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none"
+                        class="input-field w-full rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500"
                         placeholder="Ej: Script de AutoFarm">
                 </div>
                 <div>
                     <label class="block text-gray-300 text-sm font-semibold mb-2">Precio (USD) *</label>
                     <input type="number" id="product-price" required min="0" step="0.01"
-                        class="input-field w-full rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none"
+                        class="input-field w-full rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500"
                         placeholder="0.00">
                 </div>
             </div>
@@ -102,7 +122,7 @@
             <div>
                 <label class="block text-gray-300 text-sm font-semibold mb-2">Categoría *</label>
                 <select id="product-category" required
-                    class="input-field w-full rounded-xl px-4 py-3 text-sm text-white focus:outline-none">
+                    class="input-field w-full rounded-xl px-4 py-3 text-sm text-white">
                     <option value="">Seleccionar categoría...</option>
                     <option value="Scripts">Scripts</option>
                     <option value="Modelajes">Modelajes</option>
@@ -114,33 +134,34 @@
             </div>
 
             <div>
-                <label class="block text-gray-300 text-sm font-semibold mb-2">Descripción/Detalle *</label>
+                <label class="block text-gray-300 text-sm font-semibold mb-2">Descripción *</label>
                 <textarea id="product-description" required rows="3"
-                    class="input-field w-full rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none resize-none"
+                    class="input-field w-full rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 resize-none"
                     placeholder="Describe las características del producto..."></textarea>
             </div>
 
             <div>
                 <label class="block text-gray-300 text-sm font-semibold mb-2">Link de YouTube (Opcional)</label>
                 <input type="url" id="product-youtube"
-                    class="input-field w-full rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none"
+                    class="input-field w-full rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500"
                     placeholder="https://youtube.com/watch?v=...">
             </div>
 
             <div>
-                <label class="block text-gray-300 text-sm font-semibold mb-2">Fotos del Producto (Múltiples) *</label>
-                <div class="upload-zone rounded-xl p-8 text-center cursor-pointer" onclick="document.getElementById('product-images').click()">
+                <label class="block text-gray-300 text-sm font-semibold mb-2">Imágenes del Producto *</label>
+                <div class="upload-zone rounded-xl p-6 text-center" onclick="document.getElementById('product-images').click()">
                     <i class="fas fa-images text-4xl text-red-400 mb-3"></i>
                     <p class="text-white font-semibold mb-1">Haz clic para agregar imágenes</p>
-                    <p class="text-gray-400 text-xs">Puedes seleccionar varias imágenes a la vez</p>
+                    <p class="text-gray-400 text-xs">Puedes seleccionar varias imágenes</p>
                     <input type="file" id="product-images" multiple accept="image/*" class="hidden" onchange="handleImageSelect(event)">
                 </div>
                 <div id="image-preview-container" class="grid grid-cols-4 gap-3 mt-3"></div>
+                <p id="image-count" class="text-gray-400 text-xs mt-2">0 imágenes seleccionadas</p>
             </div>
 
             <div>
                 <label class="block text-gray-300 text-sm font-semibold mb-2">Archivo del Producto (Zip/Rar/Lua) *</label>
-                <div class="upload-zone rounded-xl p-6 text-center cursor-pointer" onclick="document.getElementById('product-file').click()">
+                <div class="upload-zone rounded-xl p-6 text-center" onclick="document.getElementById('product-file').click()">
                     <i class="fas fa-file-archive text-3xl text-red-400 mb-2"></i>
                     <p class="text-white font-semibold">Haz clic para subir el archivo</p>
                     <p class="text-gray-400 text-xs mt-1">Formatos: .zip, .rar, .lua</p>
@@ -152,7 +173,7 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn-primary w-full py-4 rounded-xl text-white font-bold text-lg flex items-center justify-center gap-2">
+            <button type="submit" id="submit-btn" class="btn-primary w-full py-4 rounded-xl text-white font-bold text-lg flex items-center justify-center gap-2">
                 <i class="fas fa-save"></i>
                 Agregar Producto a la Tienda
             </button>
@@ -166,10 +187,7 @@
             Productos en la Tienda
         </h2>
         <div id="products-list" class="space-y-3">
-            <div class="text-center py-12 text-gray-400">
-                <i class="fas fa-spinner fa-spin text-3xl mb-3"></i>
-                <p>Cargando productos...</p>
-            </div>
+            <!-- Los productos se cargarán aquí -->
         </div>
     </div>
 </div>
@@ -185,7 +203,10 @@
         appId: "1:677208314051:web:a27c04f31d402e83f29276"
     };
 
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    // Inicializar Firebase
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
     const db = firebase.firestore();
     const storage = firebase.storage();
 
@@ -198,6 +219,7 @@
         selectedImages = files;
         
         const container = document.getElementById('image-preview-container');
+        const countEl = document.getElementById('image-count');
         container.innerHTML = '';
         
         files.forEach((file, index) => {
@@ -215,12 +237,16 @@
             };
             reader.readAsDataURL(file);
         });
+        
+        countEl.textContent = `${files.length} imagen${files.length !== 1 ? 'es' : ''} seleccionada${files.length !== 1 ? 's' : ''}`;
     }
 
     function removeImage(index) {
         selectedImages.splice(index, 1);
         const container = document.getElementById('image-preview-container');
+        const countEl = document.getElementById('image-count');
         container.innerHTML = '';
+        
         selectedImages.forEach((file, idx) => {
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -236,6 +262,8 @@
             };
             reader.readAsDataURL(file);
         });
+        
+        countEl.textContent = `${selectedImages.length} imagen${selectedImages.length !== 1 ? 'es' : ''} seleccionada${selectedImages.length !== 1 ? 's' : ''}`;
     }
 
     // Manejar selección de archivo
@@ -251,20 +279,20 @@
     // Subir archivo a Firebase Storage
     async function uploadFile(file, productName) {
         const timestamp = Date.now();
-        const fileName = `${timestamp}_${file.name}`;
+        const fileName = `${timestamp}_${file.name.replace(/\s/g, '_')}`;
         const storageRef = storage.ref(`productos/${fileName}`);
         
-        await storageRef.put(file);
+        const uploadTask = await storageRef.put(file);
         const downloadURL = await storageRef.getDownloadURL();
         return downloadURL;
     }
 
-    // Subir imágenes a Firebase Storage
+    // Subir imágenes
     async function uploadImages(images, productName) {
         const urls = [];
         for (let i = 0; i < images.length; i++) {
             const timestamp = Date.now() + i;
-            const fileName = `${timestamp}_${images[i].name}`;
+            const fileName = `${timestamp}_${images[i].name.replace(/\s/g, '_')}`;
             const storageRef = storage.ref(`productos/${fileName}`);
             
             await storageRef.put(images[i]);
@@ -278,9 +306,20 @@
     document.getElementById('upload-product-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const submitBtn = document.getElementById('submit-btn');
         const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Subiendo...';
+        
+        if (selectedImages.length === 0) {
+            alert('Por favor selecciona al menos una imagen');
+            return;
+        }
+
+        if (!selectedFile) {
+            alert('Por favor selecciona el archivo del producto');
+            return;
+        }
+
+        submitBtn.innerHTML = '<i class="fas fa-spinner loading-spinner"></i> Subiendo...';
         submitBtn.disabled = true;
 
         try {
@@ -289,20 +328,6 @@
             const category = document.getElementById('product-category').value;
             const description = document.getElementById('product-description').value;
             const youtube = document.getElementById('product-youtube').value;
-
-            if (selectedImages.length === 0) {
-                alert('Por favor selecciona al menos una imagen');
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-                return;
-            }
-
-            if (!selectedFile) {
-                alert('Por favor selecciona el archivo del producto');
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-                return;
-            }
 
             // Subir archivo principal
             const fileURL = await uploadFile(selectedFile, name);
@@ -317,7 +342,7 @@
                 category: category,
                 description: description,
                 youtube_url: youtube || '',
-                image_url: imageUrls[0], // Imagen principal
+                image_url: imageUrls[0],
                 all_images: imageUrls,
                 file_data: fileURL,
                 file_name: selectedFile.name,
@@ -331,6 +356,7 @@
             document.getElementById('upload-product-form').reset();
             document.getElementById('image-preview-container').innerHTML = '';
             document.getElementById('file-info').classList.add('hidden');
+            document.getElementById('image-count').textContent = '0 imágenes seleccionadas';
             selectedImages = [];
             selectedFile = null;
 
@@ -346,11 +372,18 @@
         }
     });
 
-    // Cargar productos
+    // Cargar productos - FUNCIÓN CORREGIDA
     async function loadProducts() {
         const container = document.getElementById('products-list');
         
         try {
+            container.innerHTML = `
+                <div class="text-center py-8 text-gray-400">
+                    <i class="fas fa-spinner loading-spinner text-2xl mb-3"></i>
+                    <p>Cargando productos...</p>
+                </div>
+            `;
+
             const snapshot = await db.collection('Productos')
                 .orderBy('created_at', 'desc')
                 .get();
@@ -370,17 +403,17 @@
             container.innerHTML = products.map(product => `
                 <div class="product-item bg-[#0d0505] border border-red-900/30 rounded-xl p-4 flex items-center justify-between">
                     <div class="flex items-center gap-4">
-                        <img src="${product.image_url || ''}" class="w-16 h-16 rounded-lg object-cover border border-red-900/30">
+                        <img src="${product.image_url || 'https://via.placeholder.com/64'}" 
+                             class="w-16 h-16 rounded-lg object-cover border border-red-900/30"
+                             onerror="this.src='https://via.placeholder.com/64'">
                         <div>
                             <h3 class="text-white font-bold">${product.name}</h3>
-                            <p class="text-gray-400 text-xs">${product.category} • $${Number(product.price).toFixed(2)}</p>
+                            <p class="text-gray-400 text-xs">${product.category || 'Sin categoría'} • $${Number(product.price || 0).toFixed(2)}</p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <button onclick="deleteProduct('${product.id}')" class="px-3 py-2 rounded-lg bg-red-600/20 text-red-400 hover:bg-red-600/30 transition-colors">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
+                    <button onclick="deleteProduct('${product.id}')" class="px-3 py-2 rounded-lg bg-red-600/20 text-red-400 hover:bg-red-600/30 transition-colors">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </div>
             `).join('');
 
@@ -390,6 +423,10 @@
                 <div class="text-center py-8 text-red-400">
                     <i class="fas fa-exclamation-triangle text-2xl mb-2"></i>
                     <p>Error al cargar productos</p>
+                    <p class="text-xs mt-1">${error.message}</p>
+                    <button onclick="loadProducts()" class="mt-3 px-4 py-2 bg-red-600/20 rounded-lg text-red-400 hover:bg-red-600/30">
+                        <i class="fas fa-refresh mr-2"></i>Reintentar
+                    </button>
                 </div>
             `;
         }
@@ -405,12 +442,14 @@
             loadProducts();
         } catch (error) {
             console.error('Error:', error);
-            alert('Error al eliminar el producto');
+            alert('Error al eliminar el producto: ' + error.message);
         }
     }
 
     // Cargar productos al iniciar
-    loadProducts();
+    document.addEventListener('DOMContentLoaded', () => {
+        loadProducts();
+    });
 </script>
 
 </body>
