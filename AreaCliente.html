@@ -369,8 +369,13 @@
                             <span class="text-[10px] text-red-400 font-mono bg-red-900/20 px-2 py-0.5 rounded">LUA CONFIG</span>
                         </div>
                         <div class="code-block rounded-lg p-4 font-mono text-sm">
-                            <pre class="text-red-300 whitespace-pre-wrap break-all"><code id="license-code">Generando...</code></pre>
+                            <!-- CAMBIO APLICADO: Color blanco (#ffffff) -->
+                            <pre class="text-white whitespace-pre-wrap break-all"><code id="license-code">Generando...</code></pre>
                         </div>
+                        <!-- NUEVO BOTÓN PARA GENERAR CLAVE -->
+                        <button onclick="generateNewKey()" class="w-full mt-3 bg-[#150a0a] hover:bg-[#1a0a0a] border border-red-800/50 text-gray-300 hover:text-white text-xs font-semibold py-2 rounded-xl transition-all flex items-center justify-center gap-2">
+                            <i class="fas fa-sync-alt"></i> Generar Nueva Clave
+                        </button>
                     </div>
 
                     <div class="grid grid-cols-2 gap-3 mb-4">
@@ -697,6 +702,41 @@ end, true, "high")`;
             return key;
         }
 
+        // FUNCIÓN PARA GENERAR NUEVA CLAVE MANUALMENTE
+        async function generateNewKey() {
+            if (!currentUser) return;
+            const newKey = generateUniqueKey();
+            try {
+                // Eliminar la anterior si existe
+                const snapshot = await db.collection("Licencias")
+                    .where("discord_id", "==", currentUser.id)
+                    .where("type", "==", "general")
+                    .limit(1)
+                    .get();
+                
+                snapshot.forEach(async (doc) => {
+                    await doc.ref.delete();
+                });
+
+                // Crear la nueva
+                await db.collection("Licencias").add({
+                    discord_id: currentUser.id,
+                    username: currentUser.username,
+                    key: newKey,
+                    type: "general",
+                    created_at: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'active'
+                });
+                
+                userFixedLicenseKey = newKey;
+                updateLicenseDisplay();
+                alert("¡Nueva clave generada con éxito!");
+            } catch (error) {
+                console.error("Error generando clave:", error);
+                alert("Hubo un error al generar la clave.");
+            }
+        }
+
         async function ensureFixedLicense() {
             if (!currentUser) return;
             
@@ -710,16 +750,7 @@ end, true, "high")`;
                 if (!snapshot.empty) {
                     userFixedLicenseKey = snapshot.docs[0].data().key;
                 } else {
-                    const newKey = generateUniqueKey();
-                    await db.collection("Licencias").add({
-                        discord_id: currentUser.id,
-                        username: currentUser.username,
-                        key: newKey,
-                        type: "general",
-                        created_at: firebase.firestore.FieldValue.serverTimestamp(),
-                        status: 'active'
-                    });
-                    userFixedLicenseKey = newKey;
+                    await generateNewKey();
                 }
             } catch (error) {
                 console.error("Error:", error);
