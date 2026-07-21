@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Producto | Papeleta Store</title>
-    <!-- Icono Rojo -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff1a1a'/%3E%3Cstop offset='1' stop-color='%23cc1b1b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Ctext x='50' y='70' font-family='Arial, sans-serif' font-size='58' font-weight='900' fill='white' text-anchor='middle'%3EP%3C/text%3E%3C/svg%3E">
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -140,7 +139,6 @@
             text-shadow: 0 0 10px rgba(74, 222, 128, 0.3);
         }
 
-        /* Badge de Ya Obtenido */
         .badge-obtenido {
             background: linear-gradient(to right, #16a34a, #15803d);
             box-shadow: 0 4px 15px rgba(22, 163, 74, 0.3);
@@ -369,7 +367,7 @@
         let images = [];
         let currentIndex = 0;
         let isFree = false;
-        let userAlreadyOwns = false; // NUEVO: Verificar si ya lo tiene
+        let userAlreadyOwns = false;
         let currentUserDiscordId = null;
 
         // --- LÓGICA DEL CARRITO ---
@@ -476,18 +474,14 @@
             window.location.href = 'index.html';
         }
 
-        // NUEVA FUNCIÓN: Manejar acción principal según estado
         function handleMainAction() {
             if (userAlreadyOwns) {
-                // Si ya lo tiene, redirigir al área de cliente
                 window.location.href = 'AreaCliente.html';
             } else {
-                // Si no lo tiene, añadir al carrito
                 addToCartFromDetail();
             }
         }
 
-        // NUEVA FUNCIÓN: Verificar si el usuario ya tiene el producto
         async function checkIfUserOwnsProduct() {
             const token = localStorage.getItem('dc_access_token');
             if (!token) {
@@ -496,7 +490,6 @@
             }
 
             try {
-                // Obtener info del usuario
                 const res = await fetch('https://discord.com/api/users/@me', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
@@ -516,10 +509,10 @@
                     .get();
 
                 if (!licensesSnapshot.empty) {
-                    return true; // Ya tiene una licencia
+                    return true;
                 }
 
-                // También verificar en Clientes (compras)
+                // También verificar en Clientes
                 const clientsSnapshot = await db.collection("Clientes")
                     .where("discord_id", "==", user.id)
                     .get();
@@ -538,12 +531,11 @@
                 return ownsProduct;
 
             } catch (error) {
-                console.error("Error verificando propiedad del producto:", error);
+                console.error("Error verificando propiedad:", error);
                 return false;
             }
         }
 
-        // --- CARGAR PRODUCTO ---
         async function loadProduct() {
             if (!productId) return window.location.href = 'index.html';
 
@@ -553,7 +545,7 @@
 
                 currentProduct = doc.data();
 
-                // 1. Verificar si el usuario ya tiene el producto
+                // Verificar si el usuario ya tiene el producto
                 userAlreadyOwns = await checkIfUserOwnsProduct();
 
                 const priceVal = Number(currentProduct.price);
@@ -569,7 +561,6 @@
                 const secBtn = document.getElementById('secondary-action-btn');
                 const divider = document.getElementById('divider-buy');
 
-                // 2. Configurar botón según si ya lo tiene o no
                 if (userAlreadyOwns) {
                     // USUARIO YA TIENE EL PRODUCTO
                     priceTag.innerHTML = `<span class="text-green-400" style="text-shadow: 0 0 10px rgba(74, 222, 128, 0.5);">OBTENIDO</span>`;
@@ -577,11 +568,9 @@
                     mainBtn.className = "badge-obtenido w-full py-4 rounded-xl text-white font-bold text-lg flex items-center justify-center gap-3 shadow-lg transition-all";
                     mainBtn.innerHTML = `<i class="fas fa-book-open"></i> Ir a mi Biblioteca`;
                     
-                    // Ocultar botón de compra con tarjeta
                     secBtn.classList.add('hidden');
                     divider.classList.add('hidden');
 
-                    // Mostrar badge de obtenido
                     const badge = document.createElement('span');
                     badge.className = "absolute top-4 right-4 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg animate-pulse";
                     badge.innerHTML = '<i class="fas fa-check-circle mr-1"></i>YA LO TIENES';
@@ -612,7 +601,6 @@
             }
         }
 
-        // --- GALERÍA ---
         function setupGallery() {
             images = currentProduct.images && currentProduct.images.length > 0 
                      ? currentProduct.images 
@@ -665,7 +653,6 @@
             alert("Redirigiendo a pasarela de pago segura...");
         }
 
-        // --- FONDO ANIMADO ---
         function initNetworkBg() {
             const canvas = document.getElementById('network-bg');
             const ctx = canvas.getContext('2d');
