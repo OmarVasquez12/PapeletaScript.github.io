@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link rel="icon" type="image/png" href="https://media.discordapp.net/attachments/1513192322467369131/1514838369513902263/PapeletaCompilador.png?ex=6a2cd2ab&is=6a2b812b&hm=52929030c139ce7d61fc5dcbb1e1a7ae335d0d74499091241436ff630fb2f7f4&=&format=webp&quality=lossless&width=648&height=648">
+<title>Papeleta Compilador </title>
+<meta name="description" content="Compilador seguro para scripts MTA:SA">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/disable-devtool@latest"></script>
+<script src="https://resource.trickle.so/vendor_lib/unpkg/react@18/umd/react.production.min.js"></script>
+<script src="https://resource.trickle.so/vendor_lib/unpkg/react-dom@18/umd/react-dom.production.min.js"></script>
+
+<style>
+  :root{
+    --bg:#070707;
+    --card-bg:#0d0606;
+    --muted:#666;
+    --accent:#ff1a1a;
+    --accent-2:#cc1b1b;
+    --white:#eee;
+    --glass:rgba(255,26,26,0.04);
+    --success:#16a34a;
+    --danger:#ff1a1a;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:Inter,system-ui,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--white);
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    padding-bottom:60px;
+    transition:background .3s ease, color .3s ease;
+    user-select:none;
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+  }
+  
+  .container{max-width:1280px;margin:28px auto;padding:22px}
+  nav.main-nav{
+    background:linear-gradient(90deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01));
+    border:1px solid rgba(255,26,26,0.20);
+    border-radius:12px;padding:12px 18px;margin-bottom:18px;
+    display:flex;align-items:center;justify-content:space-between;
+    box-shadow:0 4px 20px rgba(0,0,0,0.5);
+    flex-wrap:wrap;gap:10px;
+  }
+  .nav-logo{display:flex;gap:10px;align-items:center;font-weight:800;font-size:18px;text-shadow:0 0 10px rgba(255,26,26,0.5)}
+  .nav-links{display:flex;gap:12px;list-style:none;margin:0;padding:0;align-items:center;flex-wrap:wrap}
+  .nav-links a{text-decoration:none;color:var(--muted);font-size:14px;padding:8px 12px;border-radius:8px;transition:all .2s}
+  .nav-links a:hover{background:rgba(255,26,26,0.1);color:var(--accent);text-shadow:0 0 8px rgba(255,26,26,0.4)}
+  .nav-right{display:flex;align-items:center;gap:10px}
+
+  .premium-header{
+    background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);
+    border-radius:14px;padding:24px;
+    display:flex;gap:20px;align-items:flex-start;margin-bottom:18px;
+    border:1px solid rgba(255,26,26,0.25);
+    box-shadow:inset 0 0 20px rgba(255,26,26,0.05);
+  }
+  .brand-title{margin:0;font-size:26px;font-weight:900;letter-spacing:1px}
+
+  .card{
+    background:var(--card-bg);padding:22px;border-radius:12px;
+    border:1px solid #1a0d0d;
+    margin-bottom:18px;transition:all .3s;
+  }
+  .card:hover{border-color:rgba(255,26,26,0.4)}
+
+  .upload-zone{
+    border:2px dashed rgba(255,26,26,0.3);
+    border-radius:12px;padding:40px 20px;
+    text-align:center;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,26,26,0.02),transparent);
+    transition:all .2s ease;
+  }
+  .upload-zone:hover, .upload-zone.dragover{
+    transform:translateY(-4px);
+    border-color:var(--accent);
+    background:linear-gradient(180deg,rgba(255,26,26,0.08),transparent);
+    box-shadow:0 8px 24px rgba(255,26,26,0.15);
+  }
+  .upload-zone i{font-size:46px;color:var(--accent);margin-bottom:10px}
+  .upload-zone h3{margin:0;font-size:18px}
+  .upload-zone p{margin:6px 0 0;color:var(--muted)}
+
+  .mode-selector{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    margin-top:20px;
+    flex-wrap:wrap;
+  }
+  .mode-btn{
+    background:rgba(255,255,255,0.03);
+    border:2px solid rgba(255,26,26,0.25);
+    color:var(--white);
+    padding:14px 22px;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:800;
+    font-size:14px;
+    transition:all .25s ease;
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    min-width:180px;
+    justify-content:center;
+  }
+  .mode-btn:hover{
+    border-color:var(--accent);
+    background:rgba(255,26,26,0.08);
+    transform:translateY(-3px);
+    box-shadow:0 6px 18px rgba(255,26,26,0.25);
+  }
+  .mode-btn i{
+    color:var(--accent);
+    font-size:20px;
+  }
+  .mode-btn small{
+    display:block;
+    font-size:10px;
+    color:var(--muted);
+    font-weight:500;
+    margin-top:4px;
+    letter-spacing:0;
+    text-transform:none;
+  }
+
+  .resource-summary{
+    background:linear-gradient(135deg, rgba(255,26,26,0.08), rgba(255,26,26,0.02));
+    border:1px solid rgba(255,26,26,0.3);
+    border-left:4px solid var(--accent);
+    border-radius:14px;
+    padding:22px;
+    margin-bottom:18px;
+    animation:slideUp .4s ease-out;
+  }
+  .resource-summary-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:16px;
+    flex-wrap:wrap;
+    margin-bottom:16px;
+    padding-bottom:14px;
+    border-bottom:1px dashed rgba(255,26,26,0.2);
+  }
+  .resource-summary-info{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    flex:1;
+    min-width:240px;
+  }
+  .resource-summary-icon{
+    width:56px;
+    height:56px;
+    border-radius:12px;
+    background:linear-gradient(135deg, var(--accent), var(--accent-2));
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:26px;
+    color:#fff;
+    box-shadow:0 0 18px rgba(255,26,26,0.5);
+    flex-shrink:0;
+    animation:pulseGlow 2.5s ease-in-out infinite;
+  }
+  .resource-summary-text{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .resource-summary-label{
+    font-size:10px;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:2px;
+    font-weight:700;
+  }
+  .resource-summary-name{
+    font-size:22px;
+    font-weight:900;
+    color:var(--white);
+    font-family:"JetBrains Mono", monospace;
+    word-break:break-all;
+    text-shadow:0 0 10px rgba(255,26,26,0.3);
+  }
+  .resource-summary-type{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size:10px;
+    color:var(--accent);
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:1.5px;
+    margin-top:2px;
+  }
+  .resource-summary-type i{font-size:10px}
+  
+  .resource-summary-stats{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .stat-chip{
+    background:rgba(0,0,0,0.4);
+    border:1px solid rgba(255,26,26,0.2);
+    padding:10px 16px;
+    border-radius:10px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+    min-width:90px;
+  }
+  .stat-chip-label{
+    font-size:9px;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:1.5px;
+    font-weight:700;
+  }
+  .stat-chip .stat-num{
+    color:var(--accent);
+    font-size:20px;
+    font-weight:900;
+    font-family:"JetBrains Mono", monospace;
+    text-shadow:0 0 8px rgba(255,26,26,0.5);
+  }
+  .stat-chip i{color:var(--accent);font-size:14px;margin-bottom:2px}
+
+  .detected-files-section{
+    margin-top:4px;
+  }
+  .detected-files-title{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:11px;
+    font-weight:900;
+    color:var(--accent);
+    text-transform:uppercase;
+    letter-spacing:2px;
+    margin-bottom:12px;
+  }
+  .detected-files-title i{font-size:12px}
+  .detected-files-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));
+    gap:8px;
+  }
+  .file-chip{
+    background:rgba(0,0,0,0.4);
+    border:1px solid rgba(255,26,26,0.2);
+    border-radius:8px;
+    padding:10px 12px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-family:"JetBrains Mono", monospace;
+    font-size:12px;
+    font-weight:600;
+    color:var(--white);
+    transition:all .2s ease;
+    position:relative;
+    overflow:hidden;
+  }
+  .file-chip::before{
+    content:"";
+    position:absolute;
+    left:0;top:0;bottom:0;
+    width:3px;
+    background:var(--accent);
+  }
+  .file-chip:hover{
+    border-color:var(--accent);
+    background:rgba(255,26,26,0.08);
+    transform:translateX(3px);
+    box-shadow:0 4px 12px rgba(255,26,26,0.15);
+  }
+  .file-chip i{
+    color:var(--accent);
+    font-size:14px;
+    flex-shrink:0;
+  }
+  .file-chip-name{
+    flex:1;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .file-chip.tag-client::before{background:#3b82f6}
+  .file-chip.tag-client i{color:#3b82f6}
+  .file-chip.tag-server::before{background:#10b981}
+  .file-chip.tag-server i{color:#10b981}
+  .file-chip.tag-shared::before{background:#f59e0b}
+  .file-chip.tag-shared i{color:#f59e0b}
+  .file-chip.tag-config::before{background:#a855f7}
+  .file-chip.tag-config i{color:#a855f7}
+
+  .btn-primary{
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    color:#fff;border:none;font-weight:800;
+    padding:12px 22px;border-radius:10px;cursor:pointer;
+    box-shadow:0 0 12px rgba(255,26,26,0.4),0 0 12px rgba(204,27,27,0.3);
+    transition:all .3s ease;font-size:15px;
+    display:inline-flex;align-items:center;gap:8px;
+  }
+  .btn-primary:hover:not(:disabled){
+    box-shadow:0 0 20px rgba(255,26,26,0.7),0 0 20px rgba(204,27,27,0.5);
+    transform:translateY(-2px);
+  }
+  .btn-primary:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
+
+  .btn-secondary{
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.1);
+    padding:8px 14px;border-radius:8px;color:var(--white);
+    cursor:pointer;transition:all .2s;font-size:13px;
+  }
+  .btn-secondary:hover{background:rgba(255,26,26,0.15);color:var(--accent)}
+
+  .btn-discord{
+    background:#5865F2;color:#fff;border:none;
+    padding:10px 18px;border-radius:10px;font-weight:700;
+    cursor:pointer;display:inline-flex;align-items:center;gap:8px;
+    text-decoration:none;transition:all .3s;
+    box-shadow:0 0 12px rgba(88,101,242,0.4);
+  }
+  .btn-discord:hover{background:#4752c4;transform:translateY(-2px);box-shadow:0 0 20px rgba(88,101,242,0.6)}
+
+  .file-list{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow-y:auto;padding-right:6px}
+  .file-list::-webkit-scrollbar{width:8px}
+  .file-list::-webkit-scrollbar-track{background:rgba(0,0,0,0.3);border-radius:4px}
+  .file-list::-webkit-scrollbar-thumb{background:linear-gradient(var(--accent),var(--accent-2));border-radius:4px}
+
+  .file-row{
+    display:flex;align-items:center;gap:12px;
+    padding:12px 14px;border-radius:10px;
+    background:rgba(13,6,6,0.8);
+    border-left:3px solid var(--accent);
+    transition:all .2s;
+  }
+  .file-row:hover{background:rgba(255,26,26,0.08);transform:translateX(4px)}
+  .file-row input[type="checkbox"]{
+    width:20px;height:20px;accent-color:var(--accent);cursor:pointer;
+  }
+  .file-row .fn{
+    font-family:"JetBrains Mono",ui-monospace,monospace;
+    color:var(--white);font-size:14px;font-weight:600;
+  }
+  .file-row .fp{color:var(--muted);font-size:12px;margin-top:2px}
+  .file-row .fi{color:var(--accent);font-size:20px}
+
+  .tag{
+    background:rgba(255,26,26,0.12);padding:4px 10px;border-radius:999px;
+    color:var(--accent);font-size:12px;font-weight:700;
+    border:1px solid rgba(255,26,26,0.3);
+  }
+
+  .progress-container{
+    height:12px;background:rgba(0,0,0,0.5);border-radius:999px;
+    margin-top:16px;overflow:hidden;
+    border:1px solid rgba(255,255,255,0.05);
+  }
+  .progress-bar{
+    height:100%;width:0%;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    transition:width .3s linear;
+    box-shadow:0 0 10px var(--accent);
+  }
+
+  .section-header{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:14px;flex-wrap:wrap;gap:10px;
+  }
+  .section-header h2{
+    margin:0;display:flex;gap:10px;align-items:center;
+    font-size:20px;
+  }
+  .section-header h2 i{color:var(--accent)}
+
+  .status-box{
+    padding:14px;border-radius:10px;margin-top:14px;
+    background:rgba(13,6,6,0.6);
+    border:1px solid rgba(255,26,26,0.20);
+  }
+  .status-box.error{
+    background:rgba(255,26,26,0.1);
+    border-color:rgba(255,26,26,0.4);
+  }
+  .status-box.error p{color:#ff6b6b;margin:4px 0;font-size:13px}
+  .status-box.error strong{color:var(--danger)}
+
+  .features{display:flex;gap:14px;margin-top:18px;flex-wrap:wrap}
+  .feature-card{
+    background:linear-gradient(135deg,rgba(255,26,26,0.04),transparent);
+    padding:18px;border-radius:12px;
+    width:calc(25% - 11px);min-width:220px;
+    border:1px solid #1a0d0d;transition:all .3s;
+  }
+  .feature-card:hover{border-color:var(--accent);transform:translateY(-5px);box-shadow:0 8px 20px rgba(255,26,26,0.15)}
+  .feature-card h3{margin-top:0;color:var(--accent)}
+  .feature-card p{color:var(--muted);margin-bottom:0}
+
+  .howto-section{
+    margin-top:18px;padding:20px;border-radius:12px;
+    background:rgba(13,6,6,0.6);border:1px solid #1a0d0d;
+  }
+  .howto-section h2{margin-top:0;color:var(--accent)}
+  .howto-section ol{color:var(--white);line-height:1.7}
+
+  footer{text-align:center;padding:30px 20px;color:var(--muted)}
+  footer p{margin:10px 0}
+
+  .empty-state{
+    text-align:center;padding:30px 18px;color:var(--muted);
+    background:rgba(0,0,0,0.3);border-radius:10px;
+    border:1px dashed rgba(255,26,26,0.2);
+  }
+  .empty-state i{font-size:40px;margin-bottom:12px;color:var(--muted)}
+
+  .fade-in{animation:fadeIn .5s ease-out}
+  .slide-up{animation:slideUp .6s ease-out}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes pulseGlow{
+    0%,100%{box-shadow:0 0 5px var(--accent)}
+    50%{box-shadow:0 0 20px var(--accent),0 0 30px var(--accent-2)}
+  }
+  .pulse-glow{animation:pulseGlow 2s ease-in-out infinite}
+
+  .icon-box{
+    width:48px;height:48px;border-radius:10px;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-size:22px;
+    box-shadow:0 0 15px rgba(255,26,26,0.5);
+  }
+
+  #papeletaModal{
+    display:none;
+    position:fixed;inset:0;
+    background:rgba(0,0,0,0.85);
+    backdrop-filter:blur(5px);
+    z-index:99999;
+    align-items:center;justify-content:center;
+  }
+  #papeletaModal.active{display:flex}
+  .papeleta-modal-card{
+    background:var(--card-bg);
+    border:2px solid var(--accent);
+    padding:40px;
+    border-radius:24px;
+    text-align:center;
+    max-width:480px;width:90%;
+    box-shadow:0 0 30px rgba(255,26,26,0.4);
+    animation:modalPop .3s ease;
+  }
+  @keyframes modalPop{
+    from{transform:scale(.85);opacity:0}
+    to{transform:scale(1);opacity:1}
+  }
+  .papeleta-modal-card .modal-icon{
+    font-size:54px;color:var(--accent);
+    margin-bottom:14px;
+    filter:drop-shadow(0 0 10px var(--accent));
+    animation:shake 0.5s ease;
+  }
+  @keyframes shake{
+    0%,100%{transform:rotate(0)}
+    25%{transform:rotate(-10deg)}
+    75%{transform:rotate(10deg)}
+  }
+  .papeleta-modal-card h2{
+    color:var(--accent);margin:0 0 10px;
+    font-size:22px;font-weight:900;
+    text-transform:uppercase;letter-spacing:1.5px;
+  }
+  .papeleta-modal-card p{
+    color:var(--white);margin:10px 0 20px;
+    font-size:15px;line-height:1.5;
+  }
+  .papeleta-modal-card button{
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    color:#fff;border:none;
+    padding:12px 32px;border-radius:10px;
+    font-weight:900;font-size:14px;
+    cursor:pointer;text-transform:uppercase;
+    letter-spacing:1px;
+    transition:all .2s;
+    box-shadow:0 0 12px rgba(255,26,26,0.4);
+  }
+  .papeleta-modal-card button:hover{
+    transform:translateY(-2px);
+    box-shadow:0 0 20px rgba(255,26,26,0.7);
+  }
+
+  .color-panel-overlay{
+    position:fixed;inset:0;
+    background:rgba(0,0,0,0.6);
+    backdrop-filter:blur(3px);
+    z-index:9998;
+    opacity:0;pointer-events:none;
+    transition:opacity .3s ease;
+  }
+  .color-panel-overlay.active{opacity:1;pointer-events:auto}
+  .color-panel{
+    position:fixed;top:0;right:-420px;
+    width:400px;max-width:90vw;height:100vh;
+    background:linear-gradient(180deg, #0d0606 0%, #070707 100%);
+    border-left:2px solid var(--accent);
+    box-shadow:-10px 0 40px rgba(255,26,26,0.2);
+    z-index:9999;
+    transition:right .4s cubic-bezier(.4,0,.2,1);
+    overflow-y:auto;padding:0;
+  }
+  .color-panel.active{right:0}
+  .color-panel::-webkit-scrollbar{width:8px}
+  .color-panel::-webkit-scrollbar-track{background:#0a0a0a}
+  .color-panel::-webkit-scrollbar-thumb{background:linear-gradient(var(--accent),var(--accent-2));border-radius:4px}
+
+  .color-panel-header{
+    padding:20px 24px;
+    border-bottom:1px solid rgba(255,26,26,0.2);
+    display:flex;justify-content:space-between;align-items:center;
+    position:sticky;top:0;
+    backdrop-filter:blur(10px);
+    background:rgba(13,6,6,0.95);
+    z-index:2;
+  }
+  .color-panel-header h2{
+    margin:0;font-size:18px;font-weight:900;
+    color:var(--accent);
+    display:flex;align-items:center;gap:10px;
+    text-transform:uppercase;letter-spacing:1px;
+  }
+  .color-panel-close{
+    background:transparent;border:1px solid rgba(255,255,255,0.1);
+    color:var(--white);width:36px;height:36px;border-radius:8px;
+    cursor:pointer;font-size:16px;transition:all .2s;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .color-panel-close:hover{
+    background:var(--danger);border-color:var(--danger);
+    transform:rotate(90deg);
+  }
+
+  .color-panel-body{padding:20px 24px}
+  .color-section-title{
+    font-size:11px;font-weight:900;
+    color:var(--accent);
+    text-transform:uppercase;letter-spacing:2px;
+    margin:20px 0 12px 0;
+    padding-bottom:8px;
+    border-bottom:1px solid rgba(255,26,26,0.2);
+    display:flex;align-items:center;gap:8px;
+  }
+  .color-section-title:first-child{margin-top:0}
+
+  .color-item{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:12px 14px;
+    background:rgba(255,255,255,0.02);
+    border:1px solid rgba(255,255,255,0.05);
+    border-radius:10px;margin-bottom:10px;
+    transition:all .2s;
+  }
+  .color-item:hover{
+    border-color:rgba(255,26,26,0.3);
+    background:rgba(255,26,26,0.05);
+  }
+  .color-item-info{display:flex;flex-direction:column;gap:2px}
+  .color-item-label{font-size:13px;font-weight:700;color:var(--white)}
+  .color-item-var{
+    font-size:10px;color:var(--muted);
+    font-family:"JetBrains Mono",monospace;
+  }
+  .color-input-wrap{display:flex;align-items:center;gap:8px}
+  .color-input{
+    width:44px;height:34px;
+    border:2px solid rgba(255,255,255,0.1);
+    border-radius:8px;cursor:pointer;
+    background:transparent;padding:2px;
+    transition:all .2s;
+  }
+  .color-input:hover{border-color:var(--accent);transform:scale(1.05)}
+  .color-hex{
+    font-family:"JetBrains Mono",monospace;
+    font-size:11px;color:var(--muted);
+    min-width:60px;text-align:right;
+    text-transform:uppercase;
+  }
+
+  .color-panel-footer{
+    padding:16px 24px;
+    border-top:1px solid rgba(255,26,26,0.2);
+    background:rgba(13,6,6,0.95);
+    position:sticky;bottom:0;
+    display:flex;gap:10px;
+    backdrop-filter:blur(10px);
+  }
+  .btn-reset{
+    flex:1;
+    background:linear-gradient(90deg,#333,#222);
+    color:var(--white);border:1px solid rgba(255,255,255,0.1);
+    padding:12px;border-radius:10px;
+    font-weight:800;font-size:13px;
+    cursor:pointer;transition:all .2s;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    text-transform:uppercase;letter-spacing:1px;
+  }
+  .btn-reset:hover{
+    background:linear-gradient(90deg,#444,#333);
+    transform:translateY(-2px);
+    box-shadow:0 4px 12px rgba(0,0,0,0.4);
+  }
+  .btn-save-notice{
+    flex:1;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    color:#fff;border:none;
+    padding:12px;border-radius:10px;
+    font-weight:800;font-size:12px;
+    text-align:center;
+    display:flex;align-items:center;justify-content:center;gap:6px;
+    text-transform:uppercase;letter-spacing:1px;
+    cursor:default;
+  }
+
+  .btn-color-panel{
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    color:#fff;border:none;
+    padding:8px 14px;border-radius:8px;
+    font-weight:800;font-size:13px;
+    cursor:pointer;transition:all .2s;
+    display:inline-flex;align-items:center;gap:6px;
+    text-transform:uppercase;letter-spacing:1px;
+    box-shadow:0 0 10px rgba(255,26,26,0.3);
+  }
+  .btn-color-panel:hover{
+    transform:translateY(-2px);
+    box-shadow:0 0 18px rgba(255,26,26,0.6);
+  }
+  .btn-color-panel i{animation:rotateIcon 4s linear infinite}
+  @keyframes rotateIcon{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+  .btn--fijo{
+    position:fixed;
+    top:20px;
+    left:20px;
+    z-index:999999 !important;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    text-decoration:none;
+    transition:all .3s ease;
+    background:rgba(0,0,0,0.6);
+    padding:10px 14px;
+    border-radius:12px;
+    border:1px solid rgba(255,26,26,0.3);
+    cursor:pointer;
+    opacity:1 !important;
+    transform:translateY(0) !important;
+    pointer-events:auto !important;
+    backdrop-filter:blur(5px);
+  }
+  .btn-volver-fijo:hover{
+    transform:scale(1.05) !important;
+    background:rgba(255,26,26,0.1);
+    border-color:var(--accent);
+    box-shadow:0 0 15px rgba(255,26,26,0.3);
+  }
+  .btn-volver-fijo span{
+    color:var(--accent);
+    font-size:11px;
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:1.5px;
+    text-shadow:0 0 10px var(--accent);
+    white-space:nowrap;
+  }
+  .btn-volver-fijo svg{
+    width:36px;
+    height:36px;
+    filter:drop-shadow(0 0 8px var(--accent));
+    transition:transform .3s ease, filter .3s ease;
+  }
+  .btn-volver-fijo:hover svg{
+    transform:rotate(-10deg);
+    filter:drop-shadow(0 0 15px var(--accent));
+  }
+
+  @media(max-width:900px){
+    .feature-card{width:100%}
+    .nav-links{display:none}
+    .brand-title{font-size:20px}
+    .color-panel{width:100%;max-width:100vw;right:-100%}
+    .resource-summary{padding:16px}
+    .resource-summary-name{font-size:18px}
+    .resource-summary-header{flex-direction:column;align-items:flex-start}
+    .mode-btn{min-width:140px;padding:12px 16px;font-size:12px}
+    .detected-files-grid{grid-template-columns:repeat(auto-fill, minmax(140px, 1fr))}
+  }
+</style>
+</head>
+<body oncontextmenu="openPapeletaModal('ADVERTENCIA', 'Dime te la quieres robar'); return false;">
+
+<div id="papeletaModal">
+  <div class="papeleta-modal-card">
+    <div class="modal-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+    <h2 id="papeletaTitle">ADVERTENCIA</h2>
+    <p id="papeletaMsg">Accion no permitida.</p>
+    <button onclick="closePapeletaModal()">ACEPTAR</button>
+  </div>
+</div>
+
+<div class="btn-volver-fijo" id="btnVolver" title="Volver al Panel de Licencias">
+  <span>Volver</span>
+  <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ff1a1a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 19v2h16v-14l-8 -4l-8 4v2"/>
+    <path d="M13 14h-9"/>
+    <path d="M7 11l-3 3l3 3"/>
+  </svg>
+</div>
+
+<div class="color-panel-overlay" id="colorPanelOverlay"></div>
+<aside class="color-panel" id="colorPanel">
+  <div class="color-panel-header">
+    <h2><i class="fa-solid fa-palette"></i> Personalizar Colores</h2>
+    <button class="color-panel-close" id="colorPanelClose" title="Cerrar">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+  <div class="color-panel-body">
+    <div class="color-section-title"><i class="fa-solid fa-fill-drip"></i> Fondos</div>
+    <div class="color-item">
+      <div class="color-item-info">
+        <div class="color-item-label">Fondo Principal</div>
+        <div class="color-item-var">--bg</div>
+      </div>
+      <div class="color-input-wrap">
+        <span class="color-hex" id="hex-bg">#070707</span>
+        <input type="color" class="color-input" data-var="--bg" value="#070707">
+      </div>
+    </div>
+    <div class="color-item">
+      <div class="color-item-info">
+        <div class="color-item-label">Fondo Tarjetas</div>
+        <div class="color-item-var">--card-bg</div>
+      </div>
+      <div class="color-input-wrap">
+        <span class="color-hex" id="hex-card-bg">#0d0606</span>
+        <input type="color" class="color-input" data-var="--card-bg" value="#0d0606">
+      </div>
+    </div>
+
+    <div class="color-section-title"><i class="fa-solid fa-star"></i> Colores Principales</div>
+    <div class="color-item">
+      <div class="color-item-info">
+        <div class="color-item-label">Color Primario</div>
+        <div class="color-item-var">--accent</div>
+      </div>
+      <div class="color-input-wrap">
+        <span class="color-hex" id="hex-accent">#ff1a1a</span>
+        <input type="color" class="color-input" data-var="--accent" value="#ff1a1a">
+      </div>
+    </div>
+    <div class="color-item">
+      <div class="color-item-info">
+        <div class="color-item-label">Color Secundario</div>
+        <div class="color-item-var">--accent-2</div>
+      </div>
+      <div class="color-input-wrap">
+        <span class="color-hex" id="hex-accent-2">#cc1b1b</span>
+        <input type="color" class="color-input" data-var="--accent-2" value="#cc1b1b">
+      </div>
+    </div>
+
+    <div class="color-section-title"><i class="fa-solid fa-font"></i> Textos</div>
+    <div class="color-item">
+      <div class="color-item-info">
+        <div class="color-item-label">Texto Principal</div>
+        <div class="color-item-var">--white</div>
+      </div>
+      <div class="color-input-wrap">
+        <span class="color-hex" id="hex-white">#eeeeee</span>
+        <input type="color" class="color-input" data-var="--white" value="#eeeeee">
+      </div>
+    </div>
+    <div class="color-item">
+      <div class="color-item-info">
+        <div class="color-item-label">Texto Secundario</div>
+        <div class="color-item-var">--muted</div>
+      </div>
+      <div class="color-input-wrap">
+        <span class="color-hex" id="hex-muted">#666666</span>
+        <input type="color" class="color-input" data-var="--muted" value="#666666">
+      </div>
+    </div>
+
+    <div class="color-section-title"><i class="fa-solid fa-circle-check"></i> Estados</div>
+    <div class="color-item">
+      <div class="color-item-info">
+        <div class="color-item-label">Color Éxito</div>
+        <div class="color-item-var">--success</div>
+      </div>
+      <div class="color-input-wrap">
+        <span class="color-hex" id="hex-success">#16a34a</span>
+        <input type="color" class="color-input" data-var="--success" value="#16a34a">
+      </div>
+    </div>
+    <div class="color-item">
+      <div class="color-item-info">
+        <div class="color-item-label">Color Peligro</div>
+        <div class="color-item-var">--danger</div>
+      </div>
+      <div class="color-input-wrap">
+        <span class="color-hex" id="hex-danger">#ff1a1a</span>
+        <input type="color" class="color-input" data-var="--danger" value="#ff1a1a">
+      </div>
+    </div>
+  </div>
+  <div class="color-panel-footer">
+    <button class="btn-reset" id="btnResetColors">
+      <i class="fa-solid fa-rotate-left"></i> Reiniciar
+    </button>
+    <div class="btn-save-notice">
+      <i class="fa-solid fa-floppy-disk"></i> Guardado automático
+    </div>
+  </div>
+</aside>
+
+<div class="container">
+  <nav class="main-nav">
+    <div class="nav-logo"><i class="fa-solid fa-bolt" style="color:var(--accent)"></i><span>PROTEGE TU SERVIDOR</span></div>
+    <ul class="nav-links">
+      <li><a href="#compiler-section"><i class="fa-solid fa-code"></i> Compilador</a></li>
+      <li><a href="#features-section"><i class="fa-solid fa-list-check"></i> Caracteristicas</a></li>
+      <li><a href="#how-to-use-section"><i class="fa-solid fa-circle-question"></i> Como usar</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="btn-color-panel" id="btnOpenColorPanel">
+        <i class="fa-solid fa-palette"></i> Color
+      </button>
+      <span class="tag">v1.4 SECURE MTA:SA</span>
+    </div>
+  </nav>
+
+  <header class="premium-header slide-up">
+    <div style="display:flex;gap:18px;align-items:center">
+      <div class="icon-box pulse-glow"><i class="fa-solid fa-shield-halved"></i></div>
+      <div>
+        <h1 class="brand-title">PL <span style="opacity:.8;font-weight:400">COMPILADOR MTA</span></h1>
+        <div style="color:var(--muted);font-size:14px;margin-top:4px">
+          COMPILACION 
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div id="root"></div>
+
+  <section class="features" id="features-section">
+    <div class="feature-card"><h3><i class="fa-solid fa-server"></i> Compilacion Real</h3><p>Usa luac.mtasa.com para compilar tus scripts con ofuscacion oficial MTA.</p></div>
+    <div class="feature-card"><h3><i class="fa-solid fa-folder-open"></i> Carpetas o ZIP</h3><p>Sube un ZIP completo o selecciona una carpeta entera desde tu PC.</p></div>
+    <div class="feature-card"><h3><i class="fa-solid fa-list-check"></i> Seleccion Flexible</h3><p>Elige que archivos compilar y cuales dejar intactos en el recurso.</p></div>
+    <div class="feature-card"><h3><i class="fa-solid fa-download"></i> Descarga Directa</h3><p>Obten el ZIP compilado listo para subir a tu servidor MTA (compatible con WinRAR).</p></div>
+  </section>
+
+  <section class="howto-section" id="how-to-use-section">
+    <h2><i class="fa-solid fa-circle-question"></i> Como usar el compilador</h2>
+    <ol>
+      <li>Elige entre <strong>subir un .zip</strong> o <strong>seleccionar una carpeta</strong> completa.</li>
+      <li>El sistema detectara automaticamente el <strong>nombre del recurso</strong> y todos los archivos <strong>.lua</strong> (cliente, server, config, etc.).</li>
+      <li>Marca los archivos que deseas compilar (por defecto todos están seleccionados).</li>
+      <li>Haz clic en <strong style="color:var(--accent)">COMPILAR Y DESCARGAR</strong>.</li>
+      <li>El sistema compila usando  y actualiza el meta.xml.</li>
+      <li>Sube el ZIP resultante a tu servidor MTA Listo!</li>
+    </ol>
+  </section>
+
+  <footer>
+    <a href="https://discord.gg/ag6g5pgf8" target="_blank" rel="noopener noreferrer" class="btn-discord">
+      <i class="fa-brands fa-discord"></i> Unete a nuestro Discord
+    </a>
+    <p>© 2026 PAPELETA PROGRAMADOR </p>
+  </footer>
+</div>
+
+<script>
+
+window.openPapeletaModal = function(title, message){
+  const modal = document.getElementById('papeletaModal');
+  document.getElementById('papeletaTitle').innerText = title || 'ADVERTENCIA';
+  document.getElementById('papeletaMsg').innerText = message || 'Acción no permitida.';
+  modal.classList.add('active');
+};
+window.closePapeletaModal = function(){
+  document.getElementById('papeletaModal').classList.remove('active');
+};
+
+try{
+  DisableDevtool({
+    ondevtoolopen: function(){
+      openPapeletaModal('ACCESO DENEGADO', 'Herramientas de desarrollador detectadas. La página se recargará en 3 segundos.');
+      setTimeout(() => { try{ location.reload(true); }catch(e){} }, 3000);
+    },
+    clearIntervalWhenDevOpen: true,
+    disableMenu: true,
+    ignore: []
+  });
+}catch(e){ console.warn('DisableDevtool no disponible', e); }
+
+document.addEventListener('keydown', function(e){
+  if(e.key === 'F12' || e.keyCode === 123){
+    e.preventDefault();
+    openPapeletaModal('PROHIBIDO', 'Acceso a herramientas de desarrollador bloqueado.');
+    return false;
+  }
+  if(e.ctrlKey && e.shiftKey && ['i','j','c'].includes((e.key||'').toLowerCase())){
+    e.preventDefault();
+    openPapeletaModal('PROHIBIDO', 'Acceso a herramientas de desarrollador bloqueado.');
+    return false;
+  }
+  if(e.ctrlKey && (e.key||'').toLowerCase() === 'u'){
+    e.preventDefault();
+    openPapeletaModal('PROHIBIDO', 'Ver código fuente bloqueado.');
+    return false;
+  }
+  if(e.ctrlKey && (e.key||'').toLowerCase() === 's'){
+    e.preventDefault();
+    openPapeletaModal('PROHIBIDO', 'Guardar página bloqueado.');
+    return false;
+  }
+  if(e.ctrlKey && (e.key||'').toLowerCase() === 'p'){
+    e.preventDefault();
+    openPapeletaModal('PROHIBIDO', 'Imprimir página bloqueado.');
+    return false;
+  }
+  if(e.ctrlKey && (e.key||'').toLowerCase() === 'a'){
+    e.preventDefault();
+    return false;
+  }
+}, true);
+
+(function(){
+  let lastDetected = 0;
+  setInterval(() => {
+    try{
+      const t0 = performance.now();
+      debugger;
+      const t1 = performance.now();
+      if(t1 - t0 > 80 && (Date.now() - lastDetected) > 2000){
+        lastDetected = Date.now();
+        document.body.innerHTML = '<div style="position:fixed;inset:0;background:#000;color:#ff1a1a;font-size:32px;font-weight:900;text-align:center;padding-top:30vh;z-index:999999;font-family:Inter,sans-serif;letter-spacing:2px;">🔒 DEVTOOLS DETECTADO<br><span style="font-size:18px;color:#666;margin-top:10px;display:block;">ACCESO BLOQUEADO - PAPELETA</span></div>';
+        setTimeout(() => {
+          try{ location.href = 'about:blank'; }catch(e){ location.reload(); }
+        }, 3000);
+      }
+    }catch(err){}
+  }, 500);
+})();
+
+document.addEventListener('copy', function(e){
+  const target = e.target;
+  if(target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA'){
+    e.preventDefault();
+    openPapeletaModal('PROHIBIDO', 'Copia de contenido bloqueada.');
+  }
+});
+
+document.addEventListener('dragstart', function(e){
+  e.preventDefault();
+  return false;
+});
+
+(function(){
+  const STORAGE_KEY = 'pl_compiler_colors';
+  const DEFAULT_COLORS = {
+    '--bg': '#070707',
+    '--card-bg': '#0d0606',
+    '--muted': '#666666',
+    '--accent': '#ff1a1a',
+    '--accent-2': '#cc1b1b',
+    '--white': '#eeeeee',
+    '--success': '#16a34a',
+    '--danger': '#ff1a1a'
+  };
+
+  const panel = document.getElementById('colorPanel');
+  const overlay = document.getElementById('colorPanelOverlay');
+  const btnOpen = document.getElementById('btnOpenColorPanel');
+  const btnClose = document.getElementById('colorPanelClose');
+  const btnReset = document.getElementById('btnResetColors');
+  const colorInputs = document.querySelectorAll('.color-input');
+
+  function openPanel(){ panel.classList.add('active'); overlay.classList.add('active'); }
+  function closePanel(){ panel.classList.remove('active'); overlay.classList.remove('active'); }
+
+  btnOpen.addEventListener('click', openPanel);
+  btnClose.addEventListener('click', closePanel);
+  overlay.addEventListener('click', closePanel);
+
+  function loadColors(){
+    const saved = localStorage.getItem(STORAGE_KEY);
+    let colors = DEFAULT_COLORS;
+    if(saved){
+      try{ colors = { ...DEFAULT_COLORS, ...JSON.parse(saved) }; }
+      catch(e){ colors = DEFAULT_COLORS; }
+    }
+    applyColors(colors);
+    updateInputs(colors);
+  }
+
+  function applyColors(colors){
+    const root = document.documentElement;
+    Object.keys(colors).forEach(varName => {
+      root.style.setProperty(varName, colors[varName]);
+    });
+    const svg = document.querySelector('.btn-volver-fijo svg');
+    if(svg) svg.setAttribute('stroke', colors['--accent']);
+  }
+
+  function updateInputs(colors){
+    colorInputs.forEach(input => {
+      const varName = input.dataset.var;
+      if(colors[varName]){
+        input.value = colors[varName];
+        const hexSpan = document.getElementById('hex-' + varName.replace('--',''));
+        if(hexSpan) hexSpan.textContent = colors[varName].toUpperCase();
+      }
+    });
+  }
+
+  function saveColors(colors){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(colors));
+  }
+
+  function getCurrentColors(){
+    const colors = {};
+    colorInputs.forEach(input => { colors[input.dataset.var] = input.value; });
+    return colors;
+  }
+
+  colorInputs.forEach(input => {
+    input.addEventListener('input', function(){
+      const varName = this.dataset.var;
+      const value = this.value;
+      document.documentElement.style.setProperty(varName, value);
+      
+      const hexSpan = document.getElementById('hex-' + varName.replace('--',''));
+      if(hexSpan) hexSpan.textContent = value.toUpperCase();
+      
+      if(varName === '--accent'){
+        const svg = document.querySelector('.btn-volver-fijo svg');
+        if(svg) svg.setAttribute('stroke', value);
+      }
+      
+      saveColors(getCurrentColors());
+    });
+  });
+
+  btnReset.addEventListener('click', function(){
+    if(!confirm('¿Restaurar todos los colores a los valores por defecto?')) return;
+    localStorage.removeItem(STORAGE_KEY);
+    applyColors(DEFAULT_COLORS);
+    updateInputs(DEFAULT_COLORS);
+    this.innerHTML = '<i class="fa-solid fa-check"></i> ¡Restaurado!';
+    setTimeout(() => {
+      this.innerHTML = '<i class="fa-solid fa-rotate-left"></i> Reiniciar';
+    }, 1500);
+  });
+
+  loadColors();
+})();
+
+(function(){
+  const btnVolver = document.getElementById('btnVolver');
+  
+  if(btnVolver){
+    btnVolver.addEventListener('click', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      
+      try {
+        if (window.parent && window.parent !== window) {
+          if (typeof window.parent.closeEncryptPanel === 'function') {
+            window.parent.closeEncryptPanel();
+          } else {
+            window.parent.document.getElementById("encryptContainer").style.display = "none";
+            window.parent.document.getElementById("encryptFrame").src = "";
+            window.parent.document.body.style.overflow = "";
+          }
+        } else {
+    window.history.back();
+}
+      } catch (err) {
+        console.error("Error al volver:", err);
+        window.location.href = "https://omarvasquez12.github.io/";
+      }
+    });
+  }
+})();
+</script>
+
+<script>
+
+const MTA_API_URL = "https://proxy-api.trickle-app.host/?url=https://luac.mtasa.com/";
+
+async function compileLuaFile(content, obfuscateLevel = 3) {
+  const formData = new FormData();
+  const blob = new Blob([content], { type: "text/plain" });
+  formData.append("luasource", blob, "script.lua");
+  formData.append("compile", "1");
+  formData.append("debug", "0");
+  formData.append("obfuscate", obfuscateLevel.toString());
+
+  const response = await fetch(MTA_API_URL, { method: "POST", body: formData });
+  if (!response.ok) throw new Error("Error al compilar archivo");
+
+  const result = await response.arrayBuffer();
+  const text = new TextDecoder().decode(result);
+  if (text.startsWith("ERROR")) throw new Error(text);
+  return new Uint8Array(result);
+}
+
+const e = React.createElement;
+
+function classifyFile(fileName) {
+  const name = fileName.toLowerCase();
+  if (name.includes('client') || name.includes('c_')) return 'client';
+  if (name.includes('server') || name.includes('s_')) return 'server';
+  if (name.includes('config') || name.includes('settings')) return 'config';
+  if (name.includes('shared') || name.includes('util') || name.includes('helper')) return 'shared';
+  return 'other';
+}
+
+function getFileTagClass(fileName) {
+  const type = classifyFile(fileName);
+  if (type === 'client') return 'tag-client';
+  if (type === 'server') return 'tag-server';
+  if (type === 'config') return 'tag-config';
+  if (type === 'shared') return 'tag-shared';
+  return '';
+}
+
+function ResourceSummary({ resourceName, files, selectedCount, sourceType }) {
+  const totalFiles = files.length;
+  
+  return e("div", { className: "resource-summary" },
+    // Encabezado con nombre del recurso y estadísticas
+    e("div", { className: "resource-summary-header" },
+      e("div", { className: "resource-summary-info" },
+        e("div", { className: "resource-summary-icon" },
+          e("i", { className: sourceType === "folder" ? "fa-solid fa-folder-tree" : "fa-solid fa-file-zipper" })
+        ),
+        e("div", { className: "resource-summary-text" },
+          e("span", { className: "resource-summary-label" }, "Recurso detectado"),
+          e("span", { className: "resource-summary-name" }, resourceName),
+          e("span", { className: "resource-summary-type" },
+            e("i", { className: "fa-solid fa-circle-info" }),
+            sourceType === "folder" ? "CARGADO DESDE CARPETA" : "CARGADO DESDE ZIP"
+          )
+        )
+      ),
+      e("div", { className: "resource-summary-stats" },
+        e("div", { className: "stat-chip" },
+          e("i", { className: "fa-solid fa-file-code" }),
+          e("span", { className: "stat-chip-label" }, "Scripts"),
+          e("span", { className: "stat-num" }, totalFiles)
+        ),
+        e("div", { className: "stat-chip" },
+          e("i", { className: "fa-solid fa-circle-check" }),
+          e("span", { className: "stat-chip-label" }, "A compilar"),
+          e("span", { className: "stat-num" }, selectedCount)
+        )
+      )
+    ),
+    
+    e("div", { className: "detected-files-section" },
+      e("div", { className: "detected-files-title" },
+        e("i", { className: "fa-solid fa-list" }),
+        "Archivos .lua detectados"
+      ),
+      e("div", { className: "detected-files-grid" },
+        files.map((file, idx) => 
+          e("div", { 
+            key: idx, 
+            className: `file-chip ${getFileTagClass(file.name)}`
+          },
+            e("i", { className: "fa-solid fa-file-code" }),
+            e("span", { className: "file-chip-name", title: file.path }, file.name)
+          )
+        )
+      )
+    )
+  );
+}
+
+function FileUploader({ onFilesLoaded }) {
+  const [isDragging, setIsDragging] = React.useState(false);
+  const zipInputRef = React.useRef(null);
+  const folderInputRef = React.useRef(null);
+
+  const processZip = async (file) => {
+    const zip = await JSZip.loadAsync(file);
+    const fileList = [];
+    zip.forEach((relativePath, zipEntry) => {
+      if (!zipEntry.dir && relativePath.endsWith(".lua")) {
+        const fileName = relativePath.split("/").pop();
+        fileList.push({ path: relativePath, name: fileName, selected: true });
+      }
+    });
+    const originalName = file.name.replace(".zip", "");
+    onFilesLoaded(fileList, zip, originalName, "zip");
+  };
+
+  // Procesar CARPETA
+  const processFolder = async (fileListRaw) => {
+    if (!fileListRaw || fileListRaw.length === 0) return;
+    
+    const firstPath = fileListRaw[0].webkitRelativePath || "";
+    const folderName = firstPath.split("/")[0] || "carpeta_seleccionada";
+    
+    const virtualZip = new JSZip();
+    const luaFiles = [];
+    
+    for (const file of fileListRaw) {
+      const relativePath = file.webkitRelativePath;
+      virtualZip.file(relativePath, file);
+      
+      if (file.name.toLowerCase().endsWith(".lua")) {
+        luaFiles.push({
+          path: relativePath,
+          name: file.name,
+          selected: true
+        });
+      }
+    }
+    
+    if (luaFiles.length === 0) {
+      alert("⚠️ No se encontraron archivos .lua en la carpeta seleccionada.");
+      return;
+    }
+    
+    onFilesLoaded(luaFiles, virtualZip, folderName, "folder");
+  };
+
+  const handleDrop = (ev) => {
+    ev.preventDefault();
+    setIsDragging(false);
+    const file = ev.dataTransfer.files[0];
+    if (file && file.name.endsWith(".zip")) {
+      processZip(file);
+    } else {
+      alert("Para arrastrar, usa un archivo .zip. Para carpetas, usa el botón 'Seleccionar Carpeta'.");
+    }
+  };
+
+  const handleZipSelect = (ev) => {
+    const file = ev.target.files[0];
+    if (file) processZip(file);
+    ev.target.value = "";
+  };
+
+  const handleFolderSelect = (ev) => {
+    const files = ev.target.files;
+    if (files && files.length > 0) processFolder(files);
+    ev.target.value = "";
+  };
+
+  return e("div", { className: "card slide-up", id: "compiler-section" },
+    e("div", {
+      className: `upload-zone ${isDragging ? "dragover" : ""}`,
+      onDragOver: (ev) => { ev.preventDefault(); setIsDragging(true); },
+      onDragLeave: () => setIsDragging(false),
+      onDrop: handleDrop,
+      onClick: () => zipInputRef.current?.click()
+    },
+      e("i", { className: "fa-solid fa-cloud-arrow-up" }),
+      e("h3", null, "Arrastra tu archivo ZIP aquí"),
+      e("p", null, "o haz clic para seleccionar un .zip")
+    ),
+    
+    e("div", { className: "mode-selector" },
+      e("button", {
+        className: "mode-btn",
+        onClick: () => zipInputRef.current?.click()
+      },
+        e("i", { className: "fa-solid fa-file-zipper" }),
+        e("div", null,
+          e("div", null, "Subir ZIP"),
+          e("small", null, "Archivo comprimido")
+        )
+      ),
+      e("button", {
+        className: "mode-btn",
+        onClick: () => folderInputRef.current?.click()
+      },
+        e("i", { className: "fa-solid fa-folder-open" }),
+        e("div", null,
+          e("div", null, "Seleccionar Carpeta"),
+          e("small", null, "Carpeta completa")
+        )
+      )
+    ),
+    
+    e("input", {
+      ref: zipInputRef, type: "file", accept: ".zip",
+      onChange: handleZipSelect, style: { display: "none" }
+    }),
+    e("input", {
+      ref: folderInputRef, type: "file",
+      webkitdirectory: "true",
+      directory: "true",
+      multiple: true,
+      onChange: handleFolderSelect, style: { display: "none" }
+    })
+  );
+}
+
+function FileItem({ file, onToggle }) {
+  return e("div", { className: "file-row" },
+    e("input", { type: "checkbox", checked: file.selected, onChange: onToggle }),
+    e("i", { className: "fa-solid fa-file-code fi" }),
+    e("div", { style: { flex: 1, minWidth: 0 } },
+      e("div", { className: "fn" }, file.name),
+      e("div", { className: "fp" }, file.path)
+    )
+  );
+}
+
+function FileList({ files, onToggle, onSelectAll, onDeselectAll, zipFile, zipFileName, isCompiling, setIsCompiling, sourceType }) {
+  const [progress, setProgress] = React.useState({ current: 0, total: 0, file: "", status: "" });
+  const [errors, setErrors] = React.useState([]);
+  const selectedCount = files.filter(f => f.selected).length;
+
+  const handleCompile = async () => {
+    setIsCompiling(true);
+    setErrors([]);
+    setProgress({ current: 0, total: selectedCount, file: "", status: "Iniciando..." });
+
+    try {
+      const onProgress = (current, total, fileName, success, error) => {
+        setProgress({ current, total, file: fileName, status: success ? "Compilado" : "Error" });
+        if (!success && error) setErrors(prev => [...prev, { file: fileName, error }]);
+      };
+
+      const compiledZip = await compileScripts(zipFile, files, onProgress);
+      const blob = await compiledZip.generateAsync({ type: "blob" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${zipFileName}_compiled.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Compilation error:", err);
+      alert("Error durante la compilación: " + err.message);
+    }
+    setIsCompiling(false);
+  };
+
+  return e("div", { className: "card slide-up" },
+
+    e(ResourceSummary, {
+      resourceName: zipFileName,
+      files: files,
+      selectedCount: selectedCount,
+      sourceType: sourceType
+    }),
+
+    e("div", { className: "section-header" },
+      e("h2", null, e("i", { className: "fa-solid fa-box-archive" }), " Archivos a procesar"),
+      e("div", { style: { display: "flex", gap: "8px" } },
+        e("button", { onClick: onSelectAll, className: "btn-secondary" },
+          e("i", { className: "fa-solid fa-check-double" }), " Marcar todos"),
+        e("button", { onClick: onDeselectAll, className: "btn-secondary" },
+          e("i", { className: "fa-solid fa-xmark" }), " Desmarcar")
+      )
+    ),
+
+    e("div", { className: "file-list" },
+      files.length === 0
+        ? e("div", { className: "empty-state" },
+            e("i", { className: "fa-regular fa-folder-open" }),
+            e("p", { style: { margin: 0 } }, "No se encontraron archivos .lua")
+          )
+        : files.map((file, index) =>
+            e(FileItem, { key: file.path, file, onToggle: () => onToggle(index) })
+          )
+    ),
+
+    isCompiling && e("div", { className: "status-box" },
+      e("div", { style: { display: "flex", justifyContent: "space-between", marginBottom: "8px", fontSize: "14px" } },
+        e("span", { style: { color: "var(--accent)" } },
+          e("i", { className: "fa-solid fa-spinner fa-spin" }), " Compilando: ", e("strong", null, progress.file)),
+        e("span", { style: { color: "var(--muted)" } }, progress.current, " / ", progress.total)
+      ),
+      e("div", { className: "progress-container" },
+        e("div", {
+          className: "progress-bar",
+          style: { width: progress.total ? `${(progress.current / progress.total) * 100}%` : "0%" }
+        })
+      )
+    ),
+
+    errors.length > 0 && e("div", { className: "status-box error" },
+      e("strong", null, e("i", { className: "fa-solid fa-triangle-exclamation" }), " Errores de compilación:"),
+      errors.map((err, i) => e("p", { key: i }, e("strong", null, err.file, ": "), err.error))
+    ),
+
+    e("div", {
+      style: {
+        display: "flex", justifyContent: "space-between", alignItems: "center",
+        paddingTop: "16px", marginTop: "16px",
+        borderTop: "1px solid rgba(255,255,255,0.05)",
+        flexWrap: "wrap", gap: "10px"
+      }
+    },
+      e("span", { style: { color: "var(--muted)", fontSize: "14px" } },
+        e("i", { className: "fa-solid fa-circle-check", style: { color: "var(--accent)" } }),
+        " ", selectedCount, " de ", files.length, " archivos seleccionados"),
+      e("button", {
+        onClick: handleCompile,
+        disabled: selectedCount === 0 || isCompiling,
+        className: "btn-primary"
+      },
+        isCompiling
+          ? e(React.Fragment, null, e("i", { className: "fa-solid fa-spinner fa-spin" }), " Compilando...")
+          : e(React.Fragment, null, e("i", { className: "fa-solid fa-shield-halved" }), " COMPILAR Y DESCARGAR")
+      )
+    )
+  );
+}
+
+async function compileScripts(originalZip, files, onProgress) {
+  const newZip = new JSZip();
+  let compiled = 0;
+  const toCompile = files.filter(f => f.selected).length;
+
+  for (const file of files) {
+    const content = await originalZip.file(file.path).async("string");
+    if (file.selected) {
+      try {
+        const compiledContent = await compileLuaFile(content);
+
+        newZip.file(file.path, compiledContent);
+        compiled++;
+        if (onProgress) onProgress(compiled, toCompile, file.name, true);
+      } catch (err) {
+        newZip.file(file.path, content);
+        if (onProgress) onProgress(compiled, toCompile, file.name, false, err.message);
+      }
+    } else {
+      newZip.file(file.path, content);
+    }
+  }
+
+  const allFiles = [];
+  originalZip.forEach((path, entry) => {
+    if (!entry.dir && !path.endsWith(".lua")) allFiles.push({ path, entry });
+  });
+
+  for (const { path, entry } of allFiles) {
+    if (path.endsWith("meta.xml")) {
+      let metaContent = await entry.async("string");
+
+      newZip.file(path, metaContent);
+    } else {
+      const content = await entry.async("uint8array");
+      newZip.file(path, content);
+    }
+  }
+  return newZip;
+}
+
+function App() {
+  const [files, setFiles] = React.useState([]);
+  const [isCompiling, setIsCompiling] = React.useState(false);
+  const [zipFile, setZipFile] = React.useState(null);
+  const [zipFileName, setZipFileName] = React.useState("");
+  const [sourceType, setSourceType] = React.useState("");
+
+  const handleFilesLoaded = (loadedFiles, originalZip, fileName, type) => {
+    setFiles(loadedFiles);
+    setZipFile(originalZip);
+    setZipFileName(fileName);
+    setSourceType(type);
+  };
+
+  const toggleFile = (index) => {
+    setFiles(prev => prev.map((f, i) => i === index ? { ...f, selected: !f.selected } : f));
+  };
+
+  const selectAll = () => setFiles(prev => prev.map(f => ({ ...f, selected: true })));
+  const deselectAll = () => setFiles(prev => prev.map(f => ({ ...f, selected: false })));
+
+  return e("main", null,
+    e(FileUploader, { onFilesLoaded: handleFilesLoaded }),
+    files.length > 0 && e(FileList, {
+      files, onToggle: toggleFile,
+      onSelectAll: selectAll, onDeselectAll: deselectAll,
+      zipFile, zipFileName, isCompiling, setIsCompiling, sourceType
+    })
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(e(App));
+</script>
+
+</body>
+</html>

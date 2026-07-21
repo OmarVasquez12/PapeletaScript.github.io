@@ -1,0 +1,143 @@
+<!-- SECCIÓN CREAR ROL - FRAGMENTO -->
+<div class="max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Panel Izquierdo -->
+        <div class="lg:col-span-2 space-y-6">
+            <div class="card p-6 rounded-xl">
+                <h2 class="text-2xl font-black text-white mb-6 flex items-center gap-2">
+                    <i class="fas fa-plus-circle text-red-500"></i>
+                    Crear Nuevo Rol
+                </h2>
+                <form id="create-role-form" onsubmit="handleCreateRoleCR(event)" class="space-y-5">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="md:col-span-2">
+                            <label class="block text-gray-300 text-sm font-semibold mb-2">Nombre del Rol *</label>
+                            <input type="text" id="role-name" required 
+                                class="input-field w-full rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none" 
+                                placeholder="Ej: Ayudante, Soporte VIP...">
+                        </div>
+                        <div>
+                            <label class="block text-gray-300 text-sm font-semibold mb-2">Color Identificativo</label>
+                            <div class="flex items-center gap-3 h-[46px]">
+                                <div class="w-10 h-10 rounded-lg overflow-hidden border-2 border-red-900/40 cursor-pointer relative" id="color-preview" style="background-color: #ff1a1a;">
+                                    <input type="color" id="role-color" value="#ff1a1a" onchange="updateColorPreviewCR(this.value)" class="absolute top-[-50%] left-[-50%] w-[200%] h-[200%] cursor-pointer border-none p-0 opacity-0">
+                                    <div class="absolute inset-0 pointer-events-none"></div>
+                                </div>
+                                <span class="text-gray-400 text-xs font-mono" id="color-hex">#FF1A1A</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-gray-300 text-sm font-semibold mb-2">Descripción del Rol</label>
+                        <textarea id="role-desc" rows="2" 
+                            class="input-field w-full rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none resize-none" 
+                            placeholder="Describe brevemente las funciones de este rol..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-gray-300 text-sm font-semibold mb-3">Permisos y Accesos</label>
+                        <div class="space-y-2">
+                            <div class="permission-item">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-cog text-gray-400 w-5"></i>
+                                    <div>
+                                        <p class="text-white text-sm font-semibold">Acceso al Panel Config</p>
+                                        <p class="text-gray-500 text-xs">Puede ver el menú lateral de administración</p>
+                                    </div>
+                                </div>
+                                <div class="toggle-switch" onclick="togglePermissionCR(this, 'canAccessConfig')" data-perm="canAccessConfig">
+                                    <div class="toggle-knob"></div>
+                                </div>
+                            </div>
+                            <!-- Repite los otros 5 permisos igual que en tu código original -->
+                            <div class="permission-item">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-cloud-upload-alt text-gray-400 w-5"></i>
+                                    <div>
+                                        <p class="text-white text-sm font-semibold">Subir Productos</p>
+                                        <p class="text-gray-500 text-xs">Puede agregar nuevos recursos a la tienda</p>
+                                    </div>
+                                </div>
+                                <div class="toggle-switch" onclick="togglePermissionCR(this, 'canUploadProducts')" data-perm="canUploadProducts">
+                                    <div class="toggle-knob"></div>
+                                </div>
+                            </div>
+                            <div class="permission-item">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-trash text-gray-400 w-5"></i>
+                                    <div>
+                                        <p class="text-white text-sm font-semibold">Eliminar Productos</p>
+                                        <p class="text-gray-500 text-xs">Puede borrar productos existentes</p>
+                                    </div>
+                                </div>
+                                <div class="toggle-switch" onclick="togglePermissionCR(this, 'canDeleteProducts')" data-perm="canDeleteProducts">
+                                    <div class="toggle-knob"></div>
+                                </div>
+                            </div>
+                            <div class="permission-item">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-user-plus text-gray-400 w-5"></i>
+                                    <div>
+                                        <p class="text-white text-sm font-semibold">Asignar Productos</p>
+                                        <p class="text-gray-500 text-xs">Puede regalar productos a usuarios manualmente</p>
+                                    </div>
+                                </div>
+                                <div class="toggle-switch" onclick="togglePermissionCR(this, 'canAssignProducts')" data-perm="canAssignProducts">
+                                    <div class="toggle-knob"></div>
+                                </div>
+                            </div>
+                            <div class="permission-item">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-key text-gray-400 w-5"></i>
+                                    <div>
+                                        <p class="text-white text-sm font-semibold">Ver Licencias</p>
+                                        <p class="text-gray-500 text-xs">Puede ver el historial de compras y licencias</p>
+                                    </div>
+                                </div>
+                                <div class="toggle-switch" onclick="togglePermissionCR(this, 'canViewLicenses')" data-perm="canViewLicenses">
+                                    <div class="toggle-knob"></div>
+                                </div>
+                            </div>
+                            <div class="permission-item">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-users-cog text-gray-400 w-5"></i>
+                                    <div>
+                                        <p class="text-white text-sm font-semibold">Gestionar Roles</p>
+                                        <p class="text-gray-500 text-xs">Puede cambiar roles de otros usuarios</p>
+                                    </div>
+                                </div>
+                                <div class="toggle-switch" onclick="togglePermissionCR(this, 'canManageRoles')" data-perm="canManageRoles">
+                                    <div class="toggle-knob"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-create w-full py-4 rounded-xl text-white font-bold text-lg flex items-center justify-center gap-3">
+                        <i class="fas fa-save"></i>
+                        Guardar Nuevo Rol
+                    </button>
+                </form>
+            </div>
+        </div>
+        <!-- Panel Derecho -->
+        <div class="lg:col-span-1">
+            <div class="card p-6 rounded-xl sticky top-24">
+                <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                    <i class="fas fa-list text-red-500"></i>
+                    Roles Activos
+                </h3>
+                <div id="roles-list" class="space-y-3 max-h-[600px] overflow-y-auto custom-scrollbar pr-2">
+                    <div class="text-center py-8 text-gray-400">
+                        <i class="fas fa-spinner loading-spinner text-2xl mb-2"></i>
+                        <p>Cargando roles...</p>
+                    </div>
+                </div>
+                <div class="mt-6 pt-6 border-t border-white/10">
+                    <p class="text-gray-500 text-xs text-center">
+                        Los roles se guardan localmente.<br>
+                        Asigna estos roles en "Usuarios Autorizados".
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
