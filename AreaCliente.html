@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Area De Clientes | Papeleta Store</title>
+    <title>Area De Clientes</title>
     <!-- Icono Rojo -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff1a1a'/%3E%3Cstop offset='1' stop-color='%23cc1b1b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Ctext x='50' y='70' font-family='Arial, sans-serif' font-size='58' font-weight='900' fill='white' text-anchor='middle'%3EP%3C/text%3E%3C/svg%3E">
 
@@ -280,7 +280,7 @@
                         <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
                             <i class="fas fa-server text-red-400"></i>
                         </div>
-                        <h2 class="text-lg font-bold text-white">Configuración MTA</h2>
+                        <h2 class="text-lg font-bold text-white">Configuracion MTA</h2>
                     </div>
 
                     <div class="space-y-4 mb-6">
@@ -297,11 +297,11 @@
 
                     <div class="mb-6">
                         <div class="flex items-center justify-between mb-2">
-                            <label class="block text-gray-400 text-xs uppercase font-semibold tracking-wider">Código de Licencia</label>
+                            <label class="block text-gray-400 text-xs uppercase font-semibold tracking-wider">Codigo de Licencia</label>
                             <span class="text-[10px] text-red-400 font-mono bg-red-900/20 px-2 py-0.5 rounded">LUA CONFIG</span>
                         </div>
                         <div class="code-block rounded-lg p-4 font-mono text-sm relative group">
-                            <pre class="text-red-300 whitespace-pre-wrap break-all"><code id="license-code">Inicia sesión para ver tu código...</code></pre>
+                            <pre class="text-red-300 whitespace-pre-wrap break-all"><code id="license-code">Generando tu licencia fija...</code></pre>
                         </div>
                     </div>
 
@@ -319,7 +319,7 @@
                     <div class="bg-red-900/10 border border-red-500/10 rounded-lg p-3">
                         <div class="flex items-start gap-2">
                             <i class="fas fa-info-circle text-red-400 mt-0.5 text-xs"></i>
-                            <p class="text-xs text-gray-400 leading-relaxed">Copia este código en tu archivo de configuración `.lua` para activar las licencias en este servidor.</p>
+                            <p class="text-xs text-gray-400 leading-relaxed">Esta es tu licencia personal única. Copia este código en tu archivo `.lua` para activar cualquier script de Papeleta Store en este servidor.</p>
                         </div>
                     </div>
                 </div>
@@ -369,7 +369,7 @@
         let currentUser = null;
         let allProducts = [];
         let myAssignedProductIds = new Set();
-        let allLicenses = [];
+        let userFixedLicenseKey = null; // Variable para guardar la licencia fija
 
         // --- AUTH FUNCTIONS ---
         function redirectToDiscord() {
@@ -416,8 +416,12 @@
                 }
                 
                 document.getElementById('login-modal').classList.add('hidden');
-                loadDashboardData();
-                loadLicenses();
+                
+                // Primero aseguramos la licencia fija, luego cargamos el resto
+                ensureFixedLicense().then(() => {
+                    loadDashboardData();
+                    updateLicenseDisplay();
+                });
             })
             .catch(err => {
                 console.error(err);
@@ -432,9 +436,71 @@
         }
 
         function showSection(section) {
-            // Placeholder for future sections
             if (section === 'store') {
                 window.location.href = 'index.html';
+            }
+        }
+
+        // --- LICENCIA FIJA GLOBAL ---
+        function generateUniqueKey() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; 
+            let key = '';
+            for (let i = 0; i < 24; i++) key += chars.charAt(Math.floor(Math.random() * chars.length));
+            return key;
+        }
+
+        async function ensureFixedLicense() {
+            if (!currentUser) return;
+            
+            try {
+                // Buscar si ya tiene una licencia de tipo 'general'
+                const snapshot = await db.collection("Licencias")
+                    .where("discord_id", "==", currentUser.id)
+                    .where("type", "==", "general")
+                    .limit(1)
+                    .get();
+                
+                if (!snapshot.empty) {
+                    // Ya tiene licencia fija, la guardamos
+                    const doc = snapshot.docs[0];
+                    userFixedLicenseKey = doc.data().key;
+                } else {
+                    // No tiene, creamos una nueva PERMANENTE
+                    const newKey = generateUniqueKey();
+                    const licenseData = {
+                        discord_id: currentUser.id,
+                        username: currentUser.username,
+                        product_id: "GENERAL_ACCESS",
+                        product_name: "Licencia Global Papeleta Store",
+                        key: newKey,
+                        type: "general", // Marcador especial
+                        created_at: firebase.firestore.FieldValue.serverTimestamp(),
+                        status: 'active'
+                    };
+                    
+                    await db.collection("Licencias").add(licenseData);
+                    userFixedLicenseKey = newKey;
+                }
+            } catch (error) {
+                console.error("Error gestionando licencia fija:", error);
+            }
+        }
+
+        function updateLicenseDisplay() {
+            const codeBlock = document.getElementById('license-code');
+            
+            if (userFixedLicenseKey && currentUser) {
+                const code = `-- Configuración de Licencia Papeleta Store
+-- Usuario: ${currentUser.username}
+-- ID: ${currentUser.id}
+
+configLicense = {
+    ["User"] = "${currentUser.username}", 
+    ["Key"] = "PapeletaStore(${userFixedLicenseKey})"
+}`;
+                codeBlock.textContent = code;
+            } else {
+                codeBlock.textContent = "// Generando licencia segura...";
             }
         }
 
@@ -443,8 +509,6 @@
             if (!currentUser) return;
 
             try {
-                console.log("Cargando datos para usuario:", currentUser.id);
-                
                 // Cargar productos disponibles
                 const productsSnapshot = await db.collection("Productos").get();
                 allProducts = [];
@@ -478,15 +542,14 @@
                                         totalSpent += parseFloat(String(prod.price).replace('$', '')) || 0;
                                     }
                                 } else {
-                                    // Fallback si el producto fue borrado de la tienda pero sigue en la compra
                                     purchasedProducts.push({
                                         id: prod.id,
                                         name: prod.name || 'Producto Desconocido',
                                         price: prod.price || purchase.total_price || 'Gratis',
-                                        image_url: '', // Sin imagen
+                                        image_url: '',
                                         purchaseDate: purchase.date?.toDate ? purchase.date.toDate() : new Date(),
                                         status: prod.status || purchase.status || 'Activo',
-                                        file_data: null // No se puede descargar si no existe en productos
+                                        file_data: null
                                     });
                                 }
                             });
@@ -494,7 +557,7 @@
                     }
                 });
 
-                // Actualizar UI
+                // Actualizar UI Stats
                 document.getElementById('stat-total-spent').innerText = '$' + totalSpent.toFixed(2);
                 document.getElementById('stat-active-scripts').innerText = purchasedProducts.length;
                 
@@ -574,45 +637,10 @@
             }
         }
 
-        // --- LICENSE FUNCTIONS ---
-        async function loadLicenses() {
-            if (!currentUser) return;
-            
-            try {
-                const snapshot = await db.collection("Licencias")
-                    .where("discord_id", "==", currentUser.id)
-                    .get();
-                
-                allLicenses = [];
-                snapshot.forEach((doc) => {
-                    allLicenses.push({ id: doc.id, ...doc.data() });
-                });
-                
-                if (allLicenses.length > 0) {
-                    updateLicenseCode();
-                } else {
-                    document.getElementById('license-code').textContent = "// No tienes licencias activas generadas.";
-                }
-            } catch (error) {
-                console.error("Error cargando licencias:", error);
-            }
-        }
-
-        function updateLicenseCode() {
-            if (allLicenses.length > 0 && currentUser) {
-                const license = allLicenses[0]; // Tomamos la primera licencia como ejemplo
-                
-                const code = `configLicense = {
-    ["User"] = "${currentUser.username}", 
-    ["Key"] = "PapeletaStore(${license.key})"
-}`;
-                document.getElementById('license-code').textContent = code;
-            }
-        }
-
+        // --- UTILS ---
         function copyLicenseCode() {
             const code = document.getElementById('license-code').textContent;
-            if(code.includes("No tienes licencias")) return;
+            if(code.includes("Generando")) return;
 
             navigator.clipboard.writeText(code).then(() => {
                 const btn = event.currentTarget;
