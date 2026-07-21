@@ -30,7 +30,6 @@
             overflow-x: hidden;
         }
 
-        /* Fondo de Red Animada */
         #network-bg {
             position: fixed;
             inset: 0;
@@ -141,7 +140,15 @@
             text-shadow: 0 0 10px rgba(74, 222, 128, 0.3);
         }
 
-        /* ESTILOS DEL MODAL DEL CARRITO (Copiados de index.html) */
+        /* Badge de Ya Obtenido */
+        .badge-obtenido {
+            background: linear-gradient(to right, #16a34a, #15803d);
+            box-shadow: 0 4px 15px rgba(22, 163, 74, 0.3);
+        }
+        .badge-obtenido:hover {
+            box-shadow: 0 6px 20px rgba(22, 163, 74, 0.5);
+        }
+
         .cart-modal-overlay {
             display: none;
             position: fixed;
@@ -200,10 +207,8 @@
 </head>
 <body class="relative">
 
-    <!-- Fondo Animado -->
     <canvas id="network-bg"></canvas>
 
-    <!-- Header Simple -->
     <header class="relative z-10 border-b border-white/5 bg-black/40 backdrop-blur-md sticky top-0">
         <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='index.html'">
@@ -215,7 +220,6 @@
                 <a href="index.html" class="text-gray-400 hover:text-white text-sm flex items-center gap-2 transition-colors hidden md:flex">
                     <i class="fas fa-arrow-left"></i> Volver a la Tienda
                 </a>
-                <!-- Botón Carrito en Header -->
                 <button onclick="openCartModal()" class="relative group p-2">
                     <i class="fas fa-shopping-cart text-xl text-gray-300 group-hover:text-red-500 transition-colors"></i>
                     <span id="header-cart-count" class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
@@ -224,12 +228,10 @@
         </div>
     </header>
 
-    <!-- Contenido Principal -->
     <main class="relative z-10 w-full max-w-7xl ml-4 md:ml-10 py-10 pr-4">
         
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
             
-            <!-- COLUMNA IZQUIERDA: GALERÍA -->
             <div class="lg:col-span-7 flex flex-col">
                 <div class="gallery-frame shadow-2xl shadow-red-900/10 group">
                     <img id="main-image" src="" alt="Producto" class="gallery-image p-2">
@@ -254,7 +256,6 @@
                 </div>
             </div>
 
-            <!-- COLUMNA DERECHA: DETALLES Y COMPRA -->
             <div class="lg:col-span-5 flex flex-col gap-6">
                 
                 <div class="flex gap-3 mb-2">
@@ -274,7 +275,7 @@
 
                 <div class="flex flex-col gap-4 mt-2">
                     
-                    <button id="main-action-btn" onclick="addToCartFromDetail()" class="btn-primary w-full py-4 rounded-xl text-white font-bold text-lg flex items-center justify-center gap-3 shadow-lg">
+                    <button id="main-action-btn" onclick="handleMainAction()" class="btn-primary w-full py-4 rounded-xl text-white font-bold text-lg flex items-center justify-center gap-3 shadow-lg">
                         <!-- JS inyectará icono y texto aquí -->
                     </button>
 
@@ -304,12 +305,11 @@
         </div>
     </main>
 
-    <!-- Footer -->
     <footer class="relative z-10 border-t border-white/5 bg-black/40 text-center py-6 text-xs text-gray-600 mt-10">
         <p>&copy; 2026 Papeleta Store. Todos los derechos reservados.</p>
     </footer>
 
-    <!-- MODAL DEL CARRITO (NUEVO) -->
+    <!-- MODAL DEL CARRITO -->
     <div id="cart-modal" class="cart-modal-overlay">
         <div class="cart-modal-content">
             <div class="cart-header">
@@ -323,9 +323,7 @@
             </div>
 
             <div class="cart-body custom-scrollbar">
-                <div id="cart-items" class="space-y-3">
-                    <!-- Items se generan aquí -->
-                </div>
+                <div id="cart-items" class="space-y-3"></div>
                 
                 <div id="cart-empty" class="hidden text-center py-8">
                     <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-[#0d0505] flex items-center justify-center">
@@ -350,7 +348,6 @@
         </div>
     </div>
 
-    <!-- LÓGICA JAVASCRIPT -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
@@ -372,6 +369,8 @@
         let images = [];
         let currentIndex = 0;
         let isFree = false;
+        let userAlreadyOwns = false; // NUEVO: Verificar si ya lo tiene
+        let currentUserDiscordId = null;
 
         // --- LÓGICA DEL CARRITO ---
         let cart = JSON.parse(localStorage.getItem('papeleta_cart') || '[]');
@@ -379,7 +378,7 @@
         function saveCart() {
             localStorage.setItem('papeleta_cart', JSON.stringify(cart));
             updateCartBadge();
-            renderCartItems(); // Actualizar modal si está abierto
+            renderCartItems();
         }
 
         function updateCartBadge() {
@@ -399,7 +398,7 @@
             const exists = cart.find(item => item.id === currentProduct.id);
             if (exists) {
                 alert("Este producto ya está en tu carrito.");
-                openCartModal(); // Abrir carrito si ya existe
+                openCartModal();
                 return;
             }
 
@@ -412,7 +411,6 @@
 
             saveCart();
             
-            // Feedback visual en botón
             const btn = document.getElementById('main-action-btn');
             const originalText = btn.innerHTML;
             btn.innerHTML = `<i class="fas fa-check"></i> ¡Añadido!`;
@@ -421,7 +419,7 @@
             setTimeout(() => {
                 btn.innerHTML = originalText;
                 btn.style.background = "";
-                openCartModal(); // ABRIR EL CARRITO AUTOMÁTICAMENTE
+                openCartModal();
             }, 800);
         }
 
@@ -430,7 +428,6 @@
             saveCart();
         }
 
-        // --- FUNCIONES DEL MODAL ---
         function openCartModal() {
             renderCartItems();
             document.getElementById('cart-modal').classList.add('active');
@@ -476,8 +473,74 @@
 
         function goToCheckout() {
             if (cart.length === 0) return;
-            // Redirigir al index para procesar el pago real (PayPal/Discord)
             window.location.href = 'index.html';
+        }
+
+        // NUEVA FUNCIÓN: Manejar acción principal según estado
+        function handleMainAction() {
+            if (userAlreadyOwns) {
+                // Si ya lo tiene, redirigir al área de cliente
+                window.location.href = 'AreaCliente.html';
+            } else {
+                // Si no lo tiene, añadir al carrito
+                addToCartFromDetail();
+            }
+        }
+
+        // NUEVA FUNCIÓN: Verificar si el usuario ya tiene el producto
+        async function checkIfUserOwnsProduct() {
+            const token = localStorage.getItem('dc_access_token');
+            if (!token) {
+                currentUserDiscordId = null;
+                return false;
+            }
+
+            try {
+                // Obtener info del usuario
+                const res = await fetch('https://discord.com/api/users/@me', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!res.ok) {
+                    localStorage.removeItem('dc_access_token');
+                    return false;
+                }
+
+                const user = await res.json();
+                currentUserDiscordId = user.id;
+
+                // Buscar en Licencias
+                const licensesSnapshot = await db.collection("Licencias")
+                    .where("discord_id", "==", user.id)
+                    .where("product_id", "==", productId)
+                    .get();
+
+                if (!licensesSnapshot.empty) {
+                    return true; // Ya tiene una licencia
+                }
+
+                // También verificar en Clientes (compras)
+                const clientsSnapshot = await db.collection("Clientes")
+                    .where("discord_id", "==", user.id)
+                    .get();
+
+                let ownsProduct = false;
+                clientsSnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    if (data.products && Array.isArray(data.products)) {
+                        const productFound = data.products.find(p => p.id === productId);
+                        if (productFound) {
+                            ownsProduct = true;
+                        }
+                    }
+                });
+
+                return ownsProduct;
+
+            } catch (error) {
+                console.error("Error verificando propiedad del producto:", error);
+                return false;
+            }
         }
 
         // --- CARGAR PRODUCTO ---
@@ -489,6 +552,9 @@
                 if (!doc.exists) return window.location.href = 'index.html';
 
                 currentProduct = doc.data();
+
+                // 1. Verificar si el usuario ya tiene el producto
+                userAlreadyOwns = await checkIfUserOwnsProduct();
 
                 const priceVal = Number(currentProduct.price);
                 const priceStr = String(currentProduct.price).toLowerCase();
@@ -503,13 +569,34 @@
                 const secBtn = document.getElementById('secondary-action-btn');
                 const divider = document.getElementById('divider-buy');
 
-                if (isFree) {
+                // 2. Configurar botón según si ya lo tiene o no
+                if (userAlreadyOwns) {
+                    // USUARIO YA TIENE EL PRODUCTO
+                    priceTag.innerHTML = `<span class="text-green-400" style="text-shadow: 0 0 10px rgba(74, 222, 128, 0.5);">OBTENIDO</span>`;
+                    
+                    mainBtn.className = "badge-obtenido w-full py-4 rounded-xl text-white font-bold text-lg flex items-center justify-center gap-3 shadow-lg transition-all";
+                    mainBtn.innerHTML = `<i class="fas fa-book-open"></i> Ir a mi Biblioteca`;
+                    
+                    // Ocultar botón de compra con tarjeta
+                    secBtn.classList.add('hidden');
+                    divider.classList.add('hidden');
+
+                    // Mostrar badge de obtenido
+                    const badge = document.createElement('span');
+                    badge.className = "absolute top-4 right-4 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg animate-pulse";
+                    badge.innerHTML = '<i class="fas fa-check-circle mr-1"></i>YA LO TIENES';
+                    document.querySelector('.gallery-frame').appendChild(badge);
+
+                } else if (isFree) {
+                    // PRODUCTO GRATIS - NO LO TIENE AÚN
                     priceTag.innerHTML = `<span class="badge-gratis">GRATIS</span>`;
                     mainBtn.className = "btn-primary w-full py-4 rounded-xl text-white font-bold text-lg flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(74,222,128,0.2)]";
                     mainBtn.innerHTML = `<i class="fas fa-gift"></i> Añadir al Carrito (Gratis)`;
                     secBtn.innerHTML = `<i class="fas fa-info-circle"></i> Más Información`;
                     divider.classList.add('hidden');
+
                 } else {
+                    // PRODUCTO DE PAGO - NO LO TIENE AÚN
                     priceTag.textContent = `$${currentProduct.price}`;
                     mainBtn.className = "btn-primary w-full py-4 rounded-xl text-white font-bold text-lg flex items-center justify-center gap-3";
                     mainBtn.innerHTML = `<i class="fas fa-shopping-cart"></i> Añadir al Carrito`;
