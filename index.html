@@ -4,12 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Papeleta Store | Recursos para MTA:SA</title>
+    <!-- Icono SVG -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff1a1a'/%3E%3Cstop offset='1' stop-color='%23cc1b1b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Ctext x='50' y='70' font-family='Arial, sans-serif' font-size='58' font-weight='900' fill='white' text-anchor='middle'%3EP%3C/text%3E%3C/svg%3E">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.paypal.com/sdk/js?client-id=sb&currency=USD"></script>
 
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
@@ -17,23 +19,9 @@
         :root {
             --bg-body: #050507;
             --bg-card: rgba(20, 10, 10, 0.6);
-            --bg-glass: rgba(255, 255, 255, 0.03);
-            --bg-glass-strong: rgba(20, 10, 10, 0.85);
             --primary: #ff1a1a;
-            --primary-glow: rgba(255, 26, 26, 0.4);
-            --secondary: #cc1b1b;
-            --success: #00ff44;
-            --danger: #ff0000;
             --discord-blue: #5865F2;
             --text-main: #ffffff;
-            --text-muted: #9496a1;
-            --text-dim: #6b7280;
-            --border-color: rgba(255, 26, 26, 0.15);
-            --border-hover: rgba(255, 26, 26, 0.3);
-            --radius-sm: 8px;
-            --radius-md: 16px;
-            --radius-lg: 24px;
-            --container-width: 1400px;
         }
         
         body {
@@ -42,22 +30,14 @@
             font-family: 'Segoe UI', system-ui, sans-serif;
         }
 
-        /* --- SCROLLBAR PERSONALIZADO (GRIS RATÓN) PARA TODA LA PÁGINA --- */
+        /* Scrollbar */
         ::-webkit-scrollbar { width: 10px; }
         ::-webkit-scrollbar-track { background: #111111; }
         ::-webkit-scrollbar-thumb { background: #6e6e6e; border-radius: 5px; border: 2px solid #111111; }
         ::-webkit-scrollbar-thumb:hover { background: #858585; }
 
-        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #1a1a1a; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #6e6e6e; border-radius: 4px; }
-
-        .red-glow {
-            text-shadow: 0 0 18px rgba(255, 26, 26, 0.85), 0 0 36px rgba(204, 27, 27, 0.4);
-        }
-        .red-border {
-            border-color: rgba(255, 26, 26, 0.25);
-        }
+        .red-glow { text-shadow: 0 0 18px rgba(255, 26, 26, 0.85); }
+        .red-border { border-color: rgba(255, 26, 26, 0.25); }
         
         #network-bg { position: fixed; inset: 0; z-index: 0; opacity: 0.5; pointer-events: none; }
         .page { display: none; }
@@ -65,191 +45,47 @@
         .nav-link.active-page { color: #ff6b6b; }
         
         .cart-badge {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #ff1a1a;
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            font-weight: bold;
-            animation: bounce 0.3s ease;
+            position: absolute; top: -8px; right: -8px; background: #ff1a1a; color: white;
+            border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center;
+            justify-content: center; font-size: 11px; font-weight: bold; animation: bounce 0.3s ease;
         }
         
-        @keyframes bounce {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-        }
+        @keyframes bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
 
         .product-detail-modal { backdrop-filter: blur(10px); }
         
-        .image-preview {
-            max-width: 100%;
-            max-height: 200px;
-            border-radius: 8px;
-            margin-top: 10px;
-        }
-
+        /* Galería */
         .gallery-container { position: relative; }
-        
         .gallery-main-image {
-            width: 100%;
-            height: 400px;
-            object-fit: contain;
-            border-radius: 16px;
+            width: 100%; height: 400px; object-fit: contain; border-radius: 16px;
             background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(153, 27, 27, 0.1));
         }
-        
-        .gallery-thumbnails {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            overflow-x: auto;
-            padding: 5px;
-        }
-        
+        .gallery-thumbnails { display: flex; gap: 10px; margin-top: 15px; overflow-x: auto; padding: 5px; }
         .gallery-thumbnail {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 8px;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: all 0.3s;
-            flex-shrink: 0;
+            width: 80px; height: 80px; object-fit: cover; border-radius: 8px; cursor: pointer;
+            border: 2px solid transparent; transition: all 0.3s; flex-shrink: 0;
         }
-        
-        .gallery-thumbnail:hover {
-            border-color: #dc2626;
-            transform: scale(1.05);
-        }
-        
-        .gallery-thumbnail.active {
-            border-color: #dc2626;
-            box-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
-        }
-        
+        .gallery-thumbnail:hover { border-color: #dc2626; transform: scale(1.05); }
+        .gallery-thumbnail.active { border-color: #dc2626; box-shadow: 0 0 10px rgba(220, 38, 38, 0.5); }
         .gallery-nav {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(220, 38, 38, 0.8);
-            color: white;
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: rgba(220, 38, 38, 0.8); color: white; border: none;
+            width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; transition: all 0.3s;
         }
-        
         .gallery-nav:hover { background: rgba(220, 38, 38, 1); }
         .gallery-nav.prev { left: 10px; }
         .gallery-nav.next { right: 10px; }
 
         .multiple-preview-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 10px;
-            margin-top: 15px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 15px;
         }
-        
-        .preview-item {
-            position: relative;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 2px solid rgba(220, 38, 38, 0.3);
-        }
-        
-        .preview-item img {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-        }
-        
+        .preview-item { position: relative; border-radius: 8px; overflow: hidden; border: 2px solid rgba(220, 38, 38, 0.3); }
+        .preview-item img { width: 100%; height: 150px; object-fit: cover; }
         .preview-item .remove-btn {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: rgba(220, 38, 38, 0.9);
-            color: white;
-            border: none;
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-        }
-        
-        .preview-item .remove-btn:hover { background: rgba(220, 38, 38, 1); }
-
-        /* ========== NUEVOS ESTILOS PANEL CONFIG ========== */
-        .config-panel {
-            display: none;
-        }
-        .config-panel.active {
-            display: block;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .config-btn {
-            transition: all 0.3s;
-            background: linear-gradient(135deg, #150a0a, #1a0e0e);
-            border: 1px solid rgba(255, 26, 26, 0.15);
-        }
-        .config-btn:hover {
-            transform: translateY(-4px);
-            border-color: rgba(255, 26, 26, 0.5);
-            box-shadow: 0 10px 25px rgba(255, 26, 26, 0.2);
-        }
-        .back-btn {
-            transition: all 0.2s;
-        }
-        .back-btn:hover {
-            color: #ff1a1a;
-            transform: translateX(-4px);
-        }
-        .permission-checkbox {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            background: rgba(13, 5, 5, 0.6);
-            border: 1px solid rgba(255, 26, 26, 0.15);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .permission-checkbox:hover {
-            border-color: rgba(255, 26, 26, 0.4);
-            background: rgba(255, 26, 26, 0.05);
-        }
-        .permission-checkbox input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            accent-color: #ff1a1a;
-            cursor: pointer;
-        }
-        .role-badge {
-            padding: 2px 8px;
-            border-radius: 6px;
-            font-size: 10px;
-            font-weight: bold;
-            text-transform: uppercase;
+            position: absolute; top: 5px; right: 5px; background: rgba(220, 38, 38, 0.9); color: white;
+            border: none; width: 25px; height: 25px; border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 12px;
         }
     </style>
 </head>
@@ -257,7 +93,7 @@
 
     <canvas id="network-bg"></canvas>
 
-    <!-- LOGIN MODAL -->
+    <!-- LOGIN MODAL (Se abre al dar clic en Acceder) -->
     <div id="login-modal" class="hidden fixed inset-0 bg-black/80 z-[60] flex items-center justify-center px-4 backdrop-blur-sm transition-opacity duration-300">
         <div class="max-w-md w-full bg-[#150a0a] border red-border rounded-2xl p-8 text-center shadow-[0_0_40px_rgba(255,26,26,0.2)] relative transform transition-all scale-100">
             <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
@@ -268,6 +104,7 @@
             <h1 class="text-3xl font-black text-white mb-2 tracking-wide uppercase">PAPELETA <span class="text-red-400 red-glow">STORE</span></h1>
             <p class="text-gray-400 text-sm mb-8">Debes iniciar sesión para realizar compras y descargar archivos.</p>
 
+            <!-- Este botón lleva a Discord -->
             <button onclick="redirectToDiscord()" class="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-3.5 px-6 rounded-xl flex items-center justify-center gap-3 transition-all duration-200 shadow-lg transform hover:scale-[1.02]">
                 <i class="fab fa-discord text-xl"></i>
                 Iniciar Sesión con Discord
@@ -291,6 +128,7 @@
 
             <div class="flex-grow overflow-y-auto custom-scrollbar p-4">
                 <div id="cart-items" class="space-y-3"></div>
+                
                 <div id="cart-empty" class="hidden text-center py-12">
                     <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-[#0d0505] flex items-center justify-center">
                         <i class="fas fa-shopping-cart text-gray-600 text-3xl"></i>
@@ -307,15 +145,13 @@
                 </div>
                 
                 <button id="claim-free-btn" onclick="claimFreeProducts()" class="hidden w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-green-900/30 mb-3">
-                    <i class="fas fa-gift"></i>
-                    Reclamar Productos Gratis
+                    <i class="fas fa-gift"></i> Reclamar Productos Gratis
                 </button>
                 
                 <div id="paypal-button-container" class="mt-2"></div>
                 
                 <button id="manual-checkout-btn" onclick="checkoutManual()" class="w-full hidden bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-red-900/30">
-                    <i class="fas fa-credit-card"></i>
-                    Pagar Manualmente (Discord)
+                    <i class="fas fa-credit-card"></i> Pagar Manualmente (Discord)
                 </button>
             </div>
         </div>
@@ -326,8 +162,7 @@
         <div class="min-h-screen px-4 py-8">
             <div class="max-w-6xl mx-auto">
                 <button onclick="closeProductDetailModal()" class="mb-6 text-gray-400 hover:text-white flex items-center gap-2 transition-colors">
-                    <i class="fas fa-arrow-left"></i>
-                    Volver a la Tienda
+                    <i class="fas fa-arrow-left"></i> Volver a la Tienda
                 </button>
 
                 <div class="grid md:grid-cols-2 gap-8 mb-8">
@@ -343,12 +178,8 @@
                             
                             <div class="gallery-container relative">
                                 <img id="detail-image" src="" alt="Producto" class="gallery-main-image">
-                                <button class="gallery-nav prev" onclick="changeImage(-1)" id="gallery-prev">
-                                    <i class="fas fa-chevron-left"></i>
-                                </button>
-                                <button class="gallery-nav next" onclick="changeImage(1)" id="gallery-next">
-                                    <i class="fas fa-chevron-right"></i>
-                                </button>
+                                <button class="gallery-nav prev" onclick="changeImage(-1)" id="gallery-prev"><i class="fas fa-chevron-left"></i></button>
+                                <button class="gallery-nav next" onclick="changeImage(1)" id="gallery-next"><i class="fas fa-chevron-right"></i></button>
                             </div>
                             <div id="gallery-thumbnails" class="gallery-thumbnails"></div>
                         </div>
@@ -368,8 +199,7 @@
 
                         <div class="space-y-3">
                             <button id="detail-buy-btn" onclick="buyFromDetail()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 transition-all shadow-lg shadow-red-900/30 text-lg">
-                                <i class="fab fa-discord text-xl"></i>
-                                Iniciar Sesión para Comprar
+                                <i class="fab fa-discord text-xl"></i> Iniciar Sesión para Comprar
                             </button>
                             <button onclick="closeProductDetailModal()" class="w-full bg-[#150a0a] border border-red-900/50 hover:border-red-600/50 text-gray-300 font-semibold py-4 rounded-xl transition-all">
                                 Volver a la Tienda
@@ -407,6 +237,7 @@
                 <a href="#" onclick="showPage('inicio')" data-page="inicio" class="nav-link hover:text-red-400 transition-colors">Inicio</a>
                 <a href="#" onclick="showPage('productos')" data-page="productos" class="nav-link hover:text-red-400 transition-colors">Productos</a>
                 <a href="#" onclick="showPage('preguntas')" data-page="preguntas" class="nav-link hover:text-red-400 transition-colors">Preguntas</a>
+                <!-- CAMBIO: Admin -> Config -->
                 <a href="#" onclick="showPage('admin'); loadAdminUsers();" data-page="admin" id="nav-admin" class="nav-link hover:text-red-400 transition-colors hidden">Config</a>
             </nav>
 
@@ -417,13 +248,12 @@
                 </button>
                 
                 <button id="logout-btn" onclick="logout()" class="hidden bg-[#150a0a] hover:bg-[#1a0a0a] border border-red-900/50 text-red-400 hover:text-red-300 px-4 py-2 rounded-lg flex items-center gap-2 transition-all text-sm font-semibold">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span class="hidden sm:inline">Salir</span>
+                    <i class="fas fa-sign-out-alt"></i> <span class="hidden sm:inline">Salir</span>
                 </button>
                 
+                <!-- BOTÓN ACCEDER CORREGIDO -->
                 <button id="login-btn" onclick="openLoginModal()" class="bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-2 px-5 rounded-lg flex items-center gap-2 transition-all text-sm shadow-lg shadow-blue-900/20">
-                    <i class="fab fa-discord"></i>
-                    Acceder
+                    <i class="fab fa-discord"></i> Acceder
                 </button>
                 
                 <div id="user-section" class="hidden flex items-center gap-3 bg-[#150a0a] px-3 py-1.5 rounded-full border border-red-900/50 cursor-pointer hover:border-red-600 transition-all group" onclick="openUserDashboard()">
@@ -510,427 +340,108 @@
             </div>
         </section>
 
-        <!-- ============================== -->
-        <!-- PÁGINA DE CONFIGURACIÓN (ADMIN) -->
-        <!-- ============================== -->
-        <section id="page-admin" class="page max-w-5xl w-full mx-auto px-6 py-12">
-            
-            <!-- PANEL PRINCIPAL DE CONFIG (6 BOTONES) -->
-            <div id="config-main-panel" class="config-panel active">
-                <h2 class="text-3xl font-black text-white uppercase tracking-tight mb-2 flex items-center gap-3">
-                    <i class="fas fa-cog text-red-400"></i> Panel de Configuración
-                </h2>
-                <p class="text-gray-400 text-sm mb-8">Selecciona una opción para gestionar tu tienda.</p>
+        <!-- SECCIÓN ADMIN / CONFIG -->
+        <section id="page-admin" class="page max-w-4xl w-full mx-auto px-6 py-12">
+            <h2 class="text-3xl font-black text-white uppercase tracking-tight mb-8 flex items-center gap-3">
+                <i class="fas fa-cog text-red-400"></i> Panel de Configuración
+            </h2>
 
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-5">
-                    <!-- Subir Producto -->
-                    <button onclick="showConfigPanel('upload')" class="config-btn rounded-2xl p-6 flex flex-col items-center gap-3 text-center hover:shadow-red-600/20">
-                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-500 to-red-800 flex items-center justify-center text-white text-2xl shadow-lg">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                        </div>
-                        <h3 class="text-white font-bold text-base">Subir Producto</h3>
-                        <p class="text-gray-500 text-xs">Agregar productos a la tienda</p>
-                    </button>
+            <!-- GRID DE BOTONES DEL PANEL -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                
+                <!-- 1. Subir Producto -->
+                <div onclick="window.location.href='SubirProducto.html'" class="bg-[#150a0a] border border-red-900/50 hover:border-red-500 rounded-2xl p-6 cursor-pointer transition-all group hover:-translate-y-1 shadow-lg">
+                    <div class="w-12 h-12 rounded-full bg-red-900/20 flex items-center justify-center mb-4 group-hover:bg-red-600 transition-colors">
+                        <i class="fas fa-cloud-upload-alt text-red-400 text-xl group-hover:text-white"></i>
+                    </div>
+                    <h3 class="text-white font-bold text-lg mb-1">Subir Producto</h3>
+                    <p class="text-gray-400 text-xs">Gestionar catálogo de la tienda</p>
+                </div>
 
-                    <!-- Licencias Usuario -->
-                    <button onclick="showConfigPanel('licenses'); loadLicensesPanel();" class="config-btn rounded-2xl p-6 flex flex-col items-center gap-3 text-center">
-                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-500 to-red-800 flex items-center justify-center text-white text-2xl shadow-lg">
-                            <i class="fas fa-key"></i>
-                        </div>
-                        <h3 class="text-white font-bold text-base">Licencias Usuario</h3>
-                        <p class="text-gray-500 text-xs">Ver licencias compradas/reclamadas</p>
-                    </button>
+                <!-- 2. Licencias Usuario -->
+                <div onclick="window.location.href='LicenciaUsario.html'" class="bg-[#150a0a] border border-red-900/50 hover:border-red-500 rounded-2xl p-6 cursor-pointer transition-all group hover:-translate-y-1 shadow-lg">
+                    <div class="w-12 h-12 rounded-full bg-red-900/20 flex items-center justify-center mb-4 group-hover:bg-red-600 transition-colors">
+                        <i class="fas fa-key text-red-400 text-xl group-hover:text-white"></i>
+                    </div>
+                    <h3 class="text-white font-bold text-lg mb-1">Licencias Usuario</h3>
+                    <p class="text-gray-400 text-xs">Ver historial de compras y claves</p>
+                </div>
 
-                    <!-- Encriptar Script -->
-                    <button onclick="showConfigPanel('encrypt')" class="config-btn rounded-2xl p-6 flex flex-col items-center gap-3 text-center">
-                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-500 to-red-800 flex items-center justify-center text-white text-2xl shadow-lg">
-                            <i class="fas fa-lock"></i>
-                        </div>
-                        <h3 class="text-white font-bold text-base">Encriptar Script</h3>
-                        <p class="text-gray-500 text-xs">Proteger código fuente</p>
-                    </button>
+                <!-- 3. Encriptar Script -->
+                <div onclick="window.location.href='encrytar.html'" class="bg-[#150a0a] border border-red-900/50 hover:border-red-500 rounded-2xl p-6 cursor-pointer transition-all group hover:-translate-y-1 shadow-lg">
+                    <div class="w-12 h-12 rounded-full bg-red-900/20 flex items-center justify-center mb-4 group-hover:bg-red-600 transition-colors">
+                        <i class="fas fa-lock text-red-400 text-xl group-hover:text-white"></i>
+                    </div>
+                    <h3 class="text-white font-bold text-lg mb-1">Encriptar Script</h3>
+                    <p class="text-gray-400 text-xs">Proteger archivos Lua</p>
+                </div>
 
-                    <!-- Pasar a Usuarios -->
-                    <button onclick="showConfigPanel('assign'); loadAssignPanel();" class="config-btn rounded-2xl p-6 flex flex-col items-center gap-3 text-center">
-                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-500 to-red-800 flex items-center justify-center text-white text-2xl shadow-lg">
-                            <i class="fas fa-user-plus"></i>
-                        </div>
-                        <h3 class="text-white font-bold text-base">Pasar a Usuarios</h3>
-                        <p class="text-gray-500 text-xs">Asignar productos a usuarios</p>
-                    </button>
+                <!-- 4. Pasar a Usuarios -->
+                <div onclick="togglePassToUsersPanel()" class="bg-[#150a0a] border border-red-900/50 hover:border-red-500 rounded-2xl p-6 cursor-pointer transition-all group hover:-translate-y-1 shadow-lg">
+                    <div class="w-12 h-12 rounded-full bg-red-900/20 flex items-center justify-center mb-4 group-hover:bg-red-600 transition-colors">
+                        <i class="fas fa-user-plus text-red-400 text-xl group-hover:text-white"></i>
+                    </div>
+                    <h3 class="text-white font-bold text-lg mb-1">Pasar a Usuarios</h3>
+                    <p class="text-gray-400 text-xs">Asignar productos manuales</p>
+                </div>
 
-                    <!-- Usuarios Autorizados -->
-                    <button onclick="showConfigPanel('authorized'); loadAuthorizedPanel();" class="config-btn rounded-2xl p-6 flex flex-col items-center gap-3 text-center">
-                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-500 to-red-800 flex items-center justify-center text-white text-2xl shadow-lg">
-                            <i class="fas fa-user-shield"></i>
-                        </div>
-                        <h3 class="text-white font-bold text-base">Usuarios Autorizados</h3>
-                        <p class="text-gray-500 text-xs">Gestionar roles de usuarios</p>
-                    </button>
+                <!-- 5. Usuarios Autorizados -->
+                <div onclick="window.location.href='UsuariosAutorizado.html'" class="bg-[#150a0a] border border-red-900/50 hover:border-red-500 rounded-2xl p-6 cursor-pointer transition-all group hover:-translate-y-1 shadow-lg">
+                    <div class="w-12 h-12 rounded-full bg-red-900/20 flex items-center justify-center mb-4 group-hover:bg-red-600 transition-colors">
+                        <i class="fas fa-user-shield text-red-400 text-xl group-hover:text-white"></i>
+                    </div>
+                    <h3 class="text-white font-bold text-lg mb-1">Usuarios Autorizados</h3>
+                    <p class="text-gray-400 text-xs">Gestionar permisos y roles</p>
+                </div>
 
-                    <!-- Crear Rol -->
-                    <button onclick="showConfigPanel('roles'); loadRolesPanel();" class="config-btn rounded-2xl p-6 flex flex-col items-center gap-3 text-center">
-                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-500 to-red-800 flex items-center justify-center text-white text-2xl shadow-lg">
-                            <i class="fas fa-user-tag"></i>
-                        </div>
-                        <h3 class="text-white font-bold text-base">Crear Rol</h3>
-                        <p class="text-gray-500 text-xs">Crear roles personalizados</p>
-                    </button>
+                <!-- 6. Crear Rol -->
+                <div onclick="window.location.href='CrearRol.html'" class="bg-[#150a0a] border border-red-900/50 hover:border-red-500 rounded-2xl p-6 cursor-pointer transition-all group hover:-translate-y-1 shadow-lg">
+                    <div class="w-12 h-12 rounded-full bg-red-900/20 flex items-center justify-center mb-4 group-hover:bg-red-600 transition-colors">
+                        <i class="fas fa-layer-group text-red-400 text-xl group-hover:text-white"></i>
+                    </div>
+                    <h3 class="text-white font-bold text-lg mb-1">Crear Rol</h3>
+                    <p class="text-gray-400 text-xs">Definir nuevos rangos</p>
                 </div>
             </div>
 
-            <!-- ========== PANEL: SUBIR PRODUCTO (antes Admin) ========== -->
-            <div id="config-upload-panel" class="config-panel">
-                <button onclick="showConfigPanel('main')" class="back-btn text-gray-400 hover:text-red-400 flex items-center gap-2 mb-6 text-sm font-semibold">
-                    <i class="fas fa-arrow-left"></i> Volver al Panel Principal
-                </button>
-
-                <h2 class="text-2xl font-black text-white mb-6 flex items-center gap-3">
-                    <i class="fas fa-cloud-upload-alt text-red-400"></i> Subir Producto
-                </h2>
-
-                <div class="bg-[#150a0a] border border-red-950/40 rounded-2xl p-6 mb-6">
-                    <h3 class="text-white font-bold mb-4 flex items-center gap-2">
-                        <i class="fas fa-plus-circle text-red-400"></i>
-                        Agregar Nuevo Producto
+            <!-- PANEL INTERNO: PASAR A USUARIOS (Oculto por defecto) -->
+            <div id="pass-to-users-panel" class="hidden bg-[#150a0a] border border-red-950/40 rounded-2xl p-6 mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-white font-bold flex items-center gap-2">
+                        <i class="fas fa-hand-holding text-red-400"></i> Asignar Producto Manualmente
                     </h3>
-                    
-                    <form id="product-form" onsubmit="handleProductSubmit(event)" class="space-y-4">
-                        <div>
-                            <label class="block text-gray-300 text-sm font-semibold mb-2">Nombre del Producto *</label>
-                            <input type="text" id="prod-name" required class="w-full bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500" placeholder="Ej: Script de Admin">
-                        </div>
-                        
-                        <div>
-                            <label class="block text-gray-300 text-sm font-semibold mb-2">Precio (USD) *</label>
-                            <input type="number" id="prod-price" required step="0.01" min="0" class="w-full bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500" placeholder="10.00">
-                        </div>
-                        
-                        <div>
-                            <label class="block text-gray-300 text-sm font-semibold mb-2">Categoría</label>
-                            <select id="prod-category" class="w-full bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-500">
-                                <option value="Scripts">Scripts</option>
-                                <option value="Modelajes">Modelajes</option>
-                                <option value="Mappings">Mappings</option>
-                                <option value="Webs">Sitios Web</option>
-                                <option value="Bots">Bots Discord</option>
-                                <option value="Otros">Otros</option>
-                            </select>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-gray-300 text-sm font-semibold mb-2">Descripción/Detalle *</label>
-                            <textarea id="prod-description" required rows="4" class="w-full bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500" placeholder="Describe las características del producto..."></textarea>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-gray-300 text-sm font-semibold mb-2">Fotos del Producto (Múltiples) *</label>
-                            <div class="border-2 border-dashed border-red-900/40 rounded-xl p-4 text-center hover:border-red-500/50 transition-colors">
-                                <input type="file" id="prod-images" accept="image/*" multiple required onchange="previewMultipleImages(this)" class="hidden">
-                                <label for="prod-images" class="cursor-pointer block">
-                                    <i class="fas fa-cloud-upload-alt text-3xl text-red-400 mb-2"></i>
-                                    <p class="text-gray-400 text-sm">Haz clic para subir imágenes</p>
-                                    <p class="text-gray-500 text-xs mt-1">Puedes seleccionar varias imágenes a la vez (máx. 800x600)</p>
-                                </label>
-                                <div id="multiple-images-preview" class="multiple-preview-container"></div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-gray-300 text-sm font-semibold mb-2">Archivo del Producto (Zip/Rar/Lua) *</label>
-                            <div class="border-2 border-dashed border-red-900/40 rounded-xl p-4 text-center hover:border-red-500/50 transition-colors bg-[#0d0505]">
-                                <input type="file" id="prod-file" accept=".zip,.rar,.7z,.lua,.txt" required onchange="updateFileName(this)" class="hidden">
-                                <label for="prod-file" class="cursor-pointer block">
-                                    <i class="fas fa-file-archive text-3xl text-red-400 mb-2"></i>
-                                    <p id="file-label-text" class="text-gray-400 text-sm">Haz clic para subir el archivo descargable</p>
-                                    <p class="text-gray-500 text-xs mt-1">El usuario podrá descargar este archivo tras comprarlo</p>
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <button type="submit" class="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-red-900/30">
-                            <i class="fas fa-plus"></i>
-                            Agregar Producto
-                        </button>
-                    </form>
-                    
-                    <div class="mt-6 pt-6 border-t border-red-950/40">
-                        <h4 class="text-white font-semibold mb-3 text-sm">Productos Agregados (Firebase):</h4>
-                        <div id="admin-products-list" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
-                            <p class="text-gray-500 text-sm">Cargando productos...</p>
-                        </div>
+                    <button onclick="togglePassToUsersPanel()" class="text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-300 text-sm font-semibold mb-2">Seleccionar Usuario (Logueado)</label>
+                        <select id="manual-assign-user" class="w-full bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-500">
+                            <option value="">Cargando usuarios...</option>
+                        </select>
                     </div>
+
+                    <div>
+                        <label class="block text-gray-300 text-sm font-semibold mb-2">Seleccionar Producto</label>
+                        <select id="manual-assign-product" class="w-full bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-500">
+                            <option value="">Cargando productos...</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" id="assign-is-free" class="w-4 h-4 rounded bg-[#0d0505] border-red-900 text-red-600 focus:ring-red-500">
+                        <label for="assign-is-free" class="text-gray-300 text-sm">Marcar como Regalo/Gratis</label>
+                    </div>
+
+                    <button onclick="executeManualAssign()" class="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-3 rounded-xl transition-all">
+                        <i class="fas fa-check mr-2"></i> Confirmar Asignación
+                    </button>
                 </div>
             </div>
 
-            <!-- ========== PANEL: LICENCIAS USUARIO ========== -->
-            <div id="config-licenses-panel" class="config-panel">
-                <button onclick="showConfigPanel('main')" class="back-btn text-gray-400 hover:text-red-400 flex items-center gap-2 mb-6 text-sm font-semibold">
-                    <i class="fas fa-arrow-left"></i> Volver al Panel Principal
-                </button>
-
-                <h2 class="text-2xl font-black text-white mb-6 flex items-center gap-3">
-                    <i class="fas fa-key text-red-400"></i> Licencias de Usuarios
-                </h2>
-                <p class="text-gray-400 text-sm mb-6">Todos los usuarios que han comprado o reclamado productos en la tienda.</p>
-
-                <div class="bg-[#150a0a] border border-red-950/40 rounded-2xl p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-white font-bold">Licencias Registradas</h3>
-                        <span id="licenses-count" class="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full">0</span>
-                    </div>
-                    <div id="licenses-list" class="space-y-2 max-h-[500px] overflow-y-auto custom-scrollbar">
-                        <p class="text-gray-500 text-sm">Cargando licencias...</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ========== PANEL: ENCRIPTAR SCRIPT ========== -->
-            <div id="config-encrypt-panel" class="config-panel">
-                <button onclick="showConfigPanel('main')" class="back-btn text-gray-400 hover:text-red-400 flex items-center gap-2 mb-6 text-sm font-semibold">
-                    <i class="fas fa-arrow-left"></i> Volver al Panel Principal
-                </button>
-
-                <h2 class="text-2xl font-black text-white mb-6 flex items-center gap-3">
-                    <i class="fas fa-lock text-red-400"></i> Encriptar Script
-                </h2>
-                <p class="text-gray-400 text-sm mb-6">Protege tus scripts mediante encriptación para evitar robos o modificaciones.</p>
-
-                <div class="bg-[#150a0a] border border-red-950/40 rounded-2xl p-6">
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-gray-300 text-sm font-semibold mb-2">Selecciona archivo de script (.lua, .js, etc.) *</label>
-                            <div class="border-2 border-dashed border-red-900/40 rounded-xl p-4 text-center hover:border-red-500/50 transition-colors bg-[#0d0505]">
-                                <input type="file" id="encrypt-file" accept=".lua,.js,.ts,.py,.txt,.cpp,.cs" onchange="updateEncryptFileName(this)" class="hidden">
-                                <label for="encrypt-file" class="cursor-pointer block">
-                                    <i class="fas fa-file-code text-3xl text-red-400 mb-2"></i>
-                                    <p id="encrypt-file-label" class="text-gray-400 text-sm">Haz clic para seleccionar el script</p>
-                                    <p class="text-gray-500 text-xs mt-1">Formatos soportados: .lua, .js, .ts, .py, .txt, .cpp, .cs</p>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-gray-300 text-sm font-semibold mb-2">Nivel de Encriptación</label>
-                            <select id="encrypt-level" class="w-full bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-500">
-                                <option value="basic">Básica (rápida)</option>
-                                <option value="medium">Media</option>
-                                <option value="strong">Fuerte (AES-256)</option>
-                                <option value="extreme">Extrema (con obfuscación)</option>
-                            </select>
-                        </div>
-
-                        <button onclick="encryptScript()" class="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-red-900/30">
-                            <i class="fas fa-lock"></i>
-                            Encriptar Script
-                        </button>
-
-                        <div id="encrypt-result" class="hidden bg-[#0d0505] border border-green-700/50 rounded-xl p-4">
-                            <h4 class="text-green-400 font-bold mb-2 flex items-center gap-2">
-                                <i class="fas fa-check-circle"></i> Script Encriptado
-                            </h4>
-                            <p class="text-gray-400 text-sm mb-3">Tu script ha sido encriptado exitosamente.</p>
-                            <button onclick="downloadEncryptedScript()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 transition-all">
-                                <i class="fas fa-download"></i> Descargar Script Encriptado
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ========== PANEL: PASAR A USUARIOS (ASIGNAR PRODUCTOS) ========== -->
-            <div id="config-assign-panel" class="config-panel">
-                <button onclick="showConfigPanel('main')" class="back-btn text-gray-400 hover:text-red-400 flex items-center gap-2 mb-6 text-sm font-semibold">
-                    <i class="fas fa-arrow-left"></i> Volver al Panel Principal
-                </button>
-
-                <h2 class="text-2xl font-black text-white mb-6 flex items-center gap-3">
-                    <i class="fas fa-user-plus text-red-400"></i> Pasar a Usuarios
-                </h2>
-                <p class="text-gray-400 text-sm mb-6">Asigna productos (gratis o pagados) a usuarios logueados con Discord.</p>
-
-                <div class="bg-[#150a0a] border border-red-950/40 rounded-2xl p-6">
-                    <div class="mb-5">
-                        <label class="block text-gray-300 text-sm font-semibold mb-2">Buscar Usuario</label>
-                        <input type="text" id="assign-search" oninput="filterAssignUsers()" placeholder="Buscar por nombre de usuario..." class="w-full bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500">
-                    </div>
-
-                    <h3 class="text-white font-semibold mb-3 flex items-center gap-2">
-                        <i class="fas fa-users text-red-400"></i> Usuarios Logueados
-                    </h3>
-                    <div id="assign-users-list" class="space-y-2 max-h-[400px] overflow-y-auto custom-scrollbar mb-6">
-                        <p class="text-gray-500 text-sm">Cargando usuarios...</p>
-                    </div>
-
-                    <!-- Modal para seleccionar producto -->
-                    <div id="assign-product-modal" class="hidden bg-[#0d0505] border border-red-600/50 rounded-2xl p-5 mt-4">
-                        <h4 class="text-white font-bold mb-3 flex items-center gap-2">
-                            <i class="fas fa-gift text-red-400"></i> Asignar Producto a: <span id="assign-target-user" class="text-red-400"></span>
-                        </h4>
-                        <div>
-                            <label class="block text-gray-300 text-sm font-semibold mb-2">Selecciona un Producto</label>
-                            <select id="assign-product-select" class="w-full bg-[#150a0a] border border-red-950/40 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-500">
-                                <option value="">-- Selecciona un producto --</option>
-                            </select>
-                        </div>
-                        <div class="mt-3 flex items-center gap-2">
-                            <input type="checkbox" id="assign-as-free" class="w-4 h-4 accent-red-600">
-                            <label for="assign-as-free" class="text-gray-300 text-sm">Asignar como <span class="text-green-400 font-bold">GRATIS</span></label>
-                        </div>
-                        <div class="mt-4 flex gap-2">
-                            <button onclick="confirmAssignProduct()" class="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-2.5 rounded-xl flex items-center justify-center gap-2">
-                                <i class="fas fa-check"></i> Confirmar
-                            </button>
-                            <button onclick="cancelAssignProduct()" class="flex-1 bg-[#150a0a] border border-red-900/50 hover:border-red-600/50 text-gray-300 font-semibold py-2.5 rounded-xl">
-                                Cancelar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ========== PANEL: USUARIOS AUTORIZADOS ========== -->
-            <div id="config-authorized-panel" class="config-panel">
-                <button onclick="showConfigPanel('main')" class="back-btn text-gray-400 hover:text-red-400 flex items-center gap-2 mb-6 text-sm font-semibold">
-                    <i class="fas fa-arrow-left"></i> Volver al Panel Principal
-                </button>
-
-                <h2 class="text-2xl font-black text-white mb-6 flex items-center gap-3">
-                    <i class="fas fa-user-shield text-red-400"></i> Usuarios Autorizados
-                </h2>
-                <p class="text-gray-400 text-sm mb-6">Gestiona los roles de los usuarios registrados. Roles disponibles: Admin, Mod (y los creados en "Crear Rol").</p>
-
-                <div class="bg-[#150a0a] border border-red-950/40 rounded-2xl p-4 mb-6">
-                    <h3 class="text-white font-bold mb-3 text-sm flex items-center gap-2">
-                        <i class="fas fa-info-circle text-red-400"></i> Roles Disponibles
-                    </h3>
-                    <div id="available-roles-list" class="flex flex-wrap gap-2">
-                        <span class="role-badge bg-red-950/60 border border-red-700 text-red-300">Admin</span>
-                        <span class="role-badge bg-blue-950/60 border border-blue-700 text-blue-300">Mod</span>
-                    </div>
-                </div>
-
-                <div class="bg-[#150a0a] border border-red-950/40 rounded-2xl p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-white font-bold flex items-center gap-2">
-                            <i class="fas fa-users text-red-400"></i> Usuarios Registrados
-                        </h3>
-                        <span id="authorized-count" class="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full">0</span>
-                    </div>
-                    <div id="authorized-users-list" class="space-y-2 max-h-[500px] overflow-y-auto custom-scrollbar">
-                        <p class="text-gray-500 text-sm">Cargando usuarios...</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ========== PANEL: CREAR ROL ========== -->
-            <div id="config-roles-panel" class="config-panel">
-                <button onclick="showConfigPanel('main')" class="back-btn text-gray-400 hover:text-red-400 flex items-center gap-2 mb-6 text-sm font-semibold">
-                    <i class="fas fa-arrow-left"></i> Volver al Panel Principal
-                </button>
-
-                <h2 class="text-2xl font-black text-white mb-6 flex items-center gap-3">
-                    <i class="fas fa-user-tag text-red-400"></i> Crear Rol
-                </h2>
-                <p class="text-gray-400 text-sm mb-6">Crea roles personalizados eligiendo qué pueden ver cada rol. Ej: Ayudante puede ver solo el Ticker.</p>
-
-                <div class="grid md:grid-cols-2 gap-6">
-                    <!-- Formulario Crear Rol -->
-                    <div class="bg-[#150a0a] border border-red-950/40 rounded-2xl p-6">
-                        <h3 class="text-white font-bold mb-4 flex items-center gap-2">
-                            <i class="fas fa-plus-circle text-red-400"></i> Nuevo Rol
-                        </h3>
-
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-gray-300 text-sm font-semibold mb-2">Nombre del Rol *</label>
-                                <input type="text" id="new-role-name" placeholder="Ej: Ayudante, Moderador, Editor..." class="w-full bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500">
-                            </div>
-
-                            <div>
-                                <label class="block text-gray-300 text-sm font-semibold mb-2">Color del Rol</label>
-                                <div class="flex gap-2">
-                                    <input type="color" id="new-role-color" value="#ff1a1a" class="w-16 h-12 rounded-lg bg-[#0d0505] border border-red-950/40 cursor-pointer">
-                                    <input type="text" id="new-role-color-text" value="#ff1a1a" oninput="document.getElementById('new-role-color').value = this.value" class="flex-1 bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-500" placeholder="#ff1a1a">
-                                </div>
-                            </div>
-
-                            <div>
-                                <label class="block text-gray-300 text-sm font-semibold mb-3">Permisos del Rol (qué puede ver)</label>
-                                <div class="space-y-2">
-                                    <label class="permission-checkbox">
-                                        <input type="checkbox" value="inicio" checked>
-                                        <span class="text-gray-300 text-sm">Ver página de Inicio</span>
-                                    </label>
-                                    <label class="permission-checkbox">
-                                        <input type="checkbox" value="productos" checked>
-                                        <span class="text-gray-300 text-sm">Ver página de Productos</span>
-                                    </label>
-                                    <label class="permission-checkbox">
-                                        <input type="checkbox" value="preguntas" checked>
-                                        <span class="text-gray-300 text-sm">Ver página de Preguntas</span>
-                                    </label>
-                                    <label class="permission-checkbox">
-                                        <input type="checkbox" value="config">
-                                        <span class="text-gray-300 text-sm">Ver Panel de Configuración (Config)</span>
-                                    </label>
-                                    <label class="permission-checkbox">
-                                        <input type="checkbox" value="upload">
-                                        <span class="text-gray-300 text-sm">Subir Productos</span>
-                                    </label>
-                                    <label class="permission-checkbox">
-                                        <input type="checkbox" value="licenses">
-                                        <span class="text-gray-300 text-sm">Ver Licencias</span>
-                                    </label>
-                                    <label class="permission-checkbox">
-                                        <input type="checkbox" value="encrypt">
-                                        <span class="text-gray-300 text-sm">Encriptar Scripts</span>
-                                    </label>
-                                    <label class="permission-checkbox">
-                                        <input type="checkbox" value="assign">
-                                        <span class="text-gray-300 text-sm">Asignar Productos a Usuarios</span>
-                                    </label>
-                                    <label class="permission-checkbox">
-                                        <input type="checkbox" value="authorized">
-                                        <span class="text-gray-300 text-sm">Ver Usuarios Autorizados</span>
-                                    </label>
-                                    <label class="permission-checkbox">
-                                        <input type="checkbox" value="roles">
-                                        <span class="text-gray-300 text-sm">Crear/Gestionar Roles</span>
-                                    </label>
-                                    <label class="permission-checkbox">
-                                        <input type="checkbox" value="ticker">
-                                        <span class="text-gray-300 text-sm">Ver Ticker (noticias)</span>
-                                    </label>
-                                    <label class="permission-checkbox">
-                                        <input type="checkbox" value="stats">
-                                        <span class="text-gray-300 text-sm">Ver Estadísticas</span>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <button onclick="createCustomRole()" class="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-red-900/30">
-                                <i class="fas fa-user-tag"></i>
-                                Crear Rol
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Lista de Roles Creados -->
-                    <div class="bg-[#150a0a] border border-red-950/40 rounded-2xl p-6">
-                        <h3 class="text-white font-bold mb-4 flex items-center gap-2">
-                            <i class="fas fa-list text-red-400"></i> Roles Creados
-                        </h3>
-                        <div id="custom-roles-list" class="space-y-2 max-h-[600px] overflow-y-auto custom-scrollbar">
-                            <p class="text-gray-500 text-sm">No hay roles personalizados aún.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PANEL DE USUARIOS LOCALES (mantener existente al final) -->
-            <div id="admin-users-section" class="bg-[#150a0a] border border-red-950/40 rounded-2xl p-6 mt-6" style="display:none;">
-                <h3 class="text-white font-bold mb-4"><i class="fas fa-users text-red-400 mr-2"></i>Usuarios Locales (Legacy)</h3>
+            <!-- Lista de usuarios local (Mantenida para compatibilidad visual si se requiere) -->
+            <div id="admin-users-section" class="bg-[#150a0a] border border-red-950/40 rounded-2xl p-6 hidden">
+                <h3 class="text-white font-bold mb-4"><i class="fas fa-users text-red-400 mr-2"></i>Usuarios Locales (Debug)</h3>
                 <div id="admin-users-list" class="space-y-2 max-h-96 overflow-y-auto custom-scrollbar">
                     <p class="text-gray-500 text-sm">La lista de usuarios se gestiona localmente en este navegador.</p>
                 </div>
@@ -967,11 +478,9 @@
         let cart = [];
         let localProducts = JSON.parse(localStorage.getItem('papeleta_local_products') || '[]');
         let tempImages = [];
-        let encryptedScriptData = null;
-        let currentAssignUserId = null;
 
         const firebaseConfig = {
-            apiKey: "AIzaSyBWGGvEKFiVZDxwxvmhuWXEKu6bNguV0mM",
+            apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
             authDomain: "papeletalicencia.firebaseapp.com",
             databaseURL: "https://papeletalicencia-default-rtdb.firebaseio.com",
             projectId: "papeletalicencia",
@@ -986,440 +495,7 @@
         }
         const db = firebase.firestore();
 
-        // ============== NUEVO: GESTIÓN DE PANELES CONFIG ==============
-        function showConfigPanel(panelName) {
-            document.querySelectorAll('.config-panel').forEach(p => p.classList.remove('active'));
-            const panel = document.getElementById('config-' + panelName + '-panel');
-            if (panel) panel.classList.add('active');
-            else document.getElementById('config-main-panel').classList.add('active');
-        }
-
-        // ============== NUEVO: PANEL LICENCIAS ==============
-        async function loadLicensesPanel() {
-            const container = document.getElementById('licenses-list');
-            const countEl = document.getElementById('licenses-count');
-            container.innerHTML = '<p class="text-gray-500 text-sm text-center py-4"><i class="fas fa-spinner animate-spin text-red-500 mr-2"></i>Cargando licencias...</p>';
-            
-            try {
-                const snapshot = await db.collection("Licencias").get();
-                
-                if (snapshot.empty) {
-                    container.innerHTML = '<p class="text-gray-500 text-sm text-center py-8">No hay licencias registradas.</p>';
-                    countEl.textContent = '0';
-                    return;
-                }
-                
-                countEl.textContent = snapshot.size;
-                let html = '';
-                snapshot.forEach(doc => {
-                    const l = doc.data();
-                    const date = l.created_at ? new Date(l.created_at.toDate()).toLocaleString('es-ES') : 'Fecha desconocida';
-                    html += `
-                        <div class="flex items-center gap-3 bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-3">
-                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-red-800 flex items-center justify-center text-white font-bold shrink-0">
-                                ${(l.username || '?')[0].toUpperCase()}
-                            </div>
-                            <div class="flex-grow min-w-0">
-                                <p class="text-white text-sm font-semibold truncate">${escapeHTML(l.username || 'Desconocido')}</p>
-                                <p class="text-gray-400 text-xs truncate"><i class="fas fa-box mr-1"></i>${escapeHTML(l.product_name || 'Sin producto')}</p>
-                                <p class="text-gray-500 text-[10px] font-mono truncate"><i class="fas fa-key mr-1"></i>${escapeHTML(l.key || 'Sin clave')}</p>
-                            </div>
-                            <div class="text-right shrink-0">
-                                <span class="inline-block px-2 py-1 rounded-md text-[10px] font-bold ${l.status === 'active' ? 'bg-green-950/60 border border-green-700 text-green-300' : 'bg-red-950/60 border border-red-700 text-red-300'}">${(l.status || 'active').toUpperCase()}</span>
-                                <p class="text-gray-500 text-[10px] mt-1">${date}</p>
-                            </div>
-                        </div>
-                    `;
-                });
-                container.innerHTML = html;
-                
-            } catch (error) {
-                console.error(error);
-                container.innerHTML = `<p class="text-red-400 text-sm text-center py-4">Error al cargar licencias: ${error.message}</p>`;
-            }
-        }
-
-        // ============== NUEVO: PANEL ENCRIPTAR SCRIPT ==============
-        function updateEncryptFileName(input) {
-            const label = document.getElementById('encrypt-file-label');
-            if (input.files && input.files[0]) {
-                label.innerText = input.files[0].name;
-                label.classList.add('text-white', 'font-bold');
-            }
-        }
-
-        async function encryptScript() {
-            const fileInput = document.getElementById('encrypt-file');
-            const level = document.getElementById('encrypt-level').value;
-            
-            if (!fileInput.files || !fileInput.files[0]) {
-                alert('Por favor selecciona un archivo de script.');
-                return;
-            }
-            
-            const file = fileInput.files[0];
-            
-            try {
-                const content = await file.text();
-                
-                // Simulación de encriptación (Base64 + prefijo de nivel)
-                const levelPrefix = `/* ENCRYPTED [${level.toUpperCase()}] - Papeleta Store */\n`;
-                const encoded = btoa(unescape(encodeURIComponent(content)));
-                
-                // Aplicar "obfuscación" según el nivel
-                let encrypted;
-                if (level === 'basic') {
-                    encrypted = levelPrefix + encoded;
-                } else if (level === 'medium') {
-                    encrypted = levelPrefix + encoded.split('').reverse().join('');
-                } else if (level === 'strong') {
-                    encrypted = levelPrefix + encoded.split('').map((c, i) => String.fromCharCode(c.charCodeAt(0) ^ (i % 256))).join('');
-                } else {
-                    encrypted = levelPrefix + 'OBFUSCATED:' + encoded + '::END';
-                }
-                
-                encryptedScriptData = {
-                    content: encrypted,
-                    originalName: file.name,
-                    level: level
-                };
-                
-                document.getElementById('encrypt-result').classList.remove('hidden');
-                alert('Script encriptado exitosamente con nivel: ' + level);
-                
-            } catch (error) {
-                console.error(error);
-                alert('Error al encriptar: ' + error.message);
-            }
-        }
-
-        function downloadEncryptedScript() {
-            if (!encryptedScriptData) return;
-            
-            const blob = new Blob([encryptedScriptData.content], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            const ext = encryptedScriptData.originalName.split('.').pop();
-            a.download = `encrypted_${encryptedScriptData.originalName.replace(/\.[^.]+$/, '')}_${encryptedScriptData.level}.${ext}`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-
-        // ============== NUEVO: PANEL ASIGNAR PRODUCTOS ==============
-        async function loadAssignPanel() {
-            const container = document.getElementById('assign-users-list');
-            container.innerHTML = '<p class="text-gray-500 text-sm text-center py-4"><i class="fas fa-spinner animate-spin text-red-500 mr-2"></i>Cargando usuarios...</p>';
-            
-            const allUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
-            
-            if (allUsers.length === 0) {
-                container.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">No hay usuarios registrados aún.</p>';
-                return;
-            }
-            
-            renderAssignUsers(allUsers);
-        }
-
-        function renderAssignUsers(users) {
-            const container = document.getElementById('assign-users-list');
-            container.innerHTML = users.map(u => `
-                <div class="flex items-center gap-3 bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-2.5">
-                    <img src="${u.avatar ? `https://cdn.discordapp.com/avatars/${u.discord_id}/${u.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png'}" class="w-10 h-10 rounded-full border border-red-700">
-                    <div class="flex-grow min-w-0">
-                        <p class="text-white text-sm font-semibold truncate">${escapeHTML(u.username || 'Desconocido')}</p>
-                        <p class="text-gray-500 text-xs">ID: ${u.discord_id}</p>
-                    </div>
-                    <button onclick="openAssignModal('${u.discord_id}', '${escapeHTML(u.username)}')" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-all">
-                        <i class="fas fa-gift mr-1"></i> Asignar
-                    </button>
-                </div>
-            `).join('');
-        }
-
-        function filterAssignUsers() {
-            const search = document.getElementById('assign-search').value.toLowerCase();
-            const allUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
-            const filtered = allUsers.filter(u => u.username && u.username.toLowerCase().includes(search));
-            renderAssignUsers(filtered);
-        }
-
-        function openAssignModal(discordId, username) {
-            currentAssignUserId = discordId;
-            document.getElementById('assign-target-user').textContent = username;
-            
-            // Poblar select con productos
-            const select = document.getElementById('assign-product-select');
-            select.innerHTML = '<option value="">-- Selecciona un producto --</option>' + 
-                allProducts.map(p => `<option value="${p.id}">${escapeHTML(p.name)} (${Number(p.price) === 0 ? 'GRATIS' : '$' + Number(p.price).toFixed(2)})</option>`).join('');
-            
-            document.getElementById('assign-product-modal').classList.remove('hidden');
-        }
-
-        function cancelAssignProduct() {
-            document.getElementById('assign-product-modal').classList.add('hidden');
-            currentAssignUserId = null;
-        }
-
-        async function confirmAssignProduct() {
-            const productId = document.getElementById('assign-product-select').value;
-            const asFree = document.getElementById('assign-as-free').checked;
-            
-            if (!productId) {
-                alert('Por favor selecciona un producto.');
-                return;
-            }
-            
-            const product = allProducts.find(p => p.id === productId);
-            if (!product) {
-                alert('Producto no encontrado.');
-                return;
-            }
-            
-            try {
-                // Buscar usuario
-                const allUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
-                const userIndex = allUsers.findIndex(u => u.discord_id === currentAssignUserId);
-                
-                if (userIndex < 0) {
-                    alert('Usuario no encontrado.');
-                    return;
-                }
-                
-                const user = allUsers[userIndex];
-                
-                // Añadir producto al usuario
-                if (!user.assigned_products) user.assigned_products = [];
-                if (!user.assigned_products.includes(productId)) {
-                    user.assigned_products.push(productId);
-                }
-                
-                localStorage.setItem('papeleta_all_users', JSON.stringify(allUsers));
-                
-                // Registrar en Firebase
-                const purchaseData = {
-                    discord_id: user.discord_id,
-                    username: user.username,
-                    avatar: user.avatar,
-                    products: [{
-                        id: product.id,
-                        name: product.name,
-                        price: asFree ? "Gratis (Asignado por Admin)" : "$" + Number(product.price).toFixed(2)
-                    }],
-                    total_price: asFree ? "Gratis (Asignado por Admin)" : "$" + Number(product.price).toFixed(2),
-                    assigned_by: currentUser ? currentUser.id : 'admin',
-                    assigned_by_username: currentUser ? currentUser.username : 'Admin',
-                    date: firebase.firestore.FieldValue.serverTimestamp(),
-                    status: asFree ? "Asignado Gratis" : "Asignado"
-                };
-
-                await db.collection("Clientes").add(purchaseData);
-                
-                // Crear licencia
-                try {
-                    const uniqueKey = generateUniqueKey();
-                    await db.collection("Licencias").add({
-                        discord_id: user.discord_id,
-                        username: user.username,
-                        product_id: product.id,
-                        product_name: product.name,
-                        key: uniqueKey,
-                        created_at: firebase.firestore.FieldValue.serverTimestamp(),
-                        status: 'active',
-                        assigned_by_admin: true
-                    });
-                } catch(e) { console.error("Error creando licencia:", e); }
-                
-                alert(`✅ Producto "${product.name}" asignado exitosamente a ${user.username} ${asFree ? '(GRATIS)' : ''}`);
-                cancelAssignProduct();
-                
-            } catch (error) {
-                console.error(error);
-                alert('Error al asignar producto: ' + error.message);
-            }
-        }
-
-        // ============== NUEVO: PANEL USUARIOS AUTORIZADOS ==============
-        function loadAuthorizedPanel() {
-            const container = document.getElementById('authorized-users-list');
-            const countEl = document.getElementById('authorized-count');
-            const roleList = document.getElementById('available-roles-list');
-            
-            // Cargar roles personalizados
-            const customRoles = JSON.parse(localStorage.getItem('papeleta_custom_roles') || '[]');
-            
-            let rolesHtml = `
-                <span class="role-badge bg-red-950/60 border border-red-700 text-red-300">Admin</span>
-                <span class="role-badge bg-blue-950/60 border border-blue-700 text-blue-300">Mod</span>
-            `;
-            customRoles.forEach(r => {
-                rolesHtml += `<span class="role-badge" style="background:${r.color}20; border-color:${r.color}; color:${r.color}">${escapeHTML(r.name)}</span>`;
-            });
-            roleList.innerHTML = rolesHtml;
-            
-            const allUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
-            countEl.textContent = allUsers.length;
-            
-            if (allUsers.length === 0) {
-                container.innerHTML = '<p class="text-gray-500 text-sm text-center py-8">No hay usuarios registrados.</p>';
-                return;
-            }
-            
-            const roleOptions = [
-                { value: 'user', label: 'Usuario', badge: '' },
-                { value: 'cliente', label: 'Cliente', badge: 'bg-green-950/60 border-green-700 text-green-300' },
-                { value: 'support', label: 'Soporte', badge: 'bg-red-950/60 border-red-700 text-red-300' },
-                { value: 'mod', label: 'Mod', badge: 'bg-blue-950/60 border-blue-700 text-blue-300' },
-                { value: 'admin', label: 'Admin', badge: 'bg-red-950/60 border-red-700 text-red-300' }
-            ];
-            
-            customRoles.forEach(r => {
-                roleOptions.push({ 
-                    value: 'custom_' + r.id, 
-                    label: r.name, 
-                    badge: '',
-                    customColor: r.color
-                });
-            });
-            
-            container.innerHTML = allUsers.map(u => {
-                const currentRole = u.role || 'user';
-                const optionsHtml = roleOptions.map(opt => {
-                    const selected = (currentRole === opt.value || (opt.value.startsWith('custom_') && currentRole === opt.value)) ? 'selected' : '';
-                    const style = opt.customColor ? `style="color:${opt.customColor}"` : '';
-                    return `<option value="${opt.value}" ${selected} ${style}>${opt.label}</option>`;
-                }).join('');
-                
-                return `
-                    <div class="flex items-center gap-3 bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-2.5">
-                        <img src="${u.avatar ? `https://cdn.discordapp.com/avatars/${u.discord_id}/${u.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png'}" class="w-10 h-10 rounded-full border border-red-700">
-                        <div class="flex-grow min-w-0">
-                            <p class="text-white text-sm font-semibold truncate">${escapeHTML(u.username || 'Desconocido')}</p>
-                            <p class="text-gray-500 text-xs truncate">ID: ${u.discord_id}</p>
-                        </div>
-                        <select onchange="changeUserRole('${u.discord_id}', this.value)" class="bg-[#150a0a] border border-red-950/40 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-red-500">
-                            ${optionsHtml}
-                        </select>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function changeUserRole(discordId, newRole) {
-            let allUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
-            const userIndex = allUsers.findIndex(u => u.discord_id === discordId);
-            if (userIndex >= 0) {
-                allUsers[userIndex].role = newRole;
-                localStorage.setItem('papeleta_all_users', JSON.stringify(allUsers));
-                
-                if (currentUser && currentUser.id === discordId) {
-                    currentUserRole = newRole;
-                    applyRoleUI();
-                }
-                
-                loadAuthorizedPanel();
-                loadSalesStats();
-                alert('✅ Rol actualizado correctamente.');
-            }
-        }
-
-        // ============== NUEVO: PANEL CREAR ROL ==============
-        function loadRolesPanel() {
-            renderCustomRoles();
-        }
-
-        function createCustomRole() {
-            const name = document.getElementById('new-role-name').value.trim();
-            const color = document.getElementById('new-role-color').value;
-            
-            if (!name) {
-                alert('Por favor ingresa un nombre para el rol.');
-                return;
-            }
-            
-            const permissions = [];
-            document.querySelectorAll('#config-roles-panel .permission-checkbox input[type="checkbox"]:checked').forEach(cb => {
-                permissions.push(cb.value);
-            });
-            
-            const customRoles = JSON.parse(localStorage.getItem('papeleta_custom_roles') || '[]');
-            
-            if (customRoles.some(r => r.name.toLowerCase() === name.toLowerCase())) {
-                alert('Ya existe un rol con ese nombre.');
-                return;
-            }
-            
-            const newRole = {
-                id: 'role_' + Date.now(),
-                name: name,
-                color: color,
-                permissions: permissions,
-                created_at: new Date().toISOString(),
-                created_by: currentUser ? currentUser.id : 'admin'
-            };
-            
-            customRoles.push(newRole);
-            localStorage.setItem('papeleta_custom_roles', JSON.stringify(customRoles));
-            
-            alert(`✅ Rol "${name}" creado exitosamente con ${permissions.length} permisos.`);
-            
-            // Resetear formulario
-            document.getElementById('new-role-name').value = '';
-            document.getElementById('new-role-color').value = '#ff1a1a';
-            document.getElementById('new-role-color-text').value = '#ff1a1a';
-            document.querySelectorAll('#config-roles-panel .permission-checkbox input[type="checkbox"]').forEach(cb => {
-                if (['inicio', 'productos', 'preguntas'].includes(cb.value)) cb.checked = true;
-                else cb.checked = false;
-            });
-            
-            renderCustomRoles();
-        }
-
-        function renderCustomRoles() {
-            const container = document.getElementById('custom-roles-list');
-            const customRoles = JSON.parse(localStorage.getItem('papeleta_custom_roles') || '[]');
-            
-            if (customRoles.length === 0) {
-                container.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">No hay roles personalizados aún.</p>';
-                return;
-            }
-            
-            const permNames = {
-                inicio: 'Inicio', productos: 'Productos', preguntas: 'Preguntas',
-                config: 'Config', upload: 'Subir Productos', licenses: 'Licencias',
-                encrypt: 'Encriptar', assign: 'Asignar Productos', authorized: 'Usuarios Autorizados',
-                roles: 'Crear Roles', ticker: 'Ticker', stats: 'Estadísticas'
-            };
-            
-            container.innerHTML = customRoles.map(r => `
-                <div class="bg-[#0d0505] border rounded-xl p-3" style="border-color: ${r.color}40">
-                    <div class="flex justify-between items-center mb-2">
-                        <div class="flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full" style="background: ${r.color}"></span>
-                            <span class="text-white font-bold text-sm" style="color: ${r.color}">${escapeHTML(r.name)}</span>
-                        </div>
-                        <button onclick="deleteCustomRole('${r.id}')" class="text-red-400 hover:text-red-300 w-7 h-7 rounded-lg hover:bg-red-950/30 flex items-center justify-center transition-all">
-                            <i class="fas fa-trash text-xs"></i>
-                        </button>
-                    </div>
-                    <div class="flex flex-wrap gap-1 mt-2">
-                        ${r.permissions.map(p => `<span class="text-[10px] px-2 py-0.5 rounded" style="background: ${r.color}20; color: ${r.color}; border: 1px solid ${r.color}40">${permNames[p] || p}</span>`).join('')}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function deleteCustomRole(roleId) {
-            if (!confirm('¿Eliminar este rol personalizado?')) return;
-            let customRoles = JSON.parse(localStorage.getItem('papeleta_custom_roles') || '[]');
-            customRoles = customRoles.filter(r => r.id !== roleId);
-            localStorage.setItem('papeleta_custom_roles', JSON.stringify(customRoles));
-            renderCustomRoles();
-        }
-
-        // ============== FUNCIONES ORIGINALES (sin cambios) ==============
+        // Preview de múltiples imágenes
         function previewMultipleImages(input) {
             const previewContainer = document.getElementById('multiple-images-preview');
             previewContainer.innerHTML = '';
@@ -1430,6 +506,7 @@
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         tempImages.push(e.target.result);
+                        
                         const div = document.createElement('div');
                         div.className = 'preview-item';
                         div.innerHTML = `
@@ -1447,7 +524,9 @@
 
         function removeImage(index) {
             tempImages.splice(index, 1);
+            const input = document.getElementById('prod-images');
             const previewContainer = document.getElementById('multiple-images-preview');
+            
             previewContainer.innerHTML = '';
             tempImages.forEach((img, idx) => {
                 const div = document.createElement('div');
@@ -1460,6 +539,18 @@
                 `;
                 previewContainer.appendChild(div);
             });
+        }
+
+        function previewImage(input) {
+            const preview = document.getElementById('image-preview');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
         }
 
         function updateFileName(input) {
@@ -1577,6 +668,7 @@
         
         function loadAdminProductsList() {
             const container = document.getElementById('admin-products-list');
+            if(!container) return; 
             
             if (allProducts.length === 0) {
                 container.innerHTML = '<p class="text-gray-500 text-sm">No hay productos locales aún.</p>';
@@ -1603,7 +695,9 @@
             
             try {
                 await db.collection("Productos").doc(id).delete();
+                
                 allProducts = allProducts.filter(p => p.id !== id);
+                
                 loadAdminProductsList();
                 renderProducts();
                 document.getElementById('stat-productos').innerText = '+' + allProducts.length;
@@ -1679,7 +773,7 @@
                         <img src="${escapeHTML(item.image || '')}" alt="${escapeHTML(item.name)}" class="w-16 h-16 object-cover rounded-lg bg-[#150a0a]">
                         <div class="flex-grow min-w-0">
                             <h4 class="text-white font-semibold text-sm truncate">${escapeHTML(item.name)}</h4>
-                            <p class="text-green-400 font-bold text-sm">${Number(item.price) === 0 ? 'GRATIS' : '$' + Number(item.price).toFixed(2)}</p>
+                            <p class="${Number(item.price) === 0 ? 'text-green-400' : 'text-green-400'} font-bold text-sm">${Number(item.price) === 0 ? 'GRATIS' : '$' + Number(item.price).toFixed(2)}</p>
                         </div>
                         <button onclick="removeFromCart('${item.id}')" class="text-red-400 hover:text-red-300 w-8 h-8 rounded-lg hover:bg-red-950/30 flex items-center justify-center transition-all">
                             <i class="fas fa-trash"></i>
@@ -1746,7 +840,7 @@
                 
                 saveUserDataLocally();
                 
-                alert('¡Productos reclamados exitosamente! Ya están disponibles en tu biblioteca.\n\nSe han generado tus licencias automáticamente.');
+                alert('¡Productos reclamados exitosamente! Ya están disponibles en tu biblioteca.\n\nSe han generado tus licencias automáticamente.\n\nGracias por seguir confiando en nuestra tienda.');
                 
                 cart = [];
                 updateCartUI();
@@ -1794,15 +888,19 @@
                     return actions.order.create({
                         purchase_units: [{
                             description: 'Compra en Papeleta Store',
-                            amount: { value: totalAmount }
+                            amount: {
+                                value: totalAmount
+                            }
                         }]
                     });
                 },
                 onApprove: function(data, actions) {
                     return actions.order.capture().then(function(details) {
                         alert('¡Pago completado por ' + details.payer.name.given_name + '!');
+                        
                         assignProductsToUserAfterPayment(details);
                         giveClientRole();
+                        
                         cart = [];
                         updateCartUI();
                         closeCartModal();
@@ -1813,13 +911,16 @@
 
         function giveClientRole() {
             if(!currentUser) return;
+            
             currentUserRole = 'cliente';
+            
             const roleBadge = document.getElementById('user-role-badge');
             if(roleBadge) {
                 roleBadge.innerText = 'CLIENTE';
                 roleBadge.classList.add('text-green-400');
                 roleBadge.classList.remove('text-red-400');
             }
+
             saveUserDataLocally();
         }
 
@@ -1867,23 +968,36 @@
             window.open(DISCORD_INVITE, '_blank');
         }
 
+        // Funciones para la galería
         function changeImage(direction) {
             if (!currentDetailProduct || !currentDetailProduct.images) return;
+            
             currentImageIndex += direction;
-            if (currentImageIndex < 0) currentImageIndex = currentDetailProduct.images.length - 1;
-            else if (currentImageIndex >= currentDetailProduct.images.length) currentImageIndex = 0;
+            
+            if (currentImageIndex < 0) {
+                currentImageIndex = currentDetailProduct.images.length - 1;
+            } else if (currentImageIndex >= currentDetailProduct.images.length) {
+                currentImageIndex = 0;
+            }
+            
             updateGallery();
         }
 
         function updateGallery() {
             if (!currentDetailProduct || !currentDetailProduct.images) return;
+            
             const mainImage = document.getElementById('detail-image');
             const thumbnails = document.getElementById('gallery-thumbnails');
+            
             mainImage.src = currentDetailProduct.images[currentImageIndex];
+            
             const thumbElements = thumbnails.querySelectorAll('.gallery-thumbnail');
             thumbElements.forEach((thumb, idx) => {
-                if (idx === currentImageIndex) thumb.classList.add('active');
-                else thumb.classList.remove('active');
+                if (idx === currentImageIndex) {
+                    thumb.classList.add('active');
+                } else {
+                    thumb.classList.remove('active');
+                }
             });
         }
 
@@ -1908,6 +1022,7 @@
                          class="gallery-thumbnail ${idx === 0 ? 'active' : ''}" 
                          onclick="jumpToImage(${idx})">
                 `).join('');
+                
                 document.getElementById('gallery-prev').style.display = product.images.length > 1 ? 'flex' : 'none';
                 document.getElementById('gallery-next').style.display = product.images.length > 1 ? 'flex' : 'none';
             } else {
@@ -1937,26 +1052,41 @@
             `).join('');
             
             const buyBtn = document.getElementById('detail-buy-btn');
+            
             const alreadyOwned = currentUser && myAssignedProductIds.has(product.id);
             
             if (alreadyOwned) {
                 buyBtn.innerHTML = '<i class="fas fa-book text-xl"></i> Biblioteca';
                 buyBtn.className = 'w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 transition-all shadow-lg shadow-green-900/30 text-lg';
-                buyBtn.onclick = () => { closeProductDetailModal(); window.location.href = 'AreaCliente.html'; };
+                buyBtn.onclick = () => {
+                    closeProductDetailModal();
+                    window.location.href = 'AreaCliente.html';
+                };
             } else if (currentUser) {
                 if (Number(product.price) === 0) {
                     buyBtn.innerHTML = '<i class="fas fa-gift text-xl"></i> Reclamar Gratis';
                     buyBtn.className = 'w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 transition-all shadow-lg shadow-green-900/30 text-lg';
-                    buyBtn.onclick = () => { addToCart(productId); closeProductDetailModal(); claimFreeProducts(); };
+                    buyBtn.onclick = () => {
+                        addToCart(productId);
+                        closeProductDetailModal();
+                        claimFreeProducts();
+                    };
                 } else {
                     buyBtn.innerHTML = '<i class="fas fa-credit-card text-xl"></i> Comprar';
                     buyBtn.className = 'w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 transition-all shadow-lg shadow-red-900/30 text-lg';
-                    buyBtn.onclick = () => { addToCart(productId); closeProductDetailModal(); openCartModal(); };
+                    buyBtn.onclick = () => {
+                        addToCart(productId);
+                        closeProductDetailModal();
+                        openCartModal();
+                    };
                 }
             } else {
                 buyBtn.innerHTML = '<i class="fab fa-discord text-xl"></i> Iniciar Sesión para Comprar';
                 buyBtn.className = 'w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 transition-all shadow-lg shadow-red-900/30 text-lg';
-                buyBtn.onclick = () => { closeProductDetailModal(); openLoginModal(); };
+                buyBtn.onclick = () => {
+                    closeProductDetailModal();
+                    openLoginModal();
+                };
             }
 
             document.getElementById('product-detail-modal').classList.remove('hidden');
@@ -1991,10 +1121,12 @@
 
         function buyFromDetail() {
             if (!currentDetailProduct) return;
+            
             if (currentUser && myAssignedProductIds.has(currentDetailProduct.id)) {
                 window.location.href = 'AreaCliente.html';
                 return;
             }
+            
             if (!currentUser) {
                 closeProductDetailModal();
                 openLoginModal();
@@ -2011,9 +1143,10 @@
             }
         }
 
-        function openLoginModal() {
-            window.location.href = 'Login.html';
-        }
+      // --- CORRECCIÓN AQUÍ: Abre el modal en lugar de redirigir ---
+      function openLoginModal() {
+       document.getElementById('login-modal').classList.remove('hidden');
+       }
 
         function closeLoginModal() {
             document.getElementById('login-modal').classList.add('hidden');
@@ -2064,14 +1197,15 @@
                 
                 closeLoginModal();
                 
-                // MODIFICADO: Verificar si tiene permisos de config (Admin o Mod o Rol con permiso)
-                if (canAccessConfig()) {
+                if (isAdmin(user)) {
                     document.getElementById('nav-admin').classList.remove('hidden');
                 }
                 
                 updateAuthUI();
                 applyRoleUI();
+                
                 registerUserInFirebase(user);
+                
                 loadUserStats();
                 loadSalesStats();
                 loadMyAssignments().then(() => {
@@ -2082,27 +1216,6 @@
                 console.error(err);
                 logout();
             });
-        }
-
-        // NUEVA función para determinar si puede ver Config
-        function canAccessConfig() {
-            if (!currentUser) return false;
-            if (isAdmin(currentUser)) return true;
-            
-            // Revisar rol personalizado
-            const savedData = JSON.parse(localStorage.getItem('papeleta_user_' + currentUser.id) || '{}');
-            const allUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
-            const userData = allUsers.find(u => u.discord_id === currentUser.id) || savedData;
-            
-            if (userData.role === 'admin' || userData.role === 'mod') return true;
-            
-            if (userData.role && userData.role.startsWith('custom_')) {
-                const customRoles = JSON.parse(localStorage.getItem('papeleta_custom_roles') || '[]');
-                const role = customRoles.find(r => 'custom_' + r.id === userData.role);
-                if (role && role.permissions.includes('config')) return true;
-            }
-            
-            return false;
         }
 
         function updateAuthUI() {
@@ -2140,6 +1253,11 @@
             if (canUpload()) {
                 document.getElementById('nav-admin').classList.remove('hidden');
             }
+            const uploadSec = document.getElementById('admin-upload-section');
+            if(uploadSec) uploadSec.style.display = canUpload() ? '' : 'none';
+            
+            const usersSec = document.getElementById('admin-users-section');
+            if(usersSec) usersSec.style.display = isAdmin(currentUser) ? '' : 'none';
         }
 
         function saveUserDataLocally() {
@@ -2177,14 +1295,18 @@
                         registered_at: firebase.firestore.FieldValue.serverTimestamp(),
                         last_login: firebase.firestore.FieldValue.serverTimestamp()
                     });
+                    console.log("✅ Nuevo usuario registrado en Firebase:", user.username);
                 } else {
                     await userDocRef.update({
                         last_login: firebase.firestore.FieldValue.serverTimestamp(),
                         username: user.username,
                         avatar: user.avatar || null
                     });
+                    console.log(" Usuario existente actualizado:", user.username);
                 }
+                
                 saveUserDataLocally();
+                
             } catch (error) {
                 console.error("Error registrando usuario en Firebase:", error);
             }
@@ -2194,8 +1316,13 @@
             try {
                 const snapshot = await db.collection("UsuariosRegistrados").get();
                 let userCount = snapshot.size;
-                if (userCount === 0) userCount = 1;
+                
+                if (userCount === 0) {
+                    userCount = 1;
+                }
+                
                 document.getElementById('stat-usuarios').innerText = '+' + userCount;
+                
             } catch (error) {
                 console.error("Error cargando estadísticas de usuarios:", error);
                 const allUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
@@ -2208,6 +1335,7 @@
         async function loadSalesStats() {
             try {
                 const snapshot = await db.collection("Clientes").get();
+                
                 let clientesQueCompraron = new Set();
                 let totalVentas = 0;
                 
@@ -2216,7 +1344,9 @@
                     const discordId = data.discord_id;
                     const status = data.status;
                     const totalPrice = data.total_price;
+                    
                     totalVentas++;
+                    
                     if (status === "Pagado" || (totalPrice && totalPrice !== "Gratis" && totalPrice !== "GRATIS")) {
                         clientesQueCompraron.add(discordId);
                     }
@@ -2224,6 +1354,7 @@
                 
                 document.getElementById('stat-clientes').innerText = '+' + clientesQueCompraron.size;
                 document.getElementById('stat-ventas').innerText = '+' + totalVentas;
+                
             } catch (error) {
                 console.error("Error cargando estadísticas:", error);
                 const allUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
@@ -2232,6 +1363,7 @@
                 allUsers.forEach(u => {
                     if(u.assigned_products) totalVentas += u.assigned_products.length;
                 });
+                
                 document.getElementById('stat-ventas').innerText = '+' + totalVentas;
                 document.getElementById('stat-clientes').innerText = '+' + clientes;
             }
@@ -2240,6 +1372,7 @@
         async function loadMyAssignments() {
             myAssignedProductIds = new Set();
             if (!currentUser) return;
+            
             const savedData = JSON.parse(localStorage.getItem('papeleta_user_' + currentUser.id) || '{}');
             if(savedData.assigned_products) {
                 myAssignedProductIds = new Set(savedData.assigned_products);
@@ -2263,6 +1396,8 @@
         async function loadAdminUsers() {
             if (!isAdmin(currentUser)) return;
             const container = document.getElementById('admin-users-list');
+            if(!container) return; 
+
             const allUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
             
             if (allUsers.length === 0) {
@@ -2291,6 +1426,7 @@
             if(userIndex >= 0) {
                 allUsers[userIndex].role = role;
                 localStorage.setItem('papeleta_all_users', JSON.stringify(allUsers));
+                
                 if(currentUser && currentUser.id === discordId) {
                     currentUserRole = role;
                     applyRoleUI();
@@ -2313,11 +1449,6 @@
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active-page'));
             const link = document.querySelector(`.nav-link[data-page="${name}"]`);
             if (link) link.classList.add('active-page');
-            
-            // Si va a admin, siempre mostrar el panel principal primero
-            if (name === 'admin') {
-                showConfigPanel('main');
-            }
         }
 
         async function loadProducts() {
@@ -2328,11 +1459,15 @@
                     jsonProducts.push(doc.data());
                 });
                 
+                console.log("Productos cargados desde Firebase");
+                
                 allProducts = [...jsonProducts, ...localProducts];
+                
                 buildCategoryFilters();
                 renderProducts();
                 document.getElementById('stat-productos').innerText = '+' + allProducts.length;
                 loadAdminProductsList();
+                
             } catch (e) {
                 console.error(e);
                 document.getElementById('products-grid').innerHTML = `
@@ -2347,6 +1482,7 @@
         function buildCategoryFilters() {
             const cats = [...new Set(allProducts.map(p => p.category).filter(Boolean))];
             const container = document.getElementById('category-filters');
+            if(!container) return;
             container.innerHTML = `<button onclick="filterCategory('all')" class="cat-btn bg-red-600 text-white text-sm font-semibold px-4 py-2 rounded-full" data-cat="all"><i class="fas fa-th-large mr-1"></i> Todas las Categorías</button>`;
             cats.forEach(cat => {
                 container.innerHTML += `<button onclick="filterCategory('${escapeHTML(cat)}')" class="cat-btn bg-[#150a0a] border border-red-950/40 text-white text-sm font-semibold px-4 py-2 rounded-full" data-cat="${escapeHTML(cat)}"><i class="fas fa-code mr-1"></i> ${escapeHTML(cat)}</button>`;
@@ -2368,6 +1504,8 @@
         function renderProducts() {
             const search = document.getElementById('search-input').value.toLowerCase();
             const grid = document.getElementById('products-grid');
+            if(!grid) return;
+
             const filtered = allProducts.filter(p => {
                 const matchesCat = activeCategory === 'all' || p.category === activeCategory;
                 const matchesSearch = !search || p.name.toLowerCase().includes(search);
@@ -2382,18 +1520,22 @@
             grid.innerHTML = filtered.map(p => {
                 const priceDisplay = Number(p.price) === 0 ? 'GRATIS' : '$' + Number(p.price).toFixed(2);
                 const priceClass = Number(p.price) === 0 ? 'bg-green-600' : 'bg-red-600';
+                
                 const alreadyOwned = currentUser && myAssignedProductIds.has(p.id);
                 const isPaid = Number(p.price) > 0;
                 
                 return `
                 <div class="bg-[#150a0a] border ${alreadyOwned ? 'border-green-600/50' : 'border-red-950/40'} rounded-2xl overflow-hidden shadow-xl group hover:border-red-600/40 transition-all relative">
                     <span class="absolute top-3 right-3 ${priceClass} text-white text-xs font-bold px-3 py-1 rounded-full z-10">${priceDisplay}</span>
+                    
                     ${alreadyOwned ? '<span class="absolute top-3 left-3 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full z-10"><i class="fas fa-check mr-1"></i>OBTENIDO</span>' : ''}
+                    
                     <img src="${escapeHTML(p.image_url || '')}" alt="${escapeHTML(p.name)}" class="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300 bg-[#0d0505]">
                     <div class="p-5">
                         <h4 class="text-lg font-bold text-white mb-1">${escapeHTML(p.name)}</h4>
                         <p class="text-gray-400 text-xs mb-3">${escapeHTML(p.description || '')}</p>
                         ${p.category ? `<span class="inline-block bg-red-950/60 border border-red-800 text-red-300 text-xs font-bold px-2.5 py-1 rounded-md mb-4">${escapeHTML(p.category)}</span>` : ''}
+                        
                         <div class="grid grid-cols-2 gap-2">
                             ${alreadyOwned ? `
                                 <button onclick="window.location.href='AreaCliente.html'" class="bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2">
@@ -2412,6 +1554,7 @@
                                 </a>
                             `}
                         </div>
+                        
                         ${isAdmin(currentUser) ? `
                         <button onclick="deleteProduct('${p.id}')" class="w-full mt-2 bg-transparent border border-red-900/50 hover:border-red-500 hover:bg-red-950/30 text-red-300 text-xs font-semibold py-2 rounded-xl transition-all">
                             <i class="fas fa-trash mr-1"></i> Eliminar
@@ -2448,6 +1591,7 @@
             if (!currentUser) return null;
             try {
                 const uniqueKey = generateUniqueKey();
+                
                 const licenseData = {
                     discord_id: currentUser.id,
                     username: currentUser.username,
@@ -2513,6 +1657,93 @@
                 requestAnimationFrame(tick);
             }
             tick();
+        }
+
+        // --- NUEVAS FUNCIONES PARA EL PANEL DE CONFIG ---
+
+        function togglePassToUsersPanel() {
+            const panel = document.getElementById('pass-to-users-panel');
+            if (panel.classList.contains('hidden')) {
+                panel.classList.remove('hidden');
+                populateManualAssignDropdowns();
+            } else {
+                panel.classList.add('hidden');
+            }
+        }
+
+        async function populateManualAssignDropdowns() {
+            const userSelect = document.getElementById('manual-assign-user');
+            const allUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
+            
+            userSelect.innerHTML = '<option value="">Selecciona un usuario...</option>';
+            allUsers.forEach(u => {
+                userSelect.innerHTML += `<option value="${u.discord_id}">${u.username} (${u.discord_id})</option>`;
+            });
+
+            const prodSelect = document.getElementById('manual-assign-product');
+            prodSelect.innerHTML = '<option value="">Selecciona un producto...</option>';
+            allProducts.forEach(p => {
+                prodSelect.innerHTML += `<option value="${p.id}">${p.name} ($${p.price})</option>`;
+            });
+        }
+
+        async function executeManualAssign() {
+            const userId = document.getElementById('manual-assign-user').value;
+            const productId = document.getElementById('manual-assign-product').value;
+            const isFree = document.getElementById('assign-is-free').checked;
+
+            if (!userId || !productId) {
+                alert('Por favor selecciona un usuario y un producto.');
+                return;
+            }
+
+            const product = allProducts.find(p => p.id === productId);
+            if (!product) return;
+
+            try {
+                const purchaseData = {
+                    discord_id: userId,
+                    username: "Asignado Manualmente", 
+                    products: [{
+                        id: product.id,
+                        name: product.name,
+                        price: isFree ? "Gratis (Manual)" : "$" + product.price
+                    }],
+                    total_price: isFree ? "Gratis" : "$" + product.price,
+                    date: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: "Asignado por Admin",
+                    assigned_by: currentUser ? currentUser.id : "Desconocido"
+                };
+
+                await db.collection("Clientes").add(purchaseData);
+                
+                await createLicenseForUserDirectly(userId, product.id, product.name);
+
+                alert(`Producto "${product.name}" asignado correctamente al usuario.`);
+                togglePassToUsersPanel(); 
+                
+            } catch (error) {
+                console.error(error);
+                alert('Error al asignar: ' + error.message);
+            }
+        }
+
+        async function createLicenseForUserDirectly(discordId, productId, productName) {
+            try {
+                const uniqueKey = generateUniqueKey();
+                const licenseData = {
+                    discord_id: discordId,
+                    product_id: productId,
+                    product_name: productName,
+                    key: uniqueKey,
+                    created_at: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'active',
+                    type: 'manual_assign'
+                };
+                await db.collection("Licencias").add(licenseData);
+            } catch (error) {
+                console.error("Error creando licencia manual:", error);
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
