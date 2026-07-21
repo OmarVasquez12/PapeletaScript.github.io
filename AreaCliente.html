@@ -15,7 +15,9 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap');
         
-        * { font-family: 'Inter', sans-serif; }
+        * {
+            font-family: 'Inter', sans-serif;
+        }
         
         body {
             background: linear-gradient(135deg, #050507 0%, #150a0a 100%);
@@ -34,8 +36,15 @@
             backdrop-filter: blur(10px);
         }
         
-        .nav-item { transition: all 0.3s ease; }
-        .nav-item:hover { background: rgba(255, 26, 26, 0.1); color: white; }
+        .nav-item {
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item:hover {
+            background: rgba(255, 26, 26, 0.1);
+            color: white;
+        }
+        
         .nav-item.active {
             background: rgba(255, 26, 26, 0.15);
             border-left: 3px solid #ff1a1a;
@@ -47,11 +56,13 @@
             background: rgba(255, 26, 26, 0.05);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+        
         .admin-nav-item:hover {
             background: rgba(255, 26, 26, 0.15);
             border-color: rgba(255, 26, 26, 0.4);
             transform: translateX(4px);
         }
+        
         .admin-nav-item.active-section {
             background: rgba(255, 26, 26, 0.2);
             border-color: rgba(255, 26, 26, 0.6);
@@ -67,6 +78,7 @@
             background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
             transition: all 0.3s ease;
         }
+        
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(220, 38, 38, 0.3);
@@ -76,7 +88,11 @@
             background: rgba(13, 5, 5, 0.8);
             border: 1px solid rgba(255, 26, 26, 0.2);
         }
-        .input-field:focus { border-color: #ff1a1a; outline: none; }
+        
+        .input-field:focus {
+            border-color: #ff1a1a;
+            outline: none;
+        }
         
         .code-block {
             background: rgba(5, 5, 7, 0.9);
@@ -94,50 +110,94 @@
         ::-webkit-scrollbar-thumb { background: #7f1d1d; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #ef4444; }
 
+        /* Modal Server.Lua */
         .lua-modal {
-            position: fixed; inset: 0; z-index: 100;
-            background: rgba(0,0,0,0.9); backdrop-filter: blur(8px);
-            display: none; align-items: center; justify-content: center; padding: 20px;
+            position: fixed; 
+            inset: 0; 
+            z-index: 100;
+            background: rgba(0,0,0,0.9); 
+            backdrop-filter: blur(8px);
+            display: none; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 20px;
             animation: fadeIn 0.3s ease;
         }
-        .lua-modal.active { display: flex; }
         
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .lua-modal.active { 
+            display: flex; 
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
         
         .lua-code-container {
-            background: #0a0505; border: 2px solid #dc2626;
-            border-radius: 16px; padding: 0; width: 100%; max-width: 1000px;
-            max-height: 85vh; display: flex; flex-direction: column;
+            background: #0a0505; 
+            border: 2px solid #dc2626;
+            border-radius: 16px; 
+            padding: 0;
+            width: 100%; 
+            max-width: 1000px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
             box-shadow: 0 0 60px rgba(220, 38, 38, 0.3);
             animation: slideUp 0.3s ease;
         }
         
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
         
         .lua-header {
             background: linear-gradient(135deg, #150a0a 0%, #0d0505 100%);
-            border-bottom: 2px solid #dc2626; padding: 20px 24px;
-            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 2px solid #dc2626;
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
         
-        .lua-body { flex: 1; overflow: auto; padding: 24px; background: #050507; }
+        .lua-body {
+            flex: 1;
+            overflow: auto;
+            padding: 24px;
+            background: #050507;
+        }
         
         .lua-pre {
             font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
-            color: #ffffff; font-size: 13px; line-height: 1.7;
-            white-space: pre-wrap; word-break: break-all; margin: 0;
+            color: #ffffff;
+            font-size: 13px; 
+            line-height: 1.7;
+            white-space: pre-wrap; 
+            word-break: break-all;
+            margin: 0;
         }
         
         .lua-footer {
-            background: #0d0505; border-top: 1px solid rgba(220, 38, 38, 0.3);
-            padding: 16px 24px; display: flex; justify-content: flex-end; gap: 12px;
+            background: #0d0505;
+            border-top: 1px solid rgba(220, 38, 38, 0.3);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
         }
         
         .admin-badge {
-            background: rgba(220, 38, 38, 0.2); border: 1px solid rgba(220, 38, 38, 0.5);
-            color: #ff6b6b; padding: 2px 8px; border-radius: 4px;
-            font-size: 10px; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 0.5px; margin-left: 8px;
+            background: rgba(220, 38, 38, 0.2);
+            border: 1px solid rgba(220, 38, 38, 0.5);
+            color: #ff6b6b;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-left: 8px;
         }
 
         .admin-section-title {
@@ -146,11 +206,69 @@
             color: #ff6b6b;
         }
 
-        .section-content { animation: sectionFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .section-content {
+            animation: sectionFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
         @keyframes sectionFadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .upload-zone {
+            border: 2px dashed rgba(255, 26, 26, 0.3);
+            background: rgba(255, 26, 26, 0.02);
+            transition: all 0.3s ease;
+        }
+
+        .upload-zone:hover {
+            border-color: rgba(255, 26, 26, 0.6);
+            background: rgba(255, 26, 26, 0.05);
+            transform: scale(1.01);
+        }
+
+        .upload-zone.dragover {
+            border-color: #ff1a1a;
+            background: rgba(255, 26, 26, 0.1);
+            box-shadow: 0 0 30px rgba(255, 26, 26, 0.2);
+        }
+
+        .encrypt-box {
+            background: linear-gradient(135deg, rgba(21, 10, 10, 0.9), rgba(13, 5, 5, 0.9));
+            border: 1px solid rgba(255, 26, 26, 0.2);
+        }
+
+        .user-row {
+            transition: all 0.2s ease;
+        }
+
+        .user-row:hover {
+            background: rgba(255, 26, 26, 0.05);
+            transform: translateX(4px);
+        }
+
+        .role-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .loading-spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -160,7 +278,9 @@
     <aside class="sidebar w-64 fixed left-0 top-0 h-full z-50 hidden md:block overflow-y-auto custom-scrollbar">
         <div class="p-6">
             <div class="flex items-center gap-3 mb-8 cursor-pointer" onclick="showSection('dashboard')">
-                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center font-black text-white shadow-lg shadow-red-900/50">P</div>
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center font-black text-white shadow-lg shadow-red-900/50">
+                    P
+                </div>
                 <div>
                     <span class="text-white font-bold text-lg tracking-wide block">AREA CLIENTES</span>
                     <span id="admin-badge-sidebar" class="admin-badge hidden">ADMIN</span>
@@ -171,70 +291,104 @@
                 <div class="text-xs text-gray-500 uppercase font-semibold mb-4 px-3 tracking-wider">Principal</div>
                 
                 <a href="#" onclick="showSection('dashboard')" id="nav-dashboard" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
-                    <i class="fas fa-home w-5"></i><span>Inicio</span>
+                    <i class="fas fa-home w-5"></i>
+                    <span>Inicio</span>
                 </a>
                 
                 <a href="index.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
-                    <i class="fas fa-store w-5"></i><span>Tienda</span>
+                    <i class="fas fa-store w-5"></i>
+                    <span>Tienda</span>
                 </a>
                 
                 <a href="#" onclick="showSection('reviews')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
-                    <i class="fas fa-star w-5"></i><span>Mis Reseñas</span>
+                    <i class="fas fa-star w-5"></i>
+                    <span>Mis Reseñas</span>
                 </a>
                 
                 <a href="#" onclick="showSection('support')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
-                    <i class="fas fa-headset w-5"></i><span>Soporte</span>
+                    <i class="fas fa-headset w-5"></i>
+                    <span>Soporte</span>
                 </a>
                 
                 <a href="https://discord.gg/rvxEdWcGkf" target="_blank" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
-                    <i class="fab fa-discord w-5"></i><span>Discord</span>
+                    <i class="fab fa-discord w-5"></i>
+                    <span>Discord</span>
                 </a>
 
-                <!-- SECCIÓN DE ADMINISTRACIÓN -->
+                <!-- SECCIÓN DE ADMINISTRACIÓN - SOLO VISIBLE PARA ADMINS -->
                 <div id="admin-nav-section" class="hidden mt-6">
                     <div class="admin-section-title text-xs uppercase font-semibold mb-4 px-3 py-2 rounded-lg tracking-wider flex items-center gap-2">
                         <i class="fas fa-shield-alt"></i> Panel Admin
                     </div>
                     
-                    <!-- SubirProducto.html -->
                     <a href="#" onclick="loadExternalSection('subir-producto', 'Achivo/SubirProducto.html')" id="nav-subir-producto" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
-                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0"><i class="fas fa-cloud-upload-alt text-red-400 text-sm"></i></div>
-                        <div><span class="text-sm font-semibold block">Subir Producto</span><span class="text-[10px] text-gray-500 block">Agregar nuevos recursos</span></div>
+                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-cloud-upload-alt text-red-400 text-sm"></i>
+                        </div>
+                        <div>
+                            <span class="text-sm font-semibold block">Subir Producto</span>
+                            <span class="text-[10px] text-gray-500 block">Agregar nuevos recursos</span>
+                        </div>
                     </a>
                     
-                    <!-- LicenciaUsuario.html -->
                     <a href="#" onclick="loadExternalSection('licencias', 'Achivo/LicenciaUsuario.html')" id="nav-licencias" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
-                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0"><i class="fas fa-key text-red-400 text-sm"></i></div>
-                        <div><span class="text-sm font-semibold block">Licencias Usuario</span><span class="text-[10px] text-gray-500 block">Ver historial de compras</span></div>
+                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-key text-red-400 text-sm"></i>
+                        </div>
+                        <div>
+                            <span class="text-sm font-semibold block">Licencias Usuario</span>
+                            <span class="text-[10px] text-gray-500 block">Ver historial de compras</span>
+                        </div>
                     </a>
                     
-                    <!-- Encriptar.html -->
-                    <a href="#" onclick="loadExternalSection('encriptar', 'Achivo/Encriptar.html')" id="nav-encriptar" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
-                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0"><i class="fas fa-lock text-red-400 text-sm"></i></div>
-                        <div><span class="text-sm font-semibold block">Encriptar Script</span><span class="text-[10px] text-gray-500 block">Proteger archivos Lua</span></div>
+                    <a href="#" onclick="loadExternalSection('encriptar', 'sections/encriptar.html')" id="nav-encriptar" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
+                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-lock text-red-400 text-sm"></i>
+                        </div>
+                        <div>
+                            <span class="text-sm font-semibold block">Encriptar Script</span>
+                            <span class="text-[10px] text-gray-500 block">Proteger archivos Lua</span>
+                        </div>
                     </a>
                     
-                    <!-- PasarUsuarios.html -->
-                    <a href="#" onclick="loadExternalSection('asignar', 'Achivo/PasarUsuarios.html')" id="nav-asignar" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
-                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0"><i class="fas fa-user-plus text-red-400 text-sm"></i></div>
-                        <div><span class="text-sm font-semibold block">Pasar a Usuarios</span><span class="text-[10px] text-gray-500 block">Asignar productos gratis</span></div>
+                    <a href="#" onclick="loadExternalSection('asignar', 'sections/asignar.html')" id="nav-asignar" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
+                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-user-plus text-red-400 text-sm"></i>
+                        </div>
+                        <div>
+                            <span class="text-sm font-semibold block">Pasar a Usuarios</span>
+                            <span class="text-[10px] text-gray-500 block">Asignar productos gratis</span>
+                        </div>
                     </a>
                     
-                    <!-- UsuariosAutorizado.html -->
-                    <a href="#" onclick="loadExternalSection('usuarios', 'Achivo/UsuariosAutorizado.html')" id="nav-usuarios" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
-                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0"><i class="fas fa-users-cog text-red-400 text-sm"></i></div>
-                        <div><span class="text-sm font-semibold block">Usuarios Autorizados</span><span class="text-[10px] text-gray-500 block">Gestionar roles Admin</span></div>
+                    <a href="#" onclick="loadExternalSection('usuarios', 'sections/usuarios.html')" id="nav-usuarios" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
+                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-users-cog text-red-400 text-sm"></i>
+                        </div>
+                        <div>
+                            <span class="text-sm font-semibold block">Usuarios Autorizados</span>
+                            <span class="text-[10px] text-gray-500 block">Gestionar roles Admin</span>
+                        </div>
                     </a>
                     
-                    <!-- CrearRol.html -->
-                    <a href="#" onclick="loadExternalSection('crear-rol', 'Achivo/CrearRol.html')" id="nav-crear-rol" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
-                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0"><i class="fas fa-id-badge text-red-400 text-sm"></i></div>
-                        <div><span class="text-sm font-semibold block">Crear Rol</span><span class="text-[10px] text-gray-500 block">Definir permisos</span></div>
+                    <a href="#" onclick="loadExternalSection('crear-rol', 'sections/crear-rol.html')" id="nav-crear-rol" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
+                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-id-badge text-red-400 text-sm"></i>
+                        </div>
+                        <div>
+                            <span class="text-sm font-semibold block">Crear Rol</span>
+                            <span class="text-[10px] text-gray-500 block">Definir permisos</span>
+                        </div>
                     </a>
 
                     <a href="#" onclick="openLuaModal()" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300">
-                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0"><i class="fas fa-file-code text-red-400 text-sm"></i></div>
-                        <div><span class="text-sm font-semibold block">Server.Lua</span><span class="text-[10px] text-gray-500 block">Sistema de licencias</span></div>
+                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-file-code text-red-400 text-sm"></i>
+                        </div>
+                        <div>
+                            <span class="text-sm font-semibold block">Server.Lua</span>
+                            <span class="text-[10px] text-gray-500 block">Sistema de licencias</span>
+                        </div>
                     </a>
                 </div>
             </nav>
@@ -267,7 +421,8 @@
                 </div>
                 
                 <a href="index.html" class="btn-primary px-5 py-2.5 rounded-lg text-white font-bold flex items-center gap-2 shadow-lg shadow-red-900/20">
-                    <i class="fas fa-shopping-cart"></i> Ir al Catálogo
+                    <i class="fas fa-shopping-cart"></i>
+                    Ir al Catálogo
                 </a>
             </div>
         </header>
@@ -289,7 +444,9 @@
                         <p class="text-gray-400 text-xs">Sistema de Validación de Licencias</p>
                     </div>
                 </div>
-                <button onclick="closeLuaModal()" class="text-gray-400 hover:text-white text-2xl transition-colors"><i class="fas fa-times"></i></button>
+                <button onclick="closeLuaModal()" class="text-gray-400 hover:text-white text-2xl transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
             
             <div class="lua-body">
@@ -297,8 +454,12 @@
             </div>
             
             <div class="lua-footer">
-                <button onclick="closeLuaModal()" class="px-4 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-800 font-medium text-sm">Cerrar</button>
-                <button onclick="copyLuaCode()" class="btn-primary px-6 py-2 rounded-lg text-white font-bold flex items-center gap-2 text-sm"><i class="fas fa-copy"></i> Copiar Código</button>
+                <button onclick="closeLuaModal()" class="px-4 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-800 font-medium text-sm">
+                    Cerrar
+                </button>
+                <button onclick="copyLuaCode()" class="btn-primary px-6 py-2 rounded-lg text-white font-bold flex items-center gap-2 text-sm">
+                    <i class="fas fa-copy"></i> Copiar Código
+                </button>
             </div>
         </div>
     </div>
@@ -539,6 +700,7 @@ end, true, "high")`;
             location.reload();
         }
 
+        // SISTEMA DE NAVEGACIÓN - SECCIONES INTERNAS (EMBEDIDAS)
         function showSection(section) {
             document.querySelectorAll('.nav-item, .admin-nav-item').forEach(item => {
                 item.classList.remove('active', 'active-section');
@@ -555,6 +717,7 @@ end, true, "high")`;
 
             const contentDiv = document.getElementById('dynamic-content');
             
+            // Secciones principales con contenido embebido
             switch(section) {
                 case 'dashboard':
                     loadDashboardSection(contentDiv);
@@ -570,7 +733,9 @@ end, true, "high")`;
             }
         }
 
+        // CARGA DE SECCIONES EXTERNAS (SOLO ADMIN)
         async function loadExternalSection(sectionName, fileUrl) {
+            // Actualizar navegación
             document.querySelectorAll('.nav-item, .admin-nav-item').forEach(item => {
                 item.classList.remove('active', 'active-section');
             });
@@ -589,18 +754,39 @@ end, true, "high")`;
                 const html = await response.text();
                 contentDiv.innerHTML = `<div class="section-content">${html}</div>`;
                 
+                // Inicializar sección específica
+                initializeExternalSection(sectionName);
+                
             } catch (error) {
                 console.error(error);
                 contentDiv.innerHTML = `
                     <div class="text-center py-12 text-red-400">
                         <i class="fas fa-exclamation-triangle text-4xl mb-4"></i>
-                        <p>Error al cargar la sección: ${fileUrl}</p>
-                        <p class="text-sm text-gray-500 mt-2">Asegúrate de que el archivo existe en la carpeta Achivo/</p>
+                        <p>Error al cargar la sección</p>
                     </div>
                 `;
             }
         }
 
+        function initializeExternalSection(section) {
+            // Aquí se pueden agregar inicializaciones específicas si es necesario
+            switch(section) {
+                case 'subir-producto':
+                    if (typeof setupDragAndDrop === 'function') setupDragAndDrop();
+                    break;
+                case 'licencias':
+                    if (typeof loadLicenciasData === 'function') loadLicenciasData();
+                    break;
+                case 'asignar':
+                    if (typeof loadProductsForAssign === 'function') loadProductsForAssign();
+                    break;
+                case 'usuarios':
+                    if (typeof loadUsuariosData === 'function') loadUsuariosData();
+                    break;
+            }
+        }
+
+        // SECCIÓN DASHBOARD (EMBEDIDA)
         async function loadDashboardSection(container) {
             document.getElementById('header-subtitle').textContent = 'Gestiona tus productos y licencias desde aquí';
             
@@ -734,6 +920,7 @@ end, true, "high")`;
             if (saved.port) document.getElementById('server-port').value = saved.port;
         }
 
+        // SECCIÓN REVIEWS (EMBEDIDA)
         function loadReviewsSection(container) {
             document.getElementById('header-subtitle').textContent = 'Tus reseñas y valoraciones';
             container.innerHTML = `
@@ -745,6 +932,7 @@ end, true, "high")`;
             `;
         }
 
+        // SECCIÓN SOPORTE (EMBEDIDA)
         function loadSupportSection(container) {
             document.getElementById('header-subtitle').textContent = 'Contacta con nuestro equipo de soporte';
             container.innerHTML = `
@@ -759,6 +947,9 @@ end, true, "high")`;
             `;
         }
 
+        // ... resto de las funciones (loadDashboardData, MODAL SERVER.LUA, etc.)
+        // Se mantienen todas las funciones auxiliares del código original
+        
         async function loadDashboardData() {
             if (!currentUser) return;
             try {
@@ -936,6 +1127,7 @@ end, true, "high")`;
             alert('Configuración guardada');
         }
 
+        // MODAL SERVER.LUA
         function openLuaModal() {
             if (!isAdmin()) {
                 alert('Acceso denegado. Solo administradores.');
