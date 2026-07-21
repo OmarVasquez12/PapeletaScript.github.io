@@ -144,24 +144,13 @@
         .tab-button {
             transition: all 0.3s ease;
             cursor: pointer;
-            position: relative;
-        }
-        .tab-button::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--primary);
-            transition: width 0.3s ease;
-        }
-        .tab-button.active::after {
-            width: 100%;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 600;
         }
         .tab-button.active {
-            color: var(--primary);
-            font-weight: 600;
+            color: #ef4444;
+            border-bottom: 2px solid #ef4444;
         }
         .tab-button:not(.active):hover {
             color: #9ca3af;
@@ -240,20 +229,24 @@
             border: 1px solid rgba(255,255,255,0.05);
         }
 
-        .no-video-message {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: #6b7280;
-            text-align: center;
-            padding: 2rem;
+        /* Estilo para el video cuando está activo */
+        .video-active .gallery-frame {
+            background: #000;
         }
-        .no-video-message i {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            opacity: 0.5;
+        .video-active .gallery-image {
+            display: none;
+        }
+        .video-active .youtube-container {
+            display: block;
+        }
+        .video-active .nav-prev, .video-active .nav-next {
+            display: none;
+        }
+        .video-active #image-counter {
+            display: none;
+        }
+        .video-active .thumbnails-container {
+            display: none;
         }
     </style>
 </head>
@@ -303,7 +296,7 @@
                     <!-- Imagen principal -->
                     <img id="main-image" src="" alt="Producto" class="gallery-image p-2">
                     
-                    <!-- Contenedor de Video YouTube (oculto por defecto) -->
+                    <!-- Contenedor de Video YouTube -->
                     <div id="youtube-video-container" class="youtube-container hidden"></div>
                     
                     <div class="absolute top-4 left-4 bg-black/60 px-3 py-1 rounded-full text-xs font-mono border border-white/10 backdrop-blur-sm" id="image-counter">
@@ -314,7 +307,7 @@
                     <button class="gallery-nav nav-next" id="nav-next" onclick="moveSlide(1)"><i class="fas fa-chevron-right"></i></button>
                 </div>
                 
-                <!-- Thumbnails (solo para imágenes) -->
+                <!-- Thumbnails -->
                 <div id="thumbnails-list" class="thumbnails-container mt-4"></div>
                 
                 <!-- Tabs Imagen/Video -->
@@ -322,7 +315,7 @@
                     <button class="tab-button active pb-2 px-2 text-sm flex items-center gap-2" onclick="switchTab('image')" id="tab-image">
                         <i class="fas fa-image"></i> IMAGEN
                     </button>
-                    <button class="tab-button pb-2 px-2 text-sm flex items-center gap-2" onclick="switchTab('video')" id="tab-video">
+                    <button class="tab-button pb-2 px-2 text-sm flex items-center gap-2" onclick="switchTab('video')" id="tab-video" style="display: none;">
                         <i class="fas fa-video"></i> VIDEO
                     </button>
                 </div>
@@ -370,7 +363,7 @@
                     </h3>
                     <p id="prod-desc" class="text-gray-400 text-sm leading-relaxed">...</p>
                 </div>
-            </div>
+            </2>
         </div>
     </main>
 
@@ -438,7 +431,7 @@
         let userAlreadyOwns = false;
         let currentUserDiscordId = null;
         let currentUserData = null;
-        let currentTab = 'image'; // Por defecto, empieza en 'image'
+        let currentTab = 'image'; // 'image' o 'video'
 
         // --- LÓGICA DEL CARRITO ---
         let cart = JSON.parse(localStorage.getItem('papeleta_cart') || '[]');
@@ -786,6 +779,12 @@
                 navNext.style.display = 'flex';
                 imageCounter.style.display = 'block';
                 
+                // Detener video si estaba reproduciéndose
+                const iframe = youtubeContainer.querySelector('iframe');
+                if (iframe) {
+                    iframe.src = iframe.src; // Recargar para detener reproducción
+                }
+                
             } else if (tab === 'video') {
                 imageTab.classList.remove('active');
                 videoTab.classList.add('active');
@@ -797,7 +796,7 @@
                 navNext.style.display = 'none';
                 imageCounter.style.display = 'none';
                 
-                // Cargar video de YouTube y reproducirlo automáticamente
+                // Cargar y reproducir video automáticamente
                 loadYouTubeVideo(true);
             }
         }
@@ -806,22 +805,21 @@
             const youtubeContainer = document.getElementById('youtube-video-container');
             
             if (currentProduct && currentProduct.youtube_id) {
-                const autoplayParam = autoPlay ? '&autoplay=1' : '&autoplay=0';
+                const params = autoPlay ? '?autoplay=1&rel=0&modestbranding=1' : '?rel=0&modestbranding=1';
                 youtubeContainer.innerHTML = `
                     <iframe 
-                        src="https://www.youtube.com/embed/${currentProduct.youtube_id}?rel=0${autoplayParam}" 
+                        src="https://www.youtube.com/embed/${currentProduct.youtube_id}${params}" 
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                         allowfullscreen>
                     </iframe>
                 `;
             } else if (currentProduct && currentProduct.youtube_url) {
-                // Intentar extraer ID del URL si solo tenemos el URL
                 const videoId = extractYouTubeId(currentProduct.youtube_url);
                 if (videoId) {
-                    const autoplayParam = autoPlay ? '&autoplay=1' : '&autoplay=0';
+                    const params = autoPlay ? '?autoplay=1&rel=0&modestbranding=1' : '?rel=0&modestbranding=1';
                     youtubeContainer.innerHTML = `
                         <iframe 
-                            src="https://www.youtube.com/embed/${videoId}?rel=0${autoplayParam}" 
+                            src="https://www.youtube.com/embed/${videoId}${params}" 
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                             allowfullscreen>
                         </iframe>
@@ -837,10 +835,10 @@
         function showNoVideoMessage() {
             const youtubeContainer = document.getElementById('youtube-video-container');
             youtubeContainer.innerHTML = `
-                <div class="no-video-message">
-                    <i class="fas fa-video-slash"></i>
-                    <p class="text-lg font-semibold">No hay video disponible</p>
-                    <p class="text-sm">Este producto no tiene video de presentación</p>
+                <div class="flex flex-col items-center justify-center h-full text-center p-6">
+                    <i class="fas fa-video-slash text-4xl text-gray-600 mb-4"></i>
+                    <p class="text-lg font-semibold text-gray-400">No hay video disponible</p>
+                    <p class="text-sm text-gray-500 mt-2">Este producto no tiene video de presentación</p>
                 </div>
             `;
         }
@@ -870,7 +868,7 @@
                 document.getElementById('prod-desc').textContent = currentProduct.description || "Sin descripción.";
                 document.getElementById('prod-category').textContent = currentProduct.category || "General";
 
-                // Mostrar/ocultar tab de video si existe
+                // Mostrar/ocultar tab de video
                 const videoTab = document.getElementById('tab-video');
                 if (currentProduct.youtube_id || currentProduct.youtube_url) {
                     videoTab.style.display = 'flex';
@@ -913,7 +911,7 @@
                 setupGallery();
                 updateCartBadge();
 
-                // Inicializar tab como 'imagen' por defecto
+                // Iniciar con tab IMAGEN activo
                 switchTab('image');
 
             } catch (error) {
