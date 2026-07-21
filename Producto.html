@@ -144,10 +144,24 @@
         .tab-button {
             transition: all 0.3s ease;
             cursor: pointer;
+            position: relative;
+        }
+        .tab-button::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+        .tab-button.active::after {
+            width: 100%;
         }
         .tab-button.active {
-            color: #ef4444;
-            border-bottom: 2px solid #ef4444;
+            color: var(--primary);
+            font-weight: 600;
         }
         .tab-button:not(.active):hover {
             color: #9ca3af;
@@ -308,7 +322,7 @@
                     <button class="tab-button active pb-2 px-2 text-sm flex items-center gap-2" onclick="switchTab('image')" id="tab-image">
                         <i class="fas fa-image"></i> IMAGEN
                     </button>
-                    <button class="tab-button pb-2 px-2 text-sm flex items-center gap-2" onclick="switchTab('video')" id="tab-video" style="display: none;">
+                    <button class="tab-button pb-2 px-2 text-sm flex items-center gap-2" onclick="switchTab('video')" id="tab-video">
                         <i class="fas fa-video"></i> VIDEO
                     </button>
                 </div>
@@ -424,7 +438,7 @@
         let userAlreadyOwns = false;
         let currentUserDiscordId = null;
         let currentUserData = null;
-        let currentTab = 'image'; // 'image' o 'video'
+        let currentTab = 'image'; // Por defecto, empieza en 'image'
 
         // --- LÓGICA DEL CARRITO ---
         let cart = JSON.parse(localStorage.getItem('papeleta_cart') || '[]');
@@ -783,18 +797,19 @@
                 navNext.style.display = 'none';
                 imageCounter.style.display = 'none';
                 
-                // Cargar video de YouTube
-                loadYouTubeVideo();
+                // Cargar video de YouTube y reproducirlo automáticamente
+                loadYouTubeVideo(true);
             }
         }
 
-        function loadYouTubeVideo() {
+        function loadYouTubeVideo(autoPlay = false) {
             const youtubeContainer = document.getElementById('youtube-video-container');
             
             if (currentProduct && currentProduct.youtube_id) {
+                const autoplayParam = autoPlay ? '&autoplay=1' : '&autoplay=0';
                 youtubeContainer.innerHTML = `
                     <iframe 
-                        src="https://www.youtube.com/embed/${currentProduct.youtube_id}?autoplay=0&rel=0" 
+                        src="https://www.youtube.com/embed/${currentProduct.youtube_id}?rel=0${autoplayParam}" 
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                         allowfullscreen>
                     </iframe>
@@ -803,9 +818,10 @@
                 // Intentar extraer ID del URL si solo tenemos el URL
                 const videoId = extractYouTubeId(currentProduct.youtube_url);
                 if (videoId) {
+                    const autoplayParam = autoPlay ? '&autoplay=1' : '&autoplay=0';
                     youtubeContainer.innerHTML = `
                         <iframe 
-                            src="https://www.youtube.com/embed/${videoId}?autoplay=0&rel=0" 
+                            src="https://www.youtube.com/embed/${videoId}?rel=0${autoplayParam}" 
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                             allowfullscreen>
                         </iframe>
@@ -897,6 +913,9 @@
                 setupGallery();
                 updateCartBadge();
 
+                // Inicializar tab como 'imagen' por defecto
+                switchTab('image');
+
             } catch (error) {
                 console.error(error);
             }
@@ -981,7 +1000,7 @@
                     ctx.fillStyle = 'rgba(255, 26, 26, 0.5)';
                     ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI*2); ctx.fill();
 
-                    for(let j=i+1; j<points.length; j++) {
+                    for(let j=i; j<points.length; j++) {
                         let p2 = points[j];
                         let dx = p.x - p2.x, dy = p.y - p2.y;
                         let dist = Math.sqrt(dx*dx + dy*dy);
