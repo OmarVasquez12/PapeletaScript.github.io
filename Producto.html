@@ -255,6 +255,15 @@
             margin-bottom: 1rem;
             opacity: 0.5;
         }
+
+        /* Ocultar todo hasta que cargue */
+        #product-content {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        #product-content.loaded {
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="relative">
@@ -295,7 +304,8 @@
         </div>
     </header>
 
-    <main class="relative z-10 w-full max-w-7xl ml-4 md:ml-10 py-10 pr-4">
+    <!-- CONTENIDO DEL PRODUCTO - OCULTO HASTA QUE CARGUE -->
+    <main id="product-content" class="relative z-10 w-full max-w-7xl ml-4 md:ml-10 py-10 pr-4">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
             <div class="lg:col-span-7 flex flex-col">
                 <!-- Gallery Frame con Video o Imagen -->
@@ -303,7 +313,7 @@
                     <!-- Imagen principal (oculta por defecto) -->
                     <img id="main-image" src="" alt="Producto" class="gallery-image p-2 hidden">
                     
-                    <!-- Contenedor de Video YouTube (visible por defecto si existe) -->
+                    <!-- Contenedor de Video YouTube -->
                     <div id="youtube-video-container" class="youtube-container"></div>
                     
                     <div class="absolute top-4 left-4 bg-black/60 px-3 py-1 rounded-full text-xs font-mono border border-white/10 backdrop-blur-sm" id="image-counter">
@@ -334,7 +344,7 @@
                     <span class="px-3 py-1 rounded-full border border-white/10 text-gray-400 text-xs font-bold uppercase tracking-wide bg-white/5">ENTREGA INSTANTÁNEA</span>
                 </div>
 
-                <h1 id="prod-title" class="text-4xl md:text-5xl font-black text-white leading-tight tracking-tight">Cargando...</h1>
+                <h1 id="prod-title" class="text-4xl md:text-5xl font-black text-white leading-tight tracking-tight"></h1>
 
                 <div class="glass-panel p-6 flex items-center justify-between mt-2">
                     <div id="price-tag" class="text-4xl font-bold text-white">$0.00</div>
@@ -346,10 +356,10 @@
 
                 <div class="flex flex-col gap-4 mt-2">
                     <button id="main-action-btn" onclick="handleMainAction()" class="btn-primary w-full py-4 rounded-xl text-white font-bold text-lg flex items-center justify-center gap-3 shadow-lg">
-                        <!-- JS inyectará icono y texto aquí -->
+                        <i class="fas fa-shopping-cart"></i> Añadir al Carrito
                     </button>
 
-                    <div id="divider-buy" class="relative flex py-2 items-center hidden">
+                    <div id="divider-buy" class="relative flex py-2 items-center">
                         <div class="flex-grow border-t border-white/10"></div>
                         <span class="flex-shrink-0 mx-4 text-gray-500 text-xs uppercase font-bold tracking-widest">O Compra Rápida</span>
                         <div class="flex-grow border-t border-white/10"></div>
@@ -368,7 +378,7 @@
                     <h3 class="text-white font-bold mb-2 flex items-center gap-2">
                         <i class="fas fa-align-left text-red-500"></i> Descripción del Producto
                     </h3>
-                    <p id="prod-desc" class="text-gray-400 text-sm leading-relaxed">...</p>
+                    <p id="prod-desc" class="text-gray-400 text-sm leading-relaxed"></p>
                 </div>
             </div>
         </div>
@@ -438,7 +448,7 @@
         let userAlreadyOwns = false;
         let currentUserDiscordId = null;
         let currentUserData = null;
-        let currentTab = 'video'; // Por defecto, empieza en 'video'
+        let currentTab = 'video';
 
         // --- LÓGICA DEL CARRITO ---
         let cart = JSON.parse(localStorage.getItem('papeleta_cart') || '[]');
@@ -762,7 +772,6 @@
             }
         }
 
-        // CAMBIADO: Cambiar entre tabs Video/Imagen
         function switchTab(tab) {
             currentTab = tab;
             const imageTab = document.getElementById('tab-image');
@@ -785,7 +794,6 @@
                 navNext.style.display = 'none';
                 imageCounter.style.display = 'none';
                 
-                // Cargar video de YouTube y reproducirlo automáticamente
                 loadYouTubeVideo(true);
                 
             } else if (tab === 'image') {
@@ -799,7 +807,6 @@
                 navNext.style.display = 'flex';
                 imageCounter.style.display = 'block';
                 
-                // Limpiar el video para que se detenga
                 youtubeContainer.innerHTML = '';
             }
         }
@@ -853,20 +860,27 @@
             return (match && match[2].length === 11) ? match[2] : null;
         }
 
+        // CARGA RÁPIDA - CARGA TODO DE UNA VEZ
         async function loadProduct() {
             if (!productId) return window.location.href = 'index.html';
 
             try {
-                const doc = await db.collection("Productos").doc(productId).get();
+                // Cargar producto y verificar propiedad al mismo tiempo
+                const [doc, ownsProduct] = await Promise.all([
+                    db.collection("Productos").doc(productId).get(),
+                    checkIfUserOwnsProduct()
+                ]);
+
                 if (!doc.exists) return window.location.href = 'index.html';
 
                 currentProduct = doc.data();
-                userAlreadyOwns = await checkIfUserOwnsProduct();
+                userAlreadyOwns = ownsProduct;
 
                 const priceVal = Number(currentProduct.price);
                 const priceStr = String(currentProduct.price).toLowerCase();
                 isFree = (priceVal === 0 || priceStr === 'gratis' || priceStr === 'free');
 
+                // Actualizar UI inmediatamente
                 document.getElementById('prod-title').textContent = currentProduct.name;
                 document.getElementById('prod-desc').textContent = currentProduct.description || "Sin descripción.";
                 document.getElementById('prod-category').textContent = currentProduct.category || "General";
@@ -877,15 +891,12 @@
                 const imageTab = document.getElementById('tab-image');
                 
                 if (!hasVideo) {
-                    // Si no tiene video, mostrar solo imagen y ocultar tab de video
                     videoTab.style.display = 'none';
                     imageTab.style.display = 'flex';
                     switchTab('image');
                 } else {
-                    // Si tiene video, mostrar ambos tabs y empezar con video
                     videoTab.style.display = 'flex';
                     imageTab.style.display = 'flex';
-                    // Inicializar tab como 'video' por defecto
                     switchTab('video');
                 }
 
@@ -924,8 +935,13 @@
                 setupGallery();
                 updateCartBadge();
 
+                // Mostrar todo de una vez
+                document.getElementById('product-content').classList.add('loaded');
+
             } catch (error) {
                 console.error(error);
+                // Si hay error, mostrar contenido vacío pero sin "Cargando..."
+                document.getElementById('product-content').classList.add('loaded');
             }
         }
 
@@ -1024,9 +1040,10 @@
             animate();
         }
 
+        // INICIALIZACIÓN - CARGAR TODO DE UNA VEZ
         document.addEventListener('DOMContentLoaded', () => {
             checkDiscordAuth();
-            loadProduct();
+            loadProduct(); // Carga todo inmediatamente
             initNetworkBg();
         });
     </script>
