@@ -1636,65 +1636,73 @@
         }
 
         function renderProducts() {
-            const search = document.getElementById('search-input').value.toLowerCase();
-            const grid = document.getElementById('products-grid');
-            const filtered = allProducts.filter(p => {
-                const matchesCat = activeCategory === 'all' || p.category === activeCategory;
-                const matchesSearch = !search || p.name.toLowerCase().includes(search);
-                return matchesCat && matchesSearch;
-            });
+    const search = document.getElementById('search-input').value.toLowerCase();
+    const grid = document.getElementById('products-grid');
+    const filtered = allProducts.filter(p => {
+        const matchesCat = activeCategory === 'all' || p.category === activeCategory;
+        const matchesSearch = !search || p.name.toLowerCase().includes(search);
+        return matchesCat && matchesSearch;
+    });
 
-            if (filtered.length === 0) {
-                grid.innerHTML = `<p class="text-gray-500 text-sm col-span-full text-center py-10">No hay productos que coincidan.</p>`;
-                return;
-            }
+    if (filtered.length === 0) {
+        grid.innerHTML = `<p class="text-gray-500 text-sm col-span-full text-center py-10">No hay productos que coincidan.</p>`;
+        return;
+    }
 
-            grid.innerHTML = filtered.map(p => {
-                const priceDisplay = Number(p.price) === 0 ? 'GRATIS' : '$' + Number(p.price).toFixed(2);
-                const priceClass = Number(p.price) === 0 ? 'bg-green-600' : 'bg-red-600';
+    grid.innerHTML = filtered.map(p => {
+        const priceDisplay = Number(p.price) === 0 ? 'GRATIS' : '$' + Number(p.price).toFixed(2);
+        const priceClass = Number(p.price) === 0 ? 'text-green-400' : 'text-red-400';
+        
+        const alreadyOwned = currentUser && myAssignedProductIds.has(p.id);
+        
+        return `
+        <div class="bg-[#150a0a] border ${alreadyOwned ? 'border-green-600/50' : 'border-red-950/40'} rounded-2xl overflow-hidden shadow-xl group hover:border-red-600/40 transition-all relative">
+            ${alreadyOwned ? '<span class="absolute top-3 right-3 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full z-10"><i class="fas fa-check mr-1"></i>OBTENIDO</span>' : ''}
+            
+            <div class="relative overflow-hidden">
+                <img src="${escapeHTML(p.image_url || '')}" alt="${escapeHTML(p.name)}" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300 bg-[#0d0505]">
+                <div class="absolute inset-0 bg-gradient-to-t from-[#150a0a] to-transparent opacity-60"></div>
+            </div>
+            
+            <div class="p-5">
+                <h4 class="text-xl font-bold text-white mb-2">${escapeHTML(p.name)}</h4>
+                <p class="text-gray-400 text-sm mb-4 line-clamp-2">${escapeHTML(p.description || '')}</p>
                 
-                const alreadyOwned = currentUser && myAssignedProductIds.has(p.id);
-                const isPaid = Number(p.price) > 0;
+                ${p.category ? `<span class="inline-block bg-red-950/60 border border-red-800 text-red-300 text-xs font-bold px-2.5 py-1 rounded-md mb-4">${escapeHTML(p.category)}</span>` : ''}
                 
-                return `
-                <div class="bg-[#150a0a] border ${alreadyOwned ? 'border-green-600/50' : 'border-red-950/40'} rounded-2xl overflow-hidden shadow-xl group hover:border-red-600/40 transition-all relative">
-                    <span class="absolute top-3 right-3 ${priceClass} text-white text-xs font-bold px-3 py-1 rounded-full z-10">${priceDisplay}</span>
-                    
-                    ${alreadyOwned ? '<span class="absolute top-3 left-3 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full z-10"><i class="fas fa-check mr-1"></i>OBTENIDO</span>' : ''}
-                    
-                    <img src="${escapeHTML(p.image_url || '')}" alt="${escapeHTML(p.name)}" class="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300 bg-[#0d0505]">
-                    <div class="p-5">
-                        <h4 class="text-lg font-bold text-white mb-1">${escapeHTML(p.name)}</h4>
-                        <p class="text-gray-400 text-xs mb-3">${escapeHTML(p.description || '')}</p>
-                        ${p.category ? `<span class="inline-block bg-red-950/60 border border-red-800 text-red-300 text-xs font-bold px-2.5 py-1 rounded-md mb-4">${escapeHTML(p.category)}</span>` : ''}
-                        
-                        <div class="grid grid-cols-2 gap-2">
-                            ${alreadyOwned ? `
-                                <button onclick="window.location.href='AreaCliente.html'" class="bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2">
-                                    <i class="fas fa-book"></i> Biblioteca
-                                </button>
-                                <a href="Producto.html?id=${p.id}" class="block w-full bg-[#0d0505] hover:bg-[#150a0a] border border-red-800/50 text-gray-300 text-sm font-semibold py-2.5 rounded-xl transition-all text-center no-underline">
-                                    Ver Detalles
-                                </a>
-                            ` : `
-                                <button onclick="addToCart('${p.id}')" class="${isPaid ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'} text-white text-sm font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2">
-                                    <i class="fas ${isPaid ? 'fa-credit-card' : 'fa-gift'}"></i>
-                                    ${isPaid ? 'Comprar' : 'Reclamar'}
-                                </button>
-                                <a href="Producto.html?id=${p.id}" class="block w-full bg-[#0d0505] hover:bg-[#150a0a] border border-red-800/50 text-gray-300 text-sm font-semibold py-2.5 rounded-xl transition-all text-center no-underline">
-                                    Ver Detalles
-                                </a>
-                            `}
-                        </div>
-                        
-                        ${isAdmin(currentUser) ? `
-                        <button onclick="deleteProduct('${p.id}')" class="w-full mt-2 bg-transparent border border-red-900/50 hover:border-red-500 hover:bg-red-950/30 text-red-300 text-xs font-semibold py-2 rounded-xl transition-all">
-                            <i class="fas fa-trash mr-1"></i> Eliminar
-                        </button>` : ''}
-                    </div>
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-2xl font-black ${priceClass}">${priceDisplay}</span>
+                    ${Number(p.price) > 0 ? '<span class="text-xs text-gray-500">USD</span>' : '<span class="text-xs text-green-400 font-semibold">Sin costo</span>'}
                 </div>
-            `}).join('');
-        }
+                
+                ${alreadyOwned ? `
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="window.location.href='AreaCliente.html'" class="bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2">
+                            <i class="fas fa-download"></i> Descargar
+                        </button>
+                        <a href="Producto.html?id=${p.id}" class="bg-[#0d0505] hover:bg-[#150a0a] border border-red-800/50 text-gray-300 text-sm font-semibold py-3 rounded-xl transition-all text-center no-underline flex items-center justify-center gap-2">
+                            <i class="fas fa-eye"></i> Ver
+                        </a>
+                    </div>
+                ` : `
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="addToCart('${p.id}')" class="bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-red-900/30">
+                            <i class="fas fa-cart-plus"></i> Añadir
+                        </button>
+                        <a href="Producto.html?id=${p.id}" class="bg-[#0d0505] hover:bg-[#1a0a0a] border border-red-800/50 text-gray-300 hover:text-white text-sm font-semibold py-3 rounded-xl transition-all text-center no-underline flex items-center justify-center gap-2">
+                            <i class="fas fa-info-circle"></i> Detalles
+                        </a>
+                    </div>
+                `}
+                
+                ${isAdmin(currentUser) ? `
+                <button onclick="deleteProduct('${p.id}')" class="w-full mt-3 bg-transparent border border-red-900/50 hover:border-red-500 hover:bg-red-950/30 text-red-300 text-xs font-semibold py-2 rounded-xl transition-all">
+                    <i class="fas fa-trash mr-1"></i> Eliminar
+                </button>` : ''}
+            </div>
+        </div>
+    `}).join('');
+}
 
         function escapeHTML(str) {
             return String(str).replace(/[&<>'"]/g,
