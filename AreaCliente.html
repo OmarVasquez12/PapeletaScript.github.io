@@ -490,13 +490,10 @@
             const codeBlock = document.getElementById('license-code');
             
             if (userFixedLicenseKey && currentUser) {
-                const code = `-- Configuración de Licencia Papeleta Store
--- Usuario: ${currentUser.username}
--- ID: ${currentUser.id}
-
+                const code = `
 configLicense = {
-    ["User"] = "${currentUser.username}", 
-    ["Key"] = "PapeletaStore(${userFixedLicenseKey})"
+["User"] = "${currentUser.username}", 
+["Key"] = "PapeletaStore(${userFixedLicenseKey})"
 }`;
                 codeBlock.textContent = code;
             } else {
