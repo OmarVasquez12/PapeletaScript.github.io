@@ -147,20 +147,20 @@
             box-shadow: 0 6px 20px rgba(22, 163, 74, 0.5);
         }
 
-        .cart-modal-overlay {
+        .cart-modal-overlay, .login-modal-overlay {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.8);
-            z-index: 100;
+            background: rgba(0,0,0,0.85);
+            z-index: 200;
             backdrop-filter: blur(5px);
             align-items: center;
             justify-content: center;
         }
-        .cart-modal-overlay.active {
+        .cart-modal-overlay.active, .login-modal-overlay.active {
             display: flex;
         }
-        .cart-modal-content {
+        .cart-modal-content, .login-card {
             background: #150a0a;
             width: 90%;
             max-width: 480px;
@@ -207,6 +207,21 @@
 
     <canvas id="network-bg"></canvas>
 
+    <!-- MODAL DE LOGIN (CORREGIDO) -->
+    <div id="login-modal" class="login-modal-overlay">
+        <div class="login-card p-8 text-center relative">
+            <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+            <div class="mx-auto w-20 h-20 rounded-xl mb-6 shadow-lg border-2 border-red-600 bg-gradient-to-br from-red-500 to-red-800 flex items-center justify-center text-3xl font-black">P</div>
+            <h1 class="text-2xl font-black text-white mb-2 tracking-wide uppercase">INICIAR SESIÓN</h1>
+            <p class="text-gray-400 text-sm mb-8">Debes acceder con Discord para comprar o reclamar productos.</p>
+            <button onclick="redirectToDiscord()" class="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-3.5 px-6 rounded-xl flex items-center justify-center gap-3 transition-all duration-200 shadow-lg transform hover:scale-[1.02]">
+                <i class="fab fa-discord text-xl"></i> Continuar con Discord
+            </button>
+        </div>
+    </div>
+
     <header class="relative z-10 border-b border-white/5 bg-black/40 backdrop-blur-md sticky top-0">
         <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='index.html'">
@@ -227,23 +242,17 @@
     </header>
 
     <main class="relative z-10 w-full max-w-7xl ml-4 md:ml-10 py-10 pr-4">
-        
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-            
             <div class="lg:col-span-7 flex flex-col">
                 <div class="gallery-frame shadow-2xl shadow-red-900/10 group">
                     <img id="main-image" src="" alt="Producto" class="gallery-image p-2">
-                    
                     <div class="absolute top-4 left-4 bg-black/60 px-3 py-1 rounded-full text-xs font-mono border border-white/10 backdrop-blur-sm">
                         <span id="current-img-idx">1</span> / <span id="total-img-idx">1</span>
                     </div>
-
                     <button class="gallery-nav nav-prev" onclick="moveSlide(-1)"><i class="fas fa-chevron-left"></i></button>
                     <button class="gallery-nav nav-next" onclick="moveSlide(1)"><i class="fas fa-chevron-right"></i></button>
                 </div>
-
                 <div id="thumbnails-list" class="thumbnails-container mt-4"></div>
-
                 <div class="flex gap-4 mt-6 border-b border-white/10 pb-2">
                     <button class="text-red-500 font-semibold border-b-2 border-red-500 pb-2 px-2 text-sm flex items-center gap-2">
                         <i class="fas fa-image"></i> IMAGEN
@@ -255,7 +264,6 @@
             </div>
 
             <div class="lg:col-span-5 flex flex-col gap-6">
-                
                 <div class="flex gap-3 mb-2">
                     <span id="prod-category" class="px-3 py-1 rounded-full border border-red-500/30 text-red-400 text-xs font-bold uppercase tracking-wide bg-red-500/5">MAPS</span>
                     <span class="px-3 py-1 rounded-full border border-white/10 text-gray-400 text-xs font-bold uppercase tracking-wide bg-white/5">ENTREGA INSTANTÁNEA</span>
@@ -272,7 +280,6 @@
                 </div>
 
                 <div class="flex flex-col gap-4 mt-2">
-                    
                     <button id="main-action-btn" onclick="handleMainAction()" class="btn-primary w-full py-4 rounded-xl text-white font-bold text-lg flex items-center justify-center gap-3 shadow-lg">
                         <!-- JS inyectará icono y texto aquí -->
                     </button>
@@ -298,7 +305,6 @@
                     </h3>
                     <p id="prod-desc" class="text-gray-400 text-sm leading-relaxed">...</p>
                 </div>
-
             </div>
         </div>
     </main>
@@ -322,7 +328,6 @@
 
             <div class="cart-body custom-scrollbar">
                 <div id="cart-items" class="space-y-3"></div>
-                
                 <div id="cart-empty" class="hidden text-center py-8">
                     <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-[#0d0505] flex items-center justify-center">
                         <i class="fas fa-shopping-cart text-gray-600 text-2xl"></i>
@@ -337,10 +342,8 @@
                     <span class="text-gray-400 text-sm">Total a pagar:</span>
                     <span id="cart-total" class="text-2xl font-black text-white">$0.00</span>
                 </div>
-                
                 <button onclick="goToCheckout()" class="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-red-900/30">
-                    <i class="fas fa-credit-card"></i>
-                    Proceder al Pago
+                    <i class="fas fa-credit-card"></i> Proceder al Pago
                 </button>
             </div>
         </div>
@@ -470,6 +473,32 @@
             totalEl.textContent = total === 0 ? 'GRATIS' : '$' + total.toFixed(2);
         }
 
+        // --- FUNCIONES DE LOGIN CORREGIDAS ---
+        function openLoginModal() {
+            document.getElementById('login-modal').classList.add('active');
+        }
+
+        function closeLoginModal() {
+            document.getElementById('login-modal').classList.remove('active');
+        }
+
+        function redirectToDiscord() {
+            const CLIENT_ID = '1213866547181780992'; 
+            const REDIRECT_URI = 'https://papeleta-script-github-io.vercel.app';
+            const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20email`;
+            window.location.href = url;
+        }
+
+        function checkDiscordAuth() {
+            const fragment = new URLSearchParams(window.location.hash.slice(1));
+            const accessToken = fragment.get('access_token');
+            if (accessToken) {
+                window.location.hash = '';
+                localStorage.setItem('dc_access_token', accessToken);
+                window.location.reload();
+            }
+        }
+
         // MODIFICADO: Procesar compra/reclamo y redirigir
         async function goToCheckout() {
             if (cart.length === 0) {
@@ -477,16 +506,14 @@
                 return;
             }
 
-            // Verificar si el usuario está logueado
             const token = localStorage.getItem('dc_access_token');
             if (!token) {
                 alert('Debes iniciar sesión para completar la compra');
-                window.location.href = 'index.html';
+                openLoginModal(); // <-- AHORA ABRE EL MODAL EN LUGAR DE REDIRIGIR
                 return;
             }
 
             try {
-                // Obtener datos del usuario
                 const res = await fetch('https://discord.com/api/users/@me', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
@@ -494,7 +521,7 @@
                 if (!res.ok) {
                     localStorage.removeItem('dc_access_token');
                     alert('Sesión expirada. Por favor inicia sesión nuevamente.');
-                    window.location.href = 'index.html';
+                    openLoginModal();
                     return;
                 }
 
@@ -502,14 +529,11 @@
                 currentUserDiscordId = user.id;
                 currentUserData = user;
 
-                // Verificar si todos los productos son gratis
                 const allFree = cart.every(item => Number(item.price) === 0);
 
                 if (allFree) {
-                    // RECLAMAR PRODUCTOS GRATIS
                     await claimFreeProducts(user);
                 } else {
-                    // COMPRAR PRODUCTOS DE PAGO
                     await purchasePaidProducts(user);
                 }
 
@@ -521,7 +545,6 @@
 
         async function claimFreeProducts(user) {
             try {
-                // Guardar en Clientes
                 const purchaseData = {
                     discord_id: user.id,
                     username: user.username,
@@ -538,18 +561,14 @@
 
                 await db.collection("Clientes").add(purchaseData);
                 
-                // Crear licencias para cada producto
                 for (const item of cart) {
                     await createLicenseForProduct(item.id, item.name, user);
                 }
                 
-                // Limpiar carrito
                 cart = [];
                 saveCart();
                 
                 alert('¡Productos reclamados exitosamente!');
-                
-                // Redirigir al Área de Cliente
                 window.location.href = 'AreaCliente.html';
                 
             } catch (error) {
@@ -559,16 +578,12 @@
         }
 
         async function purchasePaidProducts(user) {
-            // Para productos de pago, redirigir a index.html para procesar PayPal
-            // O implementar pago directo aquí
-            
             const total = cart.reduce((sum, item) => sum + Number(item.price), 0);
             
             const confirmPurchase = confirm(`Total a pagar: $${total.toFixed(2)}\n\n¿Deseas completar la compra?`);
             
             if (confirmPurchase) {
                 try {
-                    // Guardar en Clientes
                     const purchaseData = {
                         discord_id: user.id,
                         username: user.username,
@@ -585,18 +600,14 @@
 
                     await db.collection("Clientes").add(purchaseData);
                     
-                    // Crear licencias para cada producto
                     for (const item of cart) {
                         await createLicenseForProduct(item.id, item.name, user);
                     }
                     
-                    // Limpiar carrito
                     cart = [];
                     saveCart();
                     
                     alert('¡Compra completada exitosamente!');
-                    
-                    // Redirigir al Área de Cliente
                     window.location.href = 'AreaCliente.html';
                     
                 } catch (error) {
@@ -654,7 +665,6 @@
                 const user = await res.json();
                 currentUserDiscordId = user.id;
 
-                // Buscar en Licencias
                 const licensesSnapshot = await db.collection("Licencias")
                     .where("discord_id", "==", user.id)
                     .where("product_id", "==", productId)
@@ -664,7 +674,6 @@
                     return true;
                 }
 
-                // También verificar en Clientes
                 const clientsSnapshot = await db.collection("Clientes")
                     .where("discord_id", "==", user.id)
                     .get();
@@ -696,8 +705,6 @@
                 if (!doc.exists) return window.location.href = 'index.html';
 
                 currentProduct = doc.data();
-
-                // Verificar si el usuario ya tiene el producto
                 userAlreadyOwns = await checkIfUserOwnsProduct();
 
                 const priceVal = Number(currentProduct.price);
@@ -714,12 +721,9 @@
                 const divider = document.getElementById('divider-buy');
 
                 if (userAlreadyOwns) {
-                    // USUARIO YA TIENE EL PRODUCTO
                     priceTag.innerHTML = `<span class="text-green-400" style="text-shadow: 0 0 10px rgba(74, 222, 128, 0.5);">OBTENIDO</span>`;
-                    
                     mainBtn.className = "badge-obtenido w-full py-4 rounded-xl text-white font-bold text-lg flex items-center justify-center gap-3 shadow-lg transition-all";
                     mainBtn.innerHTML = `<i class="fas fa-book-open"></i> Ir a mi Biblioteca`;
-                    
                     secBtn.classList.add('hidden');
                     divider.classList.add('hidden');
 
@@ -729,7 +733,6 @@
                     document.querySelector('.gallery-frame').appendChild(badge);
 
                 } else if (isFree) {
-                    // PRODUCTO GRATIS - NO LO TIENE AÚN
                     priceTag.innerHTML = `<span class="badge-gratis">GRATIS</span>`;
                     mainBtn.className = "btn-primary w-full py-4 rounded-xl text-white font-bold text-lg flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(74,222,128,0.2)]";
                     mainBtn.innerHTML = `<i class="fas fa-gift"></i> Añadir al Carrito (Gratis)`;
@@ -737,7 +740,6 @@
                     divider.classList.add('hidden');
 
                 } else {
-                    // PRODUCTO DE PAGO - NO LO TIENE AÚN
                     priceTag.textContent = `$${currentProduct.price}`;
                     mainBtn.className = "btn-primary w-full py-4 rounded-xl text-white font-bold text-lg flex items-center justify-center gap-3";
                     mainBtn.innerHTML = `<i class="fas fa-shopping-cart"></i> Añadir al Carrito`;
@@ -849,6 +851,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            checkDiscordAuth(); // Verifica si viene de Discord
             loadProduct();
             initNetworkBg();
         });
