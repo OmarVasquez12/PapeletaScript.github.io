@@ -54,12 +54,19 @@
         .admin-nav-item {
             border: 1px solid rgba(255, 26, 26, 0.2);
             background: rgba(255, 26, 26, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .admin-nav-item:hover {
             background: rgba(255, 26, 26, 0.15);
             border-color: rgba(255, 26, 26, 0.4);
             transform: translateX(4px);
+        }
+        
+        .admin-nav-item.active-section {
+            background: rgba(255, 26, 26, 0.2);
+            border-color: rgba(255, 26, 26, 0.6);
+            box-shadow: 0 0 20px rgba(255, 26, 26, 0.2);
         }
         
         .stat-card {
@@ -103,7 +110,7 @@
         ::-webkit-scrollbar-thumb { background: #7f1d1d; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #ef4444; }
 
-        /* Modal Server.Lua Mejorado */
+        /* Modal Server.Lua */
         .lua-modal {
             position: fixed; 
             inset: 0; 
@@ -198,6 +205,82 @@
             border: 1px solid rgba(220, 38, 38, 0.3);
             color: #ff6b6b;
         }
+
+        /* ANIMACIONES PARA SECCIONES DINÁMICAS */
+        .section-content {
+            animation: sectionFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes sectionFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .upload-zone {
+            border: 2px dashed rgba(255, 26, 26, 0.3);
+            background: rgba(255, 26, 26, 0.02);
+            transition: all 0.3s ease;
+        }
+
+        .upload-zone:hover {
+            border-color: rgba(255, 26, 26, 0.6);
+            background: rgba(255, 26, 26, 0.05);
+            transform: scale(1.01);
+        }
+
+        .upload-zone.dragover {
+            border-color: #ff1a1a;
+            background: rgba(255, 26, 26, 0.1);
+            box-shadow: 0 0 30px rgba(255, 26, 26, 0.2);
+        }
+
+        .encrypt-box {
+            background: linear-gradient(135deg, rgba(21, 10, 10, 0.9), rgba(13, 5, 5, 0.9));
+            border: 1px solid rgba(255, 26, 26, 0.2);
+        }
+
+        .user-row {
+            transition: all 0.2s ease;
+        }
+
+        .user-row:hover {
+            background: rgba(255, 26, 26, 0.05);
+            transform: translateX(4px);
+        }
+
+        .role-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .loading-spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .success-check {
+            animation: checkPop 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes checkPop {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); opacity: 1; }
+        }
     </style>
 </head>
 <body class="min-h-screen flex">
@@ -205,7 +288,7 @@
     <!-- SIDEBAR -->
     <aside class="sidebar w-64 fixed left-0 top-0 h-full z-50 hidden md:block overflow-y-auto custom-scrollbar">
         <div class="p-6">
-            <div class="flex items-center gap-3 mb-8 cursor-pointer" onclick="window.location.href='index.html'">
+            <div class="flex items-center gap-3 mb-8 cursor-pointer" onclick="showSection('dashboard')">
                 <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center font-black text-white shadow-lg shadow-red-900/50">
                     P
                 </div>
@@ -218,7 +301,7 @@
             <nav class="space-y-2">
                 <div class="text-xs text-gray-500 uppercase font-semibold mb-4 px-3 tracking-wider">Principal</div>
                 
-                <a href="#" onclick="showSection('dashboard')" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
+                <a href="#" onclick="showSection('dashboard')" id="nav-dashboard" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
                     <i class="fas fa-home w-5"></i>
                     <span>Inicio</span>
                 </a>
@@ -249,7 +332,7 @@
                         <i class="fas fa-shield-alt"></i> Panel Admin
                     </div>
                     
-                    <a href="SubirProducto.html" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
+                    <a href="#" onclick="showSection('subir-producto')" id="nav-subir-producto" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
                         <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
                             <i class="fas fa-cloud-upload-alt text-red-400 text-sm"></i>
                         </div>
@@ -259,7 +342,7 @@
                         </div>
                     </a>
                     
-                    <a href="LicenciaUsuario.html" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
+                    <a href="#" onclick="showSection('licencias')" id="nav-licencias" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
                         <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
                             <i class="fas fa-key text-red-400 text-sm"></i>
                         </div>
@@ -269,7 +352,7 @@
                         </div>
                     </a>
                     
-                    <a href="Encriptar.html" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
+                    <a href="#" onclick="showSection('encriptar')" id="nav-encriptar" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
                         <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
                             <i class="fas fa-lock text-red-400 text-sm"></i>
                         </div>
@@ -279,7 +362,7 @@
                         </div>
                     </a>
                     
-                    <a href="#" onclick="openAssignProductModal()" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
+                    <a href="#" onclick="showSection('asignar')" id="nav-asignar" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
                         <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
                             <i class="fas fa-user-plus text-red-400 text-sm"></i>
                         </div>
@@ -289,7 +372,7 @@
                         </div>
                     </a>
                     
-                    <a href="UsuariosAutorizado.html" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
+                    <a href="#" onclick="showSection('usuarios')" id="nav-usuarios" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
                         <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
                             <i class="fas fa-users-cog text-red-400 text-sm"></i>
                         </div>
@@ -299,7 +382,7 @@
                         </div>
                     </a>
                     
-                    <a href="CrearRol.html" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
+                    <a href="#" onclick="showSection('crear-rol')" id="nav-crear-rol" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
                         <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
                             <i class="fas fa-id-badge text-red-400 text-sm"></i>
                         </div>
@@ -346,7 +429,7 @@
                         Bienvenido, <span id="header-username" class="gradient-text">usuario</span>
                         <span id="header-admin-badge" class="admin-badge hidden ml-2">ADMIN</span>
                     </h1>
-                    <p class="text-gray-400 text-sm">Gestiona tus productos y licencias desde aquí</p>
+                    <p id="header-subtitle" class="text-gray-400 text-sm">Gestiona tus productos y licencias desde aquí</p>
                 </div>
                 
                 <a href="index.html" class="btn-primary px-5 py-2.5 rounded-lg text-white font-bold flex items-center gap-2 shadow-lg shadow-red-900/20">
@@ -356,124 +439,9 @@
             </div>
         </header>
 
-        <div class="p-6 md:p-8 flex-grow">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="stat-card rounded-xl p-6 relative overflow-hidden group">
-                    <div class="absolute right-0 top-0 w-24 h-24 bg-red-600/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
-                    <div class="flex items-center justify-between relative z-10">
-                        <div>
-                            <p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Total Invertido</p>
-                            <p id="stat-total-spent" class="text-2xl font-bold text-white">$0.00</p>
-                        </div>
-                        <div class="w-12 h-12 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
-                            <i class="fas fa-wallet text-red-400 text-xl"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="stat-card rounded-xl p-6 relative overflow-hidden group">
-                    <div class="absolute right-0 top-0 w-24 h-24 bg-green-600/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
-                    <div class="flex items-center justify-between relative z-10">
-                        <div>
-                            <p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Scripts Activos</p>
-                            <p id="stat-active-scripts" class="text-2xl font-bold text-white">0</p>
-                        </div>
-                        <div class="w-12 h-12 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center justify-center">
-                            <i class="fas fa-lock text-green-400 text-xl"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="stat-card rounded-xl p-6 relative overflow-hidden group">
-                    <div class="absolute right-0 top-0 w-24 h-24 bg-blue-600/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
-                    <div class="flex items-center justify-between relative z-10">
-                        <div>
-                            <p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Estado de Cuenta</p>
-                            <p id="stat-account-status" class="text-lg font-bold text-red-400">Cliente Verificado</p>
-                        </div>
-                        <div class="w-12 h-12 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
-                            <i class="fas fa-user-shield text-red-400 text-xl"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-2 card rounded-xl p-6">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
-                            <i class="fas fa-cube text-red-400"></i>
-                        </div>
-                        <h2 class="text-lg font-bold text-white">Mis Productos Activos</h2>
-                    </div>
-
-                    <div class="mb-6">
-                        <div class="relative">
-                            <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
-                            <input 
-                                type="text" 
-                                id="dashboard-search"
-                                oninput="filterDashboardProducts()"
-                                placeholder="Buscar entre tus recursos..." 
-                                class="input-field w-full pl-12 pr-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none"
-                            >
-                        </div>
-                    </div>
-
-                    <div id="dashboard-products-list" class="space-y-3 max-h-[500px] overflow-y-auto custom-scrollbar pr-2"></div>
-
-                    <div id="dashboard-empty-state" class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5">
-                        <i class="fas fa-box-open text-gray-600 text-4xl mb-3"></i>
-                        <p class="text-gray-400 mb-4">No tienes productos activos aún.</p>
-                        <a href="index.html" class="btn-primary inline-block px-6 py-2 rounded-lg text-white font-medium">
-                            Ir a la tienda
-                        </a>
-                    </div>
-                </div>
-
-                <div class="card rounded-xl p-6 h-fit">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
-                            <i class="fas fa-server text-red-400"></i>
-                        </div>
-                        <h2 class="text-lg font-bold text-white">Configuración MTA</h2>
-                    </div>
-
-                    <div class="space-y-4 mb-6">
-                        <div>
-                            <label class="block text-gray-400 text-xs uppercase font-semibold mb-2 tracking-wider">Server IP</label>
-                            <input type="text" id="server-ip" value="213.181.88.154" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none font-mono text-sm">
-                        </div>
-                        
-                        <div>
-                            <label class="block text-gray-400 text-xs uppercase font-semibold mb-2 tracking-wider">Puerto</label>
-                            <input type="text" id="server-port" value="22003" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none font-mono text-sm">
-                        </div>
-                    </div>
-
-                    <div class="mb-6">
-                        <div class="flex items-center justify-between mb-2">
-                            <label class="block text-gray-400 text-xs uppercase font-semibold tracking-wider">Código de Licencia</label>
-                            <span class="text-[10px] text-red-400 font-mono bg-red-900/20 px-2 py-0.5 rounded">LUA CONFIG</span>
-                        </div>
-                        <div class="code-block rounded-lg p-4 font-mono text-sm">
-                            <pre class="text-white whitespace-pre-wrap break-all"><code id="license-code">Generando...</code></pre>
-                        </div>
-                        <button onclick="generateNewKey()" class="w-full mt-3 bg-[#150a0a] hover:bg-[#1a0a0a] border border-red-800/50 text-gray-300 hover:text-white text-xs font-semibold py-2 rounded-xl transition-all flex items-center justify-center gap-2">
-                            <i class="fas fa-sync-alt"></i> Generar Nueva Clave
-                        </button>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3 mb-4">
-                        <button onclick="saveServerConfig()" class="btn-primary px-4 py-2.5 rounded-lg text-white font-medium flex items-center justify-center gap-2 text-sm">
-                            <i class="fas fa-save"></i> Guardar
-                        </button>
-                        <button onclick="copyLicenseCode()" class="px-4 py-2.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 font-medium flex items-center justify-center gap-2 text-sm">
-                            <i class="fas fa-copy"></i> Copiar
-                        </button>
-                    </div>
-                </div>
-            </div>
+        <!-- CONTENIDO DINÁMICO -->
+        <div id="dynamic-content" class="p-6 md:p-8 flex-grow">
+            <!-- El contenido se carga aquí dinámicamente -->
         </div>
     </main>
 
@@ -706,7 +674,6 @@ end, true, "high")`;
                 
                 if (isAdmin()) {
                     currentUserRole = 'admin';
-                    // Mostrar sección de admin completa
                     document.getElementById('admin-nav-section').classList.remove('hidden');
                     document.getElementById('admin-badge-sidebar').classList.remove('hidden');
                     document.getElementById('header-admin-badge').classList.remove('hidden');
@@ -729,8 +696,7 @@ end, true, "high")`;
                 document.getElementById('login-modal').classList.add('hidden');
                 
                 ensureFixedLicense().then(() => {
-                    loadDashboardData();
-                    updateLicenseDisplay();
+                    showSection('dashboard');
                 });
             })
             .catch(err => {
@@ -746,46 +712,979 @@ end, true, "high")`;
             location.reload();
         }
 
+        // SISTEMA DE NAVEGACIÓN DINÁMICA
         function showSection(section) {
-            if (section === 'store') window.location.href = 'index.html';
+            // Actualizar navegación activa
+            document.querySelectorAll('.nav-item, .admin-nav-item').forEach(item => {
+                item.classList.remove('active', 'active-section');
+            });
+
+            const navItem = document.getElementById(`nav-${section}`);
+            if (navItem) {
+                if (navItem.classList.contains('admin-nav-item')) {
+                    navItem.classList.add('active-section');
+                } else {
+                    navItem.classList.add('active');
+                }
+            }
+
+            // Cargar contenido según la sección
+            const contentDiv = document.getElementById('dynamic-content');
+            
+            switch(section) {
+                case 'dashboard':
+                    loadDashboardSection(contentDiv);
+                    break;
+                case 'subir-producto':
+                    loadSubirProductoSection(contentDiv);
+                    break;
+                case 'licencias':
+                    loadLicenciasSection(contentDiv);
+                    break;
+                case 'encriptar':
+                    loadEncriptarSection(contentDiv);
+                    break;
+                case 'asignar':
+                    loadAsignarSection(contentDiv);
+                    break;
+                case 'usuarios':
+                    loadUsuariosSection(contentDiv);
+                    break;
+                case 'crear-rol':
+                    loadCrearRolSection(contentDiv);
+                    break;
+                default:
+                    loadDashboardSection(contentDiv);
+            }
         }
 
-        function openLuaModal() {
-            if (!isAdmin()) {
-                alert('Acceso denegado. Solo administradores.');
+        // SECCIÓN DASHBOARD
+        async function loadDashboardSection(container) {
+            document.getElementById('header-subtitle').textContent = 'Gestiona tus productos y licencias desde aquí';
+            
+            container.innerHTML = `
+                <div class="section-content">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="stat-card rounded-xl p-6 relative overflow-hidden group">
+                            <div class="absolute right-0 top-0 w-24 h-24 bg-red-600/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
+                            <div class="flex items-center justify-between relative z-10">
+                                <div>
+                                    <p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Total Invertido</p>
+                                    <p id="stat-total-spent" class="text-2xl font-bold text-white">$0.00</p>
+                                </div>
+                                <div class="w-12 h-12 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                                    <i class="fas fa-wallet text-red-400 text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card rounded-xl p-6 relative overflow-hidden group">
+                            <div class="absolute right-0 top-0 w-24 h-24 bg-green-600/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
+                            <div class="flex items-center justify-between relative z-10">
+                                <div>
+                                    <p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Scripts Activos</p>
+                                    <p id="stat-active-scripts" class="text-2xl font-bold text-white">0</p>
+                                </div>
+                                <div class="w-12 h-12 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center justify-center">
+                                    <i class="fas fa-lock text-green-400 text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card rounded-xl p-6 relative overflow-hidden group">
+                            <div class="absolute right-0 top-0 w-24 h-24 bg-blue-600/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
+                            <div class="flex items-center justify-between relative z-10">
+                                <div>
+                                    <p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Estado de Cuenta</p>
+                                    <p id="stat-account-status" class="text-lg font-bold text-red-400">Cliente Verificado</p>
+                                </div>
+                                <div class="w-12 h-12 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                                    <i class="fas fa-user-shield text-red-400 text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 card rounded-xl p-6">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                                    <i class="fas fa-cube text-red-400"></i>
+                                </div>
+                                <h2 class="text-lg font-bold text-white">Mis Productos Activos</h2>
+                            </div>
+
+                            <div class="mb-6">
+                                <div class="relative">
+                                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                                    <input 
+                                        type="text" 
+                                        id="dashboard-search"
+                                        oninput="filterDashboardProducts()"
+                                        placeholder="Buscar entre tus recursos..." 
+                                        class="input-field w-full pl-12 pr-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none"
+                                    >
+                                </div>
+                            </div>
+
+                            <div id="dashboard-products-list" class="space-y-3 max-h-[500px] overflow-y-auto custom-scrollbar pr-2"></div>
+
+                            <div id="dashboard-empty-state" class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5">
+                                <i class="fas fa-box-open text-gray-600 text-4xl mb-3"></i>
+                                <p class="text-gray-400 mb-4">No tienes productos activos aún.</p>
+                                <a href="index.html" class="btn-primary inline-block px-6 py-2 rounded-lg text-white font-medium">
+                                    Ir a la tienda
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="card rounded-xl p-6 h-fit">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                                    <i class="fas fa-server text-red-400"></i>
+                                </div>
+                                <h2 class="text-lg font-bold text-white">Configuración MTA</h2>
+                            </div>
+
+                            <div class="space-y-4 mb-6">
+                                <div>
+                                    <label class="block text-gray-400 text-xs uppercase font-semibold mb-2 tracking-wider">Server IP</label>
+                                    <input type="text" id="server-ip" value="213.181.88.154" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none font-mono text-sm">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-400 text-xs uppercase font-semibold mb-2 tracking-wider">Puerto</label>
+                                    <input type="text" id="server-port" value="22003" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none font-mono text-sm">
+                                </div>
+                            </div>
+
+                            <div class="mb-6">
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="block text-gray-400 text-xs uppercase font-semibold tracking-wider">Código de Licencia</label>
+                                    <span class="text-[10px] text-red-400 font-mono bg-red-900/20 px-2 py-0.5 rounded">LUA CONFIG</span>
+                                </div>
+                                <div class="code-block rounded-lg p-4 font-mono text-sm">
+                                    <pre class="text-white whitespace-pre-wrap break-all"><code id="license-code">Generando...</code></pre>
+                                </div>
+                                <button onclick="generateNewKey()" class="w-full mt-3 bg-[#150a0a] hover:bg-[#1a0a0a] border border-red-800/50 text-gray-300 hover:text-white text-xs font-semibold py-2 rounded-xl transition-all flex items-center justify-center gap-2">
+                                    <i class="fas fa-sync-alt"></i> Generar Nueva Clave
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3 mb-4">
+                                <button onclick="saveServerConfig()" class="btn-primary px-4 py-2.5 rounded-lg text-white font-medium flex items-center justify-center gap-2 text-sm">
+                                    <i class="fas fa-save"></i> Guardar
+                                </button>
+                                <button onclick="copyLicenseCode()" class="px-4 py-2.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 font-medium flex items-center justify-center gap-2 text-sm">
+                                    <i class="fas fa-copy"></i> Copiar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            await loadDashboardData();
+            updateLicenseDisplay();
+            
+            const saved = JSON.parse(localStorage.getItem('server_config') || '{}');
+            if (saved.ip) document.getElementById('server-ip').value = saved.ip;
+            if (saved.port) document.getElementById('server-port').value = saved.port;
+        }
+
+        // SECCIÓN SUBIR PRODUCTO
+        function loadSubirProductoSection(container) {
+            document.getElementById('header-subtitle').textContent = 'Agrega nuevos recursos a la tienda';
+            
+            container.innerHTML = `
+                <div class="section-content max-w-4xl mx-auto">
+                    <div class="card rounded-xl p-8">
+                        <div class="flex items-center gap-3 mb-8">
+                            <div class="w-12 h-12 rounded-xl bg-red-600/20 border border-red-600/30 flex items-center justify-center">
+                                <i class="fas fa-cloud-upload-alt text-red-400 text-2xl"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-2xl font-bold text-white">Subir Nuevo Producto</h2>
+                                <p class="text-gray-400 text-sm">Completa la información del recurso</p>
+                            </div>
+                        </div>
+
+                        <form id="product-upload-form" onsubmit="handleProductUpload(event)" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-gray-300 text-sm font-semibold mb-2">Nombre del Producto *</label>
+                                    <input type="text" id="prod-name" required class="input-field w-full px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none" placeholder="Ej: Sistema de Admin Premium">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-300 text-sm font-semibold mb-2">Precio (USD) *</label>
+                                    <input type="number" id="prod-price" required step="0.01" min="0" class="input-field w-full px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none" placeholder="10.00">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-300 text-sm font-semibold mb-2">Categoría</label>
+                                <select id="prod-category" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none">
+                                    <option value="Scripts">Scripts</option>
+                                    <option value="Modelajes">Modelajes</option>
+                                    <option value="Mappings">Mappings</option>
+                                    <option value="Webs">Sitios Web</option>
+                                    <option value="Bots">Bots Discord</option>
+                                    <option value="Otros">Otros</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-300 text-sm font-semibold mb-2">Descripción *</label>
+                                <textarea id="prod-description" required rows="4" class="input-field w-full px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none resize-none" placeholder="Describe las características del producto..."></textarea>
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-300 text-sm font-semibold mb-2">Imágenes del Producto *</label>
+                                <div class="upload-zone rounded-xl p-8 text-center cursor-pointer" id="image-drop-zone" onclick="document.getElementById('prod-images').click()">
+                                    <input type="file" id="prod-images" accept="image/*" multiple class="hidden" onchange="previewUploadImages(this)">
+                                    <i class="fas fa-images text-4xl text-red-400 mb-3"></i>
+                                    <p class="text-gray-300 font-semibold mb-1">Arrastra imágenes aquí o haz clic para seleccionar</p>
+                                    <p class="text-gray-500 text-xs">Máximo 5 imágenes (JPG, PNG)</p>
+                                </div>
+                                <div id="image-preview-container" class="grid grid-cols-2 md:grid-cols-5 gap-3 mt-4"></div>
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-300 text-sm font-semibold mb-2">Archivo Descargable *</label>
+                                <div class="upload-zone rounded-xl p-6 text-center cursor-pointer" onclick="document.getElementById('prod-file').click()">
+                                    <input type="file" id="prod-file" accept=".zip,.rar,.7z,.lua,.txt" class="hidden" onchange="updateFileName(this)">
+                                    <i class="fas fa-file-archive text-3xl text-red-400 mb-2"></i>
+                                    <p id="file-label-text" class="text-gray-300 font-semibold">Haz clic para subir el archivo</p>
+                                    <p class="text-gray-500 text-xs mt-1">ZIP, RAR, 7Z, LUA (Máx. 50MB)</p>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-3 pt-4">
+                                <button type="submit" class="btn-primary flex-1 px-6 py-4 rounded-xl text-white font-bold flex items-center justify-center gap-2 text-lg">
+                                    <i class="fas fa-upload"></i> Subir Producto
+                                </button>
+                                <button type="button" onclick="showSection('dashboard')" class="px-6 py-4 rounded-xl border border-red-800/50 text-gray-300 hover:bg-red-900/20 font-semibold">
+                                    Cancelar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+
+            setupDragAndDrop();
+        }
+
+        function setupDragAndDrop() {
+            const dropZone = document.getElementById('image-drop-zone');
+            if (!dropZone) return;
+
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+            });
+
+            dropZone.addEventListener('drop', handleDrop, false);
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                document.getElementById('prod-images').files = files;
+                previewUploadImages(document.getElementById('prod-images'));
+            }
+        }
+
+        let tempUploadImages = [];
+
+        function previewUploadImages(input) {
+            const container = document.getElementById('image-preview-container');
+            container.innerHTML = '';
+            tempUploadImages = [];
+            
+            if (input.files && input.files.length > 0) {
+                Array.from(input.files).slice(0, 5).forEach((file, index) => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        tempUploadImages.push(e.target.result);
+                        const div = document.createElement('div');
+                        div.className = 'relative aspect-square rounded-lg overflow-hidden border-2 border-red-600/30';
+                        div.innerHTML = `
+                            <img src="${e.target.result}" class="w-full h-full object-cover">
+                            <button type="button" onclick="removeUploadImage(${index})" class="absolute top-2 right-2 w-6 h-6 bg-red-600 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-700">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        `;
+                        container.appendChild(div);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+        }
+
+        function removeUploadImage(index) {
+            tempUploadImages.splice(index, 1);
+            const input = document.getElementById('prod-images');
+            const dt = new DataTransfer();
+            Array.from(input.files).forEach((file, i) => {
+                if (i !== index) dt.items.add(file);
+            });
+            input.files = dt.files;
+            previewUploadImages(input);
+        }
+
+        function updateFileName(input) {
+            const label = document.getElementById('file-label-text');
+            if (input.files && input.files[0]) {
+                label.innerText = input.files[0].name;
+                label.classList.add('text-white', 'font-bold');
+            }
+        }
+
+        async function handleProductUpload(e) {
+            e.preventDefault();
+            
+            if (tempUploadImages.length === 0) {
+                alert('Por favor selecciona al menos una imagen');
                 return;
             }
-            document.getElementById('lua-code-content').textContent = SERVER_LUA_CODE;
-            document.getElementById('lua-modal').classList.add('active');
-            document.body.style.overflow = 'hidden';
+
+            const fileInput = document.getElementById('prod-file');
+            if (!fileInput.files[0]) {
+                alert('Por favor selecciona el archivo de descarga');
+                return;
+            }
+
+            try {
+                const fileBase64 = await fileToBase64(fileInput.files[0]);
+                
+                const newProduct = {
+                    id: 'prod_' + Date.now(),
+                    name: document.getElementById('prod-name').value,
+                    price: parseFloat(document.getElementById('prod-price').value),
+                    category: document.getElementById('prod-category').value,
+                    description: document.getElementById('prod-description').value,
+                    image_url: tempUploadImages[0],
+                    images: tempUploadImages,
+                    file_data: fileBase64,
+                    file_name: fileInput.files[0].name,
+                    created_at: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                await db.collection("Productos").doc(newProduct.id).set(newProduct);
+                
+                alert('¡Producto subido exitosamente!');
+                showSection('dashboard');
+            } catch (error) {
+                console.error(error);
+                alert('Error al subir el producto: ' + error.message);
+            }
         }
 
-        function closeLuaModal() {
-            document.getElementById('lua-modal').classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        function copyLuaCode() {
-            navigator.clipboard.writeText(SERVER_LUA_CODE).then(() => {
-                const btn = event.currentTarget;
-                const originalHTML = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check"></i> ¡Copiado!';
-                setTimeout(() => {
-                    btn.innerHTML = originalHTML;
-                }, 2000);
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
             });
         }
 
-        document.getElementById('lua-modal').addEventListener('click', function(e) {
-            if (e.target === this) closeLuaModal();
-        });
+        // SECCIÓN LICENCIAS
+        async function loadLicenciasSection(container) {
+            document.getElementById('header-subtitle').textContent = 'Historial de compras y reclamos';
+            
+            container.innerHTML = `
+                <div class="section-content max-w-6xl mx-auto">
+                    <div class="card rounded-xl p-8">
+                        <div class="flex items-center justify-between mb-8">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-xl bg-red-600/20 border border-red-600/30 flex items-center justify-center">
+                                    <i class="fas fa-key text-red-400 text-2xl"></i>
+                                </div>
+                                <div>
+                                    <h2 class="text-2xl font-bold text-white">Licencias de Usuarios</h2>
+                                    <p class="text-gray-400 text-sm">Historial completo de transacciones</p>
+                                </div>
+                            </div>
+                            <button onclick="loadLicenciasSection(document.getElementById('dynamic-content'))" class="px-4 py-2 rounded-lg border border-red-800/50 text-gray-300 hover:bg-red-900/20 text-sm">
+                                <i class="fas fa-sync-alt mr-2"></i>Actualizar
+                            </button>
+                        </div>
 
-        function openAssignProductModal() {
-            if (!isAdmin()) {
-                alert('Acceso denegado.');
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="border-b border-red-900/30">
+                                        <th class="text-left py-4 px-4 text-gray-400 text-xs uppercase font-semibold">Usuario</th>
+                                        <th class="text-left py-4 px-4 text-gray-400 text-xs uppercase font-semibold">Productos</th>
+                                        <th class="text-left py-4 px-4 text-gray-400 text-xs uppercase font-semibold">Total</th>
+                                        <th class="text-left py-4 px-4 text-gray-400 text-xs uppercase font-semibold">Estado</th>
+                                        <th class="text-left py-4 px-4 text-gray-400 text-xs uppercase font-semibold">Fecha</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="licencias-table-body">
+                                    <tr>
+                                        <td colspan="5" class="py-12 text-center">
+                                            <i class="fas fa-spinner loading-spinner text-red-400 text-2xl"></i>
+                                            <p class="text-gray-400 mt-3">Cargando licencias...</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            await loadLicenciasData();
+        }
+
+        async function loadLicenciasData() {
+            const tbody = document.getElementById('licencias-table-body');
+            if (!tbody) return;
+
+            try {
+                const snapshot = await db.collection("Clientes").orderBy('date', 'desc').get();
+                
+                if (snapshot.empty) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="py-12 text-center">
+                                <i class="fas fa-inbox text-gray-600 text-4xl mb-3"></i>
+                                <p class="text-gray-400">No hay licencias registradas</p>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                tbody.innerHTML = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    const date = data.date?.toDate ? data.date.toDate() : new Date();
+                    const statusClass = data.status === 'Pagado' ? 'text-green-400' : 'text-yellow-400';
+                    const productsList = data.products?.map(p => p.name).join(', ') || 'N/A';
+                    
+                    return `
+                        <tr class="user-row border-b border-red-900/20">
+                            <td class="py-4 px-4">
+                                <div class="flex items-center gap-3">
+                                    <img src="${data.avatar ? `https://cdn.discordapp.com/avatars/${data.discord_id}/${data.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png'}" class="w-10 h-10 rounded-full border-2 border-red-600/30">
+                                    <span class="text-white font-semibold">${data.username || 'Desconocido'}</span>
+                                </div>
+                            </td>
+                            <td class="py-4 px-4 text-gray-300 text-sm max-w-xs truncate">${productsList}</td>
+                            <td class="py-4 px-4 text-white font-bold">${data.total_price || '$0.00'}</td>
+                            <td class="py-4 px-4"><span class="${statusClass} font-semibold">${data.status || 'Pendiente'}</span></td>
+                            <td class="py-4 px-4 text-gray-400 text-sm">${date.toLocaleDateString('es-ES')}</td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error(error);
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="py-12 text-center text-red-400">
+                            <i class="fas fa-exclamation-triangle text-2xl mb-3"></i>
+                            <p>Error al cargar licencias</p>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // SECCIÓN ENCRIPTAR
+        function loadEncriptarSection(container) {
+            document.getElementById('header-subtitle').textContent = 'Protege tus scripts de MTA:SA';
+            
+            container.innerHTML = `
+                <div class="section-content max-w-4xl mx-auto">
+                    <div class="card rounded-xl p-8">
+                        <div class="flex items-center gap-3 mb-8">
+                            <div class="w-12 h-12 rounded-xl bg-red-600/20 border border-red-600/30 flex items-center justify-center">
+                                <i class="fas fa-lock text-red-400 text-2xl"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-2xl font-bold text-white">Encriptar Script Lua</h2>
+                                <p class="text-gray-400 text-sm">Protege tu código contra modificaciones</p>
+                            </div>
+                        </div>
+
+                        <div class="encrypt-box rounded-xl p-6 mb-6">
+                            <label class="block text-gray-300 text-sm font-semibold mb-3">Código Lua Original</label>
+                            <textarea id="lua-input" rows="10" class="input-field w-full px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none font-mono text-sm resize-none" placeholder="-- Pega tu código Lua aquí..."></textarea>
+                        </div>
+
+                        <div class="flex gap-3 mb-6">
+                            <button onclick="encryptLua()" class="btn-primary flex-1 px-6 py-4 rounded-xl text-white font-bold flex items-center justify-center gap-2">
+                                <i class="fas fa-lock"></i> Encriptar Código
+                            </button>
+                            <button onclick="clearEncrypt()" class="px-6 py-4 rounded-xl border border-red-800/50 text-gray-300 hover:bg-red-900/20 font-semibold">
+                                Limpiar
+                            </button>
+                        </div>
+
+                        <div id="encrypt-result" class="hidden">
+                            <div class="encrypt-box rounded-xl p-6">
+                                <div class="flex items-center justify-between mb-3">
+                                    <label class="block text-gray-300 text-sm font-semibold">Código Encriptado</label>
+                                    <button onclick="copyEncryptedCode()" class="text-red-400 hover:text-red-300 text-sm">
+                                        <i class="fas fa-copy mr-1"></i> Copiar
+                                    </button>
+                                </div>
+                                <textarea id="lua-output" rows="10" readonly class="input-field w-full px-4 py-3 rounded-lg text-green-400 font-mono text-sm resize-none bg-[#050507]"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function encryptLua() {
+            const input = document.getElementById('lua-input').value;
+            if (!input.trim()) {
+                alert('Por favor ingresa código Lua para encriptar');
                 return;
             }
-            alert("Redirigiendo a módulo de asignación manual...");
+
+            // Simulación de encriptación (en producción usarías una librería real)
+            const encrypted = btoa(unescape(encodeURIComponent(input)));
+            const obfuscated = `-- [ENCRYPTED BY PAPELETA STORE]\nlocal _ENV=assert(loadstring([[\n${encrypted}\n]]))()\n`;
+            
+            document.getElementById('lua-output').value = obfuscated;
+            document.getElementById('encrypt-result').classList.remove('hidden');
+        }
+
+        function clearEncrypt() {
+            document.getElementById('lua-input').value = '';
+            document.getElementById('encrypt-result').classList.add('hidden');
+        }
+
+        function copyEncryptedCode() {
+            const code = document.getElementById('lua-output').value;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('¡Código copiado al portapapeles!');
+            });
+        }
+
+        // SECCIÓN ASIGNAR
+        async function loadAsignarSection(container) {
+            document.getElementById('header-subtitle').textContent = 'Asigna productos gratis a usuarios';
+            
+            container.innerHTML = `
+                <div class="section-content max-w-4xl mx-auto">
+                    <div class="card rounded-xl p-8">
+                        <div class="flex items-center gap-3 mb-8">
+                            <div class="w-12 h-12 rounded-xl bg-red-600/20 border border-red-600/30 flex items-center justify-center">
+                                <i class="fas fa-user-plus text-red-400 text-2xl"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-2xl font-bold text-white">Asignar Producto Gratis</h2>
+                                <p class="text-gray-400 text-sm">Otorga acceso manual a recursos</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-gray-300 text-sm font-semibold mb-2">ID de Discord del Usuario *</label>
+                                <input type="text" id="assign-discord-id" class="input-field w-full px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none" placeholder="Ej: 890526767608127489">
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-300 text-sm font-semibold mb-2">Seleccionar Producto *</label>
+                                <select id="assign-product" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none">
+                                    <option value="">Cargando productos...</option>
+                                </select>
+                            </div>
+
+                            <button onclick="assignProductFree()" class="btn-primary w-full px-6 py-4 rounded-xl text-white font-bold flex items-center justify-center gap-2 text-lg">
+                                <i class="fas fa-gift"></i> Asignar Producto Gratis
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            await loadProductsForAssign();
+        }
+
+        async function loadProductsForAssign() {
+            const select = document.getElementById('assign-product');
+            if (!select) return;
+
+            try {
+                const snapshot = await db.collection("Productos").get();
+                const products = [];
+                snapshot.forEach(doc => products.push({ id: doc.id, ...doc.data() }));
+
+                select.innerHTML = products.map(p => 
+                    `<option value="${p.id}">${p.name} - ${Number(p.price) === 0 ? 'GRATIS' : '$' + Number(p.price).toFixed(2)}</option>`
+                ).join('');
+            } catch (error) {
+                select.innerHTML = '<option value="">Error al cargar productos</option>';
+            }
+        }
+
+        async function assignProductFree() {
+            const discordId = document.getElementById('assign-discord-id').value;
+            const productId = document.getElementById('assign-product').value;
+
+            if (!discordId || !productId) {
+                alert('Por favor completa todos los campos');
+                return;
+            }
+
+            try {
+                const product = allProducts.find(p => p.id === productId);
+                
+                await db.collection("Clientes").add({
+                    discord_id: discordId,
+                    username: 'Asignado Manualmente',
+                    products: [{ id: productId, name: product?.name || 'Producto', price: 'Gratis' }],
+                    total_price: 'Gratis',
+                    date: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'Reclamado Exitosamente'
+                });
+
+                alert('¡Producto asignado exitosamente!');
+                showSection('dashboard');
+            } catch (error) {
+                console.error(error);
+                alert('Error al asignar producto: ' + error.message);
+            }
+        }
+
+        // SECCIÓN USUARIOS
+        async function loadUsuariosSection(container) {
+            document.getElementById('header-subtitle').textContent = 'Gestiona roles y permisos';
+            
+            container.innerHTML = `
+                <div class="section-content max-w-6xl mx-auto">
+                    <div class="card rounded-xl p-8">
+                        <div class="flex items-center justify-between mb-8">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-xl bg-red-600/20 border border-red-600/30 flex items-center justify-center">
+                                    <i class="fas fa-users-cog text-red-400 text-2xl"></i>
+                                </div>
+                                <div>
+                                    <h2 class="text-2xl font-bold text-white">Usuarios Autorizados</h2>
+                                    <p class="text-gray-400 text-sm">Administra roles y permisos</p>
+                                </div>
+                            </div>
+                            <button onclick="loadUsuariosSection(document.getElementById('dynamic-content'))" class="px-4 py-2 rounded-lg border border-red-800/50 text-gray-300 hover:bg-red-900/20 text-sm">
+                                <i class="fas fa-sync-alt mr-2"></i>Actualizar
+                            </button>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="border-b border-red-900/30">
+                                        <th class="text-left py-4 px-4 text-gray-400 text-xs uppercase font-semibold">Usuario</th>
+                                        <th class="text-left py-4 px-4 text-gray-400 text-xs uppercase font-semibold">Rol Actual</th>
+                                        <th class="text-left py-4 px-4 text-gray-400 text-xs uppercase font-semibold">Último Acceso</th>
+                                        <th class="text-left py-4 px-4 text-gray-400 text-xs uppercase font-semibold">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usuarios-table-body">
+                                    <tr>
+                                        <td colspan="4" class="py-12 text-center">
+                                            <i class="fas fa-spinner loading-spinner text-red-400 text-2xl"></i>
+                                            <p class="text-gray-400 mt-3">Cargando usuarios...</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            await loadUsuariosData();
+        }
+
+        async function loadUsuariosData() {
+            const tbody = document.getElementById('usuarios-table-body');
+            if (!tbody) return;
+
+            try {
+                const snapshot = await db.collection("UsuariosRegistrados").orderBy('last_login', 'desc').get();
+                
+                if (snapshot.empty) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="py-12 text-center">
+                                <i class="fas fa-inbox text-gray-600 text-4xl mb-3"></i>
+                                <p class="text-gray-400">No hay usuarios registrados</p>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                tbody.innerHTML = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    const lastLogin = data.last_login?.toDate ? data.last_login.toDate() : new Date();
+                    const role = data.role || 'user';
+                    const roleClass = role === 'admin' ? 'bg-red-600/20 text-red-400 border-red-600/40' : 
+                                   role === 'mod' ? 'bg-yellow-600/20 text-yellow-400 border-yellow-600/40' : 
+                                   'bg-green-600/20 text-green-400 border-green-600/40';
+                    
+                    return `
+                        <tr class="user-row border-b border-red-900/20">
+                            <td class="py-4 px-4">
+                                <div class="flex items-center gap-3">
+                                    <img src="${data.avatar ? `https://cdn.discordapp.com/avatars/${data.discord_id}/${data.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png'}" class="w-10 h-10 rounded-full border-2 border-red-600/30">
+                                    <span class="text-white font-semibold">${data.username || 'Desconocido'}</span>
+                                </div>
+                            </td>
+                            <td class="py-4 px-4">
+                                <span class="role-badge border ${roleClass}">${role.toUpperCase()}</span>
+                            </td>
+                            <td class="py-4 px-4 text-gray-400 text-sm">${lastLogin.toLocaleDateString('es-ES')}</td>
+                            <td class="py-4 px-4">
+                                <div class="flex gap-2">
+                                    ${role !== 'admin' ? `
+                                        <button onclick="setUserRole('${data.discord_id}', 'admin')" class="px-3 py-1.5 rounded-lg bg-red-600/20 border border-red-600/40 text-red-400 text-xs hover:bg-red-600/30">
+                                            Hacer Admin
+                                        </button>
+                                    ` : ''}
+                                    ${role !== 'mod' ? `
+                                        <button onclick="setUserRole('${data.discord_id}', 'mod')" class="px-3 py-1.5 rounded-lg bg-yellow-600/20 border border-yellow-600/40 text-yellow-400 text-xs hover:bg-yellow-600/30">
+                                            Hacer Mod
+                                        </button>
+                                    ` : ''}
+                                    <button onclick="setUserRole('${data.discord_id}', 'user')" class="px-3 py-1.5 rounded-lg bg-gray-600/20 border border-gray-600/40 text-gray-400 text-xs hover:bg-gray-600/30">
+                                        Quitar Rol
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error(error);
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="py-12 text-center text-red-400">
+                            <i class="fas fa-exclamation-triangle text-2xl mb-3"></i>
+                            <p>Error al cargar usuarios</p>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        async function setUserRole(discordId, role) {
+            try {
+                await db.collection("UsuariosRegistrados").doc(discordId).update({ role: role });
+                alert(`Rol actualizado a ${role.toUpperCase()}`);
+                loadUsuariosSection(document.getElementById('dynamic-content'));
+            } catch (error) {
+                alert('Error al actualizar rol: ' + error.message);
+            }
+        }
+
+        // SECCIÓN CREAR ROL
+        function loadCrearRolSection(container) {
+            document.getElementById('header-subtitle').textContent = 'Define permisos personalizados';
+            
+            container.innerHTML = `
+                <div class="section-content max-w-4xl mx-auto">
+                    <div class="card rounded-xl p-8">
+                        <div class="flex items-center gap-3 mb-8">
+                            <div class="w-12 h-12 rounded-xl bg-red-600/20 border border-red-600/30 flex items-center justify-center">
+                                <i class="fas fa-id-badge text-red-400 text-2xl"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-2xl font-bold text-white">Crear Nuevo Rol</h2>
+                                <p class="text-gray-400 text-sm">Configura permisos personalizados</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-gray-300 text-sm font-semibold mb-2">Nombre del Rol *</label>
+                                <input type="text" id="role-name" class="input-field w-full px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none" placeholder="Ej: VIP, Developer, Support">
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-300 text-sm font-semibold mb-3">Permisos</label>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <label class="flex items-center gap-3 p-4 rounded-lg border border-red-900/30 cursor-pointer hover:border-red-600/50 transition-all">
+                                        <input type="checkbox" class="w-5 h-5 accent-red-600" checked>
+                                        <span class="text-gray-300">Acceso al Panel Admin</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 p-4 rounded-lg border border-red-900/30 cursor-pointer hover:border-red-600/50 transition-all">
+                                        <input type="checkbox" class="w-5 h-5 accent-red-600">
+                                        <span class="text-gray-300">Subir Productos</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 p-4 rounded-lg border border-red-900/30 cursor-pointer hover:border-red-600/50 transition-all">
+                                        <input type="checkbox" class="w-5 h-5 accent-red-600">
+                                        <span class="text-gray-300">Gestionar Usuarios</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 p-4 rounded-lg border border-red-900/30 cursor-pointer hover:border-red-600/50 transition-all">
+                                        <input type="checkbox" class="w-5 h-5 accent-red-600">
+                                        <span class="text-gray-300">Ver Licencias</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 p-4 rounded-lg border border-red-900/30 cursor-pointer hover:border-red-600/50 transition-all">
+                                        <input type="checkbox" class="w-5 h-5 accent-red-600">
+                                        <span class="text-gray-300">Encriptar Scripts</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 p-4 rounded-lg border border-red-900/30 cursor-pointer hover:border-red-600/50 transition-all">
+                                        <input type="checkbox" class="w-5 h-5 accent-red-600">
+                                        <span class="text-gray-300">Asignar Productos</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-300 text-sm font-semibold mb-2">Color del Rol</label>
+                                <div class="flex gap-3">
+                                    <button onclick="selectRoleColor('red')" class="role-color-btn w-12 h-12 rounded-lg bg-red-600 border-4 border-white ring-2 ring-red-600"></button>
+                                    <button onclick="selectRoleColor('blue')" class="role-color-btn w-12 h-12 rounded-lg bg-blue-600 border-4 border-transparent hover:border-white"></button>
+                                    <button onclick="selectRoleColor('green')" class="role-color-btn w-12 h-12 rounded-lg bg-green-600 border-4 border-transparent hover:border-white"></button>
+                                    <button onclick="selectRoleColor('purple')" class="role-color-btn w-12 h-12 rounded-lg bg-purple-600 border-4 border-transparent hover:border-white"></button>
+                                    <button onclick="selectRoleColor('yellow')" class="role-color-btn w-12 h-12 rounded-lg bg-yellow-600 border-4 border-transparent hover:border-white"></button>
+                                </div>
+                            </div>
+
+                            <button onclick="createNewRole()" class="btn-primary w-full px-6 py-4 rounded-xl text-white font-bold flex items-center justify-center gap-2 text-lg">
+                                <i class="fas fa-plus-circle"></i> Crear Rol
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function selectRoleColor(color) {
+            document.querySelectorAll('.role-color-btn').forEach(btn => {
+                btn.classList.remove('ring-2', 'ring-red-600', 'ring-blue-600', 'ring-green-600', 'ring-purple-600', 'ring-yellow-600');
+                btn.style.borderColor = 'transparent';
+            });
+            
+            const selected = event.currentTarget;
+            selected.style.borderColor = 'white';
+            selected.classList.add(`ring-2`, `ring-${color}-600`);
+        }
+
+        function createNewRole() {
+            const roleName = document.getElementById('role-name').value;
+            if (!roleName.trim()) {
+                alert('Por favor ingresa un nombre para el rol');
+                return;
+            }
+            
+            alert(`Rol "${roleName}" creado exitosamente (simulado)`);
+            showSection('usuarios');
+        }
+
+        // FUNCIONES AUXILIARES DEL DASHBOARD
+        async function loadDashboardData() {
+            if (!currentUser) return;
+
+            try {
+                const productsSnapshot = await db.collection("Productos").get();
+                allProducts = [];
+                productsSnapshot.forEach((doc) => allProducts.push({ id: doc.id, ...doc.data() }));
+
+                const clientesSnapshot = await db.collection("Clientes").get();
+                let purchasedProducts = [];
+                let totalSpent = 0;
+
+                clientesSnapshot.forEach((doc) => {
+                    const purchase = doc.data();
+                    if (String(purchase.discord_id) === String(currentUser.id)) {
+                        if (purchase.products && Array.isArray(purchase.products)) {
+                            purchase.products.forEach(prod => {
+                                const productData = allProducts.find(p => p.id === prod.id);
+                                if (productData) {
+                                    purchasedProducts.push({
+                                        ...productData,
+                                        purchaseDate: purchase.date?.toDate ? purchase.date.toDate() : new Date(),
+                                        price: prod.price || 'Gratis'
+                                    });
+                                    if (prod.price !== "Gratis" && prod.price !== "GRATIS") {
+                                        totalSpent += parseFloat(String(prod.price).replace('$', '')) || 0;
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+
+                const spentEl = document.getElementById('stat-total-spent');
+                const scriptsEl = document.getElementById('stat-active-scripts');
+                
+                if (spentEl) spentEl.innerText = '$' + totalSpent.toFixed(2);
+                if (scriptsEl) scriptsEl.innerText = purchasedProducts.length;
+                
+                const container = document.getElementById('dashboard-products-list');
+                const emptyState = document.getElementById('dashboard-empty-state');
+                
+                if (container && emptyState) {
+                    if (purchasedProducts.length === 0) {
+                        emptyState.classList.remove('hidden');
+                        container.innerHTML = '';
+                    } else {
+                        emptyState.classList.add('hidden');
+                        container.innerHTML = purchasedProducts.map(item => `
+                            <div class="bg-[#0d0505] border border-red-900/30 rounded-xl p-4 flex items-center justify-between hover:border-red-600/50 transition-all">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-16 h-16 rounded-lg bg-[#150a0a] border border-red-900/20 overflow-hidden">
+                                        <img src="${item.image_url || ''}" class="w-full h-full object-cover">
+                                    </div>
+                                    <div>
+                                        <h3 class="text-white font-bold">${item.name}</h3>
+                                        <p class="text-gray-400 text-xs">${item.price === 'Gratis' ? 'GRATIS' : '$' + Number(item.price).toFixed(2)}</p>
+                                    </div>
+                                </div>
+                                ${item.file_data ? `
+                                    <button onclick="downloadProduct('${item.id}')" class="btn-primary px-4 py-2 rounded-lg text-white text-sm">
+                                        <i class="fas fa-download"></i> Descargar
+                                    </button>
+                                ` : '<button disabled class="px-4 py-2 rounded-lg bg-gray-800 text-gray-500 text-sm">No disponible</button>'}
+                            </div>
+                        `).join('');
+                    }
+                }
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        }
+
+        function filterDashboardProducts() {
+            const search = document.getElementById('dashboard-search')?.value.toLowerCase();
+            if (!search) return;
+            
+            document.querySelectorAll('#dashboard-products-list > div').forEach(card => {
+                card.style.display = card.innerText.toLowerCase().includes(search) ? 'flex' : 'none';
+            });
+        }
+
+        function downloadProduct(productId) {
+            const product = allProducts.find(p => p.id === productId);
+            if (product && product.file_data) {
+                const link = document.createElement('a');
+                link.href = product.file_data;
+                link.download = product.file_name || 'resource.zip';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
         }
 
         function generateUniqueKey() {
@@ -849,7 +1748,7 @@ end, true, "high")`;
 
         function updateLicenseDisplay() {
             const codeBlock = document.getElementById('license-code');
-            if (userFixedLicenseKey && currentUser) {
+            if (codeBlock && userFixedLicenseKey && currentUser) {
                 codeBlock.textContent = `configLicense = {
     ["User"] = "${currentUser.username}", 
     ["Key"] = "PapeletaStore(${userFixedLicenseKey})"
@@ -857,117 +1756,51 @@ end, true, "high")`;
             }
         }
 
-        async function loadDashboardData() {
-            if (!currentUser) return;
-
-            try {
-                const productsSnapshot = await db.collection("Productos").get();
-                allProducts = [];
-                productsSnapshot.forEach((doc) => allProducts.push({ id: doc.id, ...doc.data() }));
-
-                const clientesSnapshot = await db.collection("Clientes").get();
-                let purchasedProducts = [];
-                let totalSpent = 0;
-
-                clientesSnapshot.forEach((doc) => {
-                    const purchase = doc.data();
-                    if (String(purchase.discord_id) === String(currentUser.id)) {
-                        if (purchase.products && Array.isArray(purchase.products)) {
-                            purchase.products.forEach(prod => {
-                                const productData = allProducts.find(p => p.id === prod.id);
-                                if (productData) {
-                                    purchasedProducts.push({
-                                        ...productData,
-                                        purchaseDate: purchase.date?.toDate ? purchase.date.toDate() : new Date(),
-                                        price: prod.price || 'Gratis'
-                                    });
-                                    if (prod.price !== "Gratis" && prod.price !== "GRATIS") {
-                                        totalSpent += parseFloat(String(prod.price).replace('$', '')) || 0;
-                                    }
-                                }
-                            });
-                        }
-                    }
-                });
-
-                document.getElementById('stat-total-spent').innerText = '$' + totalSpent.toFixed(2);
-                document.getElementById('stat-active-scripts').innerText = purchasedProducts.length;
-                
-                const container = document.getElementById('dashboard-products-list');
-                if (purchasedProducts.length === 0) {
-                    document.getElementById('dashboard-empty-state').classList.remove('hidden');
-                    container.innerHTML = '';
-                } else {
-                    document.getElementById('dashboard-empty-state').classList.add('hidden');
-                    container.innerHTML = purchasedProducts.map(item => `
-                        <div class="bg-[#0d0505] border border-red-900/30 rounded-xl p-4 flex items-center justify-between hover:border-red-600/50 transition-all">
-                            <div class="flex items-center gap-4">
-                                <div class="w-16 h-16 rounded-lg bg-[#150a0a] border border-red-900/20 overflow-hidden">
-                                    <img src="${item.image_url || ''}" class="w-full h-full object-cover">
-                                </div>
-                                <div>
-                                    <h3 class="text-white font-bold">${item.name}</h3>
-                                    <p class="text-gray-400 text-xs">${item.price === 'Gratis' ? 'GRATIS' : '$' + Number(item.price).toFixed(2)}</p>
-                                </div>
-                            </div>
-                            ${item.file_data ? `
-                                <button onclick="downloadProduct('${item.id}')" class="btn-primary px-4 py-2 rounded-lg text-white text-sm">
-                                    <i class="fas fa-download"></i> Descargar
-                                </button>
-                            ` : '<button disabled class="px-4 py-2 rounded-lg bg-gray-800 text-gray-500 text-sm">No disponible</button>'}
-                        </div>
-                    `).join('');
-                }
-            } catch (error) {
-                console.error("Error:", error);
-            }
-        }
-
-        function filterDashboardProducts() {
-            const search = document.getElementById('dashboard-search').value.toLowerCase();
-            document.querySelectorAll('#dashboard-products-list > div').forEach(card => {
-                card.style.display = card.innerText.toLowerCase().includes(search) ? 'flex' : 'none';
-            });
-        }
-
-        function downloadProduct(productId) {
-            const product = allProducts.find(p => p.id === productId);
-            if (product && product.file_data) {
-                const link = document.createElement('a');
-                link.href = product.file_data;
-                link.download = product.file_name || 'resource.zip';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }
-        }
-
         function copyLicenseCode() {
-            const code = document.getElementById('license-code').textContent;
-            navigator.clipboard.writeText(code).then(() => {
-                const btn = event.currentTarget;
-                const original = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check"></i> Copiado';
-                setTimeout(() => btn.innerHTML = original, 2000);
-            });
+            const code = document.getElementById('license-code')?.textContent;
+            if (code) {
+                navigator.clipboard.writeText(code).then(() => {
+                    alert('¡Código copiado!');
+                });
+            }
         }
 
         function saveServerConfig() {
             localStorage.setItem('server_config', JSON.stringify({
-                ip: document.getElementById('server-ip').value,
-                port: document.getElementById('server-port').value
+                ip: document.getElementById('server-ip')?.value,
+                port: document.getElementById('server-port')?.value
             }));
-            const btn = event.currentTarget;
-            const original = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-check"></i> Guardado';
-            setTimeout(() => btn.innerHTML = original, 2000);
+            alert('Configuración guardada');
         }
+
+        // MODAL SERVER.LUA
+        function openLuaModal() {
+            if (!isAdmin()) {
+                alert('Acceso denegado. Solo administradores.');
+                return;
+            }
+            document.getElementById('lua-code-content').textContent = SERVER_LUA_CODE;
+            document.getElementById('lua-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLuaModal() {
+            document.getElementById('lua-modal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function copyLuaCode() {
+            navigator.clipboard.writeText(SERVER_LUA_CODE).then(() => {
+                alert('¡Código copiado!');
+            });
+        }
+
+        document.getElementById('lua-modal')?.addEventListener('click', function(e) {
+            if (e.target === this) closeLuaModal();
+        });
 
         document.addEventListener('DOMContentLoaded', () => {
             checkDiscordAuth();
-            const saved = JSON.parse(localStorage.getItem('server_config') || '{}');
-            if (saved.ip) document.getElementById('server-ip').value = saved.ip;
-            if (saved.port) document.getElementById('server-port').value = saved.port;
         });
     </script>
 </body>
