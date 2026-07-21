@@ -1,143 +1,514 @@
-<!-- SECCIÓN CREAR ROL - FRAGMENTO -->
-<div class="max-w-7xl mx-auto">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Panel Izquierdo -->
-        <div class="lg:col-span-2 space-y-6">
-            <div class="card p-6 rounded-xl">
-                <h2 class="text-2xl font-black text-white mb-6 flex items-center gap-2">
-                    <i class="fas fa-plus-circle text-red-500"></i>
-                    Crear Nuevo Rol
-                </h2>
-                <form id="create-role-form" onsubmit="handleCreateRoleCR(event)" class="space-y-5">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="md:col-span-2">
-                            <label class="block text-gray-300 text-sm font-semibold mb-2">Nombre del Rol *</label>
-                            <input type="text" id="role-name" required 
-                                class="input-field w-full rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none" 
-                                placeholder="Ej: Ayudante, Soporte VIP...">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Roles | Papeleta Store</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff1a1a'/%3E%3Cstop offset='1' stop-color='%23cc1b1b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Ctext x='50' y='70' font-family='Arial, sans-serif' font-size='58' font-weight='900' fill='white' text-anchor='middle'%3EP%3C/text%3E%3C/svg%3E">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #050507;
+            --card-bg: rgba(20, 10, 10, 0.6);
+            --primary: #ff1a1a;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #150a0a 0%, #0a0505 100%);
+            color: #f3f4f6;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #111111; }
+        ::-webkit-scrollbar-thumb { background: #6e6e6e; border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: #858585; }
+
+        .glass-panel {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 26, 26, 0.2);
+            border-radius: 16px;
+        }
+
+        .permission-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: rgba(13, 5, 5, 0.6);
+            border: 1px solid rgba(255, 26, 26, 0.1);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+        }
+        .permission-item:hover {
+            border-color: rgba(255, 26, 26, 0.3);
+            background: rgba(255, 26, 26, 0.05);
+        }
+
+        /* Toggle Switch Personalizado */
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: #374151;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .toggle-switch.active {
+            background: #dc2626;
+        }
+        .toggle-knob {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .toggle-switch.active .toggle-knob {
+            transform: translateX(20px);
+        }
+
+        .role-card {
+            background: rgba(13, 5, 5, 0.6);
+            border: 1px solid rgba(255, 26, 26, 0.15);
+            border-radius: 12px;
+            padding: 16px;
+            transition: all 0.3s ease;
+        }
+        .role-card:hover {
+            border-color: rgba(255, 26, 26, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-create {
+            background: linear-gradient(to right, #dc2626, #991b1b);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+        }
+        .btn-create:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.5);
+        }
+
+        .color-picker-wrapper {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid rgba(255, 26, 26, 0.3);
+            cursor: pointer;
+        }
+        .color-picker-wrapper input[type="color"] {
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            cursor: pointer;
+            border: none;
+            padding: 0;
+        }
+    </style>
+</head>
+<body class="relative">
+
+    <!-- Header -->
+    <header class="bg-[#0d0505]/90 backdrop-blur border-b border-red-900/30 sticky top-0 z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-red-500 to-red-800 flex items-center justify-center font-black text-white">P</div>
+                <div>
+                    <h1 class="text-white font-black tracking-wider text-lg">PAPELETA <span class="text-red-400">STORE</span></h1>
+                    <p class="text-gray-400 text-xs">Gestor de Roles Personalizados</p>
+                </div>
+            </div>
+            <a href="index.html" class="text-gray-400 hover:text-white text-sm flex items-center gap-2 transition-colors">
+                <i class="fas fa-arrow-left"></i> Volver a la Tienda
+            </a>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="max-w-7xl mx-auto px-6 py-10">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Panel Izquierdo: Crear Nuevo Rol -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- Formulario de Creación -->
+                <div class="glass-panel p-6">
+                    <h2 class="text-2xl font-black text-white mb-6 flex items-center gap-2">
+                        <i class="fas fa-plus-circle text-red-500"></i>
+                        Crear Nuevo Rol
+                    </h2>
+
+                    <form id="create-role-form" onsubmit="handleCreateRole(event)" class="space-y-5">
+                        
+                        <!-- Nombre y Color -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="md:col-span-2">
+                                <label class="block text-gray-300 text-sm font-semibold mb-2">Nombre del Rol *</label>
+                                <input type="text" id="role-name" required 
+                                    class="w-full bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition-colors" 
+                                    placeholder="Ej: Ayudante, Soporte VIP...">
+                            </div>
+                            <div>
+                                <label class="block text-gray-300 text-sm font-semibold mb-2">Color Identificativo</label>
+                                <div class="flex items-center gap-3 h-[46px]">
+                                    <div class="color-picker-wrapper" id="color-preview" style="background-color: #ff1a1a;">
+                                        <input type="color" id="role-color" value="#ff1a1a" onchange="updateColorPreview(this.value)">
+                                    </div>
+                                    <span class="text-gray-400 text-xs font-mono" id="color-hex">#FF1A1A</span>
+                                </div>
+                            </div>
                         </div>
+
+                        <!-- Descripción -->
                         <div>
-                            <label class="block text-gray-300 text-sm font-semibold mb-2">Color Identificativo</label>
-                            <div class="flex items-center gap-3 h-[46px]">
-                                <div class="w-10 h-10 rounded-lg overflow-hidden border-2 border-red-900/40 cursor-pointer relative" id="color-preview" style="background-color: #ff1a1a;">
-                                    <input type="color" id="role-color" value="#ff1a1a" onchange="updateColorPreviewCR(this.value)" class="absolute top-[-50%] left-[-50%] w-[200%] h-[200%] cursor-pointer border-none p-0 opacity-0">
-                                    <div class="absolute inset-0 pointer-events-none"></div>
+                            <label class="block text-gray-300 text-sm font-semibold mb-2">Descripción del Rol</label>
+                            <textarea id="role-desc" rows="2" 
+                                class="w-full bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition-colors" 
+                                placeholder="Describe brevemente las funciones de este rol..."></textarea>
+                        </div>
+
+                        <!-- Permisos -->
+                        <div>
+                            <label class="block text-gray-300 text-sm font-semibold mb-3">Permisos y Accesos</label>
+                            <div class="space-y-2">
+                                
+                                <div class="permission-item">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fas fa-cog text-gray-400 w-5"></i>
+                                        <div>
+                                            <p class="text-white text-sm font-semibold">Acceso al Panel Config</p>
+                                            <p class="text-gray-500 text-xs">Puede ver el menú lateral de administración</p>
+                                        </div>
+                                    </div>
+                                    <div class="toggle-switch" onclick="togglePermission(this, 'canAccessConfig')" data-perm="canAccessConfig">
+                                        <div class="toggle-knob"></div>
+                                    </div>
                                 </div>
-                                <span class="text-gray-400 text-xs font-mono" id="color-hex">#FF1A1A</span>
+
+                                <div class="permission-item">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fas fa-cloud-upload-alt text-gray-400 w-5"></i>
+                                        <div>
+                                            <p class="text-white text-sm font-semibold">Subir Productos</p>
+                                            <p class="text-gray-500 text-xs">Puede agregar nuevos recursos a la tienda</p>
+                                        </div>
+                                    </div>
+                                    <div class="toggle-switch" onclick="togglePermission(this, 'canUploadProducts')" data-perm="canUploadProducts">
+                                        <div class="toggle-knob"></div>
+                                    </div>
+                                </div>
+
+                                <div class="permission-item">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fas fa-trash text-gray-400 w-5"></i>
+                                        <div>
+                                            <p class="text-white text-sm font-semibold">Eliminar Productos</p>
+                                            <p class="text-gray-500 text-xs">Puede borrar productos existentes</p>
+                                        </div>
+                                    </div>
+                                    <div class="toggle-switch" onclick="togglePermission(this, 'canDeleteProducts')" data-perm="canDeleteProducts">
+                                        <div class="toggle-knob"></div>
+                                    </div>
+                                </div>
+
+                                <div class="permission-item">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fas fa-user-plus text-gray-400 w-5"></i>
+                                        <div>
+                                            <p class="text-white text-sm font-semibold">Asignar Productos</p>
+                                            <p class="text-gray-500 text-xs">Puede regalar productos a usuarios manualmente</p>
+                                        </div>
+                                    </div>
+                                    <div class="toggle-switch" onclick="togglePermission(this, 'canAssignProducts')" data-perm="canAssignProducts">
+                                        <div class="toggle-knob"></div>
+                                    </div>
+                                </div>
+
+                                <div class="permission-item">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fas fa-key text-gray-400 w-5"></i>
+                                        <div>
+                                            <p class="text-white text-sm font-semibold">Ver Licencias</p>
+                                            <p class="text-gray-500 text-xs">Puede ver el historial de compras y licencias</p>
+                                        </div>
+                                    </div>
+                                    <div class="toggle-switch" onclick="togglePermission(this, 'canViewLicenses')" data-perm="canViewLicenses">
+                                        <div class="toggle-knob"></div>
+                                    </div>
+                                </div>
+
+                                <div class="permission-item">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fas fa-users-cog text-gray-400 w-5"></i>
+                                        <div>
+                                            <p class="text-white text-sm font-semibold">Gestionar Roles</p>
+                                            <p class="text-gray-500 text-xs">Puede cambiar roles de otros usuarios</p>
+                                        </div>
+                                    </div>
+                                    <div class="toggle-switch" onclick="togglePermission(this, 'canManageRoles')" data-perm="canManageRoles">
+                                        <div class="toggle-knob"></div>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
-                    </div>
-                    <div>
-                        <label class="block text-gray-300 text-sm font-semibold mb-2">Descripción del Rol</label>
-                        <textarea id="role-desc" rows="2" 
-                            class="input-field w-full rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none resize-none" 
-                            placeholder="Describe brevemente las funciones de este rol..."></textarea>
-                    </div>
-                    <div>
-                        <label class="block text-gray-300 text-sm font-semibold mb-3">Permisos y Accesos</label>
-                        <div class="space-y-2">
-                            <div class="permission-item">
-                                <div class="flex items-center gap-3">
-                                    <i class="fas fa-cog text-gray-400 w-5"></i>
-                                    <div>
-                                        <p class="text-white text-sm font-semibold">Acceso al Panel Config</p>
-                                        <p class="text-gray-500 text-xs">Puede ver el menú lateral de administración</p>
-                                    </div>
-                                </div>
-                                <div class="toggle-switch" onclick="togglePermissionCR(this, 'canAccessConfig')" data-perm="canAccessConfig">
-                                    <div class="toggle-knob"></div>
-                                </div>
-                            </div>
-                            <!-- Repite los otros 5 permisos igual que en tu código original -->
-                            <div class="permission-item">
-                                <div class="flex items-center gap-3">
-                                    <i class="fas fa-cloud-upload-alt text-gray-400 w-5"></i>
-                                    <div>
-                                        <p class="text-white text-sm font-semibold">Subir Productos</p>
-                                        <p class="text-gray-500 text-xs">Puede agregar nuevos recursos a la tienda</p>
-                                    </div>
-                                </div>
-                                <div class="toggle-switch" onclick="togglePermissionCR(this, 'canUploadProducts')" data-perm="canUploadProducts">
-                                    <div class="toggle-knob"></div>
-                                </div>
-                            </div>
-                            <div class="permission-item">
-                                <div class="flex items-center gap-3">
-                                    <i class="fas fa-trash text-gray-400 w-5"></i>
-                                    <div>
-                                        <p class="text-white text-sm font-semibold">Eliminar Productos</p>
-                                        <p class="text-gray-500 text-xs">Puede borrar productos existentes</p>
-                                    </div>
-                                </div>
-                                <div class="toggle-switch" onclick="togglePermissionCR(this, 'canDeleteProducts')" data-perm="canDeleteProducts">
-                                    <div class="toggle-knob"></div>
-                                </div>
-                            </div>
-                            <div class="permission-item">
-                                <div class="flex items-center gap-3">
-                                    <i class="fas fa-user-plus text-gray-400 w-5"></i>
-                                    <div>
-                                        <p class="text-white text-sm font-semibold">Asignar Productos</p>
-                                        <p class="text-gray-500 text-xs">Puede regalar productos a usuarios manualmente</p>
-                                    </div>
-                                </div>
-                                <div class="toggle-switch" onclick="togglePermissionCR(this, 'canAssignProducts')" data-perm="canAssignProducts">
-                                    <div class="toggle-knob"></div>
-                                </div>
-                            </div>
-                            <div class="permission-item">
-                                <div class="flex items-center gap-3">
-                                    <i class="fas fa-key text-gray-400 w-5"></i>
-                                    <div>
-                                        <p class="text-white text-sm font-semibold">Ver Licencias</p>
-                                        <p class="text-gray-500 text-xs">Puede ver el historial de compras y licencias</p>
-                                    </div>
-                                </div>
-                                <div class="toggle-switch" onclick="togglePermissionCR(this, 'canViewLicenses')" data-perm="canViewLicenses">
-                                    <div class="toggle-knob"></div>
-                                </div>
-                            </div>
-                            <div class="permission-item">
-                                <div class="flex items-center gap-3">
-                                    <i class="fas fa-users-cog text-gray-400 w-5"></i>
-                                    <div>
-                                        <p class="text-white text-sm font-semibold">Gestionar Roles</p>
-                                        <p class="text-gray-500 text-xs">Puede cambiar roles de otros usuarios</p>
-                                    </div>
-                                </div>
-                                <div class="toggle-switch" onclick="togglePermissionCR(this, 'canManageRoles')" data-perm="canManageRoles">
-                                    <div class="toggle-knob"></div>
-                                </div>
-                            </div>
+
+                        <!-- Botón Crear -->
+                        <button type="submit" class="btn-create w-full py-4 rounded-xl text-white font-bold text-lg flex items-center justify-center gap-3 mt-4">
+                            <i class="fas fa-save"></i>
+                            Guardar Nuevo Rol
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+
+            <!-- Panel Derecho: Roles Existentes -->
+            <div class="lg:col-span-1">
+                <div class="glass-panel p-6 sticky top-24">
+                    <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                        <i class="fas fa-list text-red-500"></i>
+                        Roles Activos
+                    </h3>
+                    
+                    <div id="roles-list" class="space-y-3 max-h-[600px] overflow-y-auto custom-scrollbar pr-2">
+                        <div class="text-center py-8 text-gray-400">
+                            <i class="fas fa-spinner animate-spin text-2xl mb-2"></i>
+                            <p>Cargando roles...</p>
                         </div>
                     </div>
-                    <button type="submit" class="btn-create w-full py-4 rounded-xl text-white font-bold text-lg flex items-center justify-center gap-3">
-                        <i class="fas fa-save"></i>
-                        Guardar Nuevo Rol
-                    </button>
-                </form>
-            </div>
-        </div>
-        <!-- Panel Derecho -->
-        <div class="lg:col-span-1">
-            <div class="card p-6 rounded-xl sticky top-24">
-                <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                    <i class="fas fa-list text-red-500"></i>
-                    Roles Activos
-                </h3>
-                <div id="roles-list" class="space-y-3 max-h-[600px] overflow-y-auto custom-scrollbar pr-2">
-                    <div class="text-center py-8 text-gray-400">
-                        <i class="fas fa-spinner loading-spinner text-2xl mb-2"></i>
-                        <p>Cargando roles...</p>
+
+                    <div class="mt-6 pt-6 border-t border-white/10">
+                        <p class="text-gray-500 text-xs text-center">
+                            Los roles se guardan localmente.<br>
+                            Asigna estos roles en "Usuarios Autorizados".
+                        </p>
                     </div>
                 </div>
-                <div class="mt-6 pt-6 border-t border-white/10">
-                    <p class="text-gray-500 text-xs text-center">
-                        Los roles se guardan localmente.<br>
-                        Asigna estos roles en "Usuarios Autorizados".
-                    </p>
-                </div>
             </div>
+
         </div>
-    </div>
-</div>
+    </main>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
+            authDomain: "papeletalicencia.firebaseapp.com",
+            databaseURL: "https://papeletalicencia-default-rtdb.firebaseio.com",
+            projectId: "papeletalicencia",
+            storageBucket: "papeletalicencia.firebasestorage.app",
+            messagingSenderId: "677208314051",
+            appId: "1:677208314051:web:a27c04f31d402e83f29276"
+        };
+
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let currentPermissions = {};
+        let existingRoles = [];
+
+        // Inicializar permisos en falso
+        function initPermissions() {
+            currentPermissions = {
+                canAccessConfig: false,
+                canUploadProducts: false,
+                canDeleteProducts: false,
+                canAssignProducts: false,
+                canViewLicenses: false,
+                canManageRoles: false
+            };
+            
+            // Resetear toggles visuales
+            document.querySelectorAll('.toggle-switch').forEach(toggle => {
+                toggle.classList.remove('active');
+            });
+        }
+
+        function togglePermission(element, permissionKey) {
+            element.classList.toggle('active');
+            currentPermissions[permissionKey] = element.classList.contains('active');
+        }
+
+        function updateColorPreview(color) {
+            document.getElementById('color-preview').style.backgroundColor = color;
+            document.getElementById('color-hex').textContent = color.toUpperCase();
+        }
+
+        async function handleCreateRole(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('role-name').value.trim();
+            const color = document.getElementById('role-color').value;
+            const description = document.getElementById('role-desc').value.trim();
+
+            if (!name) {
+                alert('❌ El nombre del rol es obligatorio');
+                return;
+            }
+
+            // Verificar si ya existe un rol con ese nombre (case insensitive)
+            const exists = existingRoles.some(r => r.name.toLowerCase() === name.toLowerCase());
+            if (exists) {
+                alert('⚠️ Ya existe un rol con ese nombre');
+                return;
+            }
+
+            try {
+                const newRole = {
+                    id: 'role_' + Date.now(),
+                    name: name,
+                    color: color,
+                    description: description || 'Sin descripción',
+                    permissions: { ...currentPermissions },
+                    created_at: new Date().toISOString(),
+                    created_by: 'admin'
+                };
+
+                // Guardar en localStorage (persistencia de roles)
+                existingRoles.push(newRole);
+                localStorage.setItem('papeleta_custom_roles', JSON.stringify(existingRoles));
+
+                alert(`✅ Rol "${name}" creado exitosamente`);
+
+                // Resetear formulario
+                document.getElementById('create-role-form').reset();
+                updateColorPreview('#ff1a1a');
+                initPermissions();
+
+                // Recargar lista
+                renderRoles();
+
+            } catch (error) {
+                console.error("Error creating role:", error);
+                alert('❌ Error al crear el rol: ' + error.message);
+            }
+        }
+
+        function loadRoles() {
+            try {
+                const saved = localStorage.getItem('papeleta_custom_roles');
+                if (saved) {
+                    existingRoles = JSON.parse(saved);
+                } else {
+                    existingRoles = [];
+                }
+                renderRoles();
+            } catch (error) {
+                console.error("Error loading roles:", error);
+                existingRoles = [];
+                renderRoles();
+            }
+        }
+
+        function renderRoles() {
+            const container = document.getElementById('roles-list');
+
+            if (existingRoles.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-id-badge text-3xl mb-3 opacity-50"></i>
+                        <p>No hay roles personalizados</p>
+                        <p class="text-xs mt-1">Crea uno usando el formulario</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = existingRoles.map(role => {
+                // Contar permisos activos
+                const activePerms = Object.values(role.permissions).filter(v => v).length;
+                const totalPerms = Object.keys(role.permissions).length;
+
+                return `
+                <div class="role-card">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-lg" 
+                                 style="background-color: ${role.color}; box-shadow: 0 0 15px ${role.color}40;">
+                                ${role.name.charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                                <h4 class="text-white font-bold text-sm">${escapeHTML(role.name)}</h4>
+                                <p class="text-gray-500 text-xs line-clamp-1">${escapeHTML(role.description)}</p>
+                            </div>
+                        </div>
+                        <button onclick="deleteRole('${role.id}')" class="text-gray-500 hover:text-red-400 transition-colors p-1" title="Eliminar rol">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="text-gray-400">
+                            <i class="fas fa-check-circle mr-1" style="color: ${role.color}"></i>
+                            ${activePerms}/${totalPerms} permisos activos
+                        </span>
+                        <span class="font-mono text-gray-600">${role.color.toUpperCase()}</span>
+                    </div>
+
+                    <!-- Mini preview de permisos -->
+                    <div class="mt-3 pt-3 border-t border-white/5 flex flex-wrap gap-1">
+                        ${Object.entries(role.permissions).map(([key, value]) => 
+                            value ? `<span class="text-[10px] px-2 py-0.5 rounded bg-green-900/30 text-green-400 border border-green-800/30">${formatPermName(key)}</span>` : ''
+                        ).join('')}
+                        ${activePerms === 0 ? '<span class="text-[10px] text-gray-600 italic">Sin permisos</span>' : ''}
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        function deleteRole(roleId) {
+            if (!confirm('¿Estás seguro de eliminar este rol? Los usuarios que lo tengan perderán sus permisos.')) {
+                return;
+            }
+
+            existingRoles = existingRoles.filter(r => r.id !== roleId);
+            localStorage.setItem('papeleta_custom_roles', JSON.stringify(existingRoles));
+            renderRoles();
+            alert('✅ Rol eliminado correctamente');
+        }
+
+        function formatPermName(key) {
+            const names = {
+                canAccessConfig: 'Config',
+                canUploadProducts: 'Subir',
+                canDeleteProducts: 'Eliminar',
+                canAssignProducts: 'Asignar',
+                canViewLicenses: 'Licencias',
+                canManageRoles: 'Roles'
+            };
+            return names[key] || key;
+        }
+
+        function escapeHTML(str) {
+            return String(str).replace(/[&<>'"]/g, tag => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+            }[tag] || tag));
+        }
+
+        // Inicializar al cargar
+        document.addEventListener('DOMContentLoaded', () => {
+            initPermissions();
+            loadRoles();
+        });
+    </script>
+</body>
+</html>
