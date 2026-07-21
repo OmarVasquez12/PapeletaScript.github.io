@@ -369,6 +369,7 @@
         let isFree = false;
         let userAlreadyOwns = false;
         let currentUserDiscordId = null;
+        let currentUserData = null;
 
         // --- LÓGICA DEL CARRITO ---
         let cart = JSON.parse(localStorage.getItem('papeleta_cart') || '[]');
@@ -469,9 +470,160 @@
             totalEl.textContent = total === 0 ? 'GRATIS' : '$' + total.toFixed(2);
         }
 
-        function goToCheckout() {
-            if (cart.length === 0) return;
-            window.location.href = 'index.html';
+        // MODIFICADO: Procesar compra/reclamo y redirigir
+        async function goToCheckout() {
+            if (cart.length === 0) {
+                alert('Tu carrito está vacío');
+                return;
+            }
+
+            // Verificar si el usuario está logueado
+            const token = localStorage.getItem('dc_access_token');
+            if (!token) {
+                alert('Debes iniciar sesión para completar la compra');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            try {
+                // Obtener datos del usuario
+                const res = await fetch('https://discord.com/api/users/@me', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!res.ok) {
+                    localStorage.removeItem('dc_access_token');
+                    alert('Sesión expirada. Por favor inicia sesión nuevamente.');
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                const user = await res.json();
+                currentUserDiscordId = user.id;
+                currentUserData = user;
+
+                // Verificar si todos los productos son gratis
+                const allFree = cart.every(item => Number(item.price) === 0);
+
+                if (allFree) {
+                    // RECLAMAR PRODUCTOS GRATIS
+                    await claimFreeProducts(user);
+                } else {
+                    // COMPRAR PRODUCTOS DE PAGO
+                    await purchasePaidProducts(user);
+                }
+
+            } catch (error) {
+                console.error(error);
+                alert('Error al procesar la compra: ' + error.message);
+            }
+        }
+
+        async function claimFreeProducts(user) {
+            try {
+                // Guardar en Clientes
+                const purchaseData = {
+                    discord_id: user.id,
+                    username: user.username,
+                    avatar: user.avatar,
+                    products: cart.map(item => ({
+                        id: item.id,
+                        name: item.name,
+                        price: "Gratis"
+                    })),
+                    total_price: "Gratis",
+                    date: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: "Reclamado Exitosamente"
+                };
+
+                await db.collection("Clientes").add(purchaseData);
+                
+                // Crear licencias para cada producto
+                for (const item of cart) {
+                    await createLicenseForProduct(item.id, item.name, user);
+                }
+                
+                // Limpiar carrito
+                cart = [];
+                saveCart();
+                
+                alert('¡Productos reclamados exitosamente!');
+                
+                // Redirigir al Área de Cliente
+                window.location.href = 'AreaCliente.html';
+                
+            } catch (error) {
+                console.error(error);
+                alert('Error al reclamar productos: ' + error.message);
+            }
+        }
+
+        async function purchasePaidProducts(user) {
+            // Para productos de pago, redirigir a index.html para procesar PayPal
+            // O implementar pago directo aquí
+            
+            const total = cart.reduce((sum, item) => sum + Number(item.price), 0);
+            
+            const confirmPurchase = confirm(`Total a pagar: $${total.toFixed(2)}\n\n¿Deseas completar la compra?`);
+            
+            if (confirmPurchase) {
+                try {
+                    // Guardar en Clientes
+                    const purchaseData = {
+                        discord_id: user.id,
+                        username: user.username,
+                        avatar: user.avatar,
+                        products: cart.map(item => ({
+                            id: item.id,
+                            name: item.name,
+                            price: "$" + Number(item.price).toFixed(2)
+                        })),
+                        total_price: "$" + total.toFixed(2),
+                        date: firebase.firestore.FieldValue.serverTimestamp(),
+                        status: "Pagado"
+                    };
+
+                    await db.collection("Clientes").add(purchaseData);
+                    
+                    // Crear licencias para cada producto
+                    for (const item of cart) {
+                        await createLicenseForProduct(item.id, item.name, user);
+                    }
+                    
+                    // Limpiar carrito
+                    cart = [];
+                    saveCart();
+                    
+                    alert('¡Compra completada exitosamente!');
+                    
+                    // Redirigir al Área de Cliente
+                    window.location.href = 'AreaCliente.html';
+                    
+                } catch (error) {
+                    console.error(error);
+                    alert('Error al completar la compra: ' + error.message);
+                }
+            }
+        }
+
+        async function createLicenseForProduct(productId, productName, user) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let key = '';
+            for (let i = 0; i < 20; i++) {
+                key += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            
+            const licenseData = {
+                discord_id: user.id,
+                username: user.username,
+                product_id: productId,
+                product_name: productName,
+                key: key,
+                created_at: firebase.firestore.FieldValue.serverTimestamp(),
+                status: 'active'
+            };
+            
+            await db.collection("Licencias").add(licenseData);
         }
 
         function handleMainAction() {
