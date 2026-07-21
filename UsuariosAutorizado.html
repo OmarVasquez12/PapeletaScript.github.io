@@ -49,6 +49,7 @@
             transform: translateX(4px);
         }
 
+        /* Badges de Rol */
         .role-badge {
             padding: 4px 12px;
             border-radius: 20px;
@@ -56,6 +57,9 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
         .role-admin { 
             background: rgba(220, 38, 38, 0.2); 
@@ -72,40 +76,81 @@
             color: #6b7280; 
             border: 1px solid rgba(107, 114, 128, 0.3);
         }
+        /* Estilo dinámico para roles personalizados */
+        .role-custom {
+            border: 1px solid;
+        }
 
+        /* Botones de Rol Base */
         .btn-role {
             transition: all 0.2s ease;
             font-size: 12px;
             font-weight: 600;
             padding: 6px 12px;
             border-radius: 8px;
+            position: relative;
         }
         .btn-role-admin {
             background: rgba(220, 38, 38, 0.1);
             border: 1px solid rgba(220, 38, 38, 0.3);
             color: #dc2626;
         }
-        .btn-role-admin:hover {
-            background: rgba(220, 38, 38, 0.3);
-            border-color: rgba(220, 38, 38, 0.6);
-        }
+        .btn-role-admin:hover:not(:disabled) { background: rgba(220, 38, 38, 0.3); border-color: rgba(220, 38, 38, 0.6); }
+        
         .btn-role-mod {
             background: rgba(245, 158, 11, 0.1);
             border: 1px solid rgba(245, 158, 11, 0.3);
             color: #f59e0b;
         }
-        .btn-role-mod:hover {
-            background: rgba(245, 158, 11, 0.3);
-            border-color: rgba(245, 158, 11, 0.6);
-        }
+        .btn-role-mod:hover:not(:disabled) { background: rgba(245, 158, 11, 0.3); border-color: rgba(245, 158, 11, 0.6); }
+        
         .btn-role-user {
             background: rgba(107, 114, 128, 0.1);
             border: 1px solid rgba(107, 114, 128, 0.3);
             color: #6b7280;
         }
-        .btn-role-user:hover {
-            background: rgba(107, 114, 128, 0.3);
-            border-color: rgba(107, 114, 128, 0.6);
+        .btn-role-user:hover:not(:disabled) { background: rgba(107, 114, 128, 0.3); border-color: rgba(107, 114, 128, 0.6); }
+
+        /* Dropdown de Roles Personalizados */
+        .custom-roles-dropdown {
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            margin-bottom: 8px;
+            background: #1a0a0a;
+            border: 1px solid rgba(255, 26, 26, 0.3);
+            border-radius: 10px;
+            padding: 6px;
+            min-width: 180px;
+            z-index: 50;
+            box-shadow: 0 -10px 25px rgba(0,0,0,0.5);
+            display: none;
+        }
+        .custom-roles-dropdown.active { display: block; animation: slideUp 0.2s ease; }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .custom-role-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 13px;
+            color: #e5e7eb;
+        }
+        .custom-role-option:hover { background: rgba(255, 255, 255, 0.05); }
+        
+        .role-color-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
         }
 
         .stat-card {
@@ -154,9 +199,9 @@
             <div class="stat-card rounded-xl p-5">
                 <div class="flex items-center gap-3 mb-2">
                     <i class="fas fa-users text-gray-400 text-2xl"></i>
-                    <span class="text-gray-400 text-sm font-semibold">Usuarios Normales</span>
+                    <span class="text-gray-400 text-sm font-semibold">Otros Roles / Usuarios</span>
                 </div>
-                <p id="stat-users" class="text-3xl font-black text-white">0</p>
+                <p id="stat-others" class="text-3xl font-black text-white">0</p>
             </div>
         </div>
 
@@ -170,18 +215,10 @@
                         class="w-full bg-[#0d0505] border border-red-950/40 rounded-xl pl-12 pr-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition-colors">
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="filterByRole('all')" class="role-filter-btn active bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all" data-role="all">
-                        Todos
-                    </button>
-                    <button onclick="filterByRole('admin')" class="role-filter-btn bg-[#0d0505] border border-red-950/40 text-gray-300 px-4 py-2 rounded-lg text-sm font-semibold hover:border-red-500/50 transition-all" data-role="admin">
-                        Admins
-                    </button>
-                    <button onclick="filterByRole('mod')" class="role-filter-btn bg-[#0d0505] border border-red-950/40 text-gray-300 px-4 py-2 rounded-lg text-sm font-semibold hover:border-red-500/50 transition-all" data-role="mod">
-                        Mods
-                    </button>
-                    <button onclick="filterByRole('user')" class="role-filter-btn bg-[#0d0505] border border-red-950/40 text-gray-300 px-4 py-2 rounded-lg text-sm font-semibold hover:border-red-500/50 transition-all" data-role="user">
-                        Usuarios
-                    </button>
+                    <button onclick="filterByRole('all')" class="role-filter-btn active bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all" data-role="all">Todos</button>
+                    <button onclick="filterByRole('admin')" class="role-filter-btn bg-[#0d0505] border border-red-950/40 text-gray-300 px-4 py-2 rounded-lg text-sm font-semibold hover:border-red-500/50 transition-all" data-role="admin">Admins</button>
+                    <button onclick="filterByRole('mod')" class="role-filter-btn bg-[#0d0505] border border-red-950/40 text-gray-300 px-4 py-2 rounded-lg text-sm font-semibold hover:border-red-500/50 transition-all" data-role="mod">Mods</button>
+                    <button onclick="filterByRole('custom')" class="role-filter-btn bg-[#0d0505] border border-red-950/40 text-gray-300 px-4 py-2 rounded-lg text-sm font-semibold hover:border-red-500/50 transition-all" data-role="custom">Personalizados</button>
                 </div>
             </div>
         </div>
@@ -197,41 +234,6 @@
                 <div class="text-center py-12 text-gray-400">
                     <i class="fas fa-spinner animate-spin text-3xl mb-3"></i>
                     <p>Cargando usuarios...</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Info de Permisos -->
-        <div class="glass-panel p-6 mt-8">
-            <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <i class="fas fa-info-circle text-red-500"></i>
-                Permisos por Rol
-            </h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-red-950/20 border border-red-600/30 rounded-xl p-4">
-                    <div class="flex items-center gap-2 mb-2">
-                        <i class="fas fa-shield-alt text-red-500"></i>
-                        <h4 class="text-white font-bold">Administrador</h4>
-                    </div>
-                    <ul class="text-gray-400 text-sm space-y-1">
-                        <li><i class="fas fa-check text-green-400 mr-2"></i>Acceso completo a Config</li>
-                        <li><i class="fas fa-check text-green-400 mr-2"></i>Puede subir/eliminar productos</li>
-                        <li><i class="fas fa-check text-green-400 mr-2"></i>Puede gestionar roles</li>
-                        <li><i class="fas fa-check text-green-400 mr-2"></i>Puede asignar productos</li>
-                        <li><i class="fas fa-check text-green-400 mr-2"></i>Ve todas las licencias</li>
-                    </ul>
-                </div>
-                <div class="bg-yellow-950/20 border border-yellow-600/30 rounded-xl p-4">
-                    <div class="flex items-center gap-2 mb-2">
-                        <i class="fas fa-user-shield text-yellow-500"></i>
-                        <h4 class="text-white font-bold">Moderador</h4>
-                    </div>
-                    <ul class="text-gray-400 text-sm space-y-1">
-                        <li><i class="fas fa-times text-red-400 mr-2"></i>No puede ver Config</li>
-                        <li><i class="fas fa-check text-green-400 mr-2"></i>Puede ver todos los productos</li>
-                        <li><i class="fas fa-check text-green-400 mr-2"></i>Puede ver licencias de usuarios</li>
-                        <li><i class="fas fa-check text-green-400 mr-2"></i>Soporte técnico</li>
-                    </ul>
                 </div>
             </div>
         </div>
@@ -251,54 +253,49 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // IDs de administradores hardcodeados (no se pueden cambiar desde la UI)
+        // IDs de administradores hardcodeados
         const ADMIN_DISCORD_IDS = ['890526767608127489'];
         const ADMIN_DISCORD_USERNAMES = ['papeleta'];
 
         let allUsers = [];
+        let customRoles = [];
         let currentRoleFilter = 'all';
         let searchTerm = '';
+        let activeDropdownId = null; // Para cerrar dropdowns al abrir otro
 
         async function loadUsers() {
             try {
-                // Cargar desde Firestore
+                // 1. Cargar Roles Personalizados
+                const savedRoles = localStorage.getItem('papeleta_custom_roles');
+                customRoles = savedRoles ? JSON.parse(savedRoles) : [];
+
+                // 2. Cargar Usuarios de Firestore
                 const usersSnapshot = await db.collection("UsuariosRegistrados").get();
                 const firestoreUsers = [];
-                usersSnapshot.forEach((doc) => {
-                    firestoreUsers.push(doc.data());
-                });
+                usersSnapshot.forEach((doc) => firestoreUsers.push(doc.data()));
 
-                // Cargar desde localStorage (roles asignados manualmente)
+                // 3. Cargar Usuarios Locales (con roles asignados)
                 const localUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
 
-                // Combinar y priorizar datos de Firestore
+                // 4. Combinar datos
                 const userMap = new Map();
                 
-                // Primero agregar usuarios de Firestore
                 firestoreUsers.forEach(user => {
-                    userMap.set(user.discord_id, {
-                        ...user,
-                        role: 'user' // Por defecto
-                    });
+                    userMap.set(user.discord_id, { ...user, role: 'user' });
                 });
 
-                // Luego actualizar con roles de localStorage
                 localUsers.forEach(localUser => {
                     if (userMap.has(localUser.discord_id)) {
                         const existing = userMap.get(localUser.discord_id);
-                        if (localUser.role) {
-                            existing.role = localUser.role;
-                        }
+                        if (localUser.role) existing.role = localUser.role;
                     } else {
                         userMap.set(localUser.discord_id, localUser);
                     }
                 });
 
-                // Convertir a array y asignar roles de admin hardcodeados
+                // 5. Aplicar admins hardcodeados
                 allUsers = Array.from(userMap.values()).map(user => {
-                    if (isAdminHardcoded(user)) {
-                        user.role = 'admin';
-                    }
+                    if (isAdminHardcoded(user)) user.role = 'admin';
                     return user;
                 });
 
@@ -321,20 +318,23 @@
             return false;
         }
 
+        function getCustomRoleData(roleName) {
+            return customRoles.find(r => r.name.toLowerCase() === roleName.toLowerCase());
+        }
+
         function updateStats() {
             const admins = allUsers.filter(u => u.role === 'admin').length;
             const mods = allUsers.filter(u => u.role === 'mod').length;
-            const users = allUsers.filter(u => !u.role || u.role === 'user').length;
+            // "Otros" incluye usuarios normales Y roles personalizados
+            const others = allUsers.filter(u => !['admin', 'mod'].includes(u.role)).length;
 
             document.getElementById('stat-admins').textContent = admins;
             document.getElementById('stat-mods').textContent = mods;
-            document.getElementById('stat-users').textContent = users;
+            document.getElementById('stat-others').textContent = others;
         }
 
         function filterByRole(role) {
             currentRoleFilter = role;
-            
-            // Actualizar botones
             document.querySelectorAll('.role-filter-btn').forEach(btn => {
                 if (btn.dataset.role === role) {
                     btn.classList.remove('bg-[#0d0505]', 'text-gray-300');
@@ -344,7 +344,6 @@
                     btn.classList.remove('bg-red-600', 'text-white');
                 }
             });
-            
             renderUsers();
         }
 
@@ -356,13 +355,13 @@
         function renderUsers() {
             const container = document.getElementById('users-container');
             
-            // Filtrar usuarios
             let filteredUsers = allUsers.filter(user => {
+                const userRole = user.role || 'user';
+                
                 // Filtro por rol
-                if (currentRoleFilter !== 'all') {
-                    const userRole = user.role || 'user';
-                    if (userRole !== currentRoleFilter) return false;
-                }
+                if (currentRoleFilter === 'admin' && userRole !== 'admin') return false;
+                if (currentRoleFilter === 'mod' && userRole !== 'mod') return false;
+                if (currentRoleFilter === 'custom' && ['admin', 'mod', 'user'].includes(userRole)) return false;
                 
                 // Filtro por búsqueda
                 if (searchTerm) {
@@ -374,28 +373,44 @@
                 return true;
             });
 
-            // Ordenar: Admins primero, luego Mods, luego Usuarios
+            // Ordenar: Admins > Mods > Custom > Users
             filteredUsers.sort((a, b) => {
-                const roleOrder = { admin: 0, mod: 1, user: 2 };
-                const roleA = a.role || 'user';
-                const roleB = b.role || 'user';
-                return roleOrder[roleA] - roleOrder[roleB];
+                const getOrder = (r) => {
+                    if (r === 'admin') return 0;
+                    if (r === 'mod') return 1;
+                    if (getCustomRoleData(r)) return 2;
+                    return 3;
+                };
+                return getOrder(a.role) - getOrder(b.role);
             });
 
             if (filteredUsers.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-12 text-gray-500">
-                        <i class="fas fa-user-slash text-4xl mb-3"></i>
-                        <p>No se encontraron usuarios</p>
-                    </div>`;
+                container.innerHTML = `<div class="text-center py-12 text-gray-500"><i class="fas fa-user-slash text-4xl mb-3"></i><p>No se encontraron usuarios</p></div>`;
                 return;
             }
 
             container.innerHTML = filteredUsers.map(user => {
                 const userRole = user.role || 'user';
                 const isAdmin = isAdminHardcoded(user);
-                const roleClass = userRole === 'admin' ? 'role-admin' : (userRole === 'mod' ? 'role-mod' : 'role-user');
-                const roleText = userRole === 'admin' ? 'ADMIN' : (userRole === 'mod' ? 'MOD' : 'USUARIO');
+                const customRole = getCustomRoleData(userRole);
+                
+                // Determinar clase y texto del badge
+                let roleClass = 'role-user';
+                let roleText = 'USUARIO';
+                let badgeStyle = '';
+
+                if (isAdmin) {
+                    roleClass = 'role-admin';
+                    roleText = 'ADMIN';
+                } else if (userRole === 'mod') {
+                    roleClass = 'role-mod';
+                    roleText = 'MOD';
+                } else if (customRole) {
+                    roleClass = 'role-custom';
+                    roleText = customRole.name.toUpperCase();
+                    // Aplicar color personalizado inline
+                    badgeStyle = `background-color: ${customRole.color}20; color: ${customRole.color}; border-color: ${customRole.color}60;`;
+                }
                 
                 return `
                 <div class="user-row flex flex-col md:flex-row items-start md:items-center gap-4">
@@ -403,7 +418,8 @@
                     <div class="flex items-center gap-3 flex-1 min-w-0">
                         <img src="${user.avatar ? `https://cdn.discordapp.com/avatars/${user.discord_id}/${user.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png'}" 
                             alt="${user.username}" 
-                            class="w-12 h-12 rounded-full border-2 ${isAdmin ? 'border-red-500' : 'border-gray-600'}">
+                            class="w-12 h-12 rounded-full border-2 ${isAdmin ? 'border-red-500' : (customRole ? 'border-opacity-50' : 'border-gray-600')}"
+                            style="${customRole ? `border-color: ${customRole.color}` : ''}">
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2">
                                 <h4 class="text-white font-bold truncate">${escapeHTML(user.username || 'Usuario sin nombre')}</h4>
@@ -415,11 +431,11 @@
 
                     <!-- Rol Actual -->
                     <div class="flex items-center gap-2">
-                        <span class="role-badge ${roleClass}">${roleText}</span>
+                        <span class="role-badge ${roleClass}" style="${badgeStyle}">${roleText}</span>
                     </div>
 
                     <!-- Botones de Acción -->
-                    <div class="flex gap-2 flex-wrap">
+                    <div class="flex gap-2 flex-wrap relative">
                         ${!isAdmin ? `
                             <button onclick="setRole('${user.discord_id}', 'admin')" 
                                 class="btn-role btn-role-admin ${userRole === 'admin' ? 'opacity-50 cursor-not-allowed' : ''}"
@@ -431,9 +447,35 @@
                                 ${userRole === 'mod' ? 'disabled' : ''}>
                                 <i class="fas fa-user-shield mr-1"></i>Mod
                             </button>
+                            
+                            <!-- Dropdown de Roles Personalizados -->
+                            ${customRoles.length > 0 ? `
+                            <div class="relative">
+                                <button onclick="toggleCustomRoles('${user.discord_id}', event)" 
+                                    class="btn-role bg-[#0d0505] border border-red-950/40 text-gray-300 hover:border-red-500/50 hover:text-white">
+                                    <i class="fas fa-plus mr-1"></i>Más Roles...
+                                </button>
+                                
+                                <div id="dropdown-${user.discord_id}" class="custom-roles-dropdown">
+                                    ${customRoles.map(role => `
+                                        <div class="custom-role-option" onclick="setRole('${user.discord_id}', '${escapeHTML(role.name)}')">
+                                            <div class="role-color-dot" style="background-color: ${role.color}"></div>
+                                            <span>${escapeHTML(role.name)}</span>
+                                            ${userRole.toLowerCase() === role.name.toLowerCase() ? '<i class="fas fa-check ml-auto text-green-400"></i>' : ''}
+                                        </div>
+                                    `).join('')}
+                                    <div class="border-t border-white/10 my-1"></div>
+                                    <div class="custom-role-option" onclick="setRole('${user.discord_id}', 'user')">
+                                        <div class="role-color-dot" style="background-color: #6b7280"></div>
+                                        <span>Quitar Rol (Usuario)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            ` : ''}
+
                             <button onclick="setRole('${user.discord_id}', 'user')" 
-                                class="btn-role btn-role-user ${userRole === 'user' ? 'opacity-50 cursor-not-allowed' : ''}"
-                                ${userRole === 'user' ? 'disabled' : ''}>
+                                class="btn-role btn-role-user ${(!customRoles.length && userRole === 'user') ? 'opacity-50 cursor-not-allowed' : ''}"
+                                ${(!customRoles.length && userRole === 'user') ? 'disabled' : ''}>
                                 <i class="fas fa-user mr-1"></i>Usuario
                             </button>
                         ` : '<span class="text-gray-500 text-xs italic">Rol fijo</span>'}
@@ -443,17 +485,41 @@
             }).join('');
         }
 
+        function toggleCustomRoles(userId, event) {
+            event.stopPropagation();
+            
+            // Cerrar otros dropdowns abiertos
+            if (activeDropdownId && activeDropdownId !== userId) {
+                const prev = document.getElementById(`dropdown-${activeDropdownId}`);
+                if (prev) prev.classList.remove('active');
+            }
+
+            const dropdown = document.getElementById(`dropdown-${userId}`);
+            if (dropdown) {
+                dropdown.classList.toggle('active');
+                activeDropdownId = dropdown.classList.contains('active') ? userId : null;
+            }
+        }
+
+        // Cerrar dropdowns al hacer click fuera
+        document.addEventListener('click', () => {
+            if (activeDropdownId) {
+                const dropdown = document.getElementById(`dropdown-${activeDropdownId}`);
+                if (dropdown) dropdown.classList.remove('active');
+                activeDropdownId = null;
+            }
+        });
+
         async function setRole(discordId, newRole) {
             const user = allUsers.find(u => u.discord_id === discordId);
             if (!user) return;
 
-            // Verificar si es admin hardcodeado
             if (isAdminHardcoded(user)) {
                 alert('⚠️ No se puede cambiar el rol de un administrador principal');
                 return;
             }
 
-            const confirmMsg = `¿Estás seguro de cambiar el rol de ${user.username} a ${newRole.toUpperCase()}?`;
+            const confirmMsg = `¿Estás seguro de cambiar el rol de ${user.username} a "${newRole}"?`;
             if (!confirm(confirmMsg)) return;
 
             try {
@@ -478,11 +544,18 @@
                 // Actualizar en memoria
                 user.role = newRole;
 
+                // Cerrar dropdown si estaba abierto
+                if (activeDropdownId === discordId) {
+                    const dropdown = document.getElementById(`dropdown-${discordId}`);
+                    if (dropdown) dropdown.classList.remove('active');
+                    activeDropdownId = null;
+                }
+
                 // Actualizar UI
                 updateStats();
                 renderUsers();
 
-                alert(`✅ Rol de ${user.username} actualizado a ${newRole.toUpperCase()}`);
+                alert(`✅ Rol de ${user.username} actualizado a "${newRole}"`);
 
             } catch (error) {
                 console.error("Error setting role:", error);
