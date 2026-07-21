@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subir Producto | Papeleta Store</title>
+    <title>Subir Producto</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff1a1a'/%3E%3Cstop offset='1' stop-color='%23cc1b1b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Ctext x='50' y='70' font-family='Arial, sans-serif' font-size='58' font-weight='900' fill='white' text-anchor='middle'%3EP%3C/text%3E%3C/svg%3E">
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -53,6 +53,11 @@
             border-radius: 8px;
             overflow: hidden;
             border: 2px solid rgba(220, 38, 38, 0.3);
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .preview-item img {
             width: 100%;
@@ -74,16 +79,35 @@
             align-items: center;
             justify-content: center;
             font-size: 12px;
+            transition: all 0.2s;
         }
         .preview-item .remove-btn:hover {
             background: rgba(220, 38, 38, 1);
+            transform: scale(1.1);
         }
 
         .multiple-preview-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 10px;
-            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .youtube-preview {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 8px;
+            border: 2px solid rgba(220, 38, 38, 0.3);
+            background: #0d0505;
+        }
+        .youtube-preview iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
         }
     </style>
 </head>
@@ -155,18 +179,37 @@
                         placeholder="Describe las características del producto, qué incluye, requisitos, etc..."></textarea>
                 </div>
 
-                <!-- Imágenes Múltiples -->
+                <!-- Link de YouTube (OPCIONAL) -->
+                <div>
+                    <label class="block text-gray-300 text-sm font-semibold mb-2">
+                        <i class="fab fa-youtube text-red-500 mr-2"></i>Link de YouTube (Opcional)
+                    </label>
+                    <input type="url" id="prod-youtube" 
+                        class="w-full bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition-colors" 
+                        placeholder="https://www.youtube.com/watch?v=...">
+                    <p class="text-gray-500 text-xs mt-1">Pega el link del video de YouTube para mostrarlo en el producto</p>
+                    <div id="youtube-preview-container" class="mt-3 hidden">
+                        <div class="youtube-preview" id="youtube-iframe-container"></div>
+                    </div>
+                </div>
+
+                <!-- Imágenes Múltiples - PREVIEW ARRIBA -->
                 <div>
                     <label class="block text-gray-300 text-sm font-semibold mb-2">Fotos del Producto (Múltiples) *</label>
-                    <div class="border-2 border-dashed border-red-900/40 rounded-xl p-6 text-center hover:border-red-500/50 transition-colors bg-[#0d0505]/50">
-                        <input type="file" id="prod-images" accept="image/*" multiple required 
-                            onchange="previewMultipleImages(this)" class="hidden">
-                        <label for="prod-images" class="cursor-pointer block">
-                            <i class="fas fa-images text-4xl text-red-400 mb-3"></i>
-                            <p class="text-gray-300 font-semibold">Haz clic para subir imágenes</p>
+                    
+                    <!-- Preview de imágenes ARRIBA -->
+                    <div id="multiple-images-preview" class="multiple-preview-container"></div>
+                    
+                    <!-- Área de upload ABAJO -->
+                    <div class="border-2 border-dashed border-red-900/40 rounded-xl p-6 text-center hover:border-red-500/50 transition-colors bg-[#0d0505]/50 cursor-pointer" onclick="document.getElementById('prod-images').click()">
+                        <input type="file" id="prod-images" accept="image/*" multiple 
+                            onchange="addMoreImages(this)" class="hidden">
+                        <div>
+                            <i class="fas fa-plus-circle text-4xl text-red-400 mb-3"></i>
+                            <p class="text-gray-300 font-semibold">Haz clic para agregar más imágenes</p>
                             <p class="text-gray-500 text-xs mt-1">Puedes seleccionar varias imágenes a la vez (máx. 800x600 recomendado)</p>
-                        </label>
-                        <div id="multiple-images-preview" class="multiple-preview-container"></div>
+                            <p class="text-red-400/60 text-xs mt-2" id="image-count">0 imágenes seleccionadas</p>
+                        </div>
                     </div>
                 </div>
 
@@ -225,36 +268,60 @@
 
         let tempImages = [];
         let allProducts = [];
+        let youtubeVideoId = null;
 
-        // Preview de múltiples imágenes
-        function previewMultipleImages(input) {
-            const previewContainer = document.getElementById('multiple-images-preview');
-            previewContainer.innerHTML = '';
-            tempImages = [];
+        // Función para extraer ID de YouTube
+        function extractYouTubeId(url) {
+            if (!url) return null;
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        // Preview de YouTube
+        document.getElementById('prod-youtube').addEventListener('input', function(e) {
+            const url = e.target.value;
+            const videoId = extractYouTubeId(url);
+            const previewContainer = document.getElementById('youtube-preview-container');
+            const iframeContainer = document.getElementById('youtube-iframe-container');
             
+            if (videoId) {
+                youtubeVideoId = videoId;
+                iframeContainer.innerHTML = `
+                    <iframe 
+                        src="https://www.youtube.com/embed/${videoId}" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe>
+                `;
+                previewContainer.classList.remove('hidden');
+            } else {
+                youtubeVideoId = null;
+                previewContainer.classList.add('hidden');
+                iframeContainer.innerHTML = '';
+            }
+        });
+
+        // Agregar más imágenes (sin borrar las existentes)
+        function addMoreImages(input) {
             if (input.files && input.files.length > 0) {
-                Array.from(input.files).forEach((file, index) => {
+                Array.from(input.files).forEach((file) => {
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         tempImages.push({ file: file, dataUrl: e.target.result });
-                        
-                        const div = document.createElement('div');
-                        div.className = 'preview-item';
-                        div.innerHTML = `
-                            <img src="${e.target.result}" alt="Preview ${index + 1}">
-                            <button type="button" class="remove-btn" onclick="removeImage(${index})">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        `;
-                        previewContainer.appendChild(div);
+                        updateImagesPreview();
+                        updateImageCount();
                     };
                     reader.readAsDataURL(file);
                 });
             }
+            // Reset input para permitir seleccionar el mismo archivo si es necesario
+            input.value = '';
         }
 
-        function removeImage(index) {
-            tempImages.splice(index, 1);
+        // Actualizar preview de imágenes
+        function updateImagesPreview() {
             const previewContainer = document.getElementById('multiple-images-preview');
             previewContainer.innerHTML = '';
             
@@ -263,12 +330,24 @@
                 div.className = 'preview-item';
                 div.innerHTML = `
                     <img src="${img.dataUrl}" alt="Preview ${idx + 1}">
-                    <button type="button" class="remove-btn" onclick="removeImage(${idx})">
+                    <button type="button" class="remove-btn" onclick="removeImage(${idx})" title="Eliminar imagen">
                         <i class="fas fa-times"></i>
                     </button>
                 `;
                 previewContainer.appendChild(div);
             });
+        }
+
+        // Actualizar contador de imágenes
+        function updateImageCount() {
+            const count = tempImages.length;
+            document.getElementById('image-count').textContent = `${count} imagen${count !== 1 ? 'es' : ''} seleccionada${count !== 1 ? 's' : ''}`;
+        }
+
+        function removeImage(index) {
+            tempImages.splice(index, 1);
+            updateImagesPreview();
+            updateImageCount();
         }
 
         function updateFileName(input) {
@@ -331,6 +410,7 @@
             const price = parseFloat(document.getElementById('prod-price').value);
             const category = document.getElementById('prod-category').value;
             const description = document.getElementById('prod-description').value;
+            const youtubeUrl = document.getElementById('prod-youtube').value;
             const downloadFile = document.getElementById('prod-file').files[0];
             
             if (tempImages.length === 0) {
@@ -361,6 +441,8 @@
                     description: description,
                     image_url: resizedImages[0],
                     images: resizedImages,
+                    youtube_url: youtubeUrl || null,
+                    youtube_id: youtubeVideoId || null,
                     file_data: fileBase64,
                     file_name: downloadFile.name,
                     created_at: firebase.firestore.FieldValue.serverTimestamp()
@@ -375,7 +457,11 @@
                 document.getElementById('multiple-images-preview').innerHTML = '';
                 document.getElementById('file-label-text').innerText = 'Haz clic para subir el archivo descargable';
                 document.getElementById('file-label-text').classList.remove('text-white', 'font-bold');
+                document.getElementById('youtube-preview-container').classList.add('hidden');
+                document.getElementById('youtube-iframe-container').innerHTML = '';
                 tempImages = [];
+                youtubeVideoId = null;
+                updateImageCount();
                 
                 // Recargar lista
                 loadProducts();
@@ -412,6 +498,7 @@
                             <p class="text-gray-500 text-xs truncate">
                                 <i class="fas fa-tag mr-1"></i>${escapeHTML(p.category || 'Sin categoría')}
                             </p>
+                            ${p.youtube_url ? '<p class="text-red-400/60 text-xs mt-1"><i class="fab fa-youtube mr-1"></i>Video de YouTube</p>' : ''}
                         </div>
                         <button onclick="deleteProduct('${p.id}')" 
                             class="text-red-400 hover:text-red-300 w-10 h-10 rounded-lg hover:bg-red-950/30 flex items-center justify-center transition-all">
