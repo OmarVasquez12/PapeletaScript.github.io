@@ -47,6 +47,10 @@
         ::-webkit-scrollbar-thumb { background: #6e6e6e; border-radius: 5px; border: 2px solid #111111; }
         ::-webkit-scrollbar-thumb:hover { background: #858585; }
 
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #1a1a1a; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #6e6e6e; border-radius: 4px; }
+        
         .red-glow { text-shadow: 0 0 18px rgba(255, 26, 26, 0.85), 0 0 36px rgba(204, 27, 27, 0.4); }
         .red-border { border-color: rgba(255, 26, 26, 0.25); }
         
@@ -64,6 +68,41 @@
         
         @keyframes bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
 
+        .product-detail-modal { backdrop-filter: blur(10px); }
+        .image-preview { max-width: 100%; max-height: 200px; border-radius: 8px; margin-top: 10px; }
+
+        .gallery-container { position: relative; }
+        .gallery-main-image {
+            width: 100%; height: 400px; object-fit: contain; border-radius: 16px;
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(153, 27, 27, 0.1));
+        }
+        .gallery-thumbnails { display: flex; gap: 10px; margin-top: 15px; overflow-x: auto; padding: 5px; }
+        .gallery-thumbnail {
+            width: 80px; height: 80px; object-fit: cover; border-radius: 8px; cursor: pointer;
+            border: 2px solid transparent; transition: all 0.3s; flex-shrink: 0;
+        }
+        .gallery-thumbnail:hover { border-color: #dc2626; transform: scale(1.05); }
+        .gallery-thumbnail.active { border-color: #dc2626; box-shadow: 0 0 10px rgba(220, 38, 38, 0.5); }
+        .gallery-nav {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: rgba(220, 38, 38, 0.8); color: white; border: none;
+            width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; transition: all 0.3s;
+        }
+        .gallery-nav:hover { background: rgba(220, 38, 38, 1); }
+        .gallery-nav.prev { left: 10px; }
+        .gallery-nav.next { right: 10px; }
+
+        .multiple-preview-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 15px; }
+        .preview-item { position: relative; border-radius: 8px; overflow: hidden; border: 2px solid rgba(220, 38, 38, 0.3); }
+        .preview-item img { width: 100%; height: 150px; object-fit: cover; }
+        .preview-item .remove-btn {
+            position: absolute; top: 5px; right: 5px; background: rgba(220, 38, 38, 0.9);
+            color: white; border: none; width: 25px; height: 25px; border-radius: 50%;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px;
+        }
+        .preview-item .remove-btn:hover { background: rgba(220, 38, 38, 1); }
+
         /* Panel de Configuración Lateral */
         .config-panel-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.7);
@@ -71,7 +110,6 @@
             opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
         }
         .config-panel-overlay.active { opacity: 1; pointer-events: auto; }
-        
         .config-panel {
             position: fixed; top: 0; right: -400px; width: 350px; height: 100vh;
             background: linear-gradient(180deg, #150a0a 0%, #0a0505 100%);
@@ -81,32 +119,23 @@
             padding: 24px; overflow-y: auto;
         }
         .config-panel.active { right: 0; }
-
         .config-menu-item {
-            display: flex; align-items: center; gap: 12px;
-            padding: 14px 16px; margin-bottom: 8px;
+            display: flex; align-items: center; gap: 12px; padding: 14px 16px; margin-bottom: 8px;
             background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 12px; cursor: pointer; transition: all 0.2s;
-            text-decoration: none; color: inherit;
+            border-radius: 12px; cursor: pointer; transition: all 0.2s; text-decoration: none; color: inherit;
         }
-        .config-menu-item:hover {
-            background: rgba(255, 26, 26, 0.1); border-color: rgba(255, 26, 26, 0.4);
-            transform: translateX(-4px);
-        }
+        .config-menu-item:hover { background: rgba(255, 26, 26, 0.1); border-color: rgba(255, 26, 26, 0.4); transform: translateX(-4px); }
         .config-menu-icon {
-            width: 36px; height: 36px; border-radius: 8px;
-            background: rgba(255, 26, 26, 0.1); color: #ff1a1a;
-            display: flex; align-items: center; justify-content: center; font-size: 16px;
+            width: 36px; height: 36px; border-radius: 8px; background: rgba(255, 26, 26, 0.1);
+            color: #ff1a1a; display: flex; align-items: center; justify-content: center; font-size: 16px;
         }
         .config-menu-text h4 { margin: 0; font-size: 14px; font-weight: 700; color: #fff; }
         .config-menu-text p { margin: 2px 0 0; font-size: 11px; color: #9496a1; }
 
-        /* Estilos Tarjetas Productos */
         .product-card-img-container { position: relative; overflow: hidden; }
         .product-card-img-container::after {
             content: ''; position: absolute; inset: 0;
-            background: linear-gradient(to top, #150a0a 0%, transparent 60%);
-            pointer-events: none;
+            background: linear-gradient(to top, #150a0a 0%, transparent 60%); pointer-events: none;
         }
     </style>
 </head>
@@ -114,16 +143,16 @@
 
     <canvas id="network-bg"></canvas>
 
-    <!-- LOGIN MODAL -->
+    <!-- LOGIN MODAL (Se mantiene por si acaso, pero el botón ahora es enlace directo) -->
     <div id="login-modal" class="hidden fixed inset-0 bg-black/80 z-[60] flex items-center justify-center px-4 backdrop-blur-sm transition-opacity duration-300">
         <div class="max-w-md w-full bg-[#150a0a] border red-border rounded-2xl p-8 text-center shadow-[0_0_40px_rgba(255,26,26,0.2)] relative transform transition-all scale-100">
             <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"><i class="fas fa-times text-xl"></i></button>
             <div class="mx-auto w-20 h-20 rounded-xl mb-6 shadow-lg border-2 border-red-600 bg-gradient-to-br from-red-500 to-red-800 flex items-center justify-center text-3xl font-black">P</div>
             <h1 class="text-3xl font-black text-white mb-2 tracking-wide uppercase">PAPELETA <span class="text-red-400 red-glow">STORE</span></h1>
             <p class="text-gray-400 text-sm mb-8">Debes iniciar sesión para realizar compras y descargar archivos.</p>
-            <button onclick="redirectToDiscord()" class="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-3.5 px-6 rounded-xl flex items-center justify-center gap-3 transition-all duration-200 shadow-lg transform hover:scale-[1.02]">
+            <a href="Login.html" class="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-3.5 px-6 rounded-xl flex items-center justify-center gap-3 transition-all duration-200 shadow-lg transform hover:scale-[1.02] no-underline">
                 <i class="fab fa-discord text-xl"></i> Iniciar Sesión con Discord
-            </button>
+            </a>
         </div>
     </div>
 
@@ -166,61 +195,31 @@
         </div>
 
         <div class="space-y-2">
-            <!-- Subir Producto -->
             <a href="SubirProducto.html" class="config-menu-item">
                 <div class="config-menu-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-                <div class="config-menu-text">
-                    <h4>Subir Producto</h4>
-                    <p>Agregar nuevos recursos a la tienda</p>
-                </div>
+                <div class="config-menu-text"><h4>Subir Producto</h4><p>Agregar nuevos recursos a la tienda</p></div>
             </a>
-
-            <!-- Licencias Usuario -->
             <a href="LicenciaUsuario.html" class="config-menu-item">
                 <div class="config-menu-icon"><i class="fas fa-key"></i></div>
-                <div class="config-menu-text">
-                    <h4>Licencias Usuario</h4>
-                    <p>Ver historial de compras y reclamos</p>
-                </div>
+                <div class="config-menu-text"><h4>Licencias Usuario</h4><p>Ver historial de compras y reclamos</p></div>
             </a>
-
-            <!-- Encriptar Script -->
             <a href="Encriptar.html" class="config-menu-item">
                 <div class="config-menu-icon"><i class="fas fa-lock"></i></div>
-                <div class="config-menu-text">
-                    <h4>Encriptar Script</h4>
-                    <p>Proteger archivos Lua de MTA:SA</p>
-                </div>
+                <div class="config-menu-text"><h4>Encriptar Script</h4><p>Proteger archivos Lua de MTA:SA</p></div>
             </a>
-
-            <!-- Pasar a Usuarios -->
             <div class="config-menu-item" onclick="openAssignProductModal()">
                 <div class="config-menu-icon"><i class="fas fa-user-plus"></i></div>
-                <div class="config-menu-text">
-                    <h4>Pasar a Usuarios</h4>
-                    <p>Asignar productos gratis manualmente</p>
-                </div>
+                <div class="config-menu-text"><h4>Pasar a Usuarios</h4><p>Asignar productos gratis manualmente</p></div>
             </div>
-
-            <!-- Usuarios Autorizados -->
             <a href="UsuariosAutorizado.html" class="config-menu-item">
                 <div class="config-menu-icon"><i class="fas fa-users-cog"></i></div>
-                <div class="config-menu-text">
-                    <h4>Usuarios Autorizados</h4>
-                    <p>Gestionar roles Admin y Mod</p>
-                </div>
+                <div class="config-menu-text"><h4>Usuarios Autorizados</h4><p>Gestionar roles Admin y Mod</p></div>
             </a>
-
-            <!-- Crear Rol -->
             <a href="CrearRol.html" class="config-menu-item">
                 <div class="config-menu-icon"><i class="fas fa-id-badge"></i></div>
-                <div class="config-menu-text">
-                    <h4>Crear Rol</h4>
-                    <p>Definir permisos personalizados</p>
-                </div>
+                <div class="config-menu-text"><h4>Crear Rol</h4><p>Definir permisos personalizados</p></div>
             </a>
         </div>
-
         <div class="mt-8 pt-6 border-t border-white/10 text-center">
             <p class="text-xs text-gray-500">Panel exclusivo para staff</p>
         </div>
@@ -238,8 +237,6 @@
                 <a href="#" onclick="showPage('inicio')" data-page="inicio" class="nav-link hover:text-red-400 transition-colors">Inicio</a>
                 <a href="#" onclick="showPage('productos')" data-page="productos" class="nav-link hover:text-red-400 transition-colors">Productos</a>
                 <a href="#" onclick="showPage('preguntas')" data-page="preguntas" class="nav-link hover:text-red-400 transition-colors">Preguntas</a>
-                
-                <!-- BOTÓN CONFIG (SOLO ADMIN/MOD) -->
                 <a href="#" onclick="toggleConfigPanel()" data-page="config" id="nav-config" class="nav-link hover:text-red-400 transition-colors hidden flex items-center gap-2">
                     <i class="fas fa-cog"></i> Config
                 </a>
@@ -255,9 +252,10 @@
                     <i class="fas fa-sign-out-alt"></i> <span class="hidden sm:inline">Salir</span>
                 </button>
                 
-                <button id="login-btn" onclick="openLoginModal()" class="bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-2 px-5 rounded-lg flex items-center gap-2 transition-all text-sm shadow-lg shadow-blue-900/20">
+                <!-- BOTÓN ACCEDER CORREGIDO: Ahora es un enlace directo a Login.html -->
+                <a href="Login.html" id="login-btn" class="bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-2 px-5 rounded-lg flex items-center gap-2 transition-all text-sm shadow-lg shadow-blue-900/20 no-underline">
                     <i class="fab fa-discord"></i> Acceder
-                </button>
+                </a>
                 
                 <div id="user-section" class="hidden flex items-center gap-3 bg-[#150a0a] px-3 py-1.5 rounded-full border border-red-900/50 cursor-pointer hover:border-red-600 transition-all group" onclick="openUserDashboard()">
                     <img id="user-avatar" src="" alt="Avatar" class="w-8 h-8 rounded-full border border-red-500 group-hover:border-red-400 transition-colors">
@@ -350,7 +348,6 @@
         const REDIRECT_URI = 'https://papeleta-script-github-io.vercel.app';
         const DISCORD_INVITE = 'https://discord.gg/rvxEdWcGkf';
         
-        // IDs de Administradores y Moderadores
         const ADMIN_DISCORD_IDS = ['890526767608127489']; 
         const ADMIN_DISCORD_USERNAMES = ['Papeleta']; 
 
@@ -364,7 +361,7 @@
         let allProducts = [];
         let activeCategory = 'all';
         let currentUser = null;
-        let currentUserRole = 'user'; // user, cliente, mod, admin
+        let currentUserRole = 'user';
         let myAssignedProductIds = new Set();
         let currentDetailProduct = null;
         let currentImageIndex = 0;
@@ -385,7 +382,6 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // --- PANEL CONFIG ---
         function toggleConfigPanel() {
             const panel = document.getElementById('config-panel');
             const overlay = document.getElementById('config-overlay');
@@ -395,28 +391,20 @@
 
         function openAssignProductModal() {
             alert("Funcionalidad 'Pasar a Usuarios' disponible en: AsignarProducto.html");
-            // window.location.href = 'AsignarProducto.html';
         }
 
-        // --- CARRITO ---
         function addToCart(productId) {
             const product = allProducts.find(p => p.id === productId);
             if (!product) return;
-            
             if (currentUser && myAssignedProductIds.has(productId)) {
                 window.location.href = 'AreaCliente.html';
                 return;
             }
-            
             const existingItem = cart.find(item => item.id === productId);
-            if (existingItem) {
-                alert('Este producto ya está en tu carrito');
-                return;
-            }
+            if (existingItem) { alert('Este producto ya está en tu carrito'); return; }
             
             cart.push({ id: product.id, name: product.name, price: product.price, image: product.image_url });
             updateCartUI();
-            
             const badge = document.getElementById('cart-count');
             badge.classList.remove('hidden');
             badge.classList.add('animate-bounce');
@@ -471,7 +459,6 @@
         async function claimFreeProducts() {
             if (!currentUser) { alert('Debes iniciar sesión'); openLoginModal(); return; }
             if (cart.length === 0) return;
-            
             try {
                 const purchaseData = {
                     discord_id: currentUser.id, username: currentUser.username, avatar: currentUser.avatar,
@@ -480,7 +467,6 @@
                 };
                 await db.collection("Clientes").add(purchaseData);
                 for (const item of cart) await createLicenseForProduct(item.id, item.name);
-                
                 saveUserDataLocally();
                 alert('¡Productos reclamados exitosamente!');
                 cart = []; updateCartUI(); closeCartModal();
@@ -550,7 +536,6 @@
              window.open(DISCORD_INVITE, '_blank');
         }
 
-        // --- PRODUCTOS RENDERIZADO NUEVO ---
         function renderProducts() {
             const search = document.getElementById('search-input').value.toLowerCase();
             const grid = document.getElementById('products-grid');
@@ -568,28 +553,22 @@
             grid.innerHTML = filtered.map(p => {
                 const priceDisplay = Number(p.price) === 0 ? 'GRATIS' : '$' + Number(p.price).toFixed(2);
                 const priceClass = Number(p.price) === 0 ? 'text-green-400' : 'text-red-400';
-                
                 const alreadyOwned = currentUser && myAssignedProductIds.has(p.id);
                 
                 return `
                 <div class="bg-[#150a0a] border ${alreadyOwned ? 'border-green-600/50' : 'border-red-950/40'} rounded-2xl overflow-hidden shadow-xl group hover:border-red-600/40 transition-all relative">
                     ${alreadyOwned ? '<span class="absolute top-3 right-3 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full z-10"><i class="fas fa-check mr-1"></i>OBTENIDO</span>' : ''}
-                    
                     <div class="product-card-img-container">
                         <img src="${escapeHTML(p.image_url || '')}" alt="${escapeHTML(p.name)}" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300 bg-[#0d0505]">
                     </div>
-                    
                     <div class="p-5">
                         <h4 class="text-xl font-bold text-white mb-2">${escapeHTML(p.name)}</h4>
                         <p class="text-gray-400 text-sm mb-4 line-clamp-2">${escapeHTML(p.description || '')}</p>
-                        
                         ${p.category ? `<span class="inline-block bg-red-950/60 border border-red-800 text-red-300 text-xs font-bold px-2.5 py-1 rounded-md mb-4">${escapeHTML(p.category)}</span>` : ''}
-                        
                         <div class="flex items-center justify-between mb-4">
                             <span class="text-2xl font-black ${priceClass}">${priceDisplay}</span>
                             ${Number(p.price) > 0 ? '<span class="text-xs text-gray-500">USD</span>' : '<span class="text-xs text-green-400 font-semibold">Sin costo</span>'}
                         </div>
-                        
                         ${alreadyOwned ? `
                             <div class="grid grid-cols-2 gap-2">
                                 <button onclick="window.location.href='AreaCliente.html'" class="bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2">
@@ -609,14 +588,13 @@
                                 </a>
                             </div>
                         `}
-                        
                         ${isAdmin(currentUser) ? `
                         <button onclick="deleteProduct('${p.id}')" class="w-full mt-3 bg-transparent border border-red-900/50 hover:border-red-500 hover:bg-red-950/30 text-red-300 text-xs font-semibold py-2 rounded-xl transition-all">
                             <i class="fas fa-trash mr-1"></i> Eliminar
                         </button>` : ''}
                     </div>
-                </div>
-            `}).join('');
+                </div>`;
+            }).join('');
         }
 
         async function deleteProduct(id) {
@@ -630,9 +608,12 @@
             } catch (error) { alert('Error al eliminar: ' + error.message); }
         }
 
-        // --- AUTH & ROLES ---
-        function openLoginModal() { window.location.href = 'Login.html'; }
+        function openLoginModal() {
+            window.location.href = 'Login.html';
+        }
+
         function closeLoginModal() { document.getElementById('login-modal').classList.add('hidden'); }
+
         function redirectToDiscord() {
             const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20email`;
             window.location.href = url;
@@ -662,23 +643,18 @@
                 else document.getElementById('user-avatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
                 
                 closeLoginModal();
-                
-                // Verificar si es Admin
                 if (isAdmin(user)) {
                     document.getElementById('nav-config').classList.remove('hidden');
                     currentUserRole = 'admin';
                 } else {
-                    // Verificar rol guardado localmente (Mod, Ayudante, etc.)
                     const savedData = JSON.parse(localStorage.getItem('papeleta_user_' + user.id) || '{}');
                     if(savedData.role && savedData.role !== 'user' && savedData.role !== 'cliente') {
                         currentUserRole = savedData.role;
-                        // Si tiene un rol especial que permite ver config (ej: Mod)
                         if(['mod', 'staff'].includes(savedData.role.toLowerCase())) {
                              document.getElementById('nav-config').classList.remove('hidden');
                         }
                     }
                 }
-                
                 updateAuthUI(); applyRoleUI(); registerUserInFirebase(user);
                 loadUserStats(); loadSalesStats();
                 loadMyAssignments().then(() => loadProducts());
@@ -690,9 +666,11 @@
             const loginBtn = document.getElementById('login-btn');
             const userSection = document.getElementById('user-section');
             const logoutBtn = document.getElementById('logout-btn');
-            
-            if (currentUser) { loginBtn.classList.add('hidden'); userSection.classList.remove('hidden'); logoutBtn.classList.remove('hidden'); } 
-            else { loginBtn.classList.remove('hidden'); userSection.classList.add('hidden'); logoutBtn.classList.add('hidden'); }
+            if (currentUser) { 
+                loginBtn.classList.add('hidden'); userSection.classList.remove('hidden'); logoutBtn.classList.remove('hidden'); 
+            } else { 
+                loginBtn.classList.remove('hidden'); userSection.classList.add('hidden'); logoutBtn.classList.add('hidden'); 
+            }
         }
 
         function applyRoleUI() {
@@ -715,7 +693,6 @@
                 role: currentUserRole, assigned_products: Array.from(myAssignedProductIds), last_login: new Date().toISOString()
             };
             localStorage.setItem('papeleta_user_' + currentUser.id, JSON.stringify(userData));
-            
             let allUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
             const existingIndex = allUsers.findIndex(u => u.discord_id === currentUser.id);
             if(existingIndex >= 0) allUsers[existingIndex] = userData;
