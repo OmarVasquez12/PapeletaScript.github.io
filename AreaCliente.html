@@ -15,54 +15,261 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap');
         
-        * { font-family: 'Inter', sans-serif; }
-        body { background: linear-gradient(135deg, #050507 0%, #150a0a 100%); color: #e2e8f0; }
-        .sidebar { background: rgba(10, 5, 5, 0.95); backdrop-filter: blur(10px); border-right: 1px solid rgba(255, 26, 26, 0.1); }
-        .card { background: rgba(21, 10, 10, 0.6); border: 1px solid rgba(255, 26, 26, 0.15); backdrop-filter: blur(10px); }
-        .nav-item { transition: all 0.3s ease; }
-        .nav-item:hover { background: rgba(255, 26, 26, 0.1); color: white; }
-        .nav-item.active { background: rgba(255, 26, 26, 0.15); border-left: 3px solid #ff1a1a; color: #ff6b6b; }
-        .admin-nav-item { border: 1px solid rgba(255, 26, 26, 0.2); background: rgba(255, 26, 26, 0.05); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .admin-nav-item:hover { background: rgba(255, 26, 26, 0.15); border-color: rgba(255, 26, 26, 0.4); transform: translateX(4px); }
-        .admin-nav-item.active-section { background: rgba(255, 26, 26, 0.2); border-color: rgba(255, 26, 26, 0.6); box-shadow: 0 0 20px rgba(255, 26, 26, 0.2); }
-        .stat-card { background: linear-gradient(135deg, rgba(21, 10, 10, 0.8) 0%, rgba(13, 5, 5, 0.8) 100%); border: 1px solid rgba(255, 26, 26, 0.15); }
-        .btn-primary { background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); transition: all 0.3s ease; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(220, 38, 38, 0.3); }
-        .input-field { background: rgba(13, 5, 5, 0.8); border: 1px solid rgba(255, 26, 26, 0.2); }
-        .input-field:focus { border-color: #ff1a1a; outline: none; }
-        .code-block { background: rgba(5, 5, 7, 0.9); border: 1px solid rgba(255, 26, 26, 0.2); }
-        .gradient-text { background: linear-gradient(135deg, #ff1a1a 0%, #ff6b6b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: #0a0505; } ::-webkit-scrollbar-thumb { background: #7f1d1d; border-radius: 4px; } ::-webkit-scrollbar-thumb:hover { background: #ef4444; }
-        .lua-modal { position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.9); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.3s ease; }
-        .lua-modal.active { display: flex; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .lua-code-container { background: #0a0505; border: 2px solid #dc2626; border-radius: 16px; padding: 0; width: 100%; max-width: 1000px; max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 0 60px rgba(220, 38, 38, 0.3); animation: slideUp 0.3s ease; }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .lua-header { background: linear-gradient(135deg, #150a0a 0%, #0d0505 100%); border-bottom: 2px solid #dc2626; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; }
-        .lua-body { flex: 1; overflow: auto; padding: 24px; background: #050507; }
-        .lua-pre { font-family: 'Fira Code', monospace; color: #ffffff; font-size: 13px; line-height: 1.7; white-space: pre-wrap; word-break: break-all; margin: 0; }
-        .lua-footer { background: #0d0505; border-top: 1px solid rgba(220, 38, 38, 0.3); padding: 16px 24px; display: flex; justify-content: flex-end; gap: 12px; }
-        .admin-badge { background: rgba(220, 38, 38, 0.2); border: 1px solid rgba(220, 38, 38, 0.5); color: #ff6b6b; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-left: 8px; }
-        .admin-section-title { background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.3); color: #ff6b6b; }
-        .section-content { animation: sectionFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        @keyframes sectionFadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .upload-zone { border: 2px dashed rgba(255, 26, 26, 0.3); background: rgba(255, 26, 26, 0.02); transition: all 0.3s ease; }
-        .upload-zone:hover { border-color: rgba(255, 26, 26, 0.6); background: rgba(255, 26, 26, 0.05); transform: scale(1.01); }
-        .encrypt-box { background: linear-gradient(135deg, rgba(21, 10, 10, 0.9), rgba(13, 5, 5, 0.9)); border: 1px solid rgba(255, 26, 26, 0.2); }
-        .loading-spinner { animation: spin 1s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #050507 0%, #150a0a 100%);
+            color: #e2e8f0;
+        }
+        
+        .sidebar {
+            background: rgba(10, 5, 5, 0.95);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(255, 26, 26, 0.1);
+        }
+        
+        .card {
+            background: rgba(21, 10, 10, 0.6);
+            border: 1px solid rgba(255, 26, 26, 0.15);
+            backdrop-filter: blur(10px);
+        }
+        
+        .nav-item {
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item:hover {
+            background: rgba(255, 26, 26, 0.1);
+            color: white;
+        }
+        
+        .nav-item.active {
+            background: rgba(255, 26, 26, 0.15);
+            border-left: 3px solid #ff1a1a;
+            color: #ff6b6b;
+        }
+        
+        .admin-nav-item {
+            border: 1px solid rgba(255, 26, 26, 0.2);
+            background: rgba(255, 26, 26, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .admin-nav-item:hover {
+            background: rgba(255, 26, 26, 0.15);
+            border-color: rgba(255, 26, 26, 0.4);
+            transform: translateX(4px);
+        }
+        
+        .admin-nav-item.active-section {
+            background: rgba(255, 26, 26, 0.2);
+            border-color: rgba(255, 26, 26, 0.6);
+            box-shadow: 0 0 20px rgba(255, 26, 26, 0.2);
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, rgba(21, 10, 10, 0.8) 0%, rgba(13, 5, 5, 0.8) 100%);
+            border: 1px solid rgba(255, 26, 26, 0.15);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(220, 38, 38, 0.3);
+        }
+        
+        .input-field {
+            background: rgba(13, 5, 5, 0.8);
+            border: 1px solid rgba(255, 26, 26, 0.2);
+        }
+        
+        .input-field:focus {
+            border-color: #ff1a1a;
+            outline: none;
+        }
+        
+        .code-block {
+            background: rgba(5, 5, 7, 0.9);
+            border: 1px solid rgba(255, 26, 26, 0.2);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #ff1a1a 0%, #ff6b6b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-        /* ESTILOS ESPECÍFICOS PARA CREAR ROL */
-        .permission-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: rgba(13, 5, 5, 0.6); border: 1px solid rgba(255, 26, 26, 0.1); border-radius: 10px; margin-bottom: 8px; transition: all 0.2s ease; }
-        .permission-item:hover { border-color: rgba(255, 26, 26, 0.3); background: rgba(255, 26, 26, 0.05); }
-        .toggle-switch { position: relative; width: 44px; height: 24px; background: #374151; border-radius: 20px; cursor: pointer; transition: background 0.3s ease; }
-        .toggle-switch.active { background: #dc2626; }
-        .toggle-knob { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: transform 0.3s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        .toggle-switch.active .toggle-knob { transform: translateX(20px); }
-        .role-card { background: rgba(13, 5, 5, 0.6); border: 1px solid rgba(255, 26, 26, 0.15); border-radius: 12px; padding: 16px; transition: all 0.3s ease; }
-        .role-card:hover { border-color: rgba(255, 26, 26, 0.4); transform: translateY(-2px); }
-        .btn-create { background: linear-gradient(to right, #dc2626, #991b1b); transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3); }
-        .btn-create:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(220, 38, 38, 0.5); }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0505; }
+        ::-webkit-scrollbar-thumb { background: #7f1d1d; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #ef4444; }
+
+        /* Modal Server.Lua */
+        .lua-modal {
+            position: fixed; 
+            inset: 0; 
+            z-index: 100;
+            background: rgba(0,0,0,0.9); 
+            backdrop-filter: blur(8px);
+            display: none; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .lua-modal.active { 
+            display: flex; 
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .lua-code-container {
+            background: #0a0505; 
+            border: 2px solid #dc2626;
+            border-radius: 16px; 
+            padding: 0;
+            width: 100%; 
+            max-width: 1000px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 60px rgba(220, 38, 38, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .lua-header {
+            background: linear-gradient(135deg, #150a0a 0%, #0d0505 100%);
+            border-bottom: 2px solid #dc2626;
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .lua-body {
+            flex: 1;
+            overflow: auto;
+            padding: 24px;
+            background: #050507;
+        }
+        
+        .lua-pre {
+            font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+            color: #ffffff;
+            font-size: 13px; 
+            line-height: 1.7;
+            white-space: pre-wrap; 
+            word-break: break-all;
+            margin: 0;
+        }
+        
+        .lua-footer {
+            background: #0d0505;
+            border-top: 1px solid rgba(220, 38, 38, 0.3);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        
+        .admin-badge {
+            background: rgba(220, 38, 38, 0.2);
+            border: 1px solid rgba(220, 38, 38, 0.5);
+            color: #ff6b6b;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-left: 8px;
+        }
+
+        .admin-section-title {
+            background: rgba(220, 38, 38, 0.1);
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            color: #ff6b6b;
+        }
+
+        .section-content {
+            animation: sectionFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes sectionFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .upload-zone {
+            border: 2px dashed rgba(255, 26, 26, 0.3);
+            background: rgba(255, 26, 26, 0.02);
+            transition: all 0.3s ease;
+        }
+
+        .upload-zone:hover {
+            border-color: rgba(255, 26, 26, 0.6);
+            background: rgba(255, 26, 26, 0.05);
+            transform: scale(1.01);
+        }
+
+        .upload-zone.dragover {
+            border-color: #ff1a1a;
+            background: rgba(255, 26, 26, 0.1);
+            box-shadow: 0 0 30px rgba(255, 26, 26, 0.2);
+        }
+
+        .encrypt-box {
+            background: linear-gradient(135deg, rgba(21, 10, 10, 0.9), rgba(13, 5, 5, 0.9));
+            border: 1px solid rgba(255, 26, 26, 0.2);
+        }
+
+        .user-row {
+            transition: all 0.2s ease;
+        }
+
+        .user-row:hover {
+            background: rgba(255, 26, 26, 0.05);
+            transform: translateX(4px);
+        }
+
+        .role-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .loading-spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="min-h-screen flex">
@@ -71,54 +278,122 @@
     <aside class="sidebar w-64 fixed left-0 top-0 h-full z-50 hidden md:block overflow-y-auto custom-scrollbar">
         <div class="p-6">
             <div class="flex items-center gap-3 mb-8 cursor-pointer" onclick="showSection('dashboard')">
-                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center font-black text-white shadow-lg shadow-red-900/50">P</div>
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center font-black text-white shadow-lg shadow-red-900/50">
+                    P
+                </div>
                 <div>
                     <span class="text-white font-bold text-lg tracking-wide block">AREA CLIENTES</span>
                     <span id="admin-badge-sidebar" class="admin-badge hidden">ADMIN</span>
                 </div>
             </div>
+
             <nav class="space-y-2">
                 <div class="text-xs text-gray-500 uppercase font-semibold mb-4 px-3 tracking-wider">Principal</div>
-                <a href="#" onclick="showSection('dashboard')" id="nav-dashboard" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fas fa-home w-5"></i><span>Inicio</span></a>
-                <a href="index.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fas fa-store w-5"></i><span>Tienda</span></a>
-                <a href="#" onclick="showSection('reviews')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fas fa-star w-5"></i><span>Mis Reseñas</span></a>
-                <a href="#" onclick="showSection('support')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fas fa-headset w-5"></i><span>Soporte</span></a>
-                <a href="https://discord.gg/rvxEdWcGkf" target="_blank" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fab fa-discord w-5"></i><span>Discord</span></a>
+                
+                <a href="#" onclick="showSection('dashboard')" id="nav-dashboard" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
+                    <i class="fas fa-home w-5"></i>
+                    <span>Inicio</span>
+                </a>
+                
+                <a href="index.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
+                    <i class="fas fa-store w-5"></i>
+                    <span>Tienda</span>
+                </a>
+                
+                <a href="#" onclick="showSection('reviews')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
+                    <i class="fas fa-star w-5"></i>
+                    <span>Mis Reseñas</span>
+                </a>
+                
+                <a href="#" onclick="showSection('support')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
+                    <i class="fas fa-headset w-5"></i>
+                    <span>Soporte</span>
+                </a>
+                
+                <a href="https://discord.gg/rvxEdWcGkf" target="_blank" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
+                    <i class="fab fa-discord w-5"></i>
+                    <span>Discord</span>
+                </a>
 
+                <!-- SECCIÓN DE ADMINISTRACIÓN - SOLO VISIBLE PARA ADMINS -->
                 <div id="admin-nav-section" class="hidden mt-6">
-                    <div class="admin-section-title text-xs uppercase font-semibold mb-4 px-3 py-2 rounded-lg tracking-wider flex items-center gap-2"><i class="fas fa-shield-alt"></i> Panel Admin</div>
+                    <div class="admin-section-title text-xs uppercase font-semibold mb-4 px-3 py-2 rounded-lg tracking-wider flex items-center gap-2">
+                        <i class="fas fa-shield-alt"></i> Panel Admin
+                    </div>
                     
-                    <a href="#" onclick="showSection('subir-producto')" id="nav-subir-producto" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
-                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0"><i class="fas fa-cloud-upload-alt text-red-400 text-sm"></i></div>
-                        <div><span class="text-sm font-semibold block">Subir Producto</span><span class="text-[10px] text-gray-500 block">Agregar nuevos recursos</span></div>
+                    <a href="#" onclick="loadExternalSection('subir-producto', 'SubirProducto.html')" id="nav-subir-producto" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
+                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-cloud-upload-alt text-red-400 text-sm"></i>
+                        </div>
+                        <div>
+                            <span class="text-sm font-semibold block">Subir Producto</span>
+                            <span class="text-[10px] text-gray-500 block">Agregar nuevos recursos</span>
+                        </div>
                     </a>
-                    <a href="#" onclick="showSection('licencias')" id="nav-licencias" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
-                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0"><i class="fas fa-key text-red-400 text-sm"></i></div>
-                        <div><span class="text-sm font-semibold block">Licencias Usuario</span><span class="text-[10px] text-gray-500 block">Ver historial de compras</span></div>
+                    
+                    <a href="#" onclick="loadExternalSection('licencias', 'LicenciaUsuario.html')" id="nav-licencias" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
+                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-key text-red-400 text-sm"></i>
+                        </div>
+                        <div>
+                            <span class="text-sm font-semibold block">Licencias Usuario</span>
+                            <span class="text-[10px] text-gray-500 block">Ver historial de compras</span>
+                        </div>
                     </a>
-                    <a href="#" onclick="showSection('encriptar')" id="nav-encriptar" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
-                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0"><i class="fas fa-lock text-red-400 text-sm"></i></div>
-                        <div><span class="text-sm font-semibold block">Encriptar Script</span><span class="text-[10px] text-gray-500 block">Proteger archivos Lua</span></div>
+                    
+                    <a href="#" onclick="loadExternalSection('encriptar', 'Encriptar.html')" id="nav-encriptar" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
+                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-lock text-red-400 text-sm"></i>
+                        </div>
+                        <div>
+                            <span class="text-sm font-semibold block">Encriptar Script</span>
+                            <span class="text-[10px] text-gray-500 block">Proteger archivos Lua</span>
+                        </div>
                     </a>
-                    <a href="#" onclick="showSection('asignar')" id="nav-asignar" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
-                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0"><i class="fas fa-user-plus text-red-400 text-sm"></i></div>
-                        <div><span class="text-sm font-semibold block">Pasar a Usuarios</span><span class="text-[10px] text-gray-500 block">Asignar productos gratis</span></div>
+                    
+                    <a href="#" onclick="loadExternalSection('asignar', 'PasarUsuarios.html')" id="nav-asignar" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
+                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-user-plus text-red-400 text-sm"></i>
+                        </div>
+                        <div>
+                            <span class="text-sm font-semibold block">Pasar a Usuarios</span>
+                            <span class="text-[10px] text-gray-500 block">Asignar productos gratis</span>
+                        </div>
                     </a>
-                    <a href="#" onclick="showSection('usuarios')" id="nav-usuarios" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
-                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0"><i class="fas fa-users-cog text-red-400 text-sm"></i></div>
-                        <div><span class="text-sm font-semibold block">Usuarios Autorizados</span><span class="text-[10px] text-gray-500 block">Gestionar roles Admin</span></div>
+                    
+                    <a href="#" onclick="loadExternalSection('usuarios', 'UsuariosAutorizado.html')" id="nav-usuarios" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
+                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-users-cog text-red-400 text-sm"></i>
+                        </div>
+                        <div>
+                            <span class="text-sm font-semibold block">Usuarios Autorizados</span>
+                            <span class="text-[10px] text-gray-500 block">Gestionar roles Admin</span>
+                        </div>
                     </a>
-                    <a href="#" onclick="showSection('crear-rol')" id="nav-crear-rol" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
-                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0"><i class="fas fa-id-badge text-red-400 text-sm"></i></div>
-                        <div><span class="text-sm font-semibold block">Crear Rol</span><span class="text-[10px] text-gray-500 block">Definir permisos</span></div>
+                    
+                    <a href="#" onclick="loadExternalSection('crear-rol', 'CrearRol.html')" id="nav-crear-rol" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
+                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-id-badge text-red-400 text-sm"></i>
+                        </div>
+                        <div>
+                            <span class="text-sm font-semibold block">Crear Rol</span>
+                            <span class="text-[10px] text-gray-500 block">Definir permisos</span>
+                        </div>
                     </a>
+
                     <a href="#" onclick="openLuaModal()" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300">
-                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0"><i class="fas fa-file-code text-red-400 text-sm"></i></div>
-                        <div><span class="text-sm font-semibold block">Server.Lua</span><span class="text-[10px] text-gray-500 block">Sistema de licencias</span></div>
+                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-file-code text-red-400 text-sm"></i>
+                        </div>
+                        <div>
+                            <span class="text-sm font-semibold block">Server.Lua</span>
+                            <span class="text-[10px] text-gray-500 block">Sistema de licencias</span>
+                        </div>
                     </a>
                 </div>
             </nav>
         </div>
+
         <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-red-900/20 bg-[#0a0505]/50">
             <div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-red-900/10 border border-red-900/20">
                 <img id="sidebar-avatar" src="" alt="User" class="w-10 h-10 rounded-full border-2 border-red-600 object-cover">
@@ -126,7 +401,9 @@
                     <p id="sidebar-username" class="text-white font-medium text-sm truncate">Usuario</p>
                     <p id="sidebar-role" class="text-red-400 text-xs font-bold uppercase">Cliente</p>
                 </div>
-                <button onclick="logout()" class="text-gray-400 hover:text-red-400 transition-colors" title="Cerrar Sesión"><i class="fas fa-sign-out-alt"></i></button>
+                <button onclick="logout()" class="text-gray-400 hover:text-red-400 transition-colors" title="Cerrar Sesión">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
             </div>
         </div>
     </aside>
@@ -136,26 +413,53 @@
         <header class="border-b border-red-900/20 px-8 py-6 bg-[#0a0505]/30 backdrop-blur-sm sticky top-0 z-40">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 class="text-2xl font-bold text-white mb-1">Bienvenido, <span id="header-username" class="gradient-text">usuario</span><span id="header-admin-badge" class="admin-badge hidden ml-2">ADMIN</span></h1>
+                    <h1 class="text-2xl font-bold text-white mb-1">
+                        Bienvenido, <span id="header-username" class="gradient-text">usuario</span>
+                        <span id="header-admin-badge" class="admin-badge hidden ml-2">ADMIN</span>
+                    </h1>
                     <p id="header-subtitle" class="text-gray-400 text-sm">Gestiona tus productos y licencias desde aquí</p>
                 </div>
-                <a href="index.html" class="btn-primary px-5 py-2.5 rounded-lg text-white font-bold flex items-center gap-2 shadow-lg shadow-red-900/20"><i class="fas fa-shopping-cart"></i> Ir al Catálogo</a>
+                
+                <a href="index.html" class="btn-primary px-5 py-2.5 rounded-lg text-white font-bold flex items-center gap-2 shadow-lg shadow-red-900/20">
+                    <i class="fas fa-shopping-cart"></i>
+                    Ir al Catálogo
+                </a>
             </div>
         </header>
-        <div id="dynamic-content" class="p-6 md:p-8 flex-grow"></div>
+
+        <!-- CONTENIDO DINÁMICO -->
+        <div id="dynamic-content" class="p-6 md:p-8 flex-grow">
+            <!-- El contenido se carga aquí dinámicamente -->
+        </div>
     </main>
 
     <!-- MODAL SERVER.LUA -->
     <div id="lua-modal" class="lua-modal">
         <div class="lua-code-container">
             <div class="lua-header">
-                <div class="flex items-center gap-3"><i class="fas fa-file-code text-red-500 text-2xl"></i><div><h3 class="text-xl font-bold text-white">Server.Lua</h3><p class="text-gray-400 text-xs">Sistema de Validación de Licencias</p></div></div>
-                <button onclick="closeLuaModal()" class="text-gray-400 hover:text-white text-2xl transition-colors"><i class="fas fa-times"></i></button>
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-file-code text-red-500 text-2xl"></i>
+                    <div>
+                        <h3 class="text-xl font-bold text-white">Server.Lua</h3>
+                        <p class="text-gray-400 text-xs">Sistema de Validación de Licencias</p>
+                    </div>
+                </div>
+                <button onclick="closeLuaModal()" class="text-gray-400 hover:text-white text-2xl transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-            <div class="lua-body"><pre id="lua-code-content" class="lua-pre"></pre></div>
+            
+            <div class="lua-body">
+                <pre id="lua-code-content" class="lua-pre"></pre>
+            </div>
+            
             <div class="lua-footer">
-                <button onclick="closeLuaModal()" class="px-4 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-800 font-medium text-sm">Cerrar</button>
-                <button onclick="copyLuaCode()" class="btn-primary px-6 py-2 rounded-lg text-white font-bold flex items-center gap-2 text-sm"><i class="fas fa-copy"></i> Copiar Código</button>
+                <button onclick="closeLuaModal()" class="px-4 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-800 font-medium text-sm">
+                    Cerrar
+                </button>
+                <button onclick="copyLuaCode()" class="btn-primary px-6 py-2 rounded-lg text-white font-bold flex items-center gap-2 text-sm">
+                    <i class="fas fa-copy"></i> Copiar Código
+                </button>
             </div>
         </div>
     </div>
@@ -166,7 +470,9 @@
             <div class="mx-auto w-20 h-20 rounded-xl mb-6 bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center text-3xl font-black text-white">P</div>
             <h1 class="text-3xl font-black text-white mb-2">PAPELETA <span class="text-red-500">STORE</span></h1>
             <p class="text-gray-400 text-sm mb-8">Inicia sesión para acceder</p>
-            <button onclick="redirectToDiscord()" class="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-3.5 px-6 rounded-xl flex items-center justify-center gap-3"><i class="fab fa-discord text-xl"></i> Iniciar Sesión</button>
+            <button onclick="redirectToDiscord()" class="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-3.5 px-6 rounded-xl flex items-center justify-center gap-3">
+                <i class="fab fa-discord text-xl"></i> Iniciar Sesión
+            </button>
         </div>
     </div>
 
@@ -174,256 +480,186 @@
         const CLIENT_ID = '1213866547181780992'; 
         const REDIRECT_URI = window.location.href.split('#')[0]; 
         const ADMIN_DISCORD_IDS = ['890526767608127489']; 
-        const firebaseConfig = { apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM", authDomain: "papeletalicencia.firebaseapp.com", projectId: "papeletalicencia", storageBucket: "papeletalicencia.firebasestorage.app", messagingSenderId: "677208314051", appId: "1:677208314051:web:a27c04f31d402e83f29276" };
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
+            authDomain: "papeletalicencia.firebaseapp.com",
+            projectId: "papeletalicencia",
+            storageBucket: "papeletalicencia.firebasestorage.app",
+            messagingSenderId: "677208314051",
+            appId: "1:677208314051:web:a27c04f31d402e83f29276"
+        };
+
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        let currentUser = null, currentUserRole = 'client', allProducts = [], userFixedLicenseKey = null;
 
-        // === LÓGICA DE NAVEGACIÓN UNIFICADA (SIN FETCH) ===
-        function showSection(section) {
-            document.querySelectorAll('.nav-item, .admin-nav-item').forEach(item => item.classList.remove('active', 'active-section'));
-            const navItem = document.getElementById(`nav-${section}`);
-            if (navItem) navItem.classList.contains('admin-nav-item') ? navItem.classList.add('active-section') : navItem.classList.add('active');
-            
-            const contentDiv = document.getElementById('dynamic-content');
-            switch(section) {
-                case 'dashboard': loadDashboardSection(contentDiv); break;
-                case 'reviews': loadReviewsSection(contentDiv); break;
-                case 'support': loadSupportSection(contentDiv); break;
-                case 'subir-producto': loadSubirProductoSection(contentDiv); break;
-                case 'licencias': loadLicenciasSection(contentDiv); break;
-                case 'encriptar': loadEncriptarSection(contentDiv); break;
-                case 'asignar': loadAsignarSection(contentDiv); break;
-                case 'usuarios': loadUsuariosSection(contentDiv); break;
-                case 'crear-rol': loadCrearRolSection(contentDiv); break;
-                default: loadDashboardSection(contentDiv);
-            }
-        }
+        let currentUser = null;
+        let currentUserRole = 'client';
+        let allProducts = [];
+        let userFixedLicenseKey = null;
 
-        // === SECCIÓN DASHBOARD ===
-        async function loadDashboardSection(container) {
-            document.getElementById('header-subtitle').textContent = 'Gestiona tus productos y licencias desde aquí';
-            container.innerHTML = `<div class="section-content">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="stat-card rounded-xl p-6 relative overflow-hidden group"><div class="absolute right-0 top-0 w-24 h-24 bg-red-600/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div><div class="flex items-center justify-between relative z-10"><div><p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Total Invertido</p><p id="stat-total-spent" class="text-2xl font-bold text-white">$0.00</p></div><div class="w-12 h-12 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center"><i class="fas fa-wallet text-red-400 text-xl"></i></div></div></div>
-                    <div class="stat-card rounded-xl p-6 relative overflow-hidden group"><div class="absolute right-0 top-0 w-24 h-24 bg-green-600/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div><div class="flex items-center justify-between relative z-10"><div><p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Scripts Activos</p><p id="stat-active-scripts" class="text-2xl font-bold text-white">0</p></div><div class="w-12 h-12 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center justify-center"><i class="fas fa-lock text-green-400 text-xl"></i></div></div></div>
-                    <div class="stat-card rounded-xl p-6 relative overflow-hidden group"><div class="absolute right-0 top-0 w-24 h-24 bg-blue-600/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div><div class="flex items-center justify-between relative z-10"><div><p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Estado de Cuenta</p><p id="stat-account-status" class="text-lg font-bold text-red-400">Cliente Verificado</p></div><div class="w-12 h-12 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center"><i class="fas fa-user-shield text-red-400 text-xl"></i></div></div></div>
-                </div>
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-2 card rounded-xl p-6">
-                        <div class="flex items-center gap-3 mb-6"><div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center"><i class="fas fa-cube text-red-400"></i></div><h2 class="text-lg font-bold text-white">Mis Productos Activos</h2></div>
-                        <div class="mb-6"><div class="relative"><i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i><input type="text" id="dashboard-search" oninput="filterDashboardProducts()" placeholder="Buscar entre tus recursos..." class="input-field w-full pl-12 pr-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none"></div></div>
-                        <div id="dashboard-products-list" class="space-y-3 max-h-[500px] overflow-y-auto custom-scrollbar pr-2"></div>
-                        <div id="dashboard-empty-state" class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5"><i class="fas fa-box-open text-gray-600 text-4xl mb-3"></i><p class="text-gray-400 mb-4">No tienes productos activos aún.</p><a href="index.html" class="btn-primary inline-block px-6 py-2 rounded-lg text-white font-medium">Ir a la tienda</a></div>
-                    </div>
-                    <div class="card rounded-xl p-6 h-fit">
-                        <div class="flex items-center gap-3 mb-6"><div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center"><i class="fas fa-server text-red-400"></i></div><h2 class="text-lg font-bold text-white">Configuración MTA</h2></div>
-                        <div class="space-y-4 mb-6"><div><label class="block text-gray-400 text-xs uppercase font-semibold mb-2 tracking-wider">Server IP</label><input type="text" id="server-ip" value="213.181.88.154" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none font-mono text-sm"></div><div><label class="block text-gray-400 text-xs uppercase font-semibold mb-2 tracking-wider">Puerto</label><input type="text" id="server-port" value="22003" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none font-mono text-sm"></div></div>
-                        <div class="mb-6"><div class="flex items-center justify-between mb-2"><label class="block text-gray-400 text-xs uppercase font-semibold tracking-wider">Código de Licencia</label><span class="text-[10px] text-red-400 font-mono bg-red-900/20 px-2 py-0.5 rounded">LUA CONFIG</span></div><div class="code-block rounded-lg p-4 font-mono text-sm"><pre class="text-white whitespace-pre-wrap break-all"><code id="license-code">Generando...</code></pre></div><button onclick="generateNewKey()" class="w-full mt-3 bg-[#150a0a] hover:bg-[#1a0a0a] border border-red-800/50 text-gray-300 hover:text-white text-xs font-semibold py-2 rounded-xl transition-all flex items-center justify-center gap-2"><i class="fas fa-sync-alt"></i> Generar Nueva Clave</button></div>
-                        <div class="grid grid-cols-2 gap-3 mb-4"><button onclick="saveServerConfig()" class="btn-primary px-4 py-2.5 rounded-lg text-white font-medium flex items-center justify-center gap-2 text-sm"><i class="fas fa-save"></i> Guardar</button><button onclick="copyLicenseCode()" class="px-4 py-2.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 font-medium flex items-center justify-center gap-2 text-sm"><i class="fas fa-copy"></i> Copiar</button></div>
-                    </div>
-                </div>
-            </div>`;
-            await loadDashboardData(); updateLicenseDisplay();
-            const saved = JSON.parse(localStorage.getItem('server_config') || '{}');
-            if (saved.ip) document.getElementById('server-ip').value = saved.ip;
-            if (saved.port) document.getElementById('server-port').value = saved.port;
-        }
+        const SERVER_LUA_CODE = `local function clean(s)
+    if not s then return "" end
+    return tostring(s):gsub("%s+", ""):upper()
+end
 
-        // === SECCIÓN CREAR ROL (INTEGRADA) ===
-        let currentPermissionsCR = {};
-        let existingRolesCR = [];
+local function tienePermisoACL()
+    local resourceName = getResourceName(getThisResource())
+    local resObj = "resource." .. resourceName
+    
+    if not isObjectInACLGroup(resObj, aclGetGroup("Admin")) then
+        outputDebugString("[Papeleta Progamador] El resource '"..resourceName.."' NO tiene permiso en ACL 'Admin'", 1)
+        return false
+    end
+    return true
+end
 
-        function loadCrearRolSection(container) {
-            document.getElementById('header-subtitle').textContent = 'Define permisos personalizados';
-            container.innerHTML = `<div class="section-content max-w-7xl mx-auto">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div class="lg:col-span-2 space-y-6">
-                        <div class="card p-6 rounded-xl">
-                            <h2 class="text-2xl font-black text-white mb-6 flex items-center gap-2"><i class="fas fa-plus-circle text-red-500"></i> Crear Nuevo Rol</h2>
-                            <form id="create-role-form" onsubmit="handleCreateRoleCR(event)" class="space-y-5">
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div class="md:col-span-2"><label class="block text-gray-300 text-sm font-semibold mb-2">Nombre del Rol *</label><input type="text" id="role-name" required class="input-field w-full rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none" placeholder="Ej: Ayudante, Soporte VIP..."></div>
-                                    <div><label class="block text-gray-300 text-sm font-semibold mb-2">Color Identificativo</label><div class="flex items-center gap-3 h-[46px]"><div class="w-10 h-10 rounded-lg overflow-hidden border-2 border-red-900/40 cursor-pointer relative" id="color-preview" style="background-color: #ff1a1a;"><input type="color" id="role-color" value="#ff1a1a" onchange="updateColorPreviewCR(this.value)" class="absolute top-[-50%] left-[-50%] w-[200%] h-[200%] cursor-pointer border-none p-0 opacity-0"><div class="absolute inset-0 pointer-events-none"></div></div><span class="text-gray-400 text-xs font-mono" id="color-hex">#FF1A1A</span></div></div>
-                                </div>
-                                <div><label class="block text-gray-300 text-sm font-semibold mb-2">Descripción del Rol</label><textarea id="role-desc" rows="2" class="input-field w-full rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none resize-none" placeholder="Describe brevemente las funciones de este rol..."></textarea></div>
-                                <div><label class="block text-gray-300 text-sm font-semibold mb-3">Permisos y Accesos</label><div class="space-y-2">
-                                    <div class="permission-item"><div class="flex items-center gap-3"><i class="fas fa-cog text-gray-400 w-5"></i><div><p class="text-white text-sm font-semibold">Acceso al Panel Config</p><p class="text-gray-500 text-xs">Puede ver el menú lateral de administración</p></div></div><div class="toggle-switch" onclick="togglePermissionCR(this, 'canAccessConfig')"><div class="toggle-knob"></div></div></div>
-                                    <div class="permission-item"><div class="flex items-center gap-3"><i class="fas fa-cloud-upload-alt text-gray-400 w-5"></i><div><p class="text-white text-sm font-semibold">Subir Productos</p><p class="text-gray-500 text-xs">Puede agregar nuevos recursos a la tienda</p></div></div><div class="toggle-switch" onclick="togglePermissionCR(this, 'canUploadProducts')"><div class="toggle-knob"></div></div></div>
-                                    <div class="permission-item"><div class="flex items-center gap-3"><i class="fas fa-trash text-gray-400 w-5"></i><div><p class="text-white text-sm font-semibold">Eliminar Productos</p><p class="text-gray-500 text-xs">Puede borrar productos existentes</p></div></div><div class="toggle-switch" onclick="togglePermissionCR(this, 'canDeleteProducts')"><div class="toggle-knob"></div></div></div>
-                                    <div class="permission-item"><div class="flex items-center gap-3"><i class="fas fa-user-plus text-gray-400 w-5"></i><div><p class="text-white text-sm font-semibold">Asignar Productos</p><p class="text-gray-500 text-xs">Puede regalar productos a usuarios manualmente</p></div></div><div class="toggle-switch" onclick="togglePermissionCR(this, 'canAssignProducts')"><div class="toggle-knob"></div></div></div>
-                                    <div class="permission-item"><div class="flex items-center gap-3"><i class="fas fa-key text-gray-400 w-5"></i><div><p class="text-white text-sm font-semibold">Ver Licencias</p><p class="text-gray-500 text-xs">Puede ver el historial de compras y licencias</p></div></div><div class="toggle-switch" onclick="togglePermissionCR(this, 'canViewLicenses')"><div class="toggle-knob"></div></div></div>
-                                    <div class="permission-item"><div class="flex items-center gap-3"><i class="fas fa-users-cog text-gray-400 w-5"></i><div><p class="text-white text-sm font-semibold">Gestionar Roles</p><p class="text-gray-500 text-xs">Puede cambiar roles de otros usuarios</p></div></div><div class="toggle-switch" onclick="togglePermissionCR(this, 'canManageRoles')"><div class="toggle-knob"></div></div></div>
-                                </div></div>
-                                <button type="submit" class="btn-create w-full py-4 rounded-xl text-white font-bold text-lg flex items-center justify-center gap-3"><i class="fas fa-save"></i> Guardar Nuevo Rol</button>
-                            </form>
-                        </div>
-                    </div>
-                    <div class="lg:col-span-1"><div class="card p-6 rounded-xl sticky top-24"><h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2"><i class="fas fa-list text-red-500"></i> Roles Activos</h3><div id="roles-list" class="space-y-3 max-h-[600px] overflow-y-auto custom-scrollbar pr-2"></div><div class="mt-6 pt-6 border-t border-white/10"><p class="text-gray-500 text-xs text-center">Los roles se guardan localmente.<br>Asigna estos roles en "Usuarios Autorizados".</p></div></div></div>
-                </div>
-            </div>`;
-            initPermissionsCR(); loadRolesCR();
-        }
+local function cargarScriptPrincipal()
+    if _G["ScriptYaCargado"] then return end
+    _G["ScriptYaCargado"] = true
+end
 
-        function initPermissionsCR() {
-            currentPermissionsCR = { canAccessConfig: false, canUploadProducts: false, canDeleteProducts: false, canAssignProducts: false, canViewLicenses: false, canManageRoles: false };
-            document.querySelectorAll('.toggle-switch').forEach(toggle => toggle.classList.remove('active'));
-        }
+local function validarLicencia()
+    if not configLicense or not configLicense["User"] or not configLicense["Key"] then
+        outputDebugString("[Papeleta Progamador] Faltan credenciales en config", 1)
+        stopResource(getThisResource())
+        return
+    end
 
-        function togglePermissionCR(element, permissionKey) {
-            element.classList.toggle('active');
-            currentPermissionsCR[permissionKey] = element.classList.contains('active');
-        }
-
-        function updateColorPreviewCR(color) {
-            const preview = document.getElementById('color-preview');
-            const hex = document.getElementById('color-hex');
-            if (preview) preview.style.backgroundColor = color;
-            if (hex) hex.textContent = color.toUpperCase();
-        }
-
-        async function handleCreateRoleCR(e) {
-            e.preventDefault();
-            const name = document.getElementById('role-name')?.value.trim();
-            const color = document.getElementById('role-color')?.value;
-            const description = document.getElementById('role-desc')?.value.trim();
-            if (!name) { alert('❌ El nombre del rol es obligatorio'); return; }
-            const exists = existingRolesCR.some(r => r.name.toLowerCase() === name.toLowerCase());
-            if (exists) { alert('⚠️ Ya existe un rol con ese nombre'); return; }
-            try {
-                const newRole = { id: 'role_' + Date.now(), name, color, description: description || 'Sin descripción', permissions: { ...currentPermissionsCR }, created_at: new Date().toISOString(), created_by: currentUser ? currentUser.username : 'admin' };
-                existingRolesCR.push(newRole);
-                localStorage.setItem('papeleta_custom_roles', JSON.stringify(existingRolesCR));
-                alert(`✅ Rol "${name}" creado exitosamente`);
-                document.getElementById('create-role-form')?.reset();
-                updateColorPreviewCR('#ff1a1a');
-                initPermissionsCR();
-                renderRolesCR();
-            } catch (error) { console.error(error); alert('❌ Error al crear el rol: ' + error.message); }
-        }
-
-        function loadRolesCR() {
-            try {
-                const saved = localStorage.getItem('papeleta_custom_roles');
-                existingRolesCR = saved ? JSON.parse(saved) : [];
-                renderRolesCR();
-            } catch (error) { console.error(error); existingRolesCR = []; renderRolesCR(); }
-        }
-
-        function renderRolesCR() {
-            const container = document.getElementById('roles-list');
-            if (!container) return;
-            if (existingRolesCR.length === 0) {
-                container.innerHTML = `<div class="text-center py-8 text-gray-500"><i class="fas fa-id-badge text-3xl mb-3 opacity-50"></i><p>No hay roles personalizados</p><p class="text-xs mt-1">Crea uno usando el formulario</p></div>`;
-                return;
-            }
-            container.innerHTML = existingRolesCR.map(role => {
-                const activePerms = Object.values(role.permissions).filter(v => v).length;
-                const totalPerms = Object.keys(role.permissions).length;
-                return `<div class="role-card"><div class="flex items-start justify-between mb-3"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-lg" style="background-color: ${role.color}; box-shadow: 0 0 15px ${role.color}40;">${role.name.charAt(0).toUpperCase()}</div><div><h4 class="text-white font-bold text-sm">${escapeHTMLCR(role.name)}</h4><p class="text-gray-500 text-xs line-clamp-1">${escapeHTMLCR(role.description)}</p></div></div><button onclick="deleteRoleCR('${role.id}')" class="text-gray-500 hover:text-red-400 transition-colors p-1" title="Eliminar rol"><i class="fas fa-times"></i></button></div><div class="flex items-center justify-between text-xs"><span class="text-gray-400"><i class="fas fa-check-circle mr-1" style="color: ${role.color}"></i>${activePerms}/${totalPerms} permisos activos</span><span class="font-mono text-gray-600">${role.color.toUpperCase()}</span></div><div class="mt-3 pt-3 border-t border-white/5 flex flex-wrap gap-1">${Object.entries(role.permissions).map(([key, value]) => value ? `<span class="text-[10px] px-2 py-0.5 rounded bg-green-900/30 text-green-400 border border-green-800/30">${formatPermNameCR(key)}</span>` : '').join('')}${activePerms === 0 ? '<span class="text-[10px] text-gray-600 italic">Sin permisos</span>' : ''}</div></div>`;
-            }).join('');
-        }
-
-        function deleteRoleCR(roleId) {
-            if (!confirm('¿Estás seguro de eliminar este rol?')) return;
-            existingRolesCR = existingRolesCR.filter(r => r.id !== roleId);
-            localStorage.setItem('papeleta_custom_roles', JSON.stringify(existingRolesCR));
-            renderRolesCR();
-            alert('✅ Rol eliminado correctamente');
-        }
-
-        function formatPermNameCR(key) { return { canAccessConfig: 'Config', canUploadProducts: 'Subir', canDeleteProducts: 'Eliminar', canAssignProducts: 'Asignar', canViewLicenses: 'Licencias', canManageRoles: 'Roles' }[key] || key; }
-        function escapeHTMLCR(str) { return String(str).replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)); }
-
-        // === PLACEHOLDERS PARA OTRAS SECCIONES (Para que no den error) ===
-        function loadSubirProductoSection(c) { c.innerHTML = '<div class="section-content text-center py-12"><i class="fas fa-cloud-upload-alt text-6xl text-gray-600 mb-4"></i><h2 class="text-2xl font-bold text-white">Subir Producto</h2><p class="text-gray-400">Sección lista para integrar</p></div>'; }
-        function loadLicenciasSection(c) { c.innerHTML = '<div class="section-content text-center py-12"><i class="fas fa-key text-6xl text-gray-600 mb-4"></i><h2 class="text-2xl font-bold text-white">Licencias Usuario</h2><p class="text-gray-400">Sección lista para integrar</p></div>'; }
-        function loadEncriptarSection(c) { c.innerHTML = '<div class="section-content text-center py-12"><i class="fas fa-lock text-6xl text-gray-600 mb-4"></i><h2 class="text-2xl font-bold text-white">Encriptar Script</h2><p class="text-gray-400">Sección lista para integrar</p></div>'; }
-        function loadAsignarSection(c) { c.innerHTML = '<div class="section-content text-center py-12"><i class="fas fa-user-plus text-6xl text-gray-600 mb-4"></i><h2 class="text-2xl font-bold text-white">Pasar a Usuarios</h2><p class="text-gray-400">Sección lista para integrar</p></div>'; }
-        function loadUsuariosSection(c) { c.innerHTML = '<div class="section-content text-center py-12"><i class="fas fa-users-cog text-6xl text-gray-600 mb-4"></i><h2 class="text-2xl font-bold text-white">Usuarios Autorizados</h2><p class="text-gray-400">Sección lista para integrar</p></div>'; }
-        function loadReviewsSection(c) { c.innerHTML = '<div class="section-content text-center py-12"><i class="fas fa-star text-6xl text-gray-600 mb-4"></i><h2 class="text-2xl font-bold text-white">Mis Reseñas</h2><p class="text-gray-400">Próximamente</p></div>'; }
-        function loadSupportSection(c) { c.innerHTML = '<div class="section-content text-center py-12"><i class="fas fa-headset text-6xl text-gray-600 mb-4"></i><h2 class="text-2xl font-bold text-white">Soporte Técnico</h2><a href="https://discord.gg/rvxEdWcGkf" target="_blank" class="btn-primary inline-block px-6 py-3 rounded-lg text-white font-medium mt-4"><i class="fab fa-discord mr-2"></i>Unirse al Discord</a></div>'; }
-
-        // === RESTO DE FUNCIONES ORIGINALES ===
-        async function loadDashboardData() {
-            if (!currentUser) return;
-            try {
-                const productsSnapshot = await db.collection("Productos").get();
-                allProducts = []; productsSnapshot.forEach((doc) => allProducts.push({ id: doc.id, ...doc.data() }));
-                const clientesSnapshot = await db.collection("Clientes").get();
-                let purchasedProducts = [], totalSpent = 0;
-                clientesSnapshot.forEach((doc) => {
-                    const purchase = doc.data();
-                    if (String(purchase.discord_id) === String(currentUser.id)) {
-                        if (purchase.products && Array.isArray(purchase.products)) {
-                            purchase.products.forEach(prod => {
-                                const productData = allProducts.find(p => p.id === prod.id);
-                                if (productData) {
-                                    purchasedProducts.push({ ...productData, purchaseDate: purchase.date?.toDate ? purchase.date.toDate() : new Date(), price: prod.price || 'Gratis' });
-                                    if (prod.price !== "Gratis" && prod.price !== "GRATIS") totalSpent += parseFloat(String(prod.price).replace('$', '')) || 0;
-                                }
-                            });
-                        }
-                    }
-                });
-                const spentEl = document.getElementById('stat-total-spent'), scriptsEl = document.getElementById('stat-active-scripts');
-                if (spentEl) spentEl.innerText = '$' + totalSpent.toFixed(2);
-                if (scriptsEl) scriptsEl.innerText = purchasedProducts.length;
-                const container = document.getElementById('dashboard-products-list'), emptyState = document.getElementById('dashboard-empty-state');
-                if (container && emptyState) {
-                    if (purchasedProducts.length === 0) { emptyState.classList.remove('hidden'); container.innerHTML = ''; }
-                    else {
-                        emptyState.classList.add('hidden');
-                        container.innerHTML = purchasedProducts.map(item => `<div class="bg-[#0d0505] border border-red-900/30 rounded-xl p-4 flex items-center justify-between hover:border-red-600/50 transition-all"><div class="flex items-center gap-4"><div class="w-16 h-16 rounded-lg bg-[#150a0a] border border-red-900/20 overflow-hidden"><img src="${item.image_url || ''}" class="w-full h-full object-cover"></div><div><h3 class="text-white font-bold">${item.name}</h3><p class="text-gray-400 text-xs">${item.price === 'Gratis' ? 'GRATIS' : '$' + Number(item.price).toFixed(2)}</p></div></div>${item.file_data ? `<button onclick="downloadProduct('${item.id}')" class="btn-primary px-4 py-2 rounded-lg text-white text-sm"><i class="fas fa-download"></i> Descargar</button>` : '<button disabled class="px-4 py-2 rounded-lg bg-gray-800 text-gray-500 text-sm">No disponible</button>'}</div>`).join('');
-                    }
-                }
-            } catch (error) { console.error("Error:", error); }
-        }
-
-        function filterDashboardProducts() { const search = document.getElementById('dashboard-search')?.value.toLowerCase(); if (!search) return; document.querySelectorAll('#dashboard-products-list > div').forEach(card => { card.style.display = card.innerText.toLowerCase().includes(search) ? 'flex' : 'none'; }); }
-        function downloadProduct(productId) { const product = allProducts.find(p => p.id === productId); if (product && product.file_data) { const link = document.createElement('a'); link.href = product.file_data; link.download = product.file_name || 'resource.zip'; document.body.appendChild(link); link.click(); document.body.removeChild(link); } }
-        function generateUniqueKey() { const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; let key = ''; for (let i = 0; i < 24; i++) key += chars.charAt(Math.floor(Math.random() * chars.length)); return key; }
+    local userLocal = clean(configLicense["User"])
+    local keyLocal = clean(configLicense["Key"])
+    local resourceName = clean(getResourceName(getThisResource()))
+    local portActual = tostring(getServerPort() or 22003)
+    
+    fetchRemote("https://api.ipify.org?format=json", function(ipData, ipErr)
+        local ipActual = ""
+        if ipErr == 0 then
+            local ipTable = fromJSON(ipData)
+            if ipTable and ipTable.ip then
+                ipActual = clean(ipTable.ip)
+            end
+        end
         
-        async function generateNewKey() {
-            if (!currentUser) return;
-            const newKey = generateUniqueKey();
-            try {
-                const snapshot = await db.collection("Licencias").where("discord_id", "==", currentUser.id).where("type", "==", "general").limit(1).get();
-                snapshot.forEach(async (doc) => { await doc.ref.delete(); });
-                await db.collection("Licencias").add({ discord_id: currentUser.id, username: currentUser.username, key: newKey, type: "general", created_at: firebase.firestore.FieldValue.serverTimestamp(), status: 'active' });
-                userFixedLicenseKey = newKey; updateLicenseDisplay(); alert("¡Nueva clave generada con éxito!");
-            } catch (error) { console.error(error); alert("Hubo un error al generar la clave."); }
-        }
-
-        async function ensureFixedLicense() {
-            if (!currentUser) return;
-            try {
-                const snapshot = await db.collection("Licencias").where("discord_id", "==", currentUser.id).where("type", "==", "general").limit(1).get();
-                if (!snapshot.empty) userFixedLicenseKey = snapshot.docs[0].data().key;
-                else await generateNewKey();
-            } catch (error) { console.error("Error:", error); }
-        }
-
-        function updateLicenseDisplay() { const codeBlock = document.getElementById('license-code'); if (codeBlock && userFixedLicenseKey && currentUser) { codeBlock.textContent = `configLicense = {\n    ["User"] = "${currentUser.username}", \n    ["Key"] = "PapeletaStore(${userFixedLicenseKey})"\n}`; } }
-        function copyLicenseCode() { const code = document.getElementById('license-code')?.textContent; if (code) { navigator.clipboard.writeText(code).then(() => { alert('¡Código copiado!'); }); } }
-        function saveServerConfig() { localStorage.setItem('server_config', JSON.stringify({ ip: document.getElementById('server-ip')?.value, port: document.getElementById('server-port')?.value })); alert('Configuración guardada'); }
-
-        // AUTH & MODALS
-        function isAdmin() { return currentUser && ADMIN_DISCORD_IDS.includes(currentUser.id); }
-        function redirectToDiscord() { window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20email`; }
+        if ipActual == "" or ipActual == "0.0.0.0" then
+            ipActual = clean(getServerConfigSetting("serverip") or "")
+            if ipActual == "auto" or ipActual == "" then
+                outputDebugString("[Papeleta Progamador] ADVERTENCIA: No se pudo detectar IP automáticamente", 2)
+            end
+        end
         
+        local ipPortCompleto = ipActual .. ":" .. portActual
+        validarConFirebase(ipPortCompleto, userLocal, keyLocal, resourceName)
+    end)
+end
+
+function validarConFirebase(ipPortCompleto, userLocal, keyLocal, resourceName)
+    local urlBase = "https://firestore.googleapis.com/v1/projects/licenciapapeleta12/databases/(default)/documents/licencias"
+    
+    fetchRemote(urlBase, function(data, err)
+        if err ~= 0 then
+            outputDebugString("[Papeleta Progamador] Fallo de conexión a Firestore", 1)
+            stopResource(getThisResource())
+            return
+        end
+
+        local db = fromJSON(data)
+        local autorizado = false
+        local keyEncontradaPeroMalSistema = false
+
+        if db and db.documents then
+            for _, doc in ipairs(db.documents) do
+                local f = doc.fields
+                if f and f.user and f.key and f.ip and f.port and f.active and f.resource then
+                    local fireUser = clean(f.user.stringValue)
+                    local fireKey = clean(f.key.stringValue)
+                    local fireIp   = clean(f.ip.stringValue)
+                    local firePort = clean(f.port.stringValue)
+                    local fireResource = clean(f.resource.stringValue)
+                    local fireIpPort = fireIp .. ":" .. firePort
+                    local fireStatus = f.active.booleanValue
+
+                    if fireKey == keyLocal then
+                        if fireResource == resourceName then
+                            if fireUser == userLocal and fireIpPort == ipPortCompleto and fireStatus == true then
+                                autorizado = true
+                            end
+                        else
+                            keyEncontradaPeroMalSistema = true
+                            outputDebugString("[Papeleta Progamador] ERROR: Key válida pero pertenece al sistema '" .. fireResource .. "'", 1)
+                            outputDebugString("[Papeleta Progamador] Este sistema es '" .. resourceName .. "'. Licencia denegada.", 1)
+                        end
+                        break
+                    end
+                end
+            end
+        end
+
+        if autorizado then
+            if not _G["ScriptYaCargado"] then
+                outputDebugString("[Papeleta Progamador] LICENCIA VERIFICADA EXITOSAMENTE", 3)
+                cargarScriptPrincipal()
+            end
+        else
+            if keyEncontradaPeroMalSistema then
+                outputDebugString("[Papeleta Progamador] LICENCIA NO VALIDAD", 1)
+            else
+                outputDebugString("[Papeleta Progamador] LICENCIA NO VERIFICADA ", 1)
+            end
+            stopResource(getThisResource())
+        end
+    end)
+end
+
+addEventHandler("onResourceStart", resourceRoot, function()
+    if not tienePermisoACL() then
+        cancelEvent(true, "[Papeleta] Resource sin permiso en ACL 'Admin'")
+        setTimer(function() stopResource(getThisResource()) end, 50, 1)
+        return
+    end
+    outputDebugString("[Papeleta Progamador] INICIANDO VERIFICACION DE LICENCIA", 3)
+    validarLicencia()
+    setTimer(validarLicencia, 8996400000, 0)
+end, true, "high")`;
+
+        function isAdmin() {
+            if (!currentUser) return false;
+            return ADMIN_DISCORD_IDS.includes(currentUser.id);
+        }
+
+        function redirectToDiscord() {
+            const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20email`;
+            window.location.href = url;
+        }
+
         function checkDiscordAuth() {
             const fragment = new URLSearchParams(window.location.hash.slice(1));
             const accessToken = fragment.get('access_token');
-            if (accessToken) { window.location.hash = ''; localStorage.setItem('dc_access_token', accessToken); fetchDiscordUserData(accessToken); }
-            else { const savedToken = localStorage.getItem('dc_access_token'); savedToken ? fetchDiscordUserData(savedToken) : document.getElementById('login-modal').classList.remove('hidden'); }
+
+            if (accessToken) {
+                window.location.hash = '';
+                localStorage.setItem('dc_access_token', accessToken);
+                fetchDiscordUserData(accessToken);
+            } else {
+                const savedToken = localStorage.getItem('dc_access_token');
+                if (savedToken) {
+                    fetchDiscordUserData(savedToken);
+                } else {
+                    document.getElementById('login-modal').classList.remove('hidden');
+                }
+            }
         }
 
         function fetchDiscordUserData(token) {
-            fetch('https://discord.com/api/users/@me', { headers: { 'Authorization': `Bearer ${token}` } })
-            .then(res => { if (!res.ok) throw new Error('Token expirado'); return res.json(); })
+            fetch('https://discord.com/api/users/@me', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Token expirado');
+                return res.json();
+            })
             .then(user => {
                 currentUser = user;
+                
                 if (isAdmin()) {
                     currentUserRole = 'admin';
                     document.getElementById('admin-nav-section').classList.remove('hidden');
@@ -431,25 +667,661 @@
                     document.getElementById('header-admin-badge').classList.remove('hidden');
                     document.getElementById('sidebar-role').textContent = 'Administrador';
                     document.getElementById('sidebar-role').classList.add('text-red-500');
-                } else { currentUserRole = 'client'; document.getElementById('sidebar-role').textContent = 'Cliente'; }
+                } else {
+                    currentUserRole = 'client';
+                    document.getElementById('sidebar-role').textContent = 'Cliente';
+                }
+                
                 document.getElementById('header-username').innerText = user.username;
                 document.getElementById('sidebar-username').innerText = user.username;
-                if (user.avatar) document.getElementById('sidebar-avatar').src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
-                else document.getElementById('sidebar-avatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
+                
+                if (user.avatar) {
+                    document.getElementById('sidebar-avatar').src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
+                } else {
+                    document.getElementById('sidebar-avatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
+                }
+                
                 document.getElementById('login-modal').classList.add('hidden');
-                ensureFixedLicense().then(() => { showSection('dashboard'); });
-            }).catch(err => { console.error(err); logout(); });
+                
+                ensureFixedLicense().then(() => {
+                    showSection('dashboard');
+                });
+            })
+            .catch(err => {
+                console.error(err);
+                logout();
+            });
         }
 
-        function logout() { localStorage.removeItem('dc_access_token'); currentUser = null; currentUserRole = 'client'; location.reload(); }
+        function logout() {
+            localStorage.removeItem('dc_access_token');
+            currentUser = null;
+            currentUserRole = 'client';
+            location.reload();
+        }
 
-        const SERVER_LUA_CODE = `local function clean(s)\n    if not s then return "" end\n    return tostring(s):gsub("%s+", ""):upper()\nend\n\nlocal function tienePermisoACL()\n    local resourceName = getResourceName(getThisResource())\n    local resObj = "resource." .. resourceName\n    \n    if not isObjectInACLGroup(resObj, aclGetGroup("Admin")) then\n        outputDebugString("[Papeleta Progamador] El resource '"..resourceName.."' NO tiene permiso en ACL 'Admin'", 1)\n        return false\n    end\n    return true\nend\n\nlocal function cargarScriptPrincipal()\n    if _G["ScriptYaCargado"] then return end\n    _G["ScriptYaCargado"] = true\nend\n\nlocal function validarLicencia()\n    if not configLicense or not configLicense["User"] or not configLicense["Key"] then\n        outputDebugString("[Papeleta Progamador] Faltan credenciales en config", 1)\n        stopResource(getThisResource())\n        return\n    end\n\n    local userLocal = clean(configLicense["User"])\n    local keyLocal = clean(configLicense["Key"])\n    local resourceName = clean(getResourceName(getThisResource()))\n    local portActual = tostring(getServerPort() or 22003)\n    \n    fetchRemote("https://api.ipify.org?format=json", function(ipData, ipErr)\n        local ipActual = ""\n        if ipErr == 0 then\n            local ipTable = fromJSON(ipData)\n            if ipTable and ipTable.ip then\n                ipActual = clean(ipTable.ip)\n            end\n        end\n        \n        if ipActual == "" or ipActual == "0.0.0.0" then\n            ipActual = clean(getServerConfigSetting("serverip") or "")\n            if ipActual == "auto" or ipActual == "" then\n                outputDebugString("[Papeleta Progamador] ADVERTENCIA: No se pudo detectar IP automáticamente", 2)\n            end\n        end\n        \n        local ipPortCompleto = ipActual .. ":" .. portActual\n        validarConFirebase(ipPortCompleto, userLocal, keyLocal, resourceName)\n    end)\nend\n\nfunction validarConFirebase(ipPortCompleto, userLocal, keyLocal, resourceName)\n    local urlBase = "https://firestore.googleapis.com/v1/projects/licenciapapeleta12/databases/(default)/documents/licencias"\n    \n    fetchRemote(urlBase, function(data, err)\n        if err ~= 0 then\n            outputDebugString("[Papeleta Progamador] Fallo de conexión a Firestore", 1)\n            stopResource(getThisResource())\n            return\n        end\n\n        local db = fromJSON(data)\n        local autorizado = false\n        local keyEncontradaPeroMalSistema = false\n\n        if db and db.documents then\n            for _, doc in ipairs(db.documents) do\n                local f = doc.fields\n                if f and f.user and f.key and f.ip and f.port and f.active and f.resource then\n                    local fireUser = clean(f.user.stringValue)\n                    local fireKey = clean(f.key.stringValue)\n                    local fireIp   = clean(f.ip.stringValue)\n                    local firePort = clean(f.port.stringValue)\n                    local fireResource = clean(f.resource.stringValue)\n                    local fireIpPort = fireIp .. ":" .. firePort\n                    local fireStatus = f.active.booleanValue\n\n                    if fireKey == keyLocal then\n                        if fireResource == resourceName then\n                            if fireUser == userLocal and fireIpPort == ipPortCompleto and fireStatus == true then\n                                autorizado = true\n                            end\n                        else\n                            keyEncontradaPeroMalSistema = true\n                            outputDebugString("[Papeleta Progamador] ERROR: Key válida pero pertenece al sistema '" .. fireResource .. "'", 1)\n                            outputDebugString("[Papeleta Progamador] Este sistema es '" .. resourceName .. "'. Licencia denegada.", 1)\n                        end\n                        break\n                    end\n                end\n            end\n        end\n\n        if autorizado then\n            if not _G["ScriptYaCargado"] then\n                outputDebugString("[Papeleta Progamador] LICENCIA VERIFICADA EXITOSAMENTE", 3)\n                cargarScriptPrincipal()\n            end\n        else\n            if keyEncontradaPeroMalSistema then\n                outputDebugString("[Papeleta Progamador] LICENCIA NO VALIDAD", 1)\n            else\n                outputDebugString("[Papeleta Progamador] LICENCIA NO VERIFICADA ", 1)\n            end\n            stopResource(getThisResource())\n        end\n    end)\nend\n\naddEventHandler("onResourceStart", resourceRoot, function()\n    if not tienePermisoACL() then\n        cancelEvent(true, "[Papeleta] Resource sin permiso en ACL 'Admin'")\n        setTimer(function() stopResource(getThisResource()) end, 50, 1)\n        return\n    end\n    outputDebugString("[Papeleta Progamador] INICIANDO VERIFICACION DE LICENCIA", 3)\n    validarLicencia()\n    setTimer(validarLicencia, 8996400000, 0)\nend, true, "high")`;
+        // SISTEMA DE NAVEGACIÓN - SECCIONES INTERNAS (EMBEDIDAS)
+        function showSection(section) {
+            document.querySelectorAll('.nav-item, .admin-nav-item').forEach(item => {
+                item.classList.remove('active', 'active-section');
+            });
 
-        function openLuaModal() { if (!isAdmin()) { alert('Acceso denegado. Solo administradores.'); return; } document.getElementById('lua-code-content').textContent = SERVER_LUA_CODE; document.getElementById('lua-modal').classList.add('active'); document.body.style.overflow = 'hidden'; }
-        function closeLuaModal() { document.getElementById('lua-modal').classList.remove('active'); document.body.style.overflow = ''; }
-        function copyLuaCode() { navigator.clipboard.writeText(SERVER_LUA_CODE).then(() => { alert('¡Código copiado!'); }); }
-        document.getElementById('lua-modal')?.addEventListener('click', function(e) { if (e.target === this) closeLuaModal(); });
-        document.addEventListener('DOMContentLoaded', () => { checkDiscordAuth(); });
+            const navItem = document.getElementById(`nav-${section}`);
+            if (navItem) {
+                if (navItem.classList.contains('admin-nav-item')) {
+                    navItem.classList.add('active-section');
+                } else {
+                    navItem.classList.add('active');
+                }
+            }
+
+            const contentDiv = document.getElementById('dynamic-content');
+            
+            // Secciones principales con contenido embebido
+            switch(section) {
+                case 'dashboard':
+                    loadDashboardSection(contentDiv);
+                    break;
+                case 'reviews':
+                    loadReviewsSection(contentDiv);
+                    break;
+                case 'support':
+                    loadSupportSection(contentDiv);
+                    break;
+                default:
+                    loadDashboardSection(contentDiv);
+            }
+        }
+
+        // CARGA DE SECCIONES EXTERNAS (SOLO ADMIN)
+        async function loadExternalSection(sectionName, fileUrl) {
+            // Actualizar navegación
+            document.querySelectorAll('.nav-item, .admin-nav-item').forEach(item => {
+                item.classList.remove('active', 'active-section');
+            });
+            
+            const navItem = document.getElementById(`nav-${sectionName}`);
+            if (navItem && navItem.classList.contains('admin-nav-item')) {
+                navItem.classList.add('active-section');
+            }
+
+            const contentDiv = document.getElementById('dynamic-content');
+            
+            // Renderizado directo basado en el nombre de la sección
+            switch(sectionName) {
+                case 'crear-rol':
+                    renderCrearRolSection(contentDiv);
+                    break;
+                case 'subir-producto':
+                    contentDiv.innerHTML = `<div class="section-content text-center py-10"><h2 class="text-xl">Sección Subir Producto (Próximamente)</h2></div>`;
+                    break;
+                case 'licencias':
+                    contentDiv.innerHTML = `<div class="section-content text-center py-10"><h2 class="text-xl">Historial de Licencias (Próximamente)</h2></div>`;
+                    break;
+                case 'encriptar':
+                    contentDiv.innerHTML = `<div class="section-content text-center py-10"><h2 class="text-xl">Encriptador Lua (Próximamente)</h2></div>`;
+                    break;
+                case 'asignar':
+                    contentDiv.innerHTML = `<div class="section-content text-center py-10"><h2 class="text-xl">Asignar Productos (Próximamente)</h2></div>`;
+                    break;
+                case 'usuarios':
+                    contentDiv.innerHTML = `<div class="section-content text-center py-10"><h2 class="text-xl">Usuarios Autorizados (Próximamente)</h2></div>`;
+                    break;
+                default:
+                    contentDiv.innerHTML = `<div class="section-content text-center py-10 text-red-500">Error: Sección no encontrada</div>`;
+            }
+        }
+
+        // RENDERIZADO DE CREAR ROL (LÓGICA NUEVA)
+        function renderCrearRolSection(container) {
+            container.innerHTML = `
+                <div class="section-content grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Formulario -->
+                    <div class="lg:col-span-2 card rounded-xl p-6">
+                        <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+                            <i class="fas fa-plus-circle text-red-500"></i> Crear Nuevo Rol
+                        </h2>
+                        
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-2">Nombre del Rol *</label>
+                                    <input type="text" id="role-name" placeholder="Ej: Ayudante, Soporte VIP..." class="input-field w-full px-4 py-3 rounded-lg text-white focus:border-red-500 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-2">Color Identificativo</label>
+                                    <div class="flex items-center gap-3">
+                                        <input type="color" id="role-color" value="#ff1a1a" class="h-10 w-10 rounded cursor-pointer bg-transparent border-0">
+                                        <span class="text-xs font-mono text-gray-500">#FF1A1A</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm text-gray-400 mb-2">Descripción del Rol</label>
+                                <textarea id="role-desc" rows="3" placeholder="Describe brevemente las funciones de este rol..." class="input-field w-full px-4 py-3 rounded-lg text-white focus:border-red-500 outline-none resize-none"></textarea>
+                            </div>
+
+                            <div class="pt-4">
+                                <h3 class="text-lg font-semibold mb-4 text-gray-300">Permisos y Accesos</h3>
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between p-3 bg-[#0d0505] rounded-lg border border-red-900/20">
+                                        <div class="flex items-center gap-3">
+                                            <i class="fas fa-cog text-gray-500"></i>
+                                            <div>
+                                                <p class="text-sm font-medium">Acceso al Panel Config</p>
+                                                <p class="text-xs text-gray-500">Puede ver el menú lateral de administración</p>
+                                            </div>
+                                        </div>
+                                        <input type="checkbox" id="perm-config" class="w-5 h-5 accent-red-600 cursor-pointer">
+                                    </div>
+                                    
+                                    <div class="flex items-center justify-between p-3 bg-[#0d0505] rounded-lg border border-red-900/20">
+                                        <div class="flex items-center gap-3">
+                                            <i class="fas fa-cloud-upload-alt text-gray-500"></i>
+                                            <div>
+                                                <p class="text-sm font-medium">Subir Productos</p>
+                                                <p class="text-xs text-gray-500">Puede agregar nuevos recursos a la tienda</p>
+                                            </div>
+                                        </div>
+                                        <input type="checkbox" id="perm-upload" class="w-5 h-5 accent-red-600 cursor-pointer">
+                                    </div>
+
+                                    <div class="flex items-center justify-between p-3 bg-[#0d0505] rounded-lg border border-red-900/20">
+                                        <div class="flex items-center gap-3">
+                                            <i class="fas fa-trash text-gray-500"></i>
+                                            <div>
+                                                <p class="text-sm font-medium">Eliminar Productos</p>
+                                                <p class="text-xs text-gray-500">Puede borrar productos existentes</p>
+                                            </div>
+                                        </div>
+                                        <input type="checkbox" id="perm-delete" class="w-5 h-5 accent-red-600 cursor-pointer">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button onclick="saveNewRole()" class="btn-primary w-full mt-6 py-3 rounded-lg font-bold text-white shadow-lg">
+                                Guardar Nuevo Rol
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Lista de Roles Activos -->
+                    <div class="card rounded-xl p-6 h-fit">
+                        <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                            <i class="fas fa-list text-red-500"></i> Roles Activos
+                        </h3>
+                        <div id="roles-list-container" class="space-y-3 max-h-[600px] overflow-y-auto custom-scrollbar pr-2">
+                            <div class="text-center py-8 text-gray-500">
+                                <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                                <p>Cargando roles...</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-red-900/20 text-xs text-gray-500 text-center">
+                            Los roles se guardan en Firestore.<br>Asigna estos roles en "Usuarios Autorizados".
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Cargar la lista de roles al iniciar la vista
+            loadRolesList();
+        }
+
+        // LÓGICA PARA GUARDAR Y LEER ROLES EN FIREBASE
+        
+        async function saveNewRole() {
+            const name = document.getElementById('role-name').value;
+            const color = document.getElementById('role-color').value;
+            const desc = document.getElementById('role-desc').value;
+            
+            // Obtener permisos
+            const permissions = {
+                config: document.getElementById('perm-config').checked,
+                upload: document.getElementById('perm-upload').checked,
+                delete: document.getElementById('perm-delete').checked
+            };
+
+            if (!name) {
+                alert("Por favor escribe un nombre para el rol.");
+                return;
+            }
+
+            try {
+                await db.collection("Roles").add({
+                    name: name,
+                    color: color,
+                    description: desc || "Sin descripción",
+                    permissions: permissions,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                alert("¡Rol creado correctamente!");
+                // Limpiar formulario
+                document.getElementById('role-name').value = '';
+                document.getElementById('role-desc').value = '';
+                document.getElementById('perm-config').checked = false;
+                document.getElementById('perm-upload').checked = false;
+                document.getElementById('perm-delete').checked = false;
+                
+                // Recargar lista
+                loadRolesList();
+
+            } catch (error) {
+                console.error("Error al guardar:", error);
+                alert("Error al guardar el rol. Revisa la consola.");
+            }
+        }
+
+        async function loadRolesList() {
+            const container = document.getElementById('roles-list-container');
+            if (!container) return;
+
+            try {
+                const snapshot = await db.collection("Roles").orderBy("createdAt", "desc").get();
+                
+                if (snapshot.empty) {
+                    container.innerHTML = `<div class="text-center py-4 text-gray-500 text-sm">No hay roles creados aún.</div>`;
+                    return;
+                }
+
+                let html = '';
+                snapshot.forEach(doc => {
+                    const role = doc.data();
+                    html += `
+                        <div class="bg-[#0d0505] border-l-4 p-3 rounded-r-lg flex justify-between items-center group hover:bg-[#150a0a] transition-colors" style="border-left-color: ${role.color}">
+                            <div>
+                                <h4 class="font-bold text-sm" style="color: ${role.color}">${role.name}</h4>
+                                <p class="text-[10px] text-gray-500 truncate max-w-[150px]">${role.description}</p>
+                            </div>
+                            <button onclick="deleteRole('${doc.id}')" class="text-gray-600 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+
+            } catch (error) {
+                console.error("Error cargando roles:", error);
+                container.innerHTML = `<div class="text-center text-red-500 text-xs">Error al cargar roles</div>`;
+            }
+        }
+
+        async function deleteRole(id) {
+            if(confirm("¿Estás seguro de eliminar este rol?")) {
+                await db.collection("Roles").doc(id).delete();
+                loadRolesList();
+            }
+        }
+
+        // SECCIÓN DASHBOARD (EMBEDIDA)
+        async function loadDashboardSection(container) {
+            document.getElementById('header-subtitle').textContent = 'Gestiona tus productos y licencias desde aquí';
+            
+            container.innerHTML = `
+                <div class="section-content">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="stat-card rounded-xl p-6 relative overflow-hidden group">
+                            <div class="absolute right-0 top-0 w-24 h-24 bg-red-600/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
+                            <div class="flex items-center justify-between relative z-10">
+                                <div>
+                                    <p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Total Invertido</p>
+                                    <p id="stat-total-spent" class="text-2xl font-bold text-white">$0.00</p>
+                                </div>
+                                <div class="w-12 h-12 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                                    <i class="fas fa-wallet text-red-400 text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card rounded-xl p-6 relative overflow-hidden group">
+                            <div class="absolute right-0 top-0 w-24 h-24 bg-green-600/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
+                            <div class="flex items-center justify-between relative z-10">
+                                <div>
+                                    <p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Scripts Activos</p>
+                                    <p id="stat-active-scripts" class="text-2xl font-bold text-white">0</p>
+                                </div>
+                                <div class="w-12 h-12 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center justify-center">
+                                    <i class="fas fa-lock text-green-400 text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card rounded-xl p-6 relative overflow-hidden group">
+                            <div class="absolute right-0 top-0 w-24 h-24 bg-blue-600/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
+                            <div class="flex items-center justify-between relative z-10">
+                                <div>
+                                    <p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Estado de Cuenta</p>
+                                    <p id="stat-account-status" class="text-lg font-bold text-red-400">Cliente Verificado</p>
+                                </div>
+                                <div class="w-12 h-12 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                                    <i class="fas fa-user-shield text-red-400 text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 card rounded-xl p-6">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                                    <i class="fas fa-cube text-red-400"></i>
+                                </div>
+                                <h2 class="text-lg font-bold text-white">Mis Productos Activos</h2>
+                            </div>
+
+                            <div class="mb-6">
+                                <div class="relative">
+                                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                                    <input 
+                                        type="text" 
+                                        id="dashboard-search"
+                                        oninput="filterDashboardProducts()"
+                                        placeholder="Buscar entre tus recursos..." 
+                                        class="input-field w-full pl-12 pr-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none"
+                                    >
+                                </div>
+                            </div>
+
+                            <div id="dashboard-products-list" class="space-y-3 max-h-[500px] overflow-y-auto custom-scrollbar pr-2"></div>
+
+                            <div id="dashboard-empty-state" class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5">
+                                <i class="fas fa-box-open text-gray-600 text-4xl mb-3"></i>
+                                <p class="text-gray-400 mb-4">No tienes productos activos aún.</p>
+                                <a href="index.html" class="btn-primary inline-block px-6 py-2 rounded-lg text-white font-medium">
+                                    Ir a la tienda
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="card rounded-xl p-6 h-fit">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                                    <i class="fas fa-server text-red-400"></i>
+                                </div>
+                                <h2 class="text-lg font-bold text-white">Configuración MTA</h2>
+                            </div>
+
+                            <div class="space-y-4 mb-6">
+                                <div>
+                                    <label class="block text-gray-400 text-xs uppercase font-semibold mb-2 tracking-wider">Server IP</label>
+                                    <input type="text" id="server-ip" value="213.181.88.154" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none font-mono text-sm">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-400 text-xs uppercase font-semibold mb-2 tracking-wider">Puerto</label>
+                                    <input type="text" id="server-port" value="22003" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none font-mono text-sm">
+                                </div>
+                            </div>
+
+                            <div class="mb-6">
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="block text-gray-400 text-xs uppercase font-semibold tracking-wider">Código de Licencia</label>
+                                    <span class="text-[10px] text-red-400 font-mono bg-red-900/20 px-2 py-0.5 rounded">LUA CONFIG</span>
+                                </div>
+                                <div class="code-block rounded-lg p-4 font-mono text-sm">
+                                    <pre class="text-white whitespace-pre-wrap break-all"><code id="license-code">Generando...</code></pre>
+                                </div>
+                                <button onclick="generateNewKey()" class="w-full mt-3 bg-[#150a0a] hover:bg-[#1a0a0a] border border-red-800/50 text-gray-300 hover:text-white text-xs font-semibold py-2 rounded-xl transition-all flex items-center justify-center gap-2">
+                                    <i class="fas fa-sync-alt"></i> Generar Nueva Clave
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3 mb-4">
+                                <button onclick="saveServerConfig()" class="btn-primary px-4 py-2.5 rounded-lg text-white font-medium flex items-center justify-center gap-2 text-sm">
+                                    <i class="fas fa-save"></i> Guardar
+                                </button>
+                                <button onclick="copyLicenseCode()" class="px-4 py-2.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 font-medium flex items-center justify-center gap-2 text-sm">
+                                    <i class="fas fa-copy"></i> Copiar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            await loadDashboardData();
+            updateLicenseDisplay();
+            
+            const saved = JSON.parse(localStorage.getItem('server_config') || '{}');
+            if (saved.ip) document.getElementById('server-ip').value = saved.ip;
+            if (saved.port) document.getElementById('server-port').value = saved.port;
+        }
+
+        // SECCIÓN REVIEWS (EMBEDIDA)
+        function loadReviewsSection(container) {
+            document.getElementById('header-subtitle').textContent = 'Tus reseñas y valoraciones';
+            container.innerHTML = `
+                <div class="section-content text-center py-12">
+                    <i class="fas fa-star text-6xl text-gray-600 mb-4"></i>
+                    <h2 class="text-2xl font-bold text-white mb-2">Mis Reseñas</h2>
+                    <p class="text-gray-400">Próximamente podrás ver y gestionar tus reseñas aquí</p>
+                </div>
+            `;
+        }
+
+        // SECCIÓN SOPORTE (EMBEDIDA)
+        function loadSupportSection(container) {
+            document.getElementById('header-subtitle').textContent = 'Contacta con nuestro equipo de soporte';
+            container.innerHTML = `
+                <div class="section-content text-center py-12">
+                    <i class="fas fa-headset text-6xl text-gray-600 mb-4"></i>
+                    <h2 class="text-2xl font-bold text-white mb-2">Soporte Técnico</h2>
+                    <p class="text-gray-400 mb-6">¿Necesitas ayuda? Contáctanos</p>
+                    <a href="https://discord.gg/rvxEdWcGkf" target="_blank" class="btn-primary inline-block px-6 py-3 rounded-lg text-white font-medium">
+                        <i class="fab fa-discord mr-2"></i>Unirse al Discord
+                    </a>
+                </div>
+            `;
+        }
+
+        async function loadDashboardData() {
+            if (!currentUser) return;
+            try {
+                const productsSnapshot = await db.collection("Productos").get();
+                allProducts = [];
+                productsSnapshot.forEach((doc) => allProducts.push({ id: doc.id, ...doc.data() }));
+
+                const clientesSnapshot = await db.collection("Clientes").get();
+                let purchasedProducts = [];
+                let totalSpent = 0;
+
+                clientesSnapshot.forEach((doc) => {
+                    const purchase = doc.data();
+                    if (String(purchase.discord_id) === String(currentUser.id)) {
+                        if (purchase.products && Array.isArray(purchase.products)) {
+                            purchase.products.forEach(prod => {
+                                const productData = allProducts.find(p => p.id === prod.id);
+                                if (productData) {
+                                    purchasedProducts.push({
+                                        ...productData,
+                                        purchaseDate: purchase.date?.toDate ? purchase.date.toDate() : new Date(),
+                                        price: prod.price || 'Gratis'
+                                    });
+                                    if (prod.price !== "Gratis" && prod.price !== "GRATIS") {
+                                        totalSpent += parseFloat(String(prod.price).replace('$', '')) || 0;
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+
+                const spentEl = document.getElementById('stat-total-spent');
+                const scriptsEl = document.getElementById('stat-active-scripts');
+                
+                if (spentEl) spentEl.innerText = '$' + totalSpent.toFixed(2);
+                if (scriptsEl) scriptsEl.innerText = purchasedProducts.length;
+                
+                const container = document.getElementById('dashboard-products-list');
+                const emptyState = document.getElementById('dashboard-empty-state');
+                
+                if (container && emptyState) {
+                    if (purchasedProducts.length === 0) {
+                        emptyState.classList.remove('hidden');
+                        container.innerHTML = '';
+                    } else {
+                        emptyState.classList.add('hidden');
+                        container.innerHTML = purchasedProducts.map(item => `
+                            <div class="bg-[#0d0505] border border-red-900/30 rounded-xl p-4 flex items-center justify-between hover:border-red-600/50 transition-all">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-16 h-16 rounded-lg bg-[#150a0a] border border-red-900/20 overflow-hidden">
+                                        <img src="${item.image_url || ''}" class="w-full h-full object-cover">
+                                    </div>
+                                    <div>
+                                        <h3 class="text-white font-bold">${item.name}</h3>
+                                        <p class="text-gray-400 text-xs">${item.price === 'Gratis' ? 'GRATIS' : '$' + Number(item.price).toFixed(2)}</p>
+                                    </div>
+                                </div>
+                                ${item.file_data ? `
+                                    <button onclick="downloadProduct('${item.id}')" class="btn-primary px-4 py-2 rounded-lg text-white text-sm">
+                                        <i class="fas fa-download"></i> Descargar
+                                    </button>
+                                ` : '<button disabled class="px-4 py-2 rounded-lg bg-gray-800 text-gray-500 text-sm">No disponible</button>'}
+                            </div>
+                        `).join('');
+                    }
+                }
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        }
+
+        function filterDashboardProducts() {
+            const search = document.getElementById('dashboard-search')?.value.toLowerCase();
+            if (!search) return;
+            document.querySelectorAll('#dashboard-products-list > div').forEach(card => {
+                card.style.display = card.innerText.toLowerCase().includes(search) ? 'flex' : 'none';
+            });
+        }
+
+        function downloadProduct(productId) {
+            const product = allProducts.find(p => p.id === productId);
+            if (product && product.file_data) {
+                const link = document.createElement('a');
+                link.href = product.file_data;
+                link.download = product.file_name || 'resource.zip';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+
+        function generateUniqueKey() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; 
+            let key = '';
+            for (let i = 0; i < 24; i++) key += chars.charAt(Math.floor(Math.random() * chars.length));
+            return key;
+        }
+
+        async function generateNewKey() {
+            if (!currentUser) return;
+            const newKey = generateUniqueKey();
+            try {
+                const snapshot = await db.collection("Licencias")
+                    .where("discord_id", "==", currentUser.id)
+                    .where("type", "==", "general")
+                    .limit(1)
+                    .get();
+                
+                snapshot.forEach(async (doc) => {
+                    await doc.ref.delete();
+                });
+
+                await db.collection("Licencias").add({
+                    discord_id: currentUser.id,
+                    username: currentUser.username,
+                    key: newKey,
+                    type: "general",
+                    created_at: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'active'
+                });
+                
+                userFixedLicenseKey = newKey;
+                updateLicenseDisplay();
+                alert("¡Nueva clave generada con éxito!");
+            } catch (error) {
+                console.error("Error generando clave:", error);
+                alert("Hubo un error al generar la clave.");
+            }
+        }
+
+        async function ensureFixedLicense() {
+            if (!currentUser) return;
+            try {
+                const snapshot = await db.collection("Licencias")
+                    .where("discord_id", "==", currentUser.id)
+                    .where("type", "==", "general")
+                    .limit(1)
+                    .get();
+                
+                if (!snapshot.empty) {
+                    userFixedLicenseKey = snapshot.docs[0].data().key;
+                } else {
+                    await generateNewKey();
+                }
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        }
+
+        function updateLicenseDisplay() {
+            const codeBlock = document.getElementById('license-code');
+            if (codeBlock && userFixedLicenseKey && currentUser) {
+                codeBlock.textContent = `configLicense = {
+    ["User"] = "${currentUser.username}", 
+    ["Key"] = "PapeletaStore(${userFixedLicenseKey})"
+}`;
+            }
+        }
+
+        function copyLicenseCode() {
+            const code = document.getElementById('license-code')?.textContent;
+            if (code) {
+                navigator.clipboard.writeText(code).then(() => {
+                    alert('¡Código copiado!');
+                });
+            }
+        }
+
+        function saveServerConfig() {
+            localStorage.setItem('server_config', JSON.stringify({
+                ip: document.getElementById('server-ip')?.value,
+                port: document.getElementById('server-port')?.value
+            }));
+            alert('Configuración guardada');
+        }
+
+        // MODAL SERVER.LUA
+        function openLuaModal() {
+            if (!isAdmin()) {
+                alert('Acceso denegado. Solo administradores.');
+                return;
+            }
+            document.getElementById('lua-code-content').textContent = SERVER_LUA_CODE;
+            document.getElementById('lua-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLuaModal() {
+            document.getElementById('lua-modal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function copyLuaCode() {
+            navigator.clipboard.writeText(SERVER_LUA_CODE).then(() => {
+                alert('¡Código copiado!');
+            });
+        }
+
+        document.getElementById('lua-modal')?.addEventListener('click', function(e) {
+            if (e.target === this) closeLuaModal();
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkDiscordAuth();
+        });
     </script>
 </body>
 </html>
