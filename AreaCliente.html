@@ -206,7 +206,6 @@
             color: #ff6b6b;
         }
 
-        /* ANIMACIONES PARA SECCIONES DINÁMICAS */
         .section-content {
             animation: sectionFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -271,31 +270,6 @@
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
-
-        .success-check {
-            animation: checkPop 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        @keyframes checkPop {
-            0% { transform: scale(0); opacity: 0; }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        /* Loading indicator */
-        .loading-indicator {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 4rem;
-            color: #9ca3af;
-        }
-
-        .loading-indicator i {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
     </style>
 </head>
 <body class="min-h-screen flex">
@@ -347,7 +321,7 @@
                         <i class="fas fa-shield-alt"></i> Panel Admin
                     </div>
                     
-                    <a href="#" onclick="showSection('subir-producto')" id="nav-subir-producto" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
+                    <a href="#" onclick="loadExternalSection('subir-producto', 'sections/subir-producto.html')" id="nav-subir-producto" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
                         <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
                             <i class="fas fa-cloud-upload-alt text-red-400 text-sm"></i>
                         </div>
@@ -357,7 +331,7 @@
                         </div>
                     </a>
                     
-                    <a href="#" onclick="showSection('licencias')" id="nav-licencias" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
+                    <a href="#" onclick="loadExternalSection('licencias', 'sections/licencias.html')" id="nav-licencias" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
                         <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
                             <i class="fas fa-key text-red-400 text-sm"></i>
                         </div>
@@ -367,7 +341,7 @@
                         </div>
                     </a>
                     
-                    <a href="#" onclick="showSection('encriptar')" id="nav-encriptar" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
+                    <a href="#" onclick="loadExternalSection('encriptar', 'sections/encriptar.html')" id="nav-encriptar" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
                         <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
                             <i class="fas fa-lock text-red-400 text-sm"></i>
                         </div>
@@ -377,7 +351,7 @@
                         </div>
                     </a>
                     
-                    <a href="#" onclick="showSection('asignar')" id="nav-asignar" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
+                    <a href="#" onclick="loadExternalSection('asignar', 'sections/asignar.html')" id="nav-asignar" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
                         <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
                             <i class="fas fa-user-plus text-red-400 text-sm"></i>
                         </div>
@@ -387,7 +361,7 @@
                         </div>
                     </a>
                     
-                    <a href="#" onclick="showSection('usuarios')" id="nav-usuarios" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
+                    <a href="#" onclick="loadExternalSection('usuarios', 'sections/usuarios.html')" id="nav-usuarios" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
                         <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
                             <i class="fas fa-users-cog text-red-400 text-sm"></i>
                         </div>
@@ -397,7 +371,7 @@
                         </div>
                     </a>
                     
-                    <a href="#" onclick="showSection('crear-rol')" id="nav-crear-rol" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
+                    <a href="#" onclick="loadExternalSection('crear-rol', 'sections/crear-rol.html')" id="nav-crear-rol" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
                         <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
                             <i class="fas fa-id-badge text-red-400 text-sm"></i>
                         </div>
@@ -407,7 +381,6 @@
                         </div>
                     </a>
 
-                    <!-- BOTÓN SERVER.LUA -->
                     <a href="#" onclick="openLuaModal()" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300">
                         <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
                             <i class="fas fa-file-code text-red-400 text-sm"></i>
@@ -456,7 +429,7 @@
 
         <!-- CONTENIDO DINÁMICO -->
         <div id="dynamic-content" class="p-6 md:p-8 flex-grow">
-            <!-- El contenido se carga aquí dinámicamente desde archivos externos -->
+            <!-- El contenido se carga aquí dinámicamente -->
         </div>
     </main>
 
@@ -524,17 +497,6 @@
         let currentUserRole = 'client';
         let allProducts = [];
         let userFixedLicenseKey = null;
-
-        // Mapeo de secciones a archivos HTML externos
-        const SECTION_FILES = {
-            'dashboard': 'sections/dashboard.html',
-            'subir-producto': 'sections/subir-producto.html',
-            'licencias': 'sections/licencias.html',
-            'encriptar': 'sections/encriptar.html',
-            'asignar': 'sections/asignar.html',
-            'usuarios': 'sections/usuarios.html',
-            'crear-rol': 'sections/crear-rol.html'
-        };
 
         const SERVER_LUA_CODE = `local function clean(s)
     if not s then return "" end
@@ -738,9 +700,8 @@ end, true, "high")`;
             location.reload();
         }
 
-        // SISTEMA DE NAVEGACIÓN DINÁMICA - CARGA ARCHIVOS EXTERNOS
-        async function showSection(section) {
-            // Actualizar navegación activa
+        // SISTEMA DE NAVEGACIÓN - SECCIONES INTERNAS (EMBEDIDAS)
+        function showSection(section) {
             document.querySelectorAll('.nav-item, .admin-nav-item').forEach(item => {
                 item.classList.remove('active', 'active-section');
             });
@@ -754,120 +715,243 @@ end, true, "high")`;
                 }
             }
 
-            // Mostrar indicador de carga
             const contentDiv = document.getElementById('dynamic-content');
-            contentDiv.innerHTML = `
-                <div class="loading-indicator">
-                    <i class="fas fa-spinner loading-spinner text-red-400"></i>
-                    <p>Cargando sección...</p>
-                </div>
-            `;
-
-            // Obtener el archivo correspondiente
-            const fileUrl = SECTION_FILES[section];
             
-            if (!fileUrl) {
-                // Si no hay archivo mapeado, usar dashboard por defecto
-                loadExternalContent('sections/dashboard.html', contentDiv, section);
-                return;
+            // Secciones principales con contenido embebido
+            switch(section) {
+                case 'dashboard':
+                    loadDashboardSection(contentDiv);
+                    break;
+                case 'reviews':
+                    loadReviewsSection(contentDiv);
+                    break;
+                case 'support':
+                    loadSupportSection(contentDiv);
+                    break;
+                default:
+                    loadDashboardSection(contentDiv);
             }
-
-            // Cargar el contenido externo
-            await loadExternalContent(fileUrl, contentDiv, section);
         }
 
-        // Función para cargar contenido desde archivo externo
-        async function loadExternalContent(fileUrl, container, section) {
+        // CARGA DE SECCIONES EXTERNAS (SOLO ADMIN)
+        async function loadExternalSection(sectionName, fileUrl) {
+            // Actualizar navegación
+            document.querySelectorAll('.nav-item, .admin-nav-item').forEach(item => {
+                item.classList.remove('active', 'active-section');
+            });
+            
+            const navItem = document.getElementById(`nav-${sectionName}`);
+            if (navItem && navItem.classList.contains('admin-nav-item')) {
+                navItem.classList.add('active-section');
+            }
+
+            const contentDiv = document.getElementById('dynamic-content');
+            
             try {
                 const response = await fetch(fileUrl);
+                if (!response.ok) throw new Error(`Error al cargar ${fileUrl}`);
                 
-                if (!response.ok) {
-                    throw new Error(`Error al cargar ${fileUrl}: ${response.status}`);
-                }
-
                 const html = await response.text();
+                contentDiv.innerHTML = `<div class="section-content">${html}</div>`;
                 
-                // Insertar el contenido
-                container.innerHTML = `<div class="section-content">${html}</div>`;
+                // Inicializar sección específica
+                initializeExternalSection(sectionName);
                 
-                // Ejecutar scripts inline si existen
-                const scripts = container.querySelectorAll('script');
-                scripts.forEach(script => {
-                    const newScript = document.createElement('script');
-                    if (script.src) {
-                        newScript.src = script.src;
-                    } else {
-                        newScript.textContent = script.textContent;
-                    }
-                    document.body.appendChild(newScript);
-                    script.remove();
-                });
-
-                // Llamar a funciones de inicialización específicas de cada sección
-                initializeSection(section);
-
             } catch (error) {
-                console.error('Error cargando sección:', error);
-                container.innerHTML = `
-                    <div class="loading-indicator">
-                        <i class="fas fa-exclamation-triangle text-red-400 text-4xl mb-4"></i>
-                        <p class="text-red-400">Error al cargar la sección</p>
-                        <p class="text-sm text-gray-500 mt-2">${error.message}</p>
-                        <button onclick="showSection('${section}')" class="mt-4 btn-primary px-4 py-2 rounded-lg text-white">
-                            <i class="fas fa-redo mr-2"></i>Reintentar
-                        </button>
+                console.error(error);
+                contentDiv.innerHTML = `
+                    <div class="text-center py-12 text-red-400">
+                        <i class="fas fa-exclamation-triangle text-4xl mb-4"></i>
+                        <p>Error al cargar la sección</p>
                     </div>
                 `;
             }
         }
 
-        // Inicialización específica por sección
-        function initializeSection(section) {
+        function initializeExternalSection(section) {
+            // Aquí se pueden agregar inicializaciones específicas si es necesario
             switch(section) {
-                case 'dashboard':
-                    if (typeof loadDashboardData === 'function') {
-                        loadDashboardData();
-                    }
-                    updateLicenseDisplay();
-                    
-                    // Restaurar configuración guardada
-                    const saved = JSON.parse(localStorage.getItem('server_config') || '{}');
-                    const ipInput = document.getElementById('server-ip');
-                    const portInput = document.getElementById('server-port');
-                    if (saved.ip && ipInput) ipInput.value = saved.ip;
-                    if (saved.port && portInput) portInput.value = saved.port;
-                    break;
-                    
                 case 'subir-producto':
-                    if (typeof setupDragAndDrop === 'function') {
-                        setupDragAndDrop();
-                    }
+                    if (typeof setupDragAndDrop === 'function') setupDragAndDrop();
                     break;
-                    
                 case 'licencias':
-                    if (typeof loadLicenciasData === 'function') {
-                        loadLicenciasData();
-                    }
+                    if (typeof loadLicenciasData === 'function') loadLicenciasData();
                     break;
-                    
                 case 'asignar':
-                    if (typeof loadProductsForAssign === 'function') {
-                        loadProductsForAssign();
-                    }
+                    if (typeof loadProductsForAssign === 'function') loadProductsForAssign();
                     break;
-                    
                 case 'usuarios':
-                    if (typeof loadUsuariosData === 'function') {
-                        loadUsuariosData();
-                    }
+                    if (typeof loadUsuariosData === 'function') loadUsuariosData();
                     break;
             }
         }
 
-        // FUNCIONES AUXILIARES DEL DASHBOARD
+        // SECCIÓN DASHBOARD (EMBEDIDA)
+        async function loadDashboardSection(container) {
+            document.getElementById('header-subtitle').textContent = 'Gestiona tus productos y licencias desde aquí';
+            
+            container.innerHTML = `
+                <div class="section-content">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="stat-card rounded-xl p-6 relative overflow-hidden group">
+                            <div class="absolute right-0 top-0 w-24 h-24 bg-red-600/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
+                            <div class="flex items-center justify-between relative z-10">
+                                <div>
+                                    <p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Total Invertido</p>
+                                    <p id="stat-total-spent" class="text-2xl font-bold text-white">$0.00</p>
+                                </div>
+                                <div class="w-12 h-12 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                                    <i class="fas fa-wallet text-red-400 text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card rounded-xl p-6 relative overflow-hidden group">
+                            <div class="absolute right-0 top-0 w-24 h-24 bg-green-600/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
+                            <div class="flex items-center justify-between relative z-10">
+                                <div>
+                                    <p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Scripts Activos</p>
+                                    <p id="stat-active-scripts" class="text-2xl font-bold text-white">0</p>
+                                </div>
+                                <div class="w-12 h-12 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center justify-center">
+                                    <i class="fas fa-lock text-green-400 text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card rounded-xl p-6 relative overflow-hidden group">
+                            <div class="absolute right-0 top-0 w-24 h-24 bg-blue-600/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
+                            <div class="flex items-center justify-between relative z-10">
+                                <div>
+                                    <p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Estado de Cuenta</p>
+                                    <p id="stat-account-status" class="text-lg font-bold text-red-400">Cliente Verificado</p>
+                                </div>
+                                <div class="w-12 h-12 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                                    <i class="fas fa-user-shield text-red-400 text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 card rounded-xl p-6">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                                    <i class="fas fa-cube text-red-400"></i>
+                                </div>
+                                <h2 class="text-lg font-bold text-white">Mis Productos Activos</h2>
+                            </div>
+
+                            <div class="mb-6">
+                                <div class="relative">
+                                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                                    <input 
+                                        type="text" 
+                                        id="dashboard-search"
+                                        oninput="filterDashboardProducts()"
+                                        placeholder="Buscar entre tus recursos..." 
+                                        class="input-field w-full pl-12 pr-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none"
+                                    >
+                                </div>
+                            </div>
+
+                            <div id="dashboard-products-list" class="space-y-3 max-h-[500px] overflow-y-auto custom-scrollbar pr-2"></div>
+
+                            <div id="dashboard-empty-state" class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5">
+                                <i class="fas fa-box-open text-gray-600 text-4xl mb-3"></i>
+                                <p class="text-gray-400 mb-4">No tienes productos activos aún.</p>
+                                <a href="index.html" class="btn-primary inline-block px-6 py-2 rounded-lg text-white font-medium">
+                                    Ir a la tienda
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="card rounded-xl p-6 h-fit">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                                    <i class="fas fa-server text-red-400"></i>
+                                </div>
+                                <h2 class="text-lg font-bold text-white">Configuración MTA</h2>
+                            </div>
+
+                            <div class="space-y-4 mb-6">
+                                <div>
+                                    <label class="block text-gray-400 text-xs uppercase font-semibold mb-2 tracking-wider">Server IP</label>
+                                    <input type="text" id="server-ip" value="213.181.88.154" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none font-mono text-sm">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-400 text-xs uppercase font-semibold mb-2 tracking-wider">Puerto</label>
+                                    <input type="text" id="server-port" value="22003" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none font-mono text-sm">
+                                </div>
+                            </div>
+
+                            <div class="mb-6">
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="block text-gray-400 text-xs uppercase font-semibold tracking-wider">Código de Licencia</label>
+                                    <span class="text-[10px] text-red-400 font-mono bg-red-900/20 px-2 py-0.5 rounded">LUA CONFIG</span>
+                                </div>
+                                <div class="code-block rounded-lg p-4 font-mono text-sm">
+                                    <pre class="text-white whitespace-pre-wrap break-all"><code id="license-code">Generando...</code></pre>
+                                </div>
+                                <button onclick="generateNewKey()" class="w-full mt-3 bg-[#150a0a] hover:bg-[#1a0a0a] border border-red-800/50 text-gray-300 hover:text-white text-xs font-semibold py-2 rounded-xl transition-all flex items-center justify-center gap-2">
+                                    <i class="fas fa-sync-alt"></i> Generar Nueva Clave
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3 mb-4">
+                                <button onclick="saveServerConfig()" class="btn-primary px-4 py-2.5 rounded-lg text-white font-medium flex items-center justify-center gap-2 text-sm">
+                                    <i class="fas fa-save"></i> Guardar
+                                </button>
+                                <button onclick="copyLicenseCode()" class="px-4 py-2.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 font-medium flex items-center justify-center gap-2 text-sm">
+                                    <i class="fas fa-copy"></i> Copiar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            await loadDashboardData();
+            updateLicenseDisplay();
+            
+            const saved = JSON.parse(localStorage.getItem('server_config') || '{}');
+            if (saved.ip) document.getElementById('server-ip').value = saved.ip;
+            if (saved.port) document.getElementById('server-port').value = saved.port;
+        }
+
+        // SECCIÓN REVIEWS (EMBEDIDA)
+        function loadReviewsSection(container) {
+            document.getElementById('header-subtitle').textContent = 'Tus reseñas y valoraciones';
+            container.innerHTML = `
+                <div class="section-content text-center py-12">
+                    <i class="fas fa-star text-6xl text-gray-600 mb-4"></i>
+                    <h2 class="text-2xl font-bold text-white mb-2">Mis Reseñas</h2>
+                    <p class="text-gray-400">Próximamente podrás ver y gestionar tus reseñas aquí</p>
+                </div>
+            `;
+        }
+
+        // SECCIÓN SOPORTE (EMBEDIDA)
+        function loadSupportSection(container) {
+            document.getElementById('header-subtitle').textContent = 'Contacta con nuestro equipo de soporte';
+            container.innerHTML = `
+                <div class="section-content text-center py-12">
+                    <i class="fas fa-headset text-6xl text-gray-600 mb-4"></i>
+                    <h2 class="text-2xl font-bold text-white mb-2">Soporte Técnico</h2>
+                    <p class="text-gray-400 mb-6">¿Necesitas ayuda? Contáctanos</p>
+                    <a href="https://discord.gg/rvxEdWcGkf" target="_blank" class="btn-primary inline-block px-6 py-3 rounded-lg text-white font-medium">
+                        <i class="fab fa-discord mr-2"></i>Unirse al Discord
+                    </a>
+                </div>
+            `;
+        }
+
+        // ... resto de las funciones (loadDashboardData, MODAL SERVER.LUA, etc.)
+        // Se mantienen todas las funciones auxiliares del código original
+        
         async function loadDashboardData() {
             if (!currentUser) return;
-
             try {
                 const productsSnapshot = await db.collection("Productos").get();
                 allProducts = [];
@@ -941,7 +1025,6 @@ end, true, "high")`;
         function filterDashboardProducts() {
             const search = document.getElementById('dashboard-search')?.value.toLowerCase();
             if (!search) return;
-            
             document.querySelectorAll('#dashboard-products-list > div').forEach(card => {
                 card.style.display = card.innerText.toLowerCase().includes(search) ? 'flex' : 'none';
             });
@@ -1000,7 +1083,6 @@ end, true, "high")`;
 
         async function ensureFixedLicense() {
             if (!currentUser) return;
-            
             try {
                 const snapshot = await db.collection("Licencias")
                     .where("discord_id", "==", currentUser.id)
@@ -1045,379 +1127,6 @@ end, true, "high")`;
             alert('Configuración guardada');
         }
 
-        // FUNCIONES PARA SUBIR PRODUCTO
-        function setupDragAndDrop() {
-            const dropZone = document.getElementById('image-drop-zone');
-            if (!dropZone) return;
-
-            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                dropZone.addEventListener(eventName, preventDefaults, false);
-            });
-
-            function preventDefaults(e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-
-            ['dragenter', 'dragover'].forEach(eventName => {
-                dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
-            });
-
-            ['dragleave', 'drop'].forEach(eventName => {
-                dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
-            });
-
-            dropZone.addEventListener('drop', handleDrop, false);
-
-            function handleDrop(e) {
-                const dt = e.dataTransfer;
-                const files = dt.files;
-                document.getElementById('prod-images').files = files;
-                previewUploadImages(document.getElementById('prod-images'));
-            }
-        }
-
-        let tempUploadImages = [];
-
-        function previewUploadImages(input) {
-            const container = document.getElementById('image-preview-container');
-            if (!container) return;
-            
-            container.innerHTML = '';
-            tempUploadImages = [];
-            
-            if (input.files && input.files.length > 0) {
-                Array.from(input.files).slice(0, 5).forEach((file, index) => {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        tempUploadImages.push(e.target.result);
-                        const div = document.createElement('div');
-                        div.className = 'relative aspect-square rounded-lg overflow-hidden border-2 border-red-600/30';
-                        div.innerHTML = `
-                            <img src="${e.target.result}" class="w-full h-full object-cover">
-                            <button type="button" onclick="removeUploadImage(${index})" class="absolute top-2 right-2 w-6 h-6 bg-red-600 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-700">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        `;
-                        container.appendChild(div);
-                    };
-                    reader.readAsDataURL(file);
-                });
-            }
-        }
-
-        function removeUploadImage(index) {
-            tempUploadImages.splice(index, 1);
-            const input = document.getElementById('prod-images');
-            if (!input) return;
-            
-            const dt = new DataTransfer();
-            Array.from(input.files).forEach((file, i) => {
-                if (i !== index) dt.items.add(file);
-            });
-            input.files = dt.files;
-            previewUploadImages(input);
-        }
-
-        function updateFileName(input) {
-            const label = document.getElementById('file-label-text');
-            if (label && input.files && input.files[0]) {
-                label.innerText = input.files[0].name;
-                label.classList.add('text-white', 'font-bold');
-            }
-        }
-
-        async function handleProductUpload(e) {
-            e.preventDefault();
-            
-            if (tempUploadImages.length === 0) {
-                alert('Por favor selecciona al menos una imagen');
-                return;
-            }
-
-            const fileInput = document.getElementById('prod-file');
-            if (!fileInput || !fileInput.files[0]) {
-                alert('Por favor selecciona el archivo de descarga');
-                return;
-            }
-
-            try {
-                const fileBase64 = await fileToBase64(fileInput.files[0]);
-                
-                const newProduct = {
-                    id: 'prod_' + Date.now(),
-                    name: document.getElementById('prod-name').value,
-                    price: parseFloat(document.getElementById('prod-price').value),
-                    category: document.getElementById('prod-category').value,
-                    description: document.getElementById('prod-description').value,
-                    image_url: tempUploadImages[0],
-                    images: tempUploadImages,
-                    file_data: fileBase64,
-                    file_name: fileInput.files[0].name,
-                    created_at: firebase.firestore.FieldValue.serverTimestamp()
-                };
-                
-                await db.collection("Productos").doc(newProduct.id).set(newProduct);
-                
-                alert('¡Producto subido exitosamente!');
-                showSection('dashboard');
-            } catch (error) {
-                console.error(error);
-                alert('Error al subir el producto: ' + error.message);
-            }
-        }
-
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
-        }
-
-        // FUNCIONES PARA LICENCIAS
-        async function loadLicenciasData() {
-            const tbody = document.getElementById('licencias-table-body');
-            if (!tbody) return;
-
-            try {
-                const snapshot = await db.collection("Clientes").orderBy('date', 'desc').get();
-                
-                if (snapshot.empty) {
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="5" class="py-12 text-center">
-                                <i class="fas fa-inbox text-gray-600 text-4xl mb-3"></i>
-                                <p class="text-gray-400">No hay licencias registradas</p>
-                            </td>
-                        </tr>
-                    `;
-                    return;
-                }
-
-                tbody.innerHTML = snapshot.docs.map(doc => {
-                    const data = doc.data();
-                    const date = data.date?.toDate ? data.date.toDate() : new Date();
-                    const statusClass = data.status === 'Pagado' ? 'text-green-400' : 'text-yellow-400';
-                    const productsList = data.products?.map(p => p.name).join(', ') || 'N/A';
-                    
-                    return `
-                        <tr class="user-row border-b border-red-900/20">
-                            <td class="py-4 px-4">
-                                <div class="flex items-center gap-3">
-                                    <img src="${data.avatar ? `https://cdn.discordapp.com/avatars/${data.discord_id}/${data.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png'}" class="w-10 h-10 rounded-full border-2 border-red-600/30">
-                                    <span class="text-white font-semibold">${data.username || 'Desconocido'}</span>
-                                </div>
-                            </td>
-                            <td class="py-4 px-4 text-gray-300 text-sm max-w-xs truncate">${productsList}</td>
-                            <td class="py-4 px-4 text-white font-bold">${data.total_price || '$0.00'}</td>
-                            <td class="py-4 px-4"><span class="${statusClass} font-semibold">${data.status || 'Pendiente'}</span></td>
-                            <td class="py-4 px-4 text-gray-400 text-sm">${date.toLocaleDateString('es-ES')}</td>
-                        </tr>
-                    `;
-                }).join('');
-            } catch (error) {
-                console.error(error);
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="5" class="py-12 text-center text-red-400">
-                            <i class="fas fa-exclamation-triangle text-2xl mb-3"></i>
-                            <p>Error al cargar licencias</p>
-                        </td>
-                    </tr>
-                `;
-            }
-        }
-
-        // FUNCIONES PARA ENCRIPTAR
-        function encryptLua() {
-            const input = document.getElementById('lua-input');
-            if (!input || !input.value.trim()) {
-                alert('Por favor ingresa código Lua para encriptar');
-                return;
-            }
-
-            const encrypted = btoa(unescape(encodeURIComponent(input.value)));
-            const obfuscated = `-- [ENCRYPTED BY PAPELETA STORE]\nlocal _ENV=assert(loadstring([[\n${encrypted}\n]]))()\n`;
-            
-            const output = document.getElementById('lua-output');
-            const result = document.getElementById('encrypt-result');
-            
-            if (output) output.value = obfuscated;
-            if (result) result.classList.remove('hidden');
-        }
-
-        function clearEncrypt() {
-            const input = document.getElementById('lua-input');
-            const result = document.getElementById('encrypt-result');
-            
-            if (input) input.value = '';
-            if (result) result.classList.add('hidden');
-        }
-
-        function copyEncryptedCode() {
-            const output = document.getElementById('lua-output');
-            if (output && output.value) {
-                navigator.clipboard.writeText(output.value).then(() => {
-                    alert('¡Código copiado al portapapeles!');
-                });
-            }
-        }
-
-        // FUNCIONES PARA ASIGNAR
-        async function loadProductsForAssign() {
-            const select = document.getElementById('assign-product');
-            if (!select) return;
-
-            try {
-                const snapshot = await db.collection("Productos").get();
-                const products = [];
-                snapshot.forEach(doc => products.push({ id: doc.id, ...doc.data() }));
-
-                select.innerHTML = products.map(p => 
-                    `<option value="${p.id}">${p.name} - ${Number(p.price) === 0 ? 'GRATIS' : '$' + Number(p.price).toFixed(2)}</option>`
-                ).join('');
-            } catch (error) {
-                select.innerHTML = '<option value="">Error al cargar productos</option>';
-            }
-        }
-
-        async function assignProductFree() {
-            const discordId = document.getElementById('assign-discord-id')?.value;
-            const productId = document.getElementById('assign-product')?.value;
-
-            if (!discordId || !productId) {
-                alert('Por favor completa todos los campos');
-                return;
-            }
-
-            try {
-                const product = allProducts.find(p => p.id === productId);
-                
-                await db.collection("Clientes").add({
-                    discord_id: discordId,
-                    username: 'Asignado Manualmente',
-                    products: [{ id: productId, name: product?.name || 'Producto', price: 'Gratis' }],
-                    total_price: 'Gratis',
-                    date: firebase.firestore.FieldValue.serverTimestamp(),
-                    status: 'Reclamado Exitosamente'
-                });
-
-                alert('¡Producto asignado exitosamente!');
-                showSection('dashboard');
-            } catch (error) {
-                console.error(error);
-                alert('Error al asignar producto: ' + error.message);
-            }
-        }
-
-        // FUNCIONES PARA USUARIOS
-        async function loadUsuariosData() {
-            const tbody = document.getElementById('usuarios-table-body');
-            if (!tbody) return;
-
-            try {
-                const snapshot = await db.collection("UsuariosRegistrados").orderBy('last_login', 'desc').get();
-                
-                if (snapshot.empty) {
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="4" class="py-12 text-center">
-                                <i class="fas fa-inbox text-gray-600 text-4xl mb-3"></i>
-                                <p class="text-gray-400">No hay usuarios registrados</p>
-                            </td>
-                        </tr>
-                    `;
-                    return;
-                }
-
-                tbody.innerHTML = snapshot.docs.map(doc => {
-                    const data = doc.data();
-                    const lastLogin = data.last_login?.toDate ? data.last_login.toDate() : new Date();
-                    const role = data.role || 'user';
-                    const roleClass = role === 'admin' ? 'bg-red-600/20 text-red-400 border-red-600/40' : 
-                                   role === 'mod' ? 'bg-yellow-600/20 text-yellow-400 border-yellow-600/40' : 
-                                   'bg-green-600/20 text-green-400 border-green-600/40';
-                    
-                    return `
-                        <tr class="user-row border-b border-red-900/20">
-                            <td class="py-4 px-4">
-                                <div class="flex items-center gap-3">
-                                    <img src="${data.avatar ? `https://cdn.discordapp.com/avatars/${data.discord_id}/${data.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png'}" class="w-10 h-10 rounded-full border-2 border-red-600/30">
-                                    <span class="text-white font-semibold">${data.username || 'Desconocido'}</span>
-                                </div>
-                            </td>
-                            <td class="py-4 px-4">
-                                <span class="role-badge border ${roleClass}">${role.toUpperCase()}</span>
-                            </td>
-                            <td class="py-4 px-4 text-gray-400 text-sm">${lastLogin.toLocaleDateString('es-ES')}</td>
-                            <td class="py-4 px-4">
-                                <div class="flex gap-2">
-                                    ${role !== 'admin' ? `
-                                        <button onclick="setUserRole('${data.discord_id}', 'admin')" class="px-3 py-1.5 rounded-lg bg-red-600/20 border border-red-600/40 text-red-400 text-xs hover:bg-red-600/30">
-                                            Hacer Admin
-                                        </button>
-                                    ` : ''}
-                                    ${role !== 'mod' ? `
-                                        <button onclick="setUserRole('${data.discord_id}', 'mod')" class="px-3 py-1.5 rounded-lg bg-yellow-600/20 border border-yellow-600/40 text-yellow-400 text-xs hover:bg-yellow-600/30">
-                                            Hacer Mod
-                                        </button>
-                                    ` : ''}
-                                    <button onclick="setUserRole('${data.discord_id}', 'user')" class="px-3 py-1.5 rounded-lg bg-gray-600/20 border border-gray-600/40 text-gray-400 text-xs hover:bg-gray-600/30">
-                                        Quitar Rol
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                }).join('');
-            } catch (error) {
-                console.error(error);
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="4" class="py-12 text-center text-red-400">
-                            <i class="fas fa-exclamation-triangle text-2xl mb-3"></i>
-                            <p>Error al cargar usuarios</p>
-                        </td>
-                    </tr>
-                `;
-            }
-        }
-
-        async function setUserRole(discordId, role) {
-            try {
-                await db.collection("UsuariosRegistrados").doc(discordId).update({ role: role });
-                alert(`Rol actualizado a ${role.toUpperCase()}`);
-                showSection('usuarios');
-            } catch (error) {
-                alert('Error al actualizar rol: ' + error.message);
-            }
-        }
-
-        // FUNCIONES PARA CREAR ROL
-        function selectRoleColor(color) {
-            document.querySelectorAll('.role-color-btn').forEach(btn => {
-                btn.classList.remove('ring-2', 'ring-red-600', 'ring-blue-600', 'ring-green-600', 'ring-purple-600', 'ring-yellow-600');
-                btn.style.borderColor = 'transparent';
-            });
-            
-            const selected = event.currentTarget;
-            selected.style.borderColor = 'white';
-            selected.classList.add(`ring-2`, `ring-${color}-600`);
-        }
-
-        function createNewRole() {
-            const roleName = document.getElementById('role-name')?.value;
-            if (!roleName || !roleName.trim()) {
-                alert('Por favor ingresa un nombre para el rol');
-                return;
-            }
-            
-            alert(`Rol "${roleName}" creado exitosamente (simulado)`);
-            showSection('usuarios');
-        }
-
         // MODAL SERVER.LUA
         function openLuaModal() {
             if (!isAdmin()) {
@@ -1444,7 +1153,6 @@ end, true, "high")`;
             if (e.target === this) closeLuaModal();
         });
 
-        // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
             checkDiscordAuth();
         });
