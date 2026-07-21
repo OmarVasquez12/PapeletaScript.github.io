@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Producto | Papeleta Store</title>
+    <title>Producto</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff1a1a'/%3E%3Cstop offset='1' stop-color='%23cc1b1b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Ctext x='50' y='70' font-family='Arial, sans-serif' font-size='58' font-weight='900' fill='white' text-anchor='middle'%3EP%3C/text%3E%3C/svg%3E">
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -84,6 +84,18 @@
             object-fit: contain;
         }
 
+        .youtube-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .youtube-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
         .gallery-nav {
             position: absolute;
             top: 50%;
@@ -127,6 +139,18 @@
             opacity: 1;
             border-color: var(--primary);
             box-shadow: 0 0 8px rgba(220, 38, 38, 0.4);
+        }
+
+        .tab-button {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .tab-button.active {
+            color: #ef4444;
+            border-bottom: 2px solid #ef4444;
+        }
+        .tab-button:not(.active):hover {
+            color: #9ca3af;
         }
 
         ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -201,13 +225,29 @@
             margin-bottom: 0.75rem;
             border: 1px solid rgba(255,255,255,0.05);
         }
+
+        .no-video-message {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #6b7280;
+            text-align: center;
+            padding: 2rem;
+        }
+        .no-video-message i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
     </style>
 </head>
 <body class="relative">
 
     <canvas id="network-bg"></canvas>
 
-    <!-- MODAL DE LOGIN (CORREGIDO) -->
+    <!-- MODAL DE LOGIN -->
     <div id="login-modal" class="login-modal-overlay">
         <div class="login-card p-8 text-center relative">
             <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
@@ -244,20 +284,31 @@
     <main class="relative z-10 w-full max-w-7xl ml-4 md:ml-10 py-10 pr-4">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
             <div class="lg:col-span-7 flex flex-col">
-                <div class="gallery-frame shadow-2xl shadow-red-900/10 group">
+                <!-- Gallery Frame con Imagen o Video -->
+                <div class="gallery-frame shadow-2xl shadow-red-900/10 group" id="gallery-container">
+                    <!-- Imagen principal -->
                     <img id="main-image" src="" alt="Producto" class="gallery-image p-2">
-                    <div class="absolute top-4 left-4 bg-black/60 px-3 py-1 rounded-full text-xs font-mono border border-white/10 backdrop-blur-sm">
+                    
+                    <!-- Contenedor de Video YouTube (oculto por defecto) -->
+                    <div id="youtube-video-container" class="youtube-container hidden"></div>
+                    
+                    <div class="absolute top-4 left-4 bg-black/60 px-3 py-1 rounded-full text-xs font-mono border border-white/10 backdrop-blur-sm" id="image-counter">
                         <span id="current-img-idx">1</span> / <span id="total-img-idx">1</span>
                     </div>
-                    <button class="gallery-nav nav-prev" onclick="moveSlide(-1)"><i class="fas fa-chevron-left"></i></button>
-                    <button class="gallery-nav nav-next" onclick="moveSlide(1)"><i class="fas fa-chevron-right"></i></button>
+                    
+                    <button class="gallery-nav nav-prev" id="nav-prev" onclick="moveSlide(-1)"><i class="fas fa-chevron-left"></i></button>
+                    <button class="gallery-nav nav-next" id="nav-next" onclick="moveSlide(1)"><i class="fas fa-chevron-right"></i></button>
                 </div>
+                
+                <!-- Thumbnails (solo para imágenes) -->
                 <div id="thumbnails-list" class="thumbnails-container mt-4"></div>
+                
+                <!-- Tabs Imagen/Video -->
                 <div class="flex gap-4 mt-6 border-b border-white/10 pb-2">
-                    <button class="text-red-500 font-semibold border-b-2 border-red-500 pb-2 px-2 text-sm flex items-center gap-2">
+                    <button class="tab-button active pb-2 px-2 text-sm flex items-center gap-2" onclick="switchTab('image')" id="tab-image">
                         <i class="fas fa-image"></i> IMAGEN
                     </button>
-                    <button class="text-gray-500 hover:text-gray-300 pb-2 px-2 text-sm flex items-center gap-2 transition-colors">
+                    <button class="tab-button pb-2 px-2 text-sm flex items-center gap-2" onclick="switchTab('video')" id="tab-video" style="display: none;">
                         <i class="fas fa-video"></i> VIDEO
                     </button>
                 </div>
@@ -373,6 +424,7 @@
         let userAlreadyOwns = false;
         let currentUserDiscordId = null;
         let currentUserData = null;
+        let currentTab = 'image'; // 'image' o 'video'
 
         // --- LÓGICA DEL CARRITO ---
         let cart = JSON.parse(localStorage.getItem('papeleta_cart') || '[]');
@@ -473,7 +525,7 @@
             totalEl.textContent = total === 0 ? 'GRATIS' : '$' + total.toFixed(2);
         }
 
-        // --- FUNCIONES DE LOGIN CORREGIDAS ---
+        // --- FUNCIONES DE LOGIN ---
         function openLoginModal() {
             document.getElementById('login-modal').classList.add('active');
         }
@@ -509,7 +561,7 @@
             const token = localStorage.getItem('dc_access_token');
             if (!token) {
                 alert('Debes iniciar sesión para completar la compra');
-                openLoginModal(); // <-- AHORA ABRE EL MODAL EN LUGAR DE REDIRIGIR
+                openLoginModal();
                 return;
             }
 
@@ -697,6 +749,93 @@
             }
         }
 
+        // NUEVA FUNCIÓN: Cambiar entre tabs Imagen/Video
+        function switchTab(tab) {
+            currentTab = tab;
+            const imageTab = document.getElementById('tab-image');
+            const videoTab = document.getElementById('tab-video');
+            const mainImage = document.getElementById('main-image');
+            const youtubeContainer = document.getElementById('youtube-video-container');
+            const thumbnailsList = document.getElementById('thumbnails-list');
+            const navPrev = document.getElementById('nav-prev');
+            const navNext = document.getElementById('nav-next');
+            const imageCounter = document.getElementById('image-counter');
+
+            if (tab === 'image') {
+                imageTab.classList.add('active');
+                videoTab.classList.remove('active');
+                
+                mainImage.classList.remove('hidden');
+                youtubeContainer.classList.add('hidden');
+                thumbnailsList.classList.remove('hidden');
+                navPrev.style.display = 'flex';
+                navNext.style.display = 'flex';
+                imageCounter.style.display = 'block';
+                
+            } else if (tab === 'video') {
+                imageTab.classList.remove('active');
+                videoTab.classList.add('active');
+                
+                mainImage.classList.add('hidden');
+                youtubeContainer.classList.remove('hidden');
+                thumbnailsList.classList.add('hidden');
+                navPrev.style.display = 'none';
+                navNext.style.display = 'none';
+                imageCounter.style.display = 'none';
+                
+                // Cargar video de YouTube
+                loadYouTubeVideo();
+            }
+        }
+
+        function loadYouTubeVideo() {
+            const youtubeContainer = document.getElementById('youtube-video-container');
+            
+            if (currentProduct && currentProduct.youtube_id) {
+                youtubeContainer.innerHTML = `
+                    <iframe 
+                        src="https://www.youtube.com/embed/${currentProduct.youtube_id}?autoplay=0&rel=0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe>
+                `;
+            } else if (currentProduct && currentProduct.youtube_url) {
+                // Intentar extraer ID del URL si solo tenemos el URL
+                const videoId = extractYouTubeId(currentProduct.youtube_url);
+                if (videoId) {
+                    youtubeContainer.innerHTML = `
+                        <iframe 
+                            src="https://www.youtube.com/embed/${videoId}?autoplay=0&rel=0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    `;
+                } else {
+                    showNoVideoMessage();
+                }
+            } else {
+                showNoVideoMessage();
+            }
+        }
+
+        function showNoVideoMessage() {
+            const youtubeContainer = document.getElementById('youtube-video-container');
+            youtubeContainer.innerHTML = `
+                <div class="no-video-message">
+                    <i class="fas fa-video-slash"></i>
+                    <p class="text-lg font-semibold">No hay video disponible</p>
+                    <p class="text-sm">Este producto no tiene video de presentación</p>
+                </div>
+            `;
+        }
+
+        function extractYouTubeId(url) {
+            if (!url) return null;
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
         async function loadProduct() {
             if (!productId) return window.location.href = 'index.html';
 
@@ -714,6 +853,14 @@
                 document.getElementById('prod-title').textContent = currentProduct.name;
                 document.getElementById('prod-desc').textContent = currentProduct.description || "Sin descripción.";
                 document.getElementById('prod-category').textContent = currentProduct.category || "General";
+
+                // Mostrar/ocultar tab de video si existe
+                const videoTab = document.getElementById('tab-video');
+                if (currentProduct.youtube_id || currentProduct.youtube_url) {
+                    videoTab.style.display = 'flex';
+                } else {
+                    videoTab.style.display = 'none';
+                }
 
                 const priceTag = document.getElementById('price-tag');
                 const mainBtn = document.getElementById('main-action-btn');
@@ -851,7 +998,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            checkDiscordAuth(); // Verifica si viene de Discord
+            checkDiscordAuth();
             loadProduct();
             initNetworkBg();
         });
