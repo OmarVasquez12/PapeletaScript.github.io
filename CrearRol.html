@@ -1,4 +1,4 @@
-<!-- SECCIÓN CREAR ROL - FRAGMENTO PARA CARGA DINÁMICA -->
+<!-- SECCIÓN CREAR ROL - FRAGMENTO AUTÓNOMO -->
 <div class="max-w-7xl mx-auto">
     
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -235,11 +235,30 @@
     }
 </style>
 
-<!-- LÓGICA JAVASCRIPT DE LA SECCIÓN -->
+<!-- LÓGICA JAVASCRIPT DE LA SECCIÓN (AUTÓNOMA) -->
 <script>
-    // Variables globales para esta sección
+    // Variables locales para esta sección
     let currentPermissions = {};
     let existingRoles = [];
+
+    // Funciones auxiliares locales (no dependen del contexto global)
+    function escapeHTML(str) {
+        return String(str).replace(/[&<>'"]/g, tag => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+        }[tag] || tag));
+    }
+
+    function formatPermName(key) {
+        const names = {
+            canAccessConfig: 'Config',
+            canUploadProducts: 'Subir',
+            canDeleteProducts: 'Eliminar',
+            canAssignProducts: 'Asignar',
+            canViewLicenses: 'Licencias',
+            canManageRoles: 'Roles'
+        };
+        return names[key] || key;
+    }
 
     // Inicializar permisos en falso
     function initPermissions() {
@@ -303,7 +322,7 @@
                 description: description || 'Sin descripción',
                 permissions: { ...currentPermissions },
                 created_at: new Date().toISOString(),
-                created_by: currentUser ? currentUser.username : 'admin'
+                created_by: 'admin' // Usamos 'admin' directamente, no currentUser
             };
 
             // Guardar en localStorage (persistencia de roles)
@@ -313,9 +332,7 @@
             alert(`✅ Rol "${name}" creado exitosamente`);
 
             // Resetear formulario
-            if (document.getElementById('create-role-form')) {
-                document.getElementById('create-role-form').reset();
-            }
+            document.getElementById('create-role-form').reset();
             updateColorPreview('#ff1a1a');
             initPermissions();
 
@@ -410,24 +427,6 @@
         localStorage.setItem('papeleta_custom_roles', JSON.stringify(existingRoles));
         renderRoles();
         alert('✅ Rol eliminado correctamente');
-    }
-
-    function formatPermName(key) {
-        const names = {
-            canAccessConfig: 'Config',
-            canUploadProducts: 'Subir',
-            canDeleteProducts: 'Eliminar',
-            canAssignProducts: 'Asignar',
-            canViewLicenses: 'Licencias',
-            canManageRoles: 'Roles'
-        };
-        return names[key] || key;
-    }
-
-    function escapeHTML(str) {
-        return String(str).replace(/[&<>'"]/g, tag => ({
-            '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
-        }[tag] || tag));
     }
 
     // Ejecutar inicialización cuando se carga la sección
