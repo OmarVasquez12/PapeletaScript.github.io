@@ -15,9 +15,7 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap');
         
-        * {
-            font-family: 'Inter', sans-serif;
-        }
+        * { font-family: 'Inter', sans-serif; }
         
         body {
             background: linear-gradient(135deg, #050507 0%, #150a0a 100%);
@@ -36,68 +34,27 @@
             backdrop-filter: blur(10px);
         }
         
-        .nav-item {
-            transition: all 0.3s ease;
-        }
-        
-        .nav-item:hover {
-            background: rgba(255, 26, 26, 0.1);
-            color: white;
-        }
-        
-        .nav-item.active {
-            background: rgba(255, 26, 26, 0.15);
-            border-left: 3px solid #ff1a1a;
-            color: #ff6b6b;
-        }
+        .nav-item { transition: all 0.3s ease; }
+        .nav-item:hover { background: rgba(255, 26, 26, 0.1); color: white; }
+        .nav-item.active { background: rgba(255, 26, 26, 0.15); border-left: 3px solid #ff1a1a; color: #ff6b6b; }
         
         .admin-nav-item {
             border: 1px solid rgba(255, 26, 26, 0.2);
             background: rgba(255, 26, 26, 0.05);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+        .admin-nav-item:hover { background: rgba(255, 26, 26, 0.15); border-color: rgba(255, 26, 26, 0.4); transform: translateX(4px); }
+        .admin-nav-item.active-section { background: rgba(255, 26, 26, 0.2); border-color: rgba(255, 26, 26, 0.6); box-shadow: 0 0 20px rgba(255, 26, 26, 0.2); }
         
-        .admin-nav-item:hover {
-            background: rgba(255, 26, 26, 0.15);
-            border-color: rgba(255, 26, 26, 0.4);
-            transform: translateX(4px);
-        }
+        .stat-card { background: linear-gradient(135deg, rgba(21, 10, 10, 0.8) 0%, rgba(13, 5, 5, 0.8) 100%); border: 1px solid rgba(255, 26, 26, 0.15); }
         
-        .admin-nav-item.active-section {
-            background: rgba(255, 26, 26, 0.2);
-            border-color: rgba(255, 26, 26, 0.6);
-            box-shadow: 0 0 20px rgba(255, 26, 26, 0.2);
-        }
+        .btn-primary { background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); transition: all 0.3s ease; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(220, 38, 38, 0.3); }
         
-        .stat-card {
-            background: linear-gradient(135deg, rgba(21, 10, 10, 0.8) 0%, rgba(13, 5, 5, 0.8) 100%);
-            border: 1px solid rgba(255, 26, 26, 0.15);
-        }
+        .input-field { background: rgba(13, 5, 5, 0.8); border: 1px solid rgba(255, 26, 26, 0.2); }
+        .input-field:focus { border-color: #ff1a1a; outline: none; }
         
-        .btn-primary {
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-            transition: all 0.3s ease;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(220, 38, 38, 0.3);
-        }
-        
-        .input-field {
-            background: rgba(13, 5, 5, 0.8);
-            border: 1px solid rgba(255, 26, 26, 0.2);
-        }
-        
-        .input-field:focus {
-            border-color: #ff1a1a;
-            outline: none;
-        }
-        
-        .code-block {
-            background: rgba(5, 5, 7, 0.9);
-            border: 1px solid rgba(255, 26, 26, 0.2);
-        }
+        .code-block { background: rgba(5, 5, 7, 0.9); border: 1px solid rgba(255, 26, 26, 0.2); }
         
         .gradient-text {
             background: linear-gradient(135deg, #ff1a1a 0%, #ff6b6b 100%);
@@ -112,164 +69,40 @@
 
         /* Modal Server.Lua */
         .lua-modal {
-            position: fixed; 
-            inset: 0; 
-            z-index: 100;
-            background: rgba(0,0,0,0.9); 
-            backdrop-filter: blur(8px);
-            display: none; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 20px;
+            position: fixed; inset: 0; z-index: 100;
+            background: rgba(0,0,0,0.9); backdrop-filter: blur(8px);
+            display: none; align-items: center; justify-content: center; padding: 20px;
             animation: fadeIn 0.3s ease;
         }
-        
-        .lua-modal.active { 
-            display: flex; 
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+        .lua-modal.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
         .lua-code-container {
-            background: #0a0505; 
-            border: 2px solid #dc2626;
-            border-radius: 16px; 
-            padding: 0;
-            width: 100%; 
-            max-width: 1000px;
-            max-height: 85vh;
-            display: flex;
-            flex-direction: column;
+            background: #0a0505; border: 2px solid #dc2626; border-radius: 16px; padding: 0;
+            width: 100%; max-width: 1000px; max-height: 85vh;
+            display: flex; flex-direction: column;
             box-shadow: 0 0 60px rgba(220, 38, 38, 0.3);
             animation: slideUp 0.3s ease;
         }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        
-        .lua-header {
-            background: linear-gradient(135deg, #150a0a 0%, #0d0505 100%);
-            border-bottom: 2px solid #dc2626;
-            padding: 20px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .lua-body {
-            flex: 1;
-            overflow: auto;
-            padding: 24px;
-            background: #050507;
-        }
-        
-        .lua-pre {
-            font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
-            color: #ffffff;
-            font-size: 13px; 
-            line-height: 1.7;
-            white-space: pre-wrap; 
-            word-break: break-all;
-            margin: 0;
-        }
-        
-        .lua-footer {
-            background: #0d0505;
-            border-top: 1px solid rgba(220, 38, 38, 0.3);
-            padding: 16px 24px;
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-        }
+        .lua-header { background: linear-gradient(135deg, #150a0a 0%, #0d0505 100%); border-bottom: 2px solid #dc2626; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; }
+        .lua-body { flex: 1; overflow: auto; padding: 24px; background: #050507; }
+        .lua-pre { font-family: 'Fira Code', 'Consolas', 'Monaco', monospace; color: #ffffff; font-size: 13px; line-height: 1.7; white-space: pre-wrap; word-break: break-all; margin: 0; }
+        .lua-footer { background: #0d0505; border-top: 1px solid rgba(220, 38, 38, 0.3); padding: 16px 24px; display: flex; justify-content: flex-end; gap: 12px; }
         
         .admin-badge {
-            background: rgba(220, 38, 38, 0.2);
-            border: 1px solid rgba(220, 38, 38, 0.5);
-            color: #ff6b6b;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-left: 8px;
+            background: rgba(220, 38, 38, 0.2); border: 1px solid rgba(220, 38, 38, 0.5);
+            color: #ff6b6b; padding: 2px 8px; border-radius: 4px;
+            font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-left: 8px;
         }
+        .admin-section-title { background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.3); color: #ff6b6b; }
 
-        .admin-section-title {
-            background: rgba(220, 38, 38, 0.1);
-            border: 1px solid rgba(220, 38, 38, 0.3);
-            color: #ff6b6b;
-        }
+        .section-content { animation: sectionFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        @keyframes sectionFadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .section-content {
-            animation: sectionFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        @keyframes sectionFadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .upload-zone {
-            border: 2px dashed rgba(255, 26, 26, 0.3);
-            background: rgba(255, 26, 26, 0.02);
-            transition: all 0.3s ease;
-        }
-
-        .upload-zone:hover {
-            border-color: rgba(255, 26, 26, 0.6);
-            background: rgba(255, 26, 26, 0.05);
-            transform: scale(1.01);
-        }
-
-        .upload-zone.dragover {
-            border-color: #ff1a1a;
-            background: rgba(255, 26, 26, 0.1);
-            box-shadow: 0 0 30px rgba(255, 26, 26, 0.2);
-        }
-
-        .encrypt-box {
-            background: linear-gradient(135deg, rgba(21, 10, 10, 0.9), rgba(13, 5, 5, 0.9));
-            border: 1px solid rgba(255, 26, 26, 0.2);
-        }
-
-        .user-row {
-            transition: all 0.2s ease;
-        }
-
-        .user-row:hover {
-            background: rgba(255, 26, 26, 0.05);
-            transform: translateX(4px);
-        }
-
-        .role-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .loading-spinner {
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
+        .loading-spinner { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="min-h-screen flex">
@@ -278,9 +111,7 @@
     <aside class="sidebar w-64 fixed left-0 top-0 h-full z-50 hidden md:block overflow-y-auto custom-scrollbar">
         <div class="p-6">
             <div class="flex items-center gap-3 mb-8 cursor-pointer" onclick="showSection('dashboard')">
-                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center font-black text-white shadow-lg shadow-red-900/50">
-                    P
-                </div>
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center font-black text-white shadow-lg shadow-red-900/50">P</div>
                 <div>
                     <span class="text-white font-bold text-lg tracking-wide block">AREA CLIENTES</span>
                     <span id="admin-badge-sidebar" class="admin-badge hidden">ADMIN</span>
@@ -291,28 +122,19 @@
                 <div class="text-xs text-gray-500 uppercase font-semibold mb-4 px-3 tracking-wider">Principal</div>
                 
                 <a href="#" onclick="showSection('dashboard')" id="nav-dashboard" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
-                    <i class="fas fa-home w-5"></i>
-                    <span>Inicio</span>
+                    <i class="fas fa-home w-5"></i><span>Inicio</span>
                 </a>
-                
                 <a href="index.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
-                    <i class="fas fa-store w-5"></i>
-                    <span>Tienda</span>
+                    <i class="fas fa-store w-5"></i><span>Tienda</span>
                 </a>
-                
                 <a href="#" onclick="showSection('reviews')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
-                    <i class="fas fa-star w-5"></i>
-                    <span>Mis Reseñas</span>
+                    <i class="fas fa-star w-5"></i><span>Mis Reseñas</span>
                 </a>
-                
                 <a href="#" onclick="showSection('support')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
-                    <i class="fas fa-headset w-5"></i>
-                    <span>Soporte</span>
+                    <i class="fas fa-headset w-5"></i><span>Soporte</span>
                 </a>
-                
                 <a href="https://discord.gg/rvxEdWcGkf" target="_blank" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
-                    <i class="fab fa-discord w-5"></i>
-                    <span>Discord</span>
+                    <i class="fab fa-discord w-5"></i><span>Discord</span>
                 </a>
 
                 <!-- SECCIÓN DE ADMINISTRACIÓN - SOLO VISIBLE PARA ADMINS -->
@@ -321,74 +143,33 @@
                         <i class="fas fa-shield-alt"></i> Panel Admin
                     </div>
                     
-                    <a href="#" onclick="loadExternalSection('subir-producto', 'SubirProducto.html')" id="nav-subir-producto" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
-                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-cloud-upload-alt text-red-400 text-sm"></i>
-                        </div>
-                        <div>
-                            <span class="text-sm font-semibold block">Subir Producto</span>
-                            <span class="text-[10px] text-gray-500 block">Agregar nuevos recursos</span>
-                        </div>
+                    <a href="#" onclick="loadExternalSection('subir-producto')" id="nav-subir-producto" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
+                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0"><i class="fas fa-cloud-upload-alt text-red-400 text-sm"></i></div>
+                        <div><span class="text-sm font-semibold block">Subir Producto</span><span class="text-[10px] text-gray-500 block">Agregar nuevos recursos</span></div>
                     </a>
-                    
-                    <a href="#" onclick="loadExternalSection('licencias', 'LicenciaUsuario.html')" id="nav-licencias" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
-                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-key text-red-400 text-sm"></i>
-                        </div>
-                        <div>
-                            <span class="text-sm font-semibold block">Licencias Usuario</span>
-                            <span class="text-[10px] text-gray-500 block">Ver historial de compras</span>
-                        </div>
+                    <a href="#" onclick="loadExternalSection('licencias')" id="nav-licencias" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
+                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0"><i class="fas fa-key text-red-400 text-sm"></i></div>
+                        <div><span class="text-sm font-semibold block">Licencias Usuario</span><span class="text-[10px] text-gray-500 block">Ver historial de compras</span></div>
                     </a>
-                    
-                    <a href="#" onclick="loadExternalSection('encriptar', 'Encriptar.html')" id="nav-encriptar" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
-                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-lock text-red-400 text-sm"></i>
-                        </div>
-                        <div>
-                            <span class="text-sm font-semibold block">Encriptar Script</span>
-                            <span class="text-[10px] text-gray-500 block">Proteger archivos Lua</span>
-                        </div>
+                    <a href="#" onclick="loadExternalSection('encriptar')" id="nav-encriptar" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
+                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0"><i class="fas fa-lock text-red-400 text-sm"></i></div>
+                        <div><span class="text-sm font-semibold block">Encriptar Script</span><span class="text-[10px] text-gray-500 block">Proteger archivos Lua</span></div>
                     </a>
-                    
-                    <a href="#" onclick="loadExternalSection('asignar', 'PasarUsuarios.html')" id="nav-asignar" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
-                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-user-plus text-red-400 text-sm"></i>
-                        </div>
-                        <div>
-                            <span class="text-sm font-semibold block">Pasar a Usuarios</span>
-                            <span class="text-[10px] text-gray-500 block">Asignar productos gratis</span>
-                        </div>
+                    <a href="#" onclick="loadExternalSection('asignar')" id="nav-asignar" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
+                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0"><i class="fas fa-user-plus text-red-400 text-sm"></i></div>
+                        <div><span class="text-sm font-semibold block">Pasar a Usuarios</span><span class="text-[10px] text-gray-500 block">Asignar productos gratis</span></div>
                     </a>
-                    
-                    <a href="#" onclick="loadExternalSection('usuarios', 'UsuariosAutorizado.html')" id="nav-usuarios" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
-                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-users-cog text-red-400 text-sm"></i>
-                        </div>
-                        <div>
-                            <span class="text-sm font-semibold block">Usuarios Autorizados</span>
-                            <span class="text-[10px] text-gray-500 block">Gestionar roles Admin</span>
-                        </div>
+                    <a href="#" onclick="loadExternalSection('usuarios')" id="nav-usuarios" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
+                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0"><i class="fas fa-users-cog text-red-400 text-sm"></i></div>
+                        <div><span class="text-sm font-semibold block">Usuarios Autorizados</span><span class="text-[10px] text-gray-500 block">Gestionar roles Admin</span></div>
                     </a>
-                    
-                    <a href="#" onclick="loadExternalSection('crear-rol', 'CrearRol.html')" id="nav-crear-rol" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
-                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-id-badge text-red-400 text-sm"></i>
-                        </div>
-                        <div>
-                            <span class="text-sm font-semibold block">Crear Rol</span>
-                            <span class="text-[10px] text-gray-500 block">Definir permisos</span>
-                        </div>
+                    <a href="#" onclick="loadExternalSection('crear-rol')" id="nav-crear-rol" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 mb-2">
+                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0"><i class="fas fa-id-badge text-red-400 text-sm"></i></div>
+                        <div><span class="text-sm font-semibold block">Crear Rol</span><span class="text-[10px] text-gray-500 block">Definir permisos</span></div>
                     </a>
-
                     <a href="#" onclick="openLuaModal()" class="admin-nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300">
-                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-file-code text-red-400 text-sm"></i>
-                        </div>
-                        <div>
-                            <span class="text-sm font-semibold block">Server.Lua</span>
-                            <span class="text-[10px] text-gray-500 block">Sistema de licencias</span>
-                        </div>
+                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center flex-shrink-0"><i class="fas fa-file-code text-red-400 text-sm"></i></div>
+                        <div><span class="text-sm font-semibold block">Server.Lua</span><span class="text-[10px] text-gray-500 block">Sistema de licencias</span></div>
                     </a>
                 </div>
             </nav>
@@ -401,9 +182,7 @@
                     <p id="sidebar-username" class="text-white font-medium text-sm truncate">Usuario</p>
                     <p id="sidebar-role" class="text-red-400 text-xs font-bold uppercase">Cliente</p>
                 </div>
-                <button onclick="logout()" class="text-gray-400 hover:text-red-400 transition-colors" title="Cerrar Sesión">
-                    <i class="fas fa-sign-out-alt"></i>
-                </button>
+                <button onclick="logout()" class="text-gray-400 hover:text-red-400 transition-colors" title="Cerrar Sesión"><i class="fas fa-sign-out-alt"></i></button>
             </div>
         </div>
     </aside>
@@ -419,10 +198,8 @@
                     </h1>
                     <p id="header-subtitle" class="text-gray-400 text-sm">Gestiona tus productos y licencias desde aquí</p>
                 </div>
-                
                 <a href="index.html" class="btn-primary px-5 py-2.5 rounded-lg text-white font-bold flex items-center gap-2 shadow-lg shadow-red-900/20">
-                    <i class="fas fa-shopping-cart"></i>
-                    Ir al Catálogo
+                    <i class="fas fa-shopping-cart"></i> Ir al Catálogo
                 </a>
             </div>
         </header>
@@ -439,27 +216,14 @@
             <div class="lua-header">
                 <div class="flex items-center gap-3">
                     <i class="fas fa-file-code text-red-500 text-2xl"></i>
-                    <div>
-                        <h3 class="text-xl font-bold text-white">Server.Lua</h3>
-                        <p class="text-gray-400 text-xs">Sistema de Validación de Licencias</p>
-                    </div>
+                    <div><h3 class="text-xl font-bold text-white">Server.Lua</h3><p class="text-gray-400 text-xs">Sistema de Validación de Licencias</p></div>
                 </div>
-                <button onclick="closeLuaModal()" class="text-gray-400 hover:text-white text-2xl transition-colors">
-                    <i class="fas fa-times"></i>
-                </button>
+                <button onclick="closeLuaModal()" class="text-gray-400 hover:text-white text-2xl transition-colors"><i class="fas fa-times"></i></button>
             </div>
-            
-            <div class="lua-body">
-                <pre id="lua-code-content" class="lua-pre"></pre>
-            </div>
-            
+            <div class="lua-body"><pre id="lua-code-content" class="lua-pre"></pre></div>
             <div class="lua-footer">
-                <button onclick="closeLuaModal()" class="px-4 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-800 font-medium text-sm">
-                    Cerrar
-                </button>
-                <button onclick="copyLuaCode()" class="btn-primary px-6 py-2 rounded-lg text-white font-bold flex items-center gap-2 text-sm">
-                    <i class="fas fa-copy"></i> Copiar Código
-                </button>
+                <button onclick="closeLuaModal()" class="px-4 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-800 font-medium text-sm">Cerrar</button>
+                <button onclick="copyLuaCode()" class="btn-primary px-6 py-2 rounded-lg text-white font-bold flex items-center gap-2 text-sm"><i class="fas fa-copy"></i> Copiar Código</button>
             </div>
         </div>
     </div>
@@ -506,7 +270,6 @@ end
 local function tienePermisoACL()
     local resourceName = getResourceName(getThisResource())
     local resObj = "resource." .. resourceName
-    
     if not isObjectInACLGroup(resObj, aclGetGroup("Admin")) then
         outputDebugString("[Papeleta Progamador] El resource '"..resourceName.."' NO tiene permiso en ACL 'Admin'", 1)
         return false
@@ -525,7 +288,6 @@ local function validarLicencia()
         stopResource(getThisResource())
         return
     end
-
     local userLocal = clean(configLicense["User"])
     local keyLocal = clean(configLicense["Key"])
     local resourceName = clean(getResourceName(getThisResource()))
@@ -535,18 +297,11 @@ local function validarLicencia()
         local ipActual = ""
         if ipErr == 0 then
             local ipTable = fromJSON(ipData)
-            if ipTable and ipTable.ip then
-                ipActual = clean(ipTable.ip)
-            end
+            if ipTable and ipTable.ip then ipActual = clean(ipTable.ip) end
         end
-        
         if ipActual == "" or ipActual == "0.0.0.0" then
             ipActual = clean(getServerConfigSetting("serverip") or "")
-            if ipActual == "auto" or ipActual == "" then
-                outputDebugString("[Papeleta Progamador] ADVERTENCIA: No se pudo detectar IP automáticamente", 2)
-            end
         end
-        
         local ipPortCompleto = ipActual .. ":" .. portActual
         validarConFirebase(ipPortCompleto, userLocal, keyLocal, resourceName)
     end)
@@ -554,57 +309,45 @@ end
 
 function validarConFirebase(ipPortCompleto, userLocal, keyLocal, resourceName)
     local urlBase = "https://firestore.googleapis.com/v1/projects/licenciapapeleta12/databases/(default)/documents/licencias"
-    
     fetchRemote(urlBase, function(data, err)
         if err ~= 0 then
             outputDebugString("[Papeleta Progamador] Fallo de conexión a Firestore", 1)
             stopResource(getThisResource())
             return
         end
-
         local db = fromJSON(data)
         local autorizado = false
         local keyEncontradaPeroMalSistema = false
-
         if db and db.documents then
             for _, doc in ipairs(db.documents) do
                 local f = doc.fields
                 if f and f.user and f.key and f.ip and f.port and f.active and f.resource then
                     local fireUser = clean(f.user.stringValue)
                     local fireKey = clean(f.key.stringValue)
-                    local fireIp   = clean(f.ip.stringValue)
+                    local fireIp = clean(f.ip.stringValue)
                     local firePort = clean(f.port.stringValue)
                     local fireResource = clean(f.resource.stringValue)
                     local fireIpPort = fireIp .. ":" .. firePort
                     local fireStatus = f.active.booleanValue
-
                     if fireKey == keyLocal then
                         if fireResource == resourceName then
-                            if fireUser == userLocal and fireIpPort == ipPortCompleto and fireStatus == true then
-                                autorizado = true
-                            end
+                            if fireUser == userLocal and fireIpPort == ipPortCompleto and fireStatus == true then autorizado = true end
                         else
                             keyEncontradaPeroMalSistema = true
                             outputDebugString("[Papeleta Progamador] ERROR: Key válida pero pertenece al sistema '" .. fireResource .. "'", 1)
-                            outputDebugString("[Papeleta Progamador] Este sistema es '" .. resourceName .. "'. Licencia denegada.", 1)
                         end
                         break
                     end
                 end
             end
         end
-
         if autorizado then
             if not _G["ScriptYaCargado"] then
                 outputDebugString("[Papeleta Progamador] LICENCIA VERIFICADA EXITOSAMENTE", 3)
                 cargarScriptPrincipal()
             end
         else
-            if keyEncontradaPeroMalSistema then
-                outputDebugString("[Papeleta Progamador] LICENCIA NO VALIDAD", 1)
-            else
-                outputDebugString("[Papeleta Progamador] LICENCIA NO VERIFICADA ", 1)
-            end
+            outputDebugString("[Papeleta Progamador] LICENCIA NO VERIFICADA", 1)
             stopResource(getThisResource())
         end
     end)
@@ -621,45 +364,30 @@ addEventHandler("onResourceStart", resourceRoot, function()
     setTimer(validarLicencia, 8996400000, 0)
 end, true, "high")`;
 
-        function isAdmin() {
-            if (!currentUser) return false;
-            return ADMIN_DISCORD_IDS.includes(currentUser.id);
-        }
+        function isAdmin() { return currentUser && ADMIN_DISCORD_IDS.includes(currentUser.id); }
 
         function redirectToDiscord() {
-            const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20email`;
-            window.location.href = url;
+            window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20email`;
         }
 
         function checkDiscordAuth() {
             const fragment = new URLSearchParams(window.location.hash.slice(1));
             const accessToken = fragment.get('access_token');
-
             if (accessToken) {
                 window.location.hash = '';
                 localStorage.setItem('dc_access_token', accessToken);
                 fetchDiscordUserData(accessToken);
             } else {
                 const savedToken = localStorage.getItem('dc_access_token');
-                if (savedToken) {
-                    fetchDiscordUserData(savedToken);
-                } else {
-                    document.getElementById('login-modal').classList.remove('hidden');
-                }
+                savedToken ? fetchDiscordUserData(savedToken) : document.getElementById('login-modal').classList.remove('hidden');
             }
         }
 
         function fetchDiscordUserData(token) {
-            fetch('https://discord.com/api/users/@me', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            })
-            .then(res => {
-                if (!res.ok) throw new Error('Token expirado');
-                return res.json();
-            })
+            fetch('https://discord.com/api/users/@me', { headers: { 'Authorization': `Bearer ${token}` } })
+            .then(res => { if (!res.ok) throw new Error('Token expirado'); return res.json(); })
             .then(user => {
                 currentUser = user;
-                
                 if (isAdmin()) {
                     currentUserRole = 'admin';
                     document.getElementById('admin-nav-section').classList.remove('hidden');
@@ -671,26 +399,12 @@ end, true, "high")`;
                     currentUserRole = 'client';
                     document.getElementById('sidebar-role').textContent = 'Cliente';
                 }
-                
                 document.getElementById('header-username').innerText = user.username;
                 document.getElementById('sidebar-username').innerText = user.username;
-                
-                if (user.avatar) {
-                    document.getElementById('sidebar-avatar').src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
-                } else {
-                    document.getElementById('sidebar-avatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
-                }
-                
+                document.getElementById('sidebar-avatar').src = user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png';
                 document.getElementById('login-modal').classList.add('hidden');
-                
-                ensureFixedLicense().then(() => {
-                    showSection('dashboard');
-                });
-            })
-            .catch(err => {
-                console.error(err);
-                logout();
-            });
+                ensureFixedLicense().then(() => { showSection('dashboard'); });
+            }).catch(err => { console.error(err); logout(); });
         }
 
         function logout() {
@@ -700,88 +414,46 @@ end, true, "high")`;
             location.reload();
         }
 
-        // SISTEMA DE NAVEGACIÓN - SECCIONES INTERNAS (EMBEDIDAS)
+        // SISTEMA DE NAVEGACIÓN - SECCIONES INTERNAS
         function showSection(section) {
-            document.querySelectorAll('.nav-item, .admin-nav-item').forEach(item => {
-                item.classList.remove('active', 'active-section');
-            });
-
+            document.querySelectorAll('.nav-item, .admin-nav-item').forEach(item => item.classList.remove('active', 'active-section'));
             const navItem = document.getElementById(`nav-${section}`);
-            if (navItem) {
-                if (navItem.classList.contains('admin-nav-item')) {
-                    navItem.classList.add('active-section');
-                } else {
-                    navItem.classList.add('active');
-                }
-            }
-
-            const contentDiv = document.getElementById('dynamic-content');
+            if (navItem) navItem.classList.contains('admin-nav-item') ? navItem.classList.add('active-section') : navItem.classList.add('active');
             
-            // Secciones principales con contenido embebido
+            const contentDiv = document.getElementById('dynamic-content');
             switch(section) {
-                case 'dashboard':
-                    loadDashboardSection(contentDiv);
-                    break;
-                case 'reviews':
-                    loadReviewsSection(contentDiv);
-                    break;
-                case 'support':
-                    loadSupportSection(contentDiv);
-                    break;
-                default:
-                    loadDashboardSection(contentDiv);
+                case 'dashboard': loadDashboardSection(contentDiv); break;
+                case 'reviews': loadReviewsSection(contentDiv); break;
+                case 'support': loadSupportSection(contentDiv); break;
+                default: loadDashboardSection(contentDiv);
             }
         }
 
-        // CARGA DE SECCIONES EXTERNAS (SOLO ADMIN)
-        async function loadExternalSection(sectionName, fileUrl) {
-            // Actualizar navegación
-            document.querySelectorAll('.nav-item, .admin-nav-item').forEach(item => {
-                item.classList.remove('active', 'active-section');
-            });
-            
+        // CARGA DE SECCIONES DE ADMINISTRADOR (SIN FETCH, RENDERIZADO DIRECTO)
+        function loadExternalSection(sectionName) {
+            document.querySelectorAll('.nav-item, .admin-nav-item').forEach(item => item.classList.remove('active', 'active-section'));
             const navItem = document.getElementById(`nav-${sectionName}`);
-            if (navItem && navItem.classList.contains('admin-nav-item')) {
-                navItem.classList.add('active-section');
-            }
+            if (navItem && navItem.classList.contains('admin-nav-item')) navItem.classList.add('active-section');
 
             const contentDiv = document.getElementById('dynamic-content');
             
-            // Renderizado directo basado en el nombre de la sección
             switch(sectionName) {
-                case 'crear-rol':
-                    renderCrearRolSection(contentDiv);
-                    break;
-                case 'subir-producto':
-                    contentDiv.innerHTML = `<div class="section-content text-center py-10"><h2 class="text-xl">Sección Subir Producto (Próximamente)</h2></div>`;
-                    break;
-                case 'licencias':
-                    contentDiv.innerHTML = `<div class="section-content text-center py-10"><h2 class="text-xl">Historial de Licencias (Próximamente)</h2></div>`;
-                    break;
-                case 'encriptar':
-                    contentDiv.innerHTML = `<div class="section-content text-center py-10"><h2 class="text-xl">Encriptador Lua (Próximamente)</h2></div>`;
-                    break;
-                case 'asignar':
-                    contentDiv.innerHTML = `<div class="section-content text-center py-10"><h2 class="text-xl">Asignar Productos (Próximamente)</h2></div>`;
-                    break;
-                case 'usuarios':
-                    contentDiv.innerHTML = `<div class="section-content text-center py-10"><h2 class="text-xl">Usuarios Autorizados (Próximamente)</h2></div>`;
-                    break;
-                default:
-                    contentDiv.innerHTML = `<div class="section-content text-center py-10 text-red-500">Error: Sección no encontrada</div>`;
+                case 'crear-rol': renderCrearRolSection(contentDiv); break;
+                case 'subir-producto': contentDiv.innerHTML = `<div class="section-content text-center py-10"><i class="fas fa-cloud-upload-alt text-6xl text-gray-600 mb-4"></i><h2 class="text-2xl font-bold text-white mb-2">Subir Producto</h2><p class="text-gray-400">Sección lista para integrar</p></div>`; break;
+                case 'licencias': contentDiv.innerHTML = `<div class="section-content text-center py-10"><i class="fas fa-key text-6xl text-gray-600 mb-4"></i><h2 class="text-2xl font-bold text-white mb-2">Historial de Licencias</h2><p class="text-gray-400">Sección lista para integrar</p></div>`; break;
+                case 'encriptar': contentDiv.innerHTML = `<div class="section-content text-center py-10"><i class="fas fa-lock text-6xl text-gray-600 mb-4"></i><h2 class="text-2xl font-bold text-white mb-2">Encriptador Lua</h2><p class="text-gray-400">Sección lista para integrar</p></div>`; break;
+                case 'asignar': contentDiv.innerHTML = `<div class="section-content text-center py-10"><i class="fas fa-user-plus text-6xl text-gray-600 mb-4"></i><h2 class="text-2xl font-bold text-white mb-2">Asignar Productos</h2><p class="text-gray-400">Sección lista para integrar</p></div>`; break;
+                case 'usuarios': contentDiv.innerHTML = `<div class="section-content text-center py-10"><i class="fas fa-users-cog text-6xl text-gray-600 mb-4"></i><h2 class="text-2xl font-bold text-white mb-2">Usuarios Autorizados</h2><p class="text-gray-400">Sección lista para integrar</p></div>`; break;
+                default: contentDiv.innerHTML = `<div class="section-content text-center py-10 text-red-500">Error: Sección no encontrada</div>`;
             }
         }
 
-        // RENDERIZADO DE CREAR ROL (LÓGICA NUEVA)
+        // === LÓGICA DE CREAR ROL ===
         function renderCrearRolSection(container) {
             container.innerHTML = `
                 <div class="section-content grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Formulario -->
                     <div class="lg:col-span-2 card rounded-xl p-6">
-                        <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
-                            <i class="fas fa-plus-circle text-red-500"></i> Crear Nuevo Rol
-                        </h2>
-                        
+                        <h2 class="text-2xl font-bold mb-6 flex items-center gap-2"><i class="fas fa-plus-circle text-red-500"></i> Crear Nuevo Rol</h2>
                         <div class="space-y-4">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
@@ -796,152 +468,88 @@ end, true, "high")`;
                                     </div>
                                 </div>
                             </div>
-
                             <div>
                                 <label class="block text-sm text-gray-400 mb-2">Descripción del Rol</label>
                                 <textarea id="role-desc" rows="3" placeholder="Describe brevemente las funciones de este rol..." class="input-field w-full px-4 py-3 rounded-lg text-white focus:border-red-500 outline-none resize-none"></textarea>
                             </div>
-
                             <div class="pt-4">
                                 <h3 class="text-lg font-semibold mb-4 text-gray-300">Permisos y Accesos</h3>
                                 <div class="space-y-3">
                                     <div class="flex items-center justify-between p-3 bg-[#0d0505] rounded-lg border border-red-900/20">
-                                        <div class="flex items-center gap-3">
-                                            <i class="fas fa-cog text-gray-500"></i>
-                                            <div>
-                                                <p class="text-sm font-medium">Acceso al Panel Config</p>
-                                                <p class="text-xs text-gray-500">Puede ver el menú lateral de administración</p>
-                                            </div>
-                                        </div>
+                                        <div class="flex items-center gap-3"><i class="fas fa-cog text-gray-500"></i><div><p class="text-sm font-medium">Acceso al Panel Config</p><p class="text-xs text-gray-500">Puede ver el menú lateral de administración</p></div></div>
                                         <input type="checkbox" id="perm-config" class="w-5 h-5 accent-red-600 cursor-pointer">
                                     </div>
-                                    
                                     <div class="flex items-center justify-between p-3 bg-[#0d0505] rounded-lg border border-red-900/20">
-                                        <div class="flex items-center gap-3">
-                                            <i class="fas fa-cloud-upload-alt text-gray-500"></i>
-                                            <div>
-                                                <p class="text-sm font-medium">Subir Productos</p>
-                                                <p class="text-xs text-gray-500">Puede agregar nuevos recursos a la tienda</p>
-                                            </div>
-                                        </div>
+                                        <div class="flex items-center gap-3"><i class="fas fa-cloud-upload-alt text-gray-500"></i><div><p class="text-sm font-medium">Subir Productos</p><p class="text-xs text-gray-500">Puede agregar nuevos recursos a la tienda</p></div></div>
                                         <input type="checkbox" id="perm-upload" class="w-5 h-5 accent-red-600 cursor-pointer">
                                     </div>
-
                                     <div class="flex items-center justify-between p-3 bg-[#0d0505] rounded-lg border border-red-900/20">
-                                        <div class="flex items-center gap-3">
-                                            <i class="fas fa-trash text-gray-500"></i>
-                                            <div>
-                                                <p class="text-sm font-medium">Eliminar Productos</p>
-                                                <p class="text-xs text-gray-500">Puede borrar productos existentes</p>
-                                            </div>
-                                        </div>
+                                        <div class="flex items-center gap-3"><i class="fas fa-trash text-gray-500"></i><div><p class="text-sm font-medium">Eliminar Productos</p><p class="text-xs text-gray-500">Puede borrar productos existentes</p></div></div>
                                         <input type="checkbox" id="perm-delete" class="w-5 h-5 accent-red-600 cursor-pointer">
                                     </div>
                                 </div>
                             </div>
-
-                            <button onclick="saveNewRole()" class="btn-primary w-full mt-6 py-3 rounded-lg font-bold text-white shadow-lg">
-                                Guardar Nuevo Rol
-                            </button>
+                            <button onclick="saveNewRole()" class="btn-primary w-full mt-6 py-3 rounded-lg font-bold text-white shadow-lg">Guardar Nuevo Rol</button>
                         </div>
                     </div>
-
-                    <!-- Lista de Roles Activos -->
                     <div class="card rounded-xl p-6 h-fit">
-                        <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
-                            <i class="fas fa-list text-red-500"></i> Roles Activos
-                        </h3>
+                        <h3 class="text-lg font-bold mb-4 flex items-center gap-2"><i class="fas fa-list text-red-500"></i> Roles Activos</h3>
                         <div id="roles-list-container" class="space-y-3 max-h-[600px] overflow-y-auto custom-scrollbar pr-2">
-                            <div class="text-center py-8 text-gray-500">
-                                <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
-                                <p>Cargando roles...</p>
-                            </div>
+                            <div class="text-center py-8 text-gray-500"><i class="fas fa-spinner loading-spinner text-2xl mb-2"></i><p>Cargando roles...</p></div>
                         </div>
-                        <div class="mt-4 pt-4 border-t border-red-900/20 text-xs text-gray-500 text-center">
-                            Los roles se guardan en Firestore.<br>Asigna estos roles en "Usuarios Autorizados".
-                        </div>
+                        <div class="mt-4 pt-4 border-t border-red-900/20 text-xs text-gray-500 text-center">Los roles se guardan en Firestore.<br>Asigna estos roles en "Usuarios Autorizados".</div>
                     </div>
-                </div>
-            `;
-            
-            // Cargar la lista de roles al iniciar la vista
+                </div>`;
             loadRolesList();
         }
 
-        // LÓGICA PARA GUARDAR Y LEER ROLES EN FIREBASE
-        
         async function saveNewRole() {
             const name = document.getElementById('role-name').value;
             const color = document.getElementById('role-color').value;
             const desc = document.getElementById('role-desc').value;
-            
-            // Obtener permisos
             const permissions = {
                 config: document.getElementById('perm-config').checked,
                 upload: document.getElementById('perm-upload').checked,
                 delete: document.getElementById('perm-delete').checked
             };
-
-            if (!name) {
-                alert("Por favor escribe un nombre para el rol.");
-                return;
-            }
+            if (!name) return alert("Por favor escribe un nombre para el rol.");
 
             try {
                 await db.collection("Roles").add({
-                    name: name,
-                    color: color,
-                    description: desc || "Sin descripción",
-                    permissions: permissions,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    name: name, color: color, description: desc || "Sin descripción",
+                    permissions: permissions, createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                
                 alert("¡Rol creado correctamente!");
-                // Limpiar formulario
                 document.getElementById('role-name').value = '';
                 document.getElementById('role-desc').value = '';
                 document.getElementById('perm-config').checked = false;
                 document.getElementById('perm-upload').checked = false;
                 document.getElementById('perm-delete').checked = false;
-                
-                // Recargar lista
                 loadRolesList();
-
             } catch (error) {
                 console.error("Error al guardar:", error);
-                alert("Error al guardar el rol. Revisa la consola.");
+                alert("Error al guardar el rol.");
             }
         }
 
         async function loadRolesList() {
             const container = document.getElementById('roles-list-container');
             if (!container) return;
-
             try {
                 const snapshot = await db.collection("Roles").orderBy("createdAt", "desc").get();
-                
                 if (snapshot.empty) {
                     container.innerHTML = `<div class="text-center py-4 text-gray-500 text-sm">No hay roles creados aún.</div>`;
                     return;
                 }
-
                 let html = '';
                 snapshot.forEach(doc => {
                     const role = doc.data();
-                    html += `
-                        <div class="bg-[#0d0505] border-l-4 p-3 rounded-r-lg flex justify-between items-center group hover:bg-[#150a0a] transition-colors" style="border-left-color: ${role.color}">
-                            <div>
-                                <h4 class="font-bold text-sm" style="color: ${role.color}">${role.name}</h4>
-                                <p class="text-[10px] text-gray-500 truncate max-w-[150px]">${role.description}</p>
-                            </div>
-                            <button onclick="deleteRole('${doc.id}')" class="text-gray-600 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </div>
-                    `;
+                    html += `<div class="bg-[#0d0505] border-l-4 p-3 rounded-r-lg flex justify-between items-center group hover:bg-[#150a0a] transition-colors" style="border-left-color: ${role.color}">
+                        <div><h4 class="font-bold text-sm" style="color: ${role.color}">${role.name}</h4><p class="text-[10px] text-gray-500 truncate max-w-[150px]">${role.description}</p></div>
+                        <button onclick="deleteRole('${doc.id}')" class="text-gray-600 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"><i class="fas fa-trash-alt"></i></button>
+                    </div>`;
                 });
                 container.innerHTML = html;
-
             } catch (error) {
                 console.error("Error cargando roles:", error);
                 container.innerHTML = `<div class="text-center text-red-500 text-xs">Error al cargar roles</div>`;
@@ -955,165 +563,74 @@ end, true, "high")`;
             }
         }
 
-        // SECCIÓN DASHBOARD (EMBEDIDA)
+        // === SECCIÓN DASHBOARD ===
         async function loadDashboardSection(container) {
             document.getElementById('header-subtitle').textContent = 'Gestiona tus productos y licencias desde aquí';
-            
             container.innerHTML = `
                 <div class="section-content">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         <div class="stat-card rounded-xl p-6 relative overflow-hidden group">
                             <div class="absolute right-0 top-0 w-24 h-24 bg-red-600/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
                             <div class="flex items-center justify-between relative z-10">
-                                <div>
-                                    <p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Total Invertido</p>
-                                    <p id="stat-total-spent" class="text-2xl font-bold text-white">$0.00</p>
-                                </div>
-                                <div class="w-12 h-12 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
-                                    <i class="fas fa-wallet text-red-400 text-xl"></i>
-                                </div>
+                                <div><p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Total Invertido</p><p id="stat-total-spent" class="text-2xl font-bold text-white">$0.00</p></div>
+                                <div class="w-12 h-12 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center"><i class="fas fa-wallet text-red-400 text-xl"></i></div>
                             </div>
                         </div>
-
                         <div class="stat-card rounded-xl p-6 relative overflow-hidden group">
                             <div class="absolute right-0 top-0 w-24 h-24 bg-green-600/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
                             <div class="flex items-center justify-between relative z-10">
-                                <div>
-                                    <p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Scripts Activos</p>
-                                    <p id="stat-active-scripts" class="text-2xl font-bold text-white">0</p>
-                                </div>
-                                <div class="w-12 h-12 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center justify-center">
-                                    <i class="fas fa-lock text-green-400 text-xl"></i>
-                                </div>
+                                <div><p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Scripts Activos</p><p id="stat-active-scripts" class="text-2xl font-bold text-white">0</p></div>
+                                <div class="w-12 h-12 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center justify-center"><i class="fas fa-lock text-green-400 text-xl"></i></div>
                             </div>
                         </div>
-
                         <div class="stat-card rounded-xl p-6 relative overflow-hidden group">
                             <div class="absolute right-0 top-0 w-24 h-24 bg-blue-600/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
                             <div class="flex items-center justify-between relative z-10">
-                                <div>
-                                    <p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Estado de Cuenta</p>
-                                    <p id="stat-account-status" class="text-lg font-bold text-red-400">Cliente Verificado</p>
-                                </div>
-                                <div class="w-12 h-12 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
-                                    <i class="fas fa-user-shield text-red-400 text-xl"></i>
-                                </div>
+                                <div><p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Estado de Cuenta</p><p id="stat-account-status" class="text-lg font-bold text-red-400">Cliente Verificado</p></div>
+                                <div class="w-12 h-12 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center"><i class="fas fa-user-shield text-red-400 text-xl"></i></div>
                             </div>
                         </div>
                     </div>
-
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div class="lg:col-span-2 card rounded-xl p-6">
-                            <div class="flex items-center gap-3 mb-6">
-                                <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
-                                    <i class="fas fa-cube text-red-400"></i>
-                                </div>
-                                <h2 class="text-lg font-bold text-white">Mis Productos Activos</h2>
-                            </div>
-
-                            <div class="mb-6">
-                                <div class="relative">
-                                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
-                                    <input 
-                                        type="text" 
-                                        id="dashboard-search"
-                                        oninput="filterDashboardProducts()"
-                                        placeholder="Buscar entre tus recursos..." 
-                                        class="input-field w-full pl-12 pr-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none"
-                                    >
-                                </div>
-                            </div>
-
+                            <div class="flex items-center gap-3 mb-6"><div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center"><i class="fas fa-cube text-red-400"></i></div><h2 class="text-lg font-bold text-white">Mis Productos Activos</h2></div>
+                            <div class="mb-6"><div class="relative"><i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i><input type="text" id="dashboard-search" oninput="filterDashboardProducts()" placeholder="Buscar entre tus recursos..." class="input-field w-full pl-12 pr-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none"></div></div>
                             <div id="dashboard-products-list" class="space-y-3 max-h-[500px] overflow-y-auto custom-scrollbar pr-2"></div>
-
-                            <div id="dashboard-empty-state" class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5">
-                                <i class="fas fa-box-open text-gray-600 text-4xl mb-3"></i>
-                                <p class="text-gray-400 mb-4">No tienes productos activos aún.</p>
-                                <a href="index.html" class="btn-primary inline-block px-6 py-2 rounded-lg text-white font-medium">
-                                    Ir a la tienda
-                                </a>
-                            </div>
+                            <div id="dashboard-empty-state" class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5"><i class="fas fa-box-open text-gray-600 text-4xl mb-3"></i><p class="text-gray-400 mb-4">No tienes productos activos aún.</p><a href="index.html" class="btn-primary inline-block px-6 py-2 rounded-lg text-white font-medium">Ir a la tienda</a></div>
                         </div>
-
                         <div class="card rounded-xl p-6 h-fit">
-                            <div class="flex items-center gap-3 mb-6">
-                                <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
-                                    <i class="fas fa-server text-red-400"></i>
-                                </div>
-                                <h2 class="text-lg font-bold text-white">Configuración MTA</h2>
-                            </div>
-
+                            <div class="flex items-center gap-3 mb-6"><div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center"><i class="fas fa-server text-red-400"></i></div><h2 class="text-lg font-bold text-white">Configuración MTA</h2></div>
                             <div class="space-y-4 mb-6">
-                                <div>
-                                    <label class="block text-gray-400 text-xs uppercase font-semibold mb-2 tracking-wider">Server IP</label>
-                                    <input type="text" id="server-ip" value="213.181.88.154" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none font-mono text-sm">
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-gray-400 text-xs uppercase font-semibold mb-2 tracking-wider">Puerto</label>
-                                    <input type="text" id="server-port" value="22003" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none font-mono text-sm">
-                                </div>
+                                <div><label class="block text-gray-400 text-xs uppercase font-semibold mb-2 tracking-wider">Server IP</label><input type="text" id="server-ip" value="213.181.88.154" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none font-mono text-sm"></div>
+                                <div><label class="block text-gray-400 text-xs uppercase font-semibold mb-2 tracking-wider">Puerto</label><input type="text" id="server-port" value="22003" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none font-mono text-sm"></div>
                             </div>
-
                             <div class="mb-6">
-                                <div class="flex items-center justify-between mb-2">
-                                    <label class="block text-gray-400 text-xs uppercase font-semibold tracking-wider">Código de Licencia</label>
-                                    <span class="text-[10px] text-red-400 font-mono bg-red-900/20 px-2 py-0.5 rounded">LUA CONFIG</span>
-                                </div>
-                                <div class="code-block rounded-lg p-4 font-mono text-sm">
-                                    <pre class="text-white whitespace-pre-wrap break-all"><code id="license-code">Generando...</code></pre>
-                                </div>
-                                <button onclick="generateNewKey()" class="w-full mt-3 bg-[#150a0a] hover:bg-[#1a0a0a] border border-red-800/50 text-gray-300 hover:text-white text-xs font-semibold py-2 rounded-xl transition-all flex items-center justify-center gap-2">
-                                    <i class="fas fa-sync-alt"></i> Generar Nueva Clave
-                                </button>
+                                <div class="flex items-center justify-between mb-2"><label class="block text-gray-400 text-xs uppercase font-semibold tracking-wider">Código de Licencia</label><span class="text-[10px] text-red-400 font-mono bg-red-900/20 px-2 py-0.5 rounded">LUA CONFIG</span></div>
+                                <div class="code-block rounded-lg p-4 font-mono text-sm"><pre class="text-white whitespace-pre-wrap break-all"><code id="license-code">Generando...</code></pre></div>
+                                <button onclick="generateNewKey()" class="w-full mt-3 bg-[#150a0a] hover:bg-[#1a0a0a] border border-red-800/50 text-gray-300 hover:text-white text-xs font-semibold py-2 rounded-xl transition-all flex items-center justify-center gap-2"><i class="fas fa-sync-alt"></i> Generar Nueva Clave</button>
                             </div>
-
                             <div class="grid grid-cols-2 gap-3 mb-4">
-                                <button onclick="saveServerConfig()" class="btn-primary px-4 py-2.5 rounded-lg text-white font-medium flex items-center justify-center gap-2 text-sm">
-                                    <i class="fas fa-save"></i> Guardar
-                                </button>
-                                <button onclick="copyLicenseCode()" class="px-4 py-2.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 font-medium flex items-center justify-center gap-2 text-sm">
-                                    <i class="fas fa-copy"></i> Copiar
-                                </button>
+                                <button onclick="saveServerConfig()" class="btn-primary px-4 py-2.5 rounded-lg text-white font-medium flex items-center justify-center gap-2 text-sm"><i class="fas fa-save"></i> Guardar</button>
+                                <button onclick="copyLicenseCode()" class="px-4 py-2.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 font-medium flex items-center justify-center gap-2 text-sm"><i class="fas fa-copy"></i> Copiar</button>
                             </div>
                         </div>
                     </div>
-                </div>
-            `;
-
+                </div>`;
             await loadDashboardData();
             updateLicenseDisplay();
-            
             const saved = JSON.parse(localStorage.getItem('server_config') || '{}');
             if (saved.ip) document.getElementById('server-ip').value = saved.ip;
             if (saved.port) document.getElementById('server-port').value = saved.port;
         }
 
-        // SECCIÓN REVIEWS (EMBEDIDA)
         function loadReviewsSection(container) {
             document.getElementById('header-subtitle').textContent = 'Tus reseñas y valoraciones';
-            container.innerHTML = `
-                <div class="section-content text-center py-12">
-                    <i class="fas fa-star text-6xl text-gray-600 mb-4"></i>
-                    <h2 class="text-2xl font-bold text-white mb-2">Mis Reseñas</h2>
-                    <p class="text-gray-400">Próximamente podrás ver y gestionar tus reseñas aquí</p>
-                </div>
-            `;
+            container.innerHTML = `<div class="section-content text-center py-12"><i class="fas fa-star text-6xl text-gray-600 mb-4"></i><h2 class="text-2xl font-bold text-white mb-2">Mis Reseñas</h2><p class="text-gray-400">Próximamente podrás ver y gestionar tus reseñas aquí</p></div>`;
         }
 
-        // SECCIÓN SOPORTE (EMBEDIDA)
         function loadSupportSection(container) {
             document.getElementById('header-subtitle').textContent = 'Contacta con nuestro equipo de soporte';
-            container.innerHTML = `
-                <div class="section-content text-center py-12">
-                    <i class="fas fa-headset text-6xl text-gray-600 mb-4"></i>
-                    <h2 class="text-2xl font-bold text-white mb-2">Soporte Técnico</h2>
-                    <p class="text-gray-400 mb-6">¿Necesitas ayuda? Contáctanos</p>
-                    <a href="https://discord.gg/rvxEdWcGkf" target="_blank" class="btn-primary inline-block px-6 py-3 rounded-lg text-white font-medium">
-                        <i class="fab fa-discord mr-2"></i>Unirse al Discord
-                    </a>
-                </div>
-            `;
+            container.innerHTML = `<div class="section-content text-center py-12"><i class="fas fa-headset text-6xl text-gray-600 mb-4"></i><h2 class="text-2xl font-bold text-white mb-2">Soporte Técnico</h2><p class="text-gray-400 mb-6">¿Necesitas ayuda? Contáctanos</p><a href="https://discord.gg/rvxEdWcGkf" target="_blank" class="btn-primary inline-block px-6 py-3 rounded-lg text-white font-medium"><i class="fab fa-discord mr-2"></i>Unirse al Discord</a></div>`;
         }
 
         async function loadDashboardData() {
@@ -1122,11 +639,8 @@ end, true, "high")`;
                 const productsSnapshot = await db.collection("Productos").get();
                 allProducts = [];
                 productsSnapshot.forEach((doc) => allProducts.push({ id: doc.id, ...doc.data() }));
-
                 const clientesSnapshot = await db.collection("Clientes").get();
-                let purchasedProducts = [];
-                let totalSpent = 0;
-
+                let purchasedProducts = [], totalSpent = 0;
                 clientesSnapshot.forEach((doc) => {
                     const purchase = doc.data();
                     if (String(purchase.discord_id) === String(currentUser.id)) {
@@ -1134,58 +648,32 @@ end, true, "high")`;
                             purchase.products.forEach(prod => {
                                 const productData = allProducts.find(p => p.id === prod.id);
                                 if (productData) {
-                                    purchasedProducts.push({
-                                        ...productData,
-                                        purchaseDate: purchase.date?.toDate ? purchase.date.toDate() : new Date(),
-                                        price: prod.price || 'Gratis'
-                                    });
-                                    if (prod.price !== "Gratis" && prod.price !== "GRATIS") {
-                                        totalSpent += parseFloat(String(prod.price).replace('$', '')) || 0;
-                                    }
+                                    purchasedProducts.push({ ...productData, purchaseDate: purchase.date?.toDate ? purchase.date.toDate() : new Date(), price: prod.price || 'Gratis' });
+                                    if (prod.price !== "Gratis" && prod.price !== "GRATIS") totalSpent += parseFloat(String(prod.price).replace('$', '')) || 0;
                                 }
                             });
                         }
                     }
                 });
-
-                const spentEl = document.getElementById('stat-total-spent');
-                const scriptsEl = document.getElementById('stat-active-scripts');
-                
+                const spentEl = document.getElementById('stat-total-spent'), scriptsEl = document.getElementById('stat-active-scripts');
                 if (spentEl) spentEl.innerText = '$' + totalSpent.toFixed(2);
                 if (scriptsEl) scriptsEl.innerText = purchasedProducts.length;
-                
-                const container = document.getElementById('dashboard-products-list');
-                const emptyState = document.getElementById('dashboard-empty-state');
-                
+                const container = document.getElementById('dashboard-products-list'), emptyState = document.getElementById('dashboard-empty-state');
                 if (container && emptyState) {
-                    if (purchasedProducts.length === 0) {
-                        emptyState.classList.remove('hidden');
-                        container.innerHTML = '';
-                    } else {
+                    if (purchasedProducts.length === 0) { emptyState.classList.remove('hidden'); container.innerHTML = ''; }
+                    else {
                         emptyState.classList.add('hidden');
                         container.innerHTML = purchasedProducts.map(item => `
                             <div class="bg-[#0d0505] border border-red-900/30 rounded-xl p-4 flex items-center justify-between hover:border-red-600/50 transition-all">
                                 <div class="flex items-center gap-4">
-                                    <div class="w-16 h-16 rounded-lg bg-[#150a0a] border border-red-900/20 overflow-hidden">
-                                        <img src="${item.image_url || ''}" class="w-full h-full object-cover">
-                                    </div>
-                                    <div>
-                                        <h3 class="text-white font-bold">${item.name}</h3>
-                                        <p class="text-gray-400 text-xs">${item.price === 'Gratis' ? 'GRATIS' : '$' + Number(item.price).toFixed(2)}</p>
-                                    </div>
+                                    <div class="w-16 h-16 rounded-lg bg-[#150a0a] border border-red-900/20 overflow-hidden"><img src="${item.image_url || ''}" class="w-full h-full object-cover"></div>
+                                    <div><h3 class="text-white font-bold">${item.name}</h3><p class="text-gray-400 text-xs">${item.price === 'Gratis' ? 'GRATIS' : '$' + Number(item.price).toFixed(2)}</p></div>
                                 </div>
-                                ${item.file_data ? `
-                                    <button onclick="downloadProduct('${item.id}')" class="btn-primary px-4 py-2 rounded-lg text-white text-sm">
-                                        <i class="fas fa-download"></i> Descargar
-                                    </button>
-                                ` : '<button disabled class="px-4 py-2 rounded-lg bg-gray-800 text-gray-500 text-sm">No disponible</button>'}
-                            </div>
-                        `).join('');
+                                ${item.file_data ? `<button onclick="downloadProduct('${item.id}')" class="btn-primary px-4 py-2 rounded-lg text-white text-sm"><i class="fas fa-download"></i> Descargar</button>` : '<button disabled class="px-4 py-2 rounded-lg bg-gray-800 text-gray-500 text-sm">No disponible</button>'}
+                            </div>`).join('');
                     }
                 }
-            } catch (error) {
-                console.error("Error:", error);
-            }
+            } catch (error) { console.error("Error:", error); }
         }
 
         function filterDashboardProducts() {
@@ -1219,25 +707,12 @@ end, true, "high")`;
             if (!currentUser) return;
             const newKey = generateUniqueKey();
             try {
-                const snapshot = await db.collection("Licencias")
-                    .where("discord_id", "==", currentUser.id)
-                    .where("type", "==", "general")
-                    .limit(1)
-                    .get();
-                
-                snapshot.forEach(async (doc) => {
-                    await doc.ref.delete();
-                });
-
+                const snapshot = await db.collection("Licencias").where("discord_id", "==", currentUser.id).where("type", "==", "general").limit(1).get();
+                snapshot.forEach(async (doc) => { await doc.ref.delete(); });
                 await db.collection("Licencias").add({
-                    discord_id: currentUser.id,
-                    username: currentUser.username,
-                    key: newKey,
-                    type: "general",
-                    created_at: firebase.firestore.FieldValue.serverTimestamp(),
-                    status: 'active'
+                    discord_id: currentUser.id, username: currentUser.username, key: newKey,
+                    type: "general", created_at: firebase.firestore.FieldValue.serverTimestamp(), status: 'active'
                 });
-                
                 userFixedLicenseKey = newKey;
                 updateLicenseDisplay();
                 alert("¡Nueva clave generada con éxito!");
@@ -1250,38 +725,23 @@ end, true, "high")`;
         async function ensureFixedLicense() {
             if (!currentUser) return;
             try {
-                const snapshot = await db.collection("Licencias")
-                    .where("discord_id", "==", currentUser.id)
-                    .where("type", "==", "general")
-                    .limit(1)
-                    .get();
-                
-                if (!snapshot.empty) {
-                    userFixedLicenseKey = snapshot.docs[0].data().key;
-                } else {
-                    await generateNewKey();
-                }
-            } catch (error) {
-                console.error("Error:", error);
-            }
+                const snapshot = await db.collection("Licencias").where("discord_id", "==", currentUser.id).where("type", "==", "general").limit(1).get();
+                if (!snapshot.empty) userFixedLicenseKey = snapshot.docs[0].data().key;
+                else await generateNewKey();
+            } catch (error) { console.error("Error:", error); }
         }
 
         function updateLicenseDisplay() {
             const codeBlock = document.getElementById('license-code');
             if (codeBlock && userFixedLicenseKey && currentUser) {
-                codeBlock.textContent = `configLicense = {
-    ["User"] = "${currentUser.username}", 
-    ["Key"] = "PapeletaStore(${userFixedLicenseKey})"
-}`;
+                codeBlock.textContent = `configLicense = {\n    ["User"] = "${currentUser.username}", \n    ["Key"] = "PapeletaStore(${userFixedLicenseKey})"\n}`;
             }
         }
 
         function copyLicenseCode() {
             const code = document.getElementById('license-code')?.textContent;
             if (code) {
-                navigator.clipboard.writeText(code).then(() => {
-                    alert('¡Código copiado!');
-                });
+                navigator.clipboard.writeText(code).then(() => { alert('¡Código copiado!'); });
             }
         }
 
@@ -1295,10 +755,7 @@ end, true, "high")`;
 
         // MODAL SERVER.LUA
         function openLuaModal() {
-            if (!isAdmin()) {
-                alert('Acceso denegado. Solo administradores.');
-                return;
-            }
+            if (!isAdmin()) { alert('Acceso denegado. Solo administradores.'); return; }
             document.getElementById('lua-code-content').textContent = SERVER_LUA_CODE;
             document.getElementById('lua-modal').classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -1310,9 +767,7 @@ end, true, "high")`;
         }
 
         function copyLuaCode() {
-            navigator.clipboard.writeText(SERVER_LUA_CODE).then(() => {
-                alert('¡Código copiado!');
-            });
+            navigator.clipboard.writeText(SERVER_LUA_CODE).then(() => { alert('¡Código copiado!'); });
         }
 
         document.getElementById('lua-modal')?.addEventListener('click', function(e) {
