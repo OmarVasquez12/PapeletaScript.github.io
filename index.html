@@ -125,6 +125,87 @@
         }
         .config-menu-text h4 { margin: 0; font-size: 14px; font-weight: 700; color: #fff; }
         .config-menu-text p { margin: 2px 0 0; font-size: 11px; color: #9496a1; }
+
+        /* ESTILOS PANEL DE USUARIO (CLIENTE) */
+        .user-panel-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px); z-index: 100;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .user-panel-overlay.active { opacity: 1; pointer-events: auto; }
+        
+        .user-panel {
+            position: fixed; top: 0; left: -400px; width: 350px; height: 100vh;
+            background: linear-gradient(180deg, #150a0a 0%, #0a0505 100%);
+            border-right: 1px solid rgba(255, 26, 26, 0.3);
+            box-shadow: 10px 0 40px rgba(0,0,0,0.8);
+            z-index: 101; transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 24px; overflow-y: auto;
+        }
+        .user-panel.active { left: 0; }
+
+        .user-panel-header {
+            text-align: center; padding-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 24px;
+        }
+        .user-panel-avatar {
+            width: 100px; height: 100px; border-radius: 50%;
+            border: 3px solid #ff1a1a; margin: 0 auto 16px;
+            box-shadow: 0 0 20px rgba(255, 26, 26, 0.4);
+        }
+        .user-panel-name {
+            font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 8px;
+        }
+        .user-panel-role {
+            display: inline-block; padding: 6px 16px;
+            background: rgba(0, 255, 68, 0.15);
+            border: 1px solid rgba(0, 255, 68, 0.4);
+            color: #00ff44; border-radius: 20px;
+            font-size: 12px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .user-panel-role.admin {
+            background: rgba(255, 26, 26, 0.15);
+            border-color: rgba(255, 26, 26, 0.4);
+            color: #ff1a1a;
+        }
+
+        .user-menu-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px 16px; margin-bottom: 8px;
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px; cursor: pointer; transition: all 0.2s;
+            text-decoration: none; color: inherit;
+        }
+        .user-menu-item:hover {
+            background: rgba(255, 26, 26, 0.1); border-color: rgba(255, 26, 26, 0.4);
+            transform: translateX(4px);
+        }
+        .user-menu-icon {
+            width: 36px; height: 36px; border-radius: 8px;
+            background: rgba(255, 26, 26, 0.1); color: #ff1a1a;
+            display: flex; align-items: center; justify-content: center; font-size: 16px;
+        }
+        .user-menu-text h4 { margin: 0; font-size: 14px; font-weight: 700; color: #fff; }
+        .user-menu-text p { margin: 2px 0 0; font-size: 11px; color: #9496a1; }
+
+        .user-panel-footer {
+            margin-top: 32px; padding-top: 24px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .logout-btn {
+            width: 100%; padding: 12px;
+            background: rgba(255, 26, 26, 0.15);
+            border: 1px solid rgba(255, 26, 26, 0.4);
+            color: #ff1a1a; border-radius: 12px;
+            font-weight: 600; cursor: pointer;
+            transition: all 0.2s; display: flex;
+            align-items: center; justify-content: center; gap: 8px;
+        }
+        .logout-btn:hover {
+            background: rgba(255, 26, 26, 0.25);
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-gradient-to-b from-[#150a0a] to-[#0a0505] relative">
@@ -232,7 +313,42 @@
         </div>
     </div>
 
-    <!-- PANEL DE CONFIGURACIÓN LATERAL (NUEVO) -->
+    <!-- PANEL DE USUARIO (CLIENTE) - LATERAL IZQUIERDO -->
+    <div id="user-panel-overlay" class="user-panel-overlay" onclick="toggleUserPanel()"></div>
+    <aside id="user-panel" class="user-panel">
+        <div class="user-panel-header">
+            <img id="panel-user-avatar" src="" alt="Avatar" class="user-panel-avatar">
+            <h2 id="panel-user-name" class="user-panel-name">Usuario</h2>
+            <span id="panel-user-role" class="user-panel-role">CLIENTE</span>
+        </div>
+        
+        <div class="space-y-2">
+            <a href="AreaCliente.html" class="user-menu-item">
+                <div class="user-menu-icon"><i class="fas fa-box"></i></div>
+                <div class="user-menu-text"><h4>Mis Productos</h4><p>Ver y descargar mis compras</p></div>
+            </a>
+            <a href="LicenciaUsuario.html" class="user-menu-item">
+                <div class="user-menu-icon"><i class="fas fa-key"></i></div>
+                <div class="user-menu-text"><h4>Mis Licencias</h4><p>Ver claves de activación</p></div>
+            </a>
+            <a href="#" onclick="toggleUserPanel(); showPage('productos')" class="user-menu-item">
+                <div class="user-menu-icon"><i class="fas fa-store"></i></div>
+                <div class="user-menu-text"><h4>Tienda</h4><p>Explorar más productos</p></div>
+            </a>
+            <a href="#" onclick="toggleUserPanel(); openCartModal()" class="user-menu-item">
+                <div class="user-menu-icon"><i class="fas fa-shopping-cart"></i></div>
+                <div class="user-menu-text"><h4>Carrito</h4><p>Ver mi carrito de compras</p></div>
+            </a>
+        </div>
+
+        <div class="user-panel-footer">
+            <button onclick="logout()" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+            </button>
+        </div>
+    </aside>
+
+    <!-- PANEL DE CONFIGURACIÓN LATERAL (ADMIN) -->
     <div id="config-overlay" class="config-panel-overlay" onclick="toggleConfigPanel()"></div>
     <aside id="config-panel" class="config-panel">
         <div class="flex justify-between items-center mb-6 pb-4 border-b border-white/10">
@@ -303,11 +419,12 @@
                     <i class="fab fa-discord"></i> Acceder
                 </button>
                 
-                <div id="user-section" class="hidden flex items-center gap-3 bg-[#150a0a] px-3 py-1.5 rounded-full border border-red-900/50 cursor-pointer hover:border-red-600 transition-all group" onclick="openUserDashboard()">
+                <!-- SECCIÓN DE USUARIO - AHORA ABRE EL PANEL LATERAL -->
+                <div id="user-section" class="hidden flex items-center gap-3 bg-[#150a0a] px-3 py-1.5 rounded-full border border-red-900/50 cursor-pointer hover:border-red-600 transition-all group" onclick="toggleUserPanel()">
                     <img id="user-avatar" src="" alt="Avatar" class="w-8 h-8 rounded-full border border-red-500 group-hover:border-red-400 transition-colors">
                     <div class="flex flex-col items-start leading-none">
                         <span id="user-name" class="text-white font-semibold text-sm pr-2 group-hover:text-red-300 transition-colors">...</span>
-                        <span id="user-role-badge" class="text-[10px] text-red-400 font-bold uppercase tracking-wider">Usuario</span>
+                        <span id="user-role-badge" class="text-[10px] text-green-400 font-bold uppercase tracking-wider">Cliente</span>
                     </div>
                     <i class="fas fa-external-link-alt text-gray-500 text-xs group-hover:text-red-400 transition-colors"></i>
                 </div>
@@ -453,6 +570,43 @@
 
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+
+        // --- FUNCIONES PANEL DE USUARIO (CLIENTE) ---
+        function toggleUserPanel() {
+            if (!currentUser) {
+                openLoginModal();
+                return;
+            }
+            const panel = document.getElementById('user-panel');
+            const overlay = document.getElementById('user-panel-overlay');
+            panel.classList.toggle('active');
+            overlay.classList.toggle('active');
+            
+            // Actualizar información del panel
+            if (currentUser) {
+                document.getElementById('panel-user-name').textContent = currentUser.username;
+                document.getElementById('user-name').textContent = currentUser.username;
+                
+                if (currentUser.avatar) {
+                    const avatarUrl = `https://cdn.discordapp.com/avatars/${currentUser.id}/${currentUser.avatar}.png`;
+                    document.getElementById('panel-user-avatar').src = avatarUrl;
+                    document.getElementById('user-avatar').src = avatarUrl;
+                }
+                
+                const roleBadge = document.getElementById('panel-user-role');
+                const roleBadgeHeader = document.getElementById('user-role-badge');
+                
+                if (currentUserRole === 'admin' || currentUserRole === 'mod') {
+                    roleBadge.textContent = currentUserRole.toUpperCase();
+                    roleBadge.className = 'user-panel-role admin';
+                    roleBadgeHeader.textContent = currentUserRole.toUpperCase();
+                } else {
+                    roleBadge.textContent = 'CLIENTE';
+                    roleBadge.className = 'user-panel-role';
+                    roleBadgeHeader.textContent = 'Cliente';
+                }
+            }
+        }
 
         // --- FUNCIONES PANEL CONFIG ---
         function toggleConfigPanel() {
@@ -846,6 +1000,8 @@
                     if(savedData.role && ['mod', 'staff', 'developer'].includes(savedData.role.toLowerCase())) {
                          document.getElementById('nav-config').classList.remove('hidden');
                          currentUserRole = savedData.role;
+                    } else {
+                        currentUserRole = 'cliente';
                     }
                 }
                 
@@ -972,6 +1128,11 @@
             localStorage.removeItem('dc_access_token');
             currentUser = null; currentUserRole = 'user';
             document.getElementById('nav-config').classList.add('hidden');
+            // Cerrar paneles si están abiertos
+            document.getElementById('user-panel').classList.remove('active');
+            document.getElementById('user-panel-overlay').classList.remove('active');
+            document.getElementById('config-panel').classList.remove('active');
+            document.getElementById('config-overlay').classList.remove('active');
             updateAuthUI(); loadProducts();
         }
 
@@ -1070,8 +1231,6 @@
         }
 
         function escapeHTML(str) { return String(str).replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)); }
-
-        function openUserDashboard() { if (!currentUser) { openLoginModal(); return; } window.location.href = 'AreaCliente.html'; }
 
         function generateUniqueKey() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; let key = '';
