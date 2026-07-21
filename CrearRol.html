@@ -1,53 +1,41 @@
-<!-- SECCIÓN CREAR ROL - FRAGMENTO AUTÓNOMO -->
+<!-- SECCIÓN CREAR ROL - FRAGMENTO -->
 <div class="max-w-7xl mx-auto">
-    
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        <!-- Panel Izquierdo: Crear Nuevo Rol -->
+        <!-- Panel Izquierdo -->
         <div class="lg:col-span-2 space-y-6">
-            
-            <!-- Formulario de Creación -->
             <div class="card p-6 rounded-xl">
                 <h2 class="text-2xl font-black text-white mb-6 flex items-center gap-2">
                     <i class="fas fa-plus-circle text-red-500"></i>
                     Crear Nuevo Rol
                 </h2>
-
-                <form id="create-role-form" onsubmit="handleCreateRole(event)" class="space-y-5">
-                    
-                    <!-- Nombre y Color -->
+                <form id="create-role-form" onsubmit="handleCreateRoleCR(event)" class="space-y-5">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div class="md:col-span-2">
                             <label class="block text-gray-300 text-sm font-semibold mb-2">Nombre del Rol *</label>
                             <input type="text" id="role-name" required 
-                                class="input-field w-full rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none transition-colors" 
+                                class="input-field w-full rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none" 
                                 placeholder="Ej: Ayudante, Soporte VIP...">
                         </div>
                         <div>
                             <label class="block text-gray-300 text-sm font-semibold mb-2">Color Identificativo</label>
                             <div class="flex items-center gap-3 h-[46px]">
                                 <div class="w-10 h-10 rounded-lg overflow-hidden border-2 border-red-900/40 cursor-pointer relative" id="color-preview" style="background-color: #ff1a1a;">
-                                    <input type="color" id="role-color" value="#ff1a1a" onchange="updateColorPreview(this.value)" class="absolute top-[-50%] left-[-50%] w-[200%] h-[200%] cursor-pointer border-none p-0 opacity-0">
+                                    <input type="color" id="role-color" value="#ff1a1a" onchange="updateColorPreviewCR(this.value)" class="absolute top-[-50%] left-[-50%] w-[200%] h-[200%] cursor-pointer border-none p-0 opacity-0">
                                     <div class="absolute inset-0 pointer-events-none"></div>
                                 </div>
                                 <span class="text-gray-400 text-xs font-mono" id="color-hex">#FF1A1A</span>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Descripción -->
                     <div>
                         <label class="block text-gray-300 text-sm font-semibold mb-2">Descripción del Rol</label>
                         <textarea id="role-desc" rows="2" 
-                            class="input-field w-full rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none transition-colors resize-none" 
+                            class="input-field w-full rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none resize-none" 
                             placeholder="Describe brevemente las funciones de este rol..."></textarea>
                     </div>
-
-                    <!-- Permisos -->
                     <div>
                         <label class="block text-gray-300 text-sm font-semibold mb-3">Permisos y Accesos</label>
                         <div class="space-y-2">
-                            
                             <div class="permission-item">
                                 <div class="flex items-center gap-3">
                                     <i class="fas fa-cog text-gray-400 w-5"></i>
@@ -56,11 +44,11 @@
                                         <p class="text-gray-500 text-xs">Puede ver el menú lateral de administración</p>
                                     </div>
                                 </div>
-                                <div class="toggle-switch" onclick="togglePermission(this, 'canAccessConfig')" data-perm="canAccessConfig">
+                                <div class="toggle-switch" onclick="togglePermissionCR(this, 'canAccessConfig')" data-perm="canAccessConfig">
                                     <div class="toggle-knob"></div>
                                 </div>
                             </div>
-
+                            <!-- Repite los otros 5 permisos igual que en tu código original -->
                             <div class="permission-item">
                                 <div class="flex items-center gap-3">
                                     <i class="fas fa-cloud-upload-alt text-gray-400 w-5"></i>
@@ -69,11 +57,10 @@
                                         <p class="text-gray-500 text-xs">Puede agregar nuevos recursos a la tienda</p>
                                     </div>
                                 </div>
-                                <div class="toggle-switch" onclick="togglePermission(this, 'canUploadProducts')" data-perm="canUploadProducts">
+                                <div class="toggle-switch" onclick="togglePermissionCR(this, 'canUploadProducts')" data-perm="canUploadProducts">
                                     <div class="toggle-knob"></div>
                                 </div>
                             </div>
-
                             <div class="permission-item">
                                 <div class="flex items-center gap-3">
                                     <i class="fas fa-trash text-gray-400 w-5"></i>
@@ -82,11 +69,10 @@
                                         <p class="text-gray-500 text-xs">Puede borrar productos existentes</p>
                                     </div>
                                 </div>
-                                <div class="toggle-switch" onclick="togglePermission(this, 'canDeleteProducts')" data-perm="canDeleteProducts">
+                                <div class="toggle-switch" onclick="togglePermissionCR(this, 'canDeleteProducts')" data-perm="canDeleteProducts">
                                     <div class="toggle-knob"></div>
                                 </div>
                             </div>
-
                             <div class="permission-item">
                                 <div class="flex items-center gap-3">
                                     <i class="fas fa-user-plus text-gray-400 w-5"></i>
@@ -95,11 +81,10 @@
                                         <p class="text-gray-500 text-xs">Puede regalar productos a usuarios manualmente</p>
                                     </div>
                                 </div>
-                                <div class="toggle-switch" onclick="togglePermission(this, 'canAssignProducts')" data-perm="canAssignProducts">
+                                <div class="toggle-switch" onclick="togglePermissionCR(this, 'canAssignProducts')" data-perm="canAssignProducts">
                                     <div class="toggle-knob"></div>
                                 </div>
                             </div>
-
                             <div class="permission-item">
                                 <div class="flex items-center gap-3">
                                     <i class="fas fa-key text-gray-400 w-5"></i>
@@ -108,11 +93,10 @@
                                         <p class="text-gray-500 text-xs">Puede ver el historial de compras y licencias</p>
                                     </div>
                                 </div>
-                                <div class="toggle-switch" onclick="togglePermission(this, 'canViewLicenses')" data-perm="canViewLicenses">
+                                <div class="toggle-switch" onclick="togglePermissionCR(this, 'canViewLicenses')" data-perm="canViewLicenses">
                                     <div class="toggle-knob"></div>
                                 </div>
                             </div>
-
                             <div class="permission-item">
                                 <div class="flex items-center gap-3">
                                     <i class="fas fa-users-cog text-gray-400 w-5"></i>
@@ -121,39 +105,32 @@
                                         <p class="text-gray-500 text-xs">Puede cambiar roles de otros usuarios</p>
                                     </div>
                                 </div>
-                                <div class="toggle-switch" onclick="togglePermission(this, 'canManageRoles')" data-perm="canManageRoles">
+                                <div class="toggle-switch" onclick="togglePermissionCR(this, 'canManageRoles')" data-perm="canManageRoles">
                                     <div class="toggle-knob"></div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
-
-                    <!-- Botón Crear -->
-                    <button type="submit" class="btn-create w-full py-4 rounded-xl text-white font-bold text-lg flex items-center justify-center gap-3 mt-4">
+                    <button type="submit" class="btn-create w-full py-4 rounded-xl text-white font-bold text-lg flex items-center justify-center gap-3">
                         <i class="fas fa-save"></i>
                         Guardar Nuevo Rol
                     </button>
                 </form>
             </div>
-
         </div>
-
-        <!-- Panel Derecho: Roles Existentes -->
+        <!-- Panel Derecho -->
         <div class="lg:col-span-1">
             <div class="card p-6 rounded-xl sticky top-24">
                 <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
                     <i class="fas fa-list text-red-500"></i>
                     Roles Activos
                 </h3>
-                
                 <div id="roles-list" class="space-y-3 max-h-[600px] overflow-y-auto custom-scrollbar pr-2">
                     <div class="text-center py-8 text-gray-400">
                         <i class="fas fa-spinner loading-spinner text-2xl mb-2"></i>
                         <p>Cargando roles...</p>
                     </div>
                 </div>
-
                 <div class="mt-6 pt-6 border-t border-white/10">
                     <p class="text-gray-500 text-xs text-center">
                         Los roles se guardan localmente.<br>
@@ -162,276 +139,5 @@
                 </div>
             </div>
         </div>
-
     </div>
 </div>
-
-<!-- ESTILOS ESPECÍFICOS DE ESTA SECCIÓN -->
-<style>
-    .permission-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 12px 16px;
-        background: rgba(13, 5, 5, 0.6);
-        border: 1px solid rgba(255, 26, 26, 0.1);
-        border-radius: 10px;
-        margin-bottom: 8px;
-        transition: all 0.2s ease;
-    }
-    .permission-item:hover {
-        border-color: rgba(255, 26, 26, 0.3);
-        background: rgba(255, 26, 26, 0.05);
-    }
-
-    /* Toggle Switch Personalizado */
-    .toggle-switch {
-        position: relative;
-        width: 44px;
-        height: 24px;
-        background: #374151;
-        border-radius: 20px;
-        cursor: pointer;
-        transition: background 0.3s ease;
-    }
-    .toggle-switch.active {
-        background: #dc2626;
-    }
-    .toggle-knob {
-        position: absolute;
-        top: 2px;
-        left: 2px;
-        width: 20px;
-        height: 20px;
-        background: white;
-        border-radius: 50%;
-        transition: transform 0.3s ease;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-    .toggle-switch.active .toggle-knob {
-        transform: translateX(20px);
-    }
-
-    .role-card {
-        background: rgba(13, 5, 5, 0.6);
-        border: 1px solid rgba(255, 26, 26, 0.15);
-        border-radius: 12px;
-        padding: 16px;
-        transition: all 0.3s ease;
-    }
-    .role-card:hover {
-        border-color: rgba(255, 26, 26, 0.4);
-        transform: translateY(-2px);
-    }
-
-    .btn-create {
-        background: linear-gradient(to right, #dc2626, #991b1b);
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
-    }
-    .btn-create:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(220, 38, 38, 0.5);
-    }
-</style>
-
-<!-- LÓGICA JAVASCRIPT DE LA SECCIÓN (AUTÓNOMA) -->
-<script>
-    // Variables locales para esta sección
-    let currentPermissions = {};
-    let existingRoles = [];
-
-    // Funciones auxiliares locales (no dependen del contexto global)
-    function escapeHTML(str) {
-        return String(str).replace(/[&<>'"]/g, tag => ({
-            '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
-        }[tag] || tag));
-    }
-
-    function formatPermName(key) {
-        const names = {
-            canAccessConfig: 'Config',
-            canUploadProducts: 'Subir',
-            canDeleteProducts: 'Eliminar',
-            canAssignProducts: 'Asignar',
-            canViewLicenses: 'Licencias',
-            canManageRoles: 'Roles'
-        };
-        return names[key] || key;
-    }
-
-    // Inicializar permisos en falso
-    function initPermissions() {
-        currentPermissions = {
-            canAccessConfig: false,
-            canUploadProducts: false,
-            canDeleteProducts: false,
-            canAssignProducts: false,
-            canViewLicenses: false,
-            canManageRoles: false
-        };
-        
-        // Resetear toggles visuales
-        document.querySelectorAll('.toggle-switch').forEach(toggle => {
-            toggle.classList.remove('active');
-        });
-    }
-
-    function togglePermission(element, permissionKey) {
-        element.classList.toggle('active');
-        currentPermissions[permissionKey] = element.classList.contains('active');
-    }
-
-    function updateColorPreview(color) {
-        const preview = document.getElementById('color-preview');
-        const hex = document.getElementById('color-hex');
-        if (preview) preview.style.backgroundColor = color;
-        if (hex) hex.textContent = color.toUpperCase();
-    }
-
-    async function handleCreateRole(e) {
-        e.preventDefault();
-
-        const nameInput = document.getElementById('role-name');
-        const colorInput = document.getElementById('role-color');
-        const descInput = document.getElementById('role-desc');
-
-        if (!nameInput || !colorInput) return;
-
-        const name = nameInput.value.trim();
-        const color = colorInput.value;
-        const description = descInput ? descInput.value.trim() : '';
-
-        if (!name) {
-            alert('❌ El nombre del rol es obligatorio');
-            return;
-        }
-
-        // Verificar si ya existe un rol con ese nombre (case insensitive)
-        const exists = existingRoles.some(r => r.name.toLowerCase() === name.toLowerCase());
-        if (exists) {
-            alert('⚠️ Ya existe un rol con ese nombre');
-            return;
-        }
-
-        try {
-            const newRole = {
-                id: 'role_' + Date.now(),
-                name: name,
-                color: color,
-                description: description || 'Sin descripción',
-                permissions: { ...currentPermissions },
-                created_at: new Date().toISOString(),
-                created_by: 'admin' // Usamos 'admin' directamente, no currentUser
-            };
-
-            // Guardar en localStorage (persistencia de roles)
-            existingRoles.push(newRole);
-            localStorage.setItem('papeleta_custom_roles', JSON.stringify(existingRoles));
-
-            alert(`✅ Rol "${name}" creado exitosamente`);
-
-            // Resetear formulario
-            document.getElementById('create-role-form').reset();
-            updateColorPreview('#ff1a1a');
-            initPermissions();
-
-            // Recargar lista
-            renderRoles();
-
-        } catch (error) {
-            console.error("Error creating role:", error);
-            alert('❌ Error al crear el rol: ' + error.message);
-        }
-    }
-
-    function loadRoles() {
-        try {
-            const saved = localStorage.getItem('papeleta_custom_roles');
-            if (saved) {
-                existingRoles = JSON.parse(saved);
-            } else {
-                existingRoles = [];
-            }
-            renderRoles();
-        } catch (error) {
-            console.error("Error loading roles:", error);
-            existingRoles = [];
-            renderRoles();
-        }
-    }
-
-    function renderRoles() {
-        const container = document.getElementById('roles-list');
-        if (!container) return;
-
-        if (existingRoles.length === 0) {
-            container.innerHTML = `
-                <div class="text-center py-8 text-gray-500">
-                    <i class="fas fa-id-badge text-3xl mb-3 opacity-50"></i>
-                    <p>No hay roles personalizados</p>
-                    <p class="text-xs mt-1">Crea uno usando el formulario</p>
-                </div>`;
-            return;
-        }
-
-        container.innerHTML = existingRoles.map(role => {
-            // Contar permisos activos
-            const activePerms = Object.values(role.permissions).filter(v => v).length;
-            const totalPerms = Object.keys(role.permissions).length;
-
-            return `
-            <div class="role-card">
-                <div class="flex items-start justify-between mb-3">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-lg" 
-                             style="background-color: ${role.color}; box-shadow: 0 0 15px ${role.color}40;">
-                            ${role.name.charAt(0).toUpperCase()}
-                        </div>
-                        <div>
-                            <h4 class="text-white font-bold text-sm">${escapeHTML(role.name)}</h4>
-                            <p class="text-gray-500 text-xs line-clamp-1">${escapeHTML(role.description)}</p>
-                        </div>
-                    </div>
-                    <button onclick="deleteRole('${role.id}')" class="text-gray-500 hover:text-red-400 transition-colors p-1" title="Eliminar rol">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                
-                <div class="flex items-center justify-between text-xs">
-                    <span class="text-gray-400">
-                        <i class="fas fa-check-circle mr-1" style="color: ${role.color}"></i>
-                        ${activePerms}/${totalPerms} permisos activos
-                    </span>
-                    <span class="font-mono text-gray-600">${role.color.toUpperCase()}</span>
-                </div>
-
-                <!-- Mini preview de permisos -->
-                <div class="mt-3 pt-3 border-t border-white/5 flex flex-wrap gap-1">
-                    ${Object.entries(role.permissions).map(([key, value]) => 
-                        value ? `<span class="text-[10px] px-2 py-0.5 rounded bg-green-900/30 text-green-400 border border-green-800/30">${formatPermName(key)}</span>` : ''
-                    ).join('')}
-                    ${activePerms === 0 ? '<span class="text-[10px] text-gray-600 italic">Sin permisos</span>' : ''}
-                </div>
-            </div>
-            `;
-        }).join('');
-    }
-
-    function deleteRole(roleId) {
-        if (!confirm('¿Estás seguro de eliminar este rol? Los usuarios que lo tengan perderán sus permisos.')) {
-            return;
-        }
-
-        existingRoles = existingRoles.filter(r => r.id !== roleId);
-        localStorage.setItem('papeleta_custom_roles', JSON.stringify(existingRoles));
-        renderRoles();
-        alert('✅ Rol eliminado correctamente');
-    }
-
-    // Ejecutar inicialización cuando se carga la sección
-    (function() {
-        initPermissions();
-        loadRoles();
-    })();
-</script>
