@@ -3,539 +3,415 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subir Producto</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff1a1a'/%3E%3Cstop offset='1' stop-color='%23cc1b1b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Ctext x='50' y='70' font-family='Arial, sans-serif' font-size='58' font-weight='900' fill='white' text-anchor='middle'%3EP%3C/text%3E%3C/svg%3E">
-    
+    <title>Subir Producto - Papeleta Store</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     <style>
-        :root {
-            --bg-dark: #050507;
-            --card-bg: rgba(20, 10, 10, 0.6);
-            --primary: #ff1a1a;
-            --primary-dark: #991b1b;
-        }
-        
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        * { font-family: 'Inter', sans-serif; }
         body {
-            background: linear-gradient(135deg, #150a0a 0%, #0a0505 100%);
-            color: #f3f4f6;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            min-height: 100vh;
+            background: linear-gradient(135deg, #050507 0%, #150a0a 100%);
+            color: #e2e8f0;
         }
-
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #111111; }
-        ::-webkit-scrollbar-thumb { background: #6e6e6e; border-radius: 5px; }
-        ::-webkit-scrollbar-thumb:hover { background: #858585; }
-
-        .glass-panel {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
+        .card {
+            background: rgba(21, 10, 10, 0.6);
+            border: 1px solid rgba(255, 26, 26, 0.15);
+            backdrop-filter: blur(10px);
+        }
+        .input-field {
+            background: rgba(13, 5, 5, 0.8);
             border: 1px solid rgba(255, 26, 26, 0.2);
-            border-radius: 16px;
         }
-
+        .input-field:focus {
+            border-color: #ff1a1a;
+            outline: none;
+        }
         .btn-primary {
-            background: linear-gradient(to right, #dc2626, #991b1b);
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
         }
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.5);
+            box-shadow: 0 10px 25px rgba(220, 38, 38, 0.3);
         }
-
-        .preview-item {
-            position: relative;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 2px solid rgba(220, 38, 38, 0.3);
-            animation: slideIn 0.3s ease;
+        .upload-zone {
+            border: 2px dashed rgba(255, 26, 26, 0.3);
+            background: rgba(255, 26, 26, 0.02);
+            transition: all 0.3s ease;
         }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .upload-zone:hover {
+            border-color: rgba(255, 26, 26, 0.6);
+            background: rgba(255, 26, 26, 0.05);
         }
-        .preview-item img {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
+        .upload-zone.dragover {
+            border-color: #ff1a1a;
+            background: rgba(255, 26, 26, 0.1);
         }
-        .preview-item .remove-btn {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: rgba(220, 38, 38, 0.9);
-            color: white;
-            border: none;
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            transition: all 0.2s;
+        .product-item {
+            transition: all 0.3s ease;
         }
-        .preview-item .remove-btn:hover {
-            background: rgba(220, 38, 38, 1);
-            transform: scale(1.1);
-        }
-
-        .multiple-preview-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .youtube-preview {
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            overflow: hidden;
-            border-radius: 8px;
-            border: 2px solid rgba(220, 38, 38, 0.3);
-            background: #0d0505;
-        }
-        .youtube-preview iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+        .product-item:hover {
+            background: rgba(255, 26, 26, 0.05);
+            transform: translateX(4px);
         }
     </style>
 </head>
-<body class="relative">
+<body class="min-h-screen p-6">
 
+<div class="max-w-7xl mx-auto">
     <!-- Header -->
-    <header class="bg-[#0d0505]/90 backdrop-blur border-b border-red-900/30 sticky top-0 z-50 px-6 py-4">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-red-500 to-red-800 flex items-center justify-center font-black text-white">P</div>
-                <div>
-                    <h1 class="text-white font-black tracking-wider text-lg">PAPELETA <span class="text-red-400">STORE</span></h1>
-                    <p class="text-gray-400 text-xs">Panel de Administración</p>
-                </div>
+    <div class="flex items-center justify-between mb-8">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center font-black text-white text-xl">P</div>
+            <div>
+                <h1 class="text-2xl font-bold text-white">PAPELETA <span class="text-red-500">STORE</span></h1>
+                <p class="text-gray-400 text-sm">Panel de Administración</p>
             </div>
-            <a href="index.html" class="text-gray-400 hover:text-white text-sm flex items-center gap-2 transition-colors">
-                <i class="fas fa-arrow-left"></i> Volver a la Tienda
-            </a>
         </div>
-    </header>
+        <a href="AreaCliente.html" class="px-4 py-2 rounded-lg border border-red-600/30 text-red-400 hover:bg-red-600/10 transition-colors">
+            <i class="fas fa-arrow-left mr-2"></i>Volver al Panel
+        </a>
+    </div>
 
-    <!-- Contenido Principal -->
-    <main class="max-w-5xl mx-auto px-6 py-10">
+    <!-- Sección Subir Producto -->
+    <div class="card rounded-xl p-6 mb-8">
+        <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+            <i class="fas fa-cloud-upload-alt text-red-500"></i>
+            Subir Nuevo Producto
+        </h2>
         
-        <div class="glass-panel p-8 mb-8">
-            <h2 class="text-3xl font-black text-white mb-2 flex items-center gap-3">
-                <i class="fas fa-cloud-upload-alt text-red-500"></i>
-                Subir Nuevo Producto
-            </h2>
-            <p class="text-gray-400 text-sm mb-6">Completa el formulario para agregar un producto a la tienda</p>
-
-            <form id="product-form" onsubmit="handleProductSubmit(event)" class="space-y-6">
-                
-                <!-- Nombre -->
+        <form id="upload-product-form" class="space-y-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-gray-300 text-sm font-semibold mb-2">Nombre del Producto *</label>
-                    <input type="text" id="prod-name" required 
-                        class="w-full bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition-colors" 
-                        placeholder="Ej: Script de Inventario Premium">
+                    <input type="text" id="product-name" required
+                        class="input-field w-full rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none"
+                        placeholder="Ej: Script de AutoFarm">
                 </div>
-
-                <!-- Precio y Categoría -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-gray-300 text-sm font-semibold mb-2">Precio (USD) *</label>
-                        <input type="number" id="prod-price" required step="0.01" min="0" 
-                            class="w-full bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition-colors" 
-                            placeholder="10.00">
-                    </div>
-                    <div>
-                        <label class="block text-gray-300 text-sm font-semibold mb-2">Categoría</label>
-                        <select id="prod-category" 
-                            class="w-full bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-500 transition-colors">
-                            <option value="Scripts">Scripts</option>
-                            <option value="Modelajes">Modelajes</option>
-                            <option value="Mappings">Mappings</option>
-                            <option value="Webs">Sitios Web</option>
-                            <option value="Bots">Bots Discord</option>
-                            <option value="Otros">Otros</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Descripción -->
                 <div>
-                    <label class="block text-gray-300 text-sm font-semibold mb-2">Descripción/Detalle *</label>
-                    <textarea id="prod-description" required rows="4" 
-                        class="w-full bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition-colors" 
-                        placeholder="Describe las características del producto, qué incluye, requisitos, etc..."></textarea>
+                    <label class="block text-gray-300 text-sm font-semibold mb-2">Precio (USD) *</label>
+                    <input type="number" id="product-price" required min="0" step="0.01"
+                        class="input-field w-full rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none"
+                        placeholder="0.00">
                 </div>
+            </div>
 
-                <!-- Link de YouTube (OPCIONAL) -->
-                <div>
-                    <label class="block text-gray-300 text-sm font-semibold mb-2">
-                        <i class="fab fa-youtube text-red-500 mr-2"></i>Link de YouTube (Opcional)
-                    </label>
-                    <input type="url" id="prod-youtube" 
-                        class="w-full bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition-colors" 
-                        placeholder="https://www.youtube.com/watch?v=...">
-                    <p class="text-gray-500 text-xs mt-1">Pega el link del video de YouTube para mostrarlo en el producto</p>
-                    <div id="youtube-preview-container" class="mt-3 hidden">
-                        <div class="youtube-preview" id="youtube-iframe-container"></div>
-                    </div>
+            <div>
+                <label class="block text-gray-300 text-sm font-semibold mb-2">Categoría *</label>
+                <select id="product-category" required
+                    class="input-field w-full rounded-xl px-4 py-3 text-sm text-white focus:outline-none">
+                    <option value="">Seleccionar categoría...</option>
+                    <option value="Scripts">Scripts</option>
+                    <option value="Modelajes">Modelajes</option>
+                    <option value="Mappings">Mappings</option>
+                    <option value="Sitios Web">Sitios Web</option>
+                    <option value="Bots Discord">Bots Discord</option>
+                    <option value="Otros">Otros</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-gray-300 text-sm font-semibold mb-2">Descripción/Detalle *</label>
+                <textarea id="product-description" required rows="3"
+                    class="input-field w-full rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none resize-none"
+                    placeholder="Describe las características del producto..."></textarea>
+            </div>
+
+            <div>
+                <label class="block text-gray-300 text-sm font-semibold mb-2">Link de YouTube (Opcional)</label>
+                <input type="url" id="product-youtube"
+                    class="input-field w-full rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none"
+                    placeholder="https://youtube.com/watch?v=...">
+            </div>
+
+            <div>
+                <label class="block text-gray-300 text-sm font-semibold mb-2">Fotos del Producto (Múltiples) *</label>
+                <div class="upload-zone rounded-xl p-8 text-center cursor-pointer" onclick="document.getElementById('product-images').click()">
+                    <i class="fas fa-images text-4xl text-red-400 mb-3"></i>
+                    <p class="text-white font-semibold mb-1">Haz clic para agregar imágenes</p>
+                    <p class="text-gray-400 text-xs">Puedes seleccionar varias imágenes a la vez</p>
+                    <input type="file" id="product-images" multiple accept="image/*" class="hidden" onchange="handleImageSelect(event)">
                 </div>
+                <div id="image-preview-container" class="grid grid-cols-4 gap-3 mt-3"></div>
+            </div>
 
-                <!-- Imágenes Múltiples - PREVIEW ARRIBA -->
-                <div>
-                    <label class="block text-gray-300 text-sm font-semibold mb-2">Fotos del Producto (Múltiples) *</label>
-                    
-                    <!-- Preview de imágenes ARRIBA -->
-                    <div id="multiple-images-preview" class="multiple-preview-container"></div>
-                    
-                    <!-- Área de upload ABAJO -->
-                    <div class="border-2 border-dashed border-red-900/40 rounded-xl p-6 text-center hover:border-red-500/50 transition-colors bg-[#0d0505]/50 cursor-pointer" onclick="document.getElementById('prod-images').click()">
-                        <input type="file" id="prod-images" accept="image/*" multiple 
-                            onchange="addMoreImages(this)" class="hidden">
-                        <div>
-                            <i class="fas fa-plus-circle text-4xl text-red-400 mb-3"></i>
-                            <p class="text-gray-300 font-semibold">Haz clic para agregar más imágenes</p>
-                            <p class="text-gray-500 text-xs mt-1">Puedes seleccionar varias imágenes a la vez (máx. 800x600 recomendado)</p>
-                            <p class="text-red-400/60 text-xs mt-2" id="image-count">0 imágenes seleccionadas</p>
-                        </div>
-                    </div>
+            <div>
+                <label class="block text-gray-300 text-sm font-semibold mb-2">Archivo del Producto (Zip/Rar/Lua) *</label>
+                <div class="upload-zone rounded-xl p-6 text-center cursor-pointer" onclick="document.getElementById('product-file').click()">
+                    <i class="fas fa-file-archive text-3xl text-red-400 mb-2"></i>
+                    <p class="text-white font-semibold">Haz clic para subir el archivo</p>
+                    <p class="text-gray-400 text-xs mt-1">Formatos: .zip, .rar, .lua</p>
+                    <input type="file" id="product-file" accept=".zip,.rar,.lua" class="hidden" onchange="handleFileSelect(event)">
                 </div>
-
-                <!-- Archivo Descargable -->
-                <div>
-                    <label class="block text-gray-300 text-sm font-semibold mb-2">Archivo del Producto (Zip/Rar/Lua) *</label>
-                    <div class="border-2 border-dashed border-red-900/40 rounded-xl p-6 text-center hover:border-red-500/50 transition-colors bg-[#0d0505]/50">
-                        <input type="file" id="prod-file" accept=".zip,.rar,.7z,.lua,.txt" required 
-                            onchange="updateFileName(this)" class="hidden">
-                        <label for="prod-file" class="cursor-pointer block">
-                            <i class="fas fa-file-archive text-4xl text-red-400 mb-3"></i>
-                            <p id="file-label-text" class="text-gray-300 font-semibold">Haz clic para subir el archivo descargable</p>
-                            <p class="text-gray-500 text-xs mt-1">El usuario podrá descargar este archivo tras comprarlo</p>
-                        </label>
-                    </div>
+                <div id="file-info" class="mt-2 p-3 bg-red-900/20 border border-red-600/30 rounded-lg hidden">
+                    <p class="text-white text-sm font-semibold" id="file-name"></p>
+                    <p class="text-gray-400 text-xs" id="file-size"></p>
                 </div>
+            </div>
 
-                <!-- Botón Submit -->
-                <div class="pt-4">
-                    <button type="submit" 
-                        class="btn-primary w-full py-4 rounded-xl text-white font-bold text-lg flex items-center justify-center gap-3">
-                        <i class="fas fa-plus-circle"></i>
-                        Agregar Producto a la Tienda
-                    </button>
-                </div>
-            </form>
-        </div>
+            <button type="submit" class="btn-primary w-full py-4 rounded-xl text-white font-bold text-lg flex items-center justify-center gap-2">
+                <i class="fas fa-save"></i>
+                Agregar Producto a la Tienda
+            </button>
+        </form>
+    </div>
 
-        <!-- Lista de Productos Existentes -->
-        <div class="glass-panel p-8">
-            <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <i class="fas fa-list text-red-500"></i>
-                Productos en la Tienda
-            </h3>
-            <div id="admin-products-list" class="space-y-3">
-                <p class="text-gray-500 text-sm text-center py-8">
-                    <i class="fas fa-spinner animate-spin mr-2"></i>Cargando productos...
-                </p>
+    <!-- Lista de Productos -->
+    <div class="card rounded-xl p-6">
+        <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+            <i class="fas fa-list text-red-500"></i>
+            Productos en la Tienda
+        </h2>
+        <div id="products-list" class="space-y-3">
+            <div class="text-center py-12 text-gray-400">
+                <i class="fas fa-spinner fa-spin text-3xl mb-3"></i>
+                <p>Cargando productos...</p>
             </div>
         </div>
-    </main>
+    </div>
+</div>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
-            authDomain: "papeletalicencia.firebaseapp.com",
-            databaseURL: "https://papeletalicencia-default-rtdb.firebaseio.com",
-            projectId: "papeletalicencia",
-            storageBucket: "papeletalicencia.firebasestorage.app",
-            messagingSenderId: "677208314051",
-            appId: "1:677208314051:web:a27c04f31d402e83f29276"
-        };
+<script>
+    // Configuración de Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
+        authDomain: "papeletalicencia.firebaseapp.com",
+        projectId: "papeletalicencia",
+        storageBucket: "papeletalicencia.firebasestorage.app",
+        messagingSenderId: "677208314051",
+        appId: "1:677208314051:web:a27c04f31d402e83f29276"
+    };
 
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const storage = firebase.storage();
 
-        let tempImages = [];
-        let allProducts = [];
-        let youtubeVideoId = null;
+    let selectedImages = [];
+    let selectedFile = null;
 
-        // Función para extraer ID de YouTube
-        function extractYouTubeId(url) {
-            if (!url) return null;
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-            const match = url.match(regExp);
-            return (match && match[2].length === 11) ? match[2] : null;
-        }
-
-        // Preview de YouTube
-        document.getElementById('prod-youtube').addEventListener('input', function(e) {
-            const url = e.target.value;
-            const videoId = extractYouTubeId(url);
-            const previewContainer = document.getElementById('youtube-preview-container');
-            const iframeContainer = document.getElementById('youtube-iframe-container');
-            
-            if (videoId) {
-                youtubeVideoId = videoId;
-                iframeContainer.innerHTML = `
-                    <iframe 
-                        src="https://www.youtube.com/embed/${videoId}" 
-                        frameborder="0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowfullscreen>
-                    </iframe>
-                `;
-                previewContainer.classList.remove('hidden');
-            } else {
-                youtubeVideoId = null;
-                previewContainer.classList.add('hidden');
-                iframeContainer.innerHTML = '';
-            }
-        });
-
-        // Agregar más imágenes (sin borrar las existentes)
-        function addMoreImages(input) {
-            if (input.files && input.files.length > 0) {
-                Array.from(input.files).forEach((file) => {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        tempImages.push({ file: file, dataUrl: e.target.result });
-                        updateImagesPreview();
-                        updateImageCount();
-                    };
-                    reader.readAsDataURL(file);
-                });
-            }
-            // Reset input para permitir seleccionar el mismo archivo si es necesario
-            input.value = '';
-        }
-
-        // Actualizar preview de imágenes
-        function updateImagesPreview() {
-            const previewContainer = document.getElementById('multiple-images-preview');
-            previewContainer.innerHTML = '';
-            
-            tempImages.forEach((img, idx) => {
+    // Manejar selección de imágenes
+    function handleImageSelect(event) {
+        const files = Array.from(event.target.files);
+        selectedImages = files;
+        
+        const container = document.getElementById('image-preview-container');
+        container.innerHTML = '';
+        
+        files.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
                 const div = document.createElement('div');
-                div.className = 'preview-item';
+                div.className = 'relative aspect-square rounded-lg overflow-hidden border-2 border-red-600/30';
                 div.innerHTML = `
-                    <img src="${img.dataUrl}" alt="Preview ${idx + 1}">
-                    <button type="button" class="remove-btn" onclick="removeImage(${idx})" title="Eliminar imagen">
+                    <img src="${e.target.result}" class="w-full h-full object-cover">
+                    <button type="button" onclick="removeImage(${index})" class="absolute top-1 right-1 w-6 h-6 bg-red-600 rounded-full flex items-center justify-center text-white text-xs hover:bg-red-700">
                         <i class="fas fa-times"></i>
                     </button>
                 `;
-                previewContainer.appendChild(div);
-            });
-        }
+                container.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
 
-        // Actualizar contador de imágenes
-        function updateImageCount() {
-            const count = tempImages.length;
-            document.getElementById('image-count').textContent = `${count} imagen${count !== 1 ? 'es' : ''} seleccionada${count !== 1 ? 's' : ''}`;
-        }
+    function removeImage(index) {
+        selectedImages.splice(index, 1);
+        const container = document.getElementById('image-preview-container');
+        container.innerHTML = '';
+        selectedImages.forEach((file, idx) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const div = document.createElement('div');
+                div.className = 'relative aspect-square rounded-lg overflow-hidden border-2 border-red-600/30';
+                div.innerHTML = `
+                    <img src="${e.target.result}" class="w-full h-full object-cover">
+                    <button type="button" onclick="removeImage(${idx})" class="absolute top-1 right-1 w-6 h-6 bg-red-600 rounded-full flex items-center justify-center text-white text-xs hover:bg-red-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                container.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
 
-        function removeImage(index) {
-            tempImages.splice(index, 1);
-            updateImagesPreview();
-            updateImageCount();
+    // Manejar selección de archivo
+    function handleFileSelect(event) {
+        selectedFile = event.target.files[0];
+        if (selectedFile) {
+            document.getElementById('file-info').classList.remove('hidden');
+            document.getElementById('file-name').textContent = selectedFile.name;
+            document.getElementById('file-size').textContent = (selectedFile.size / 1024 / 1024).toFixed(2) + ' MB';
         }
+    }
 
-        function updateFileName(input) {
-            const label = document.getElementById('file-label-text');
-            if (input.files && input.files[0]) {
-                label.innerText = input.files[0].name;
-                label.classList.add('text-white', 'font-bold');
-            }
-        }
+    // Subir archivo a Firebase Storage
+    async function uploadFile(file, productName) {
+        const timestamp = Date.now();
+        const fileName = `${timestamp}_${file.name}`;
+        const storageRef = storage.ref(`productos/${fileName}`);
+        
+        await storageRef.put(file);
+        const downloadURL = await storageRef.getDownloadURL();
+        return downloadURL;
+    }
 
-        function resizeImage(file, maxWidth = 800, maxHeight = 600) {
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const img = new Image();
-                    img.onload = function() {
-                        let width = img.width;
-                        let height = img.height;
-                        
-                        if (width > height) {
-                            if (width > maxWidth) {
-                                height = Math.round((height * maxWidth) / width);
-                                width = maxWidth;
-                            }
-                        } else {
-                            if (height > maxHeight) {
-                                width = Math.round((width * maxHeight) / height);
-                                height = maxHeight;
-                            }
-                        }
-                        
-                        const canvas = document.createElement('canvas');
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        
-                        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-                        resolve(dataUrl);
-                    };
-                    img.src = event.target.result;
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
-        }
-
-        async function handleProductSubmit(e) {
-            e.preventDefault();
+    // Subir imágenes a Firebase Storage
+    async function uploadImages(images, productName) {
+        const urls = [];
+        for (let i = 0; i < images.length; i++) {
+            const timestamp = Date.now() + i;
+            const fileName = `${timestamp}_${images[i].name}`;
+            const storageRef = storage.ref(`productos/${fileName}`);
             
-            const name = document.getElementById('prod-name').value;
-            const price = parseFloat(document.getElementById('prod-price').value);
-            const category = document.getElementById('prod-category').value;
-            const description = document.getElementById('prod-description').value;
-            const youtubeUrl = document.getElementById('prod-youtube').value;
-            const downloadFile = document.getElementById('prod-file').files[0];
-            
-            if (tempImages.length === 0) {
+            await storageRef.put(images[i]);
+            const downloadURL = await storageRef.getDownloadURL();
+            urls.push(downloadURL);
+        }
+        return urls;
+    }
+
+    // Manejar envío del formulario
+    document.getElementById('upload-product-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Subiendo...';
+        submitBtn.disabled = true;
+
+        try {
+            const name = document.getElementById('product-name').value;
+            const price = parseFloat(document.getElementById('product-price').value);
+            const category = document.getElementById('product-category').value;
+            const description = document.getElementById('product-description').value;
+            const youtube = document.getElementById('product-youtube').value;
+
+            if (selectedImages.length === 0) {
                 alert('Por favor selecciona al menos una imagen');
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
                 return;
             }
-            
-            if (!downloadFile) {
-                alert('Por favor selecciona el archivo de descarga');
-                return;
-            }
-            
-            try {
-                // Redimensionar todas las imágenes
-                const resizedImages = [];
-                for (let i = 0; i < tempImages.length; i++) {
-                    const resized = await resizeImage(tempImages[i].file);
-                    resizedImages.push(resized);
-                }
-                
-                const fileBase64 = await fileToBase64(downloadFile);
-                
-                const newProduct = {
-                    id: 'prod_' + Date.now(),
-                    name: name,
-                    price: price,
-                    category: category,
-                    description: description,
-                    image_url: resizedImages[0],
-                    images: resizedImages,
-                    youtube_url: youtubeUrl || null,
-                    youtube_id: youtubeVideoId || null,
-                    file_data: fileBase64,
-                    file_name: downloadFile.name,
-                    created_at: firebase.firestore.FieldValue.serverTimestamp()
-                };
-                
-                await db.collection("Productos").doc(newProduct.id).set(newProduct);
-                
-                alert('✅ Producto guardado exitosamente en la tienda');
-                
-                // Reset form
-                document.getElementById('product-form').reset();
-                document.getElementById('multiple-images-preview').innerHTML = '';
-                document.getElementById('file-label-text').innerText = 'Haz clic para subir el archivo descargable';
-                document.getElementById('file-label-text').classList.remove('text-white', 'font-bold');
-                document.getElementById('youtube-preview-container').classList.add('hidden');
-                document.getElementById('youtube-iframe-container').innerHTML = '';
-                tempImages = [];
-                youtubeVideoId = null;
-                updateImageCount();
-                
-                // Recargar lista
-                loadProducts();
-                
-            } catch (error) {
-                console.error(error);
-                alert('❌ Error al guardar: ' + error.message);
-            }
-        }
 
-        async function loadProducts() {
-            const container = document.getElementById('admin-products-list');
+            if (!selectedFile) {
+                alert('Por favor selecciona el archivo del producto');
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                return;
+            }
+
+            // Subir archivo principal
+            const fileURL = await uploadFile(selectedFile, name);
             
-            try {
-                const snapshot = await db.collection("Productos").get();
-                allProducts = [];
-                snapshot.forEach((doc) => {
-                    allProducts.push(doc.data());
-                });
-                
-                if (allProducts.length === 0) {
-                    container.innerHTML = '<p class="text-gray-500 text-sm text-center py-8">No hay productos en la tienda aún.</p>';
-                    return;
-                }
-                
-                container.innerHTML = allProducts.map(p => `
-                    <div class="flex items-center gap-4 bg-[#0d0505] border border-red-950/40 rounded-xl p-4 hover:border-red-500/30 transition-colors">
-                        <img src="${p.image_url}" class="w-16 h-16 rounded-lg object-cover border border-red-900/30">
-                        <div class="flex-grow min-w-0">
-                            <p class="text-white font-semibold truncate">${escapeHTML(p.name)}</p>
-                            <p class="${Number(p.price) === 0 ? 'text-green-400' : 'text-red-400'} text-sm font-bold">
-                                ${Number(p.price) === 0 ? 'GRATIS' : '$' + Number(p.price).toFixed(2)}
-                            </p>
-                            <p class="text-gray-500 text-xs truncate">
-                                <i class="fas fa-tag mr-1"></i>${escapeHTML(p.category || 'Sin categoría')}
-                            </p>
-                            ${p.youtube_url ? '<p class="text-red-400/60 text-xs mt-1"><i class="fab fa-youtube mr-1"></i>Video de YouTube</p>' : ''}
+            // Subir imágenes
+            const imageUrls = await uploadImages(selectedImages, name);
+
+            // Guardar en Firestore
+            await db.collection('Productos').add({
+                name: name,
+                price: price,
+                category: category,
+                description: description,
+                youtube_url: youtube || '',
+                image_url: imageUrls[0], // Imagen principal
+                all_images: imageUrls,
+                file_data: fileURL,
+                file_name: selectedFile.name,
+                created_at: firebase.firestore.FieldValue.serverTimestamp(),
+                status: 'active'
+            });
+
+            alert('¡Producto subido exitosamente!');
+            
+            // Limpiar formulario
+            document.getElementById('upload-product-form').reset();
+            document.getElementById('image-preview-container').innerHTML = '';
+            document.getElementById('file-info').classList.add('hidden');
+            selectedImages = [];
+            selectedFile = null;
+
+            // Recargar lista
+            loadProducts();
+
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al subir el producto: ' + error.message);
+        } finally {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    });
+
+    // Cargar productos
+    async function loadProducts() {
+        const container = document.getElementById('products-list');
+        
+        try {
+            const snapshot = await db.collection('Productos')
+                .orderBy('created_at', 'desc')
+                .get();
+            
+            if (snapshot.empty) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-gray-400">
+                        <i class="fas fa-box-open text-4xl mb-3"></i>
+                        <p>No hay productos subidos aún</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            
+            container.innerHTML = products.map(product => `
+                <div class="product-item bg-[#0d0505] border border-red-900/30 rounded-xl p-4 flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <img src="${product.image_url || ''}" class="w-16 h-16 rounded-lg object-cover border border-red-900/30">
+                        <div>
+                            <h3 class="text-white font-bold">${product.name}</h3>
+                            <p class="text-gray-400 text-xs">${product.category} • $${Number(product.price).toFixed(2)}</p>
                         </div>
-                        <button onclick="deleteProduct('${p.id}')" 
-                            class="text-red-400 hover:text-red-300 w-10 h-10 rounded-lg hover:bg-red-950/30 flex items-center justify-center transition-all">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="deleteProduct('${product.id}')" class="px-3 py-2 rounded-lg bg-red-600/20 text-red-400 hover:bg-red-600/30 transition-colors">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
-                `).join('');
-                
-            } catch (error) {
-                console.error(error);
-                container.innerHTML = '<p class="text-red-400 text-sm text-center py-8">Error al cargar productos</p>';
-            }
-        }
+                </div>
+            `).join('');
 
-        async function deleteProduct(id) {
-            if (!confirm('¿Estás seguro de eliminar este producto de la tienda?')) return;
-            
-            try {
-                await db.collection("Productos").doc(id).delete();
-                alert('✅ Producto eliminado correctamente');
-                loadProducts();
-            } catch (error) {
-                console.error(error);
-                alert('❌ Error al eliminar: ' + error.message);
-            }
+        } catch (error) {
+            console.error('Error cargando productos:', error);
+            container.innerHTML = `
+                <div class="text-center py-8 text-red-400">
+                    <i class="fas fa-exclamation-triangle text-2xl mb-2"></i>
+                    <p>Error al cargar productos</p>
+                </div>
+            `;
         }
+    }
 
-        function escapeHTML(str) {
-            return String(str).replace(/[&<>'"]/g, tag => ({
-                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
-            }[tag] || tag));
-        }
-
-        // Cargar productos al iniciar
-        document.addEventListener('DOMContentLoaded', () => {
+    // Eliminar producto
+    async function deleteProduct(productId) {
+        if (!confirm('¿Estás seguro de eliminar este producto?')) return;
+        
+        try {
+            await db.collection('Productos').doc(productId).delete();
+            alert('Producto eliminado');
             loadProducts();
-        });
-    </script>
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al eliminar el producto');
+        }
+    }
+
+    // Cargar productos al iniciar
+    loadProducts();
+</script>
+
 </body>
 </html>
