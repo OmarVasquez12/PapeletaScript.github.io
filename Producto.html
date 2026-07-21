@@ -144,13 +144,24 @@
         .tab-button {
             transition: all 0.3s ease;
             cursor: pointer;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            font-weight: 600;
+            position: relative;
+        }
+        .tab-button::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+        .tab-button.active::after {
+            width: 100%;
         }
         .tab-button.active {
-            color: #ef4444;
-            border-bottom: 2px solid #ef4444;
+            color: var(--primary);
+            font-weight: 600;
         }
         .tab-button:not(.active):hover {
             color: #9ca3af;
@@ -229,24 +240,20 @@
             border: 1px solid rgba(255,255,255,0.05);
         }
 
-        /* Estilo para el video cuando está activo */
-        .video-active .gallery-frame {
-            background: #000;
+        .no-video-message {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #6b7280;
+            text-align: center;
+            padding: 2rem;
         }
-        .video-active .gallery-image {
-            display: none;
-        }
-        .video-active .youtube-container {
-            display: block;
-        }
-        .video-active .nav-prev, .video-active .nav-next {
-            display: none;
-        }
-        .video-active #image-counter {
-            display: none;
-        }
-        .video-active .thumbnails-container {
-            display: none;
+        .no-video-message i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
         }
     </style>
 </head>
@@ -291,13 +298,13 @@
     <main class="relative z-10 w-full max-w-7xl ml-4 md:ml-10 py-10 pr-4">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
             <div class="lg:col-span-7 flex flex-col">
-                <!-- Gallery Frame con Imagen o Video -->
+                <!-- Gallery Frame con Video o Imagen -->
                 <div class="gallery-frame shadow-2xl shadow-red-900/10 group" id="gallery-container">
-                    <!-- Imagen principal -->
-                    <img id="main-image" src="" alt="Producto" class="gallery-image p-2">
+                    <!-- Imagen principal (oculta por defecto) -->
+                    <img id="main-image" src="" alt="Producto" class="gallery-image p-2 hidden">
                     
-                    <!-- Contenedor de Video YouTube -->
-                    <div id="youtube-video-container" class="youtube-container hidden"></div>
+                    <!-- Contenedor de Video YouTube (visible por defecto si existe) -->
+                    <div id="youtube-video-container" class="youtube-container"></div>
                     
                     <div class="absolute top-4 left-4 bg-black/60 px-3 py-1 rounded-full text-xs font-mono border border-white/10 backdrop-blur-sm" id="image-counter">
                         <span id="current-img-idx">1</span> / <span id="total-img-idx">1</span>
@@ -307,16 +314,16 @@
                     <button class="gallery-nav nav-next" id="nav-next" onclick="moveSlide(1)"><i class="fas fa-chevron-right"></i></button>
                 </div>
                 
-                <!-- Thumbnails -->
-                <div id="thumbnails-list" class="thumbnails-container mt-4"></div>
+                <!-- Thumbnails (solo para imágenes, ocultos por defecto) -->
+                <div id="thumbnails-list" class="thumbnails-container mt-4 hidden"></div>
                 
-                <!-- Tabs Imagen/Video -->
+                <!-- Tabs Video/Imagen -->
                 <div class="flex gap-4 mt-6 border-b border-white/10 pb-2">
-                    <button class="tab-button active pb-2 px-2 text-sm flex items-center gap-2" onclick="switchTab('image')" id="tab-image">
-                        <i class="fas fa-image"></i> IMAGEN
-                    </button>
-                    <button class="tab-button pb-2 px-2 text-sm flex items-center gap-2" onclick="switchTab('video')" id="tab-video" style="display: none;">
+                    <button class="tab-button active pb-2 px-2 text-sm flex items-center gap-2" onclick="switchTab('video')" id="tab-video">
                         <i class="fas fa-video"></i> VIDEO
+                    </button>
+                    <button class="tab-button pb-2 px-2 text-sm flex items-center gap-2" onclick="switchTab('image')" id="tab-image">
+                        <i class="fas fa-image"></i> IMAGEN
                     </button>
                 </div>
             </div>
@@ -363,7 +370,7 @@
                     </h3>
                     <p id="prod-desc" class="text-gray-400 text-sm leading-relaxed">...</p>
                 </div>
-            </2>
+            </div>
         </div>
     </main>
 
@@ -431,7 +438,7 @@
         let userAlreadyOwns = false;
         let currentUserDiscordId = null;
         let currentUserData = null;
-        let currentTab = 'image'; // 'image' o 'video'
+        let currentTab = 'video'; // Por defecto, empieza en 'video'
 
         // --- LÓGICA DEL CARRITO ---
         let cart = JSON.parse(localStorage.getItem('papeleta_cart') || '[]');
@@ -558,7 +565,6 @@
             }
         }
 
-        // MODIFICADO: Procesar compra/reclamo y redirigir
         async function goToCheckout() {
             if (cart.length === 0) {
                 alert('Tu carrito está vacío');
@@ -756,7 +762,7 @@
             }
         }
 
-        // NUEVA FUNCIÓN: Cambiar entre tabs Imagen/Video
+        // CAMBIADO: Cambiar entre tabs Video/Imagen
         function switchTab(tab) {
             currentTab = tab;
             const imageTab = document.getElementById('tab-image');
@@ -768,7 +774,21 @@
             const navNext = document.getElementById('nav-next');
             const imageCounter = document.getElementById('image-counter');
 
-            if (tab === 'image') {
+            if (tab === 'video') {
+                videoTab.classList.add('active');
+                imageTab.classList.remove('active');
+                
+                mainImage.classList.add('hidden');
+                youtubeContainer.classList.remove('hidden');
+                thumbnailsList.classList.add('hidden');
+                navPrev.style.display = 'none';
+                navNext.style.display = 'none';
+                imageCounter.style.display = 'none';
+                
+                // Cargar video de YouTube y reproducirlo automáticamente
+                loadYouTubeVideo(true);
+                
+            } else if (tab === 'image') {
                 imageTab.classList.add('active');
                 videoTab.classList.remove('active');
                 
@@ -779,25 +799,8 @@
                 navNext.style.display = 'flex';
                 imageCounter.style.display = 'block';
                 
-                // Detener video si estaba reproduciéndose
-                const iframe = youtubeContainer.querySelector('iframe');
-                if (iframe) {
-                    iframe.src = iframe.src; // Recargar para detener reproducción
-                }
-                
-            } else if (tab === 'video') {
-                imageTab.classList.remove('active');
-                videoTab.classList.add('active');
-                
-                mainImage.classList.add('hidden');
-                youtubeContainer.classList.remove('hidden');
-                thumbnailsList.classList.add('hidden');
-                navPrev.style.display = 'none';
-                navNext.style.display = 'none';
-                imageCounter.style.display = 'none';
-                
-                // Cargar y reproducir video automáticamente
-                loadYouTubeVideo(true);
+                // Limpiar el video para que se detenga
+                youtubeContainer.innerHTML = '';
             }
         }
 
@@ -805,10 +808,10 @@
             const youtubeContainer = document.getElementById('youtube-video-container');
             
             if (currentProduct && currentProduct.youtube_id) {
-                const params = autoPlay ? '?autoplay=1&rel=0&modestbranding=1' : '?rel=0&modestbranding=1';
+                const autoplayParam = autoPlay ? '&autoplay=1' : '&autoplay=0';
                 youtubeContainer.innerHTML = `
                     <iframe 
-                        src="https://www.youtube.com/embed/${currentProduct.youtube_id}${params}" 
+                        src="https://www.youtube.com/embed/${currentProduct.youtube_id}?rel=0${autoplayParam}" 
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                         allowfullscreen>
                     </iframe>
@@ -816,10 +819,10 @@
             } else if (currentProduct && currentProduct.youtube_url) {
                 const videoId = extractYouTubeId(currentProduct.youtube_url);
                 if (videoId) {
-                    const params = autoPlay ? '?autoplay=1&rel=0&modestbranding=1' : '?rel=0&modestbranding=1';
+                    const autoplayParam = autoPlay ? '&autoplay=1' : '&autoplay=0';
                     youtubeContainer.innerHTML = `
                         <iframe 
-                            src="https://www.youtube.com/embed/${videoId}${params}" 
+                            src="https://www.youtube.com/embed/${videoId}?rel=0${autoplayParam}" 
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                             allowfullscreen>
                         </iframe>
@@ -835,10 +838,10 @@
         function showNoVideoMessage() {
             const youtubeContainer = document.getElementById('youtube-video-container');
             youtubeContainer.innerHTML = `
-                <div class="flex flex-col items-center justify-center h-full text-center p-6">
-                    <i class="fas fa-video-slash text-4xl text-gray-600 mb-4"></i>
-                    <p class="text-lg font-semibold text-gray-400">No hay video disponible</p>
-                    <p class="text-sm text-gray-500 mt-2">Este producto no tiene video de presentación</p>
+                <div class="no-video-message">
+                    <i class="fas fa-video-slash"></i>
+                    <p class="text-lg font-semibold">No hay video disponible</p>
+                    <p class="text-sm">Este producto no tiene video de presentación</p>
                 </div>
             `;
         }
@@ -868,12 +871,22 @@
                 document.getElementById('prod-desc').textContent = currentProduct.description || "Sin descripción.";
                 document.getElementById('prod-category').textContent = currentProduct.category || "General";
 
-                // Mostrar/ocultar tab de video
+                // Verificar si tiene video
+                const hasVideo = currentProduct.youtube_id || currentProduct.youtube_url;
                 const videoTab = document.getElementById('tab-video');
-                if (currentProduct.youtube_id || currentProduct.youtube_url) {
-                    videoTab.style.display = 'flex';
-                } else {
+                const imageTab = document.getElementById('tab-image');
+                
+                if (!hasVideo) {
+                    // Si no tiene video, mostrar solo imagen y ocultar tab de video
                     videoTab.style.display = 'none';
+                    imageTab.style.display = 'flex';
+                    switchTab('image');
+                } else {
+                    // Si tiene video, mostrar ambos tabs y empezar con video
+                    videoTab.style.display = 'flex';
+                    imageTab.style.display = 'flex';
+                    // Inicializar tab como 'video' por defecto
+                    switchTab('video');
                 }
 
                 const priceTag = document.getElementById('price-tag');
@@ -910,9 +923,6 @@
 
                 setupGallery();
                 updateCartBadge();
-
-                // Iniciar con tab IMAGEN activo
-                switchTab('image');
 
             } catch (error) {
                 console.error(error);
