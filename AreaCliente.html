@@ -4,18 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Area De Clientes | Papeleta Store</title>
-    <!-- Icono Rojo -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff1a1a'/%3E%3Cstop offset='1' stop-color='%23cc1b1b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Ctext x='50' y='70' font-family='Arial, sans-serif' font-size='58' font-weight='900' fill='white' text-anchor='middle'%3EP%3C/text%3E%3C/svg%3E">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- FIREBASE SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap');
         
         * {
             font-family: 'Inter', sans-serif;
@@ -30,10 +28,6 @@
             background: rgba(10, 5, 5, 0.95);
             backdrop-filter: blur(10px);
             border-right: 1px solid rgba(255, 26, 26, 0.1);
-        }
-        
-        .main-content {
-            background: transparent;
         }
         
         .card {
@@ -70,18 +64,15 @@
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(220, 38, 38, 0.3);
-            filter: brightness(1.1);
         }
         
         .input-field {
             background: rgba(13, 5, 5, 0.8);
             border: 1px solid rgba(255, 26, 26, 0.2);
-            transition: all 0.3s ease;
         }
         
         .input-field:focus {
             border-color: #ff1a1a;
-            box-shadow: 0 0 0 3px rgba(255, 26, 26, 0.1);
             outline: none;
         }
         
@@ -96,37 +87,99 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* Scrollbar personalizada roja */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0a0505; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #7f1d1d; 
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #ef4444; 
-        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0505; }
+        ::-webkit-scrollbar-thumb { background: #7f1d1d; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #ef4444; }
 
-        /* Estilos para el Modal de Server.lua */
+        /* Modal Server.Lua Mejorado */
         .lua-modal {
-            position: fixed; inset: 0; z-index: 100;
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
-            display: none; align-items: center; justify-content: center; padding: 20px;
+            position: fixed; 
+            inset: 0; 
+            z-index: 100;
+            background: rgba(0,0,0,0.9); 
+            backdrop-filter: blur(8px);
+            display: none; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
         }
-        .lua-modal.active { display: flex; }
+        
+        .lua-modal.active { 
+            display: flex; 
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
         .lua-code-container {
-            max-height: 70vh; overflow-y: auto;
-            background: #0d0505; border: 1px solid #7f1d1d;
-            border-radius: 12px; padding: 20px; width: 100%; max-width: 900px;
+            background: #0a0505; 
+            border: 2px solid #dc2626;
+            border-radius: 16px; 
+            padding: 0;
+            width: 100%; 
+            max-width: 1000px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 60px rgba(220, 38, 38, 0.3);
+            animation: slideUp 0.3s ease;
         }
+        
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .lua-header {
+            background: linear-gradient(135deg, #150a0a 0%, #0d0505 100%);
+            border-bottom: 2px solid #dc2626;
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .lua-body {
+            flex: 1;
+            overflow: auto;
+            padding: 24px;
+            background: #050507;
+        }
+        
         .lua-pre {
-            font-family: 'Consolas', 'Monaco', monospace;
-            color: #ff6b6b; font-size: 13px; line-height: 1.6;
-            white-space: pre-wrap; word-break: break-all;
+            font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+            color: #ffffff;
+            font-size: 13px; 
+            line-height: 1.7;
+            white-space: pre-wrap; 
+            word-break: break-all;
+            margin: 0;
+        }
+        
+        .lua-footer {
+            background: #0d0505;
+            border-top: 1px solid rgba(220, 38, 38, 0.3);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        
+        .admin-badge {
+            background: rgba(220, 38, 38, 0.2);
+            border: 1px solid rgba(220, 38, 38, 0.5);
+            color: #ff6b6b;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-left: 8px;
         }
     </style>
 </head>
@@ -139,7 +192,10 @@
                 <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center font-black text-white shadow-lg shadow-red-900/50">
                     P
                 </div>
-                <span class="text-white font-bold text-lg tracking-wide">AREA CLIENTES</span>
+                <div>
+                    <span class="text-white font-bold text-lg tracking-wide block">AREA CLIENTES</span>
+                    <span id="admin-badge-sidebar" class="admin-badge hidden">ADMIN</span>
+                </div>
             </div>
 
             <nav class="space-y-2">
@@ -160,10 +216,11 @@
                     <span>Mis Reseñas</span>
                 </a>
                 
-                <!-- NUEVO BOTÓN SERVER.LUA -->
-                <a href="#" onclick="openLuaModal()" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:text-red-400">
-                    <i class="fas fa-file-code w-5"></i>
+                <!-- BOTÓN SERVER.LUA - SOLO PARA ADMINS -->
+                <a href="#" id="nav-server-lua" onclick="openLuaModal()" class="nav-item hidden flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:text-red-400 border border-transparent hover:border-red-600/30">
+                    <i class="fas fa-file-code w-5 text-red-400"></i>
                     <span>Server.Lua</span>
+                    <i class="fas fa-shield-alt ml-auto text-xs text-red-500/50"></i>
                 </a>
                 
                 <a href="#" onclick="showSection('support')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
@@ -183,7 +240,7 @@
                 <img id="sidebar-avatar" src="" alt="User" class="w-10 h-10 rounded-full border-2 border-red-600 object-cover">
                 <div class="flex-1 min-w-0">
                     <p id="sidebar-username" class="text-white font-medium text-sm truncate">Usuario</p>
-                    <p class="text-red-400 text-xs font-bold uppercase">Cliente</p>
+                    <p id="sidebar-role" class="text-red-400 text-xs font-bold uppercase">Cliente</p>
                 </div>
                 <button onclick="logout()" class="text-gray-400 hover:text-red-400 transition-colors" title="Cerrar Sesión">
                     <i class="fas fa-sign-out-alt"></i>
@@ -194,20 +251,13 @@
 
     <!-- MAIN CONTENT -->
     <main class="main-content flex-1 md:ml-64 min-h-screen flex flex-col">
-        <!-- HEADER MOBILE -->
-        <div class="md:hidden p-4 bg-[#0a0505] border-b border-red-900/20 flex justify-between items-center">
-             <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded bg-red-600 flex items-center justify-center font-bold">P</div>
-                <span class="font-bold">Papeleta Store</span>
-             </div>
-             <button onclick="logout()" class="text-gray-400"><i class="fas fa-sign-out-alt"></i></button>
-        </div>
-
-        <!-- HEADER DESKTOP -->
         <header class="border-b border-red-900/20 px-8 py-6 bg-[#0a0505]/30 backdrop-blur-sm sticky top-0 z-40">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 class="text-2xl font-bold text-white mb-1">Bienvenido, <span id="header-username" class="gradient-text">usuario</span></h1>
+                    <h1 class="text-2xl font-bold text-white mb-1">
+                        Bienvenido, <span id="header-username" class="gradient-text">usuario</span>
+                        <span id="header-admin-badge" class="admin-badge hidden ml-2">ADMIN</span>
+                    </h1>
                     <p class="text-gray-400 text-sm">Gestiona tus productos y licencias desde aquí</p>
                 </div>
                 
@@ -219,7 +269,6 @@
         </header>
 
         <div class="p-6 md:p-8 flex-grow">
-            <!-- STATS CARDS -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div class="stat-card rounded-xl p-6 relative overflow-hidden group">
                     <div class="absolute right-0 top-0 w-24 h-24 bg-red-600/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
@@ -262,7 +311,6 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- PRODUCTS SECTION -->
                 <div class="lg:col-span-2 card rounded-xl p-6">
                     <div class="flex items-center gap-3 mb-6">
                         <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
@@ -284,11 +332,9 @@
                         </div>
                     </div>
 
-                    <div id="dashboard-products-list" class="space-y-3 max-h-[500px] overflow-y-auto custom-scrollbar pr-2">
-                        <!-- Products will be loaded here -->
-                    </div>
+                    <div id="dashboard-products-list" class="space-y-3 max-h-[500px] overflow-y-auto custom-scrollbar pr-2"></div>
 
-                    <div id="dashboard-empty-state" class="hidden text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5">
+                    <div id="dashboard-empty-state" class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5">
                         <i class="fas fa-box-open text-gray-600 text-4xl mb-3"></i>
                         <p class="text-gray-400 mb-4">No tienes productos activos aún.</p>
                         <a href="index.html" class="btn-primary inline-block px-6 py-2 rounded-lg text-white font-medium">
@@ -297,7 +343,6 @@
                     </div>
                 </div>
 
-                <!-- SETUP SERVER SECTION -->
                 <div class="card rounded-xl p-6 h-fit">
                     <div class="flex items-center gap-3 mb-6">
                         <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
@@ -323,27 +368,18 @@
                             <label class="block text-gray-400 text-xs uppercase font-semibold tracking-wider">Código de Licencia</label>
                             <span class="text-[10px] text-red-400 font-mono bg-red-900/20 px-2 py-0.5 rounded">LUA CONFIG</span>
                         </div>
-                        <div class="code-block rounded-lg p-4 font-mono text-sm relative group">
-                            <pre class="text-red-300 whitespace-pre-wrap break-all"><code id="license-code">Generando tu licencia fija...</code></pre>
+                        <div class="code-block rounded-lg p-4 font-mono text-sm">
+                            <pre class="text-red-300 whitespace-pre-wrap break-all"><code id="license-code">Generando...</code></pre>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-3 mb-4">
                         <button onclick="saveServerConfig()" class="btn-primary px-4 py-2.5 rounded-lg text-white font-medium flex items-center justify-center gap-2 text-sm">
-                            <i class="fas fa-save"></i>
-                            Guardar
+                            <i class="fas fa-save"></i> Guardar
                         </button>
-                        <button onclick="copyLicenseCode()" class="px-4 py-2.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500/50 font-medium flex items-center justify-center gap-2 transition-all text-sm">
-                            <i class="fas fa-copy"></i>
-                            Copiar
+                        <button onclick="copyLicenseCode()" class="px-4 py-2.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 font-medium flex items-center justify-center gap-2 text-sm">
+                            <i class="fas fa-copy"></i> Copiar
                         </button>
-                    </div>
-
-                    <div class="bg-red-900/10 border border-red-500/10 rounded-lg p-3">
-                        <div class="flex items-start gap-2">
-                            <i class="fas fa-info-circle text-red-400 mt-0.5 text-xs"></i>
-                            <p class="text-xs text-gray-400 leading-relaxed">Esta es tu licencia personal única. Copia este código en tu archivo `.lua` para activar cualquier script de Papeleta Store en este servidor.</p>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -352,68 +388,69 @@
 
     <!-- MODAL SERVER.LUA -->
     <div id="lua-modal" class="lua-modal">
-        <div class="lua-code-container relative">
-            <button onclick="closeLuaModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl">
-                <i class="fas fa-times"></i>
-            </button>
-            
-            <div class="flex items-center justify-between mb-4 pb-4 border-b border-red-900/30">
-                <h3 class="text-xl font-bold text-white flex items-center gap-2">
-                    <i class="fas fa-file-code text-red-500"></i> Server.Lua - Sistema de Validación
-                </h3>
-                <button onclick="copyLuaCode()" class="btn-primary px-4 py-2 rounded-lg text-white text-sm font-bold flex items-center gap-2">
-                    <i class="fas fa-copy"></i> Copiar Código
+        <div class="lua-code-container">
+            <div class="lua-header">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-file-code text-red-500 text-2xl"></i>
+                    <div>
+                        <h3 class="text-xl font-bold text-white">Server.Lua</h3>
+                        <p class="text-gray-400 text-xs">Sistema de Validación de Licencias</p>
+                    </div>
+                </div>
+                <button onclick="closeLuaModal()" class="text-gray-400 hover:text-white text-2xl transition-colors">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
             
-            <pre id="lua-code-content" class="lua-pre"></pre>
+            <div class="lua-body">
+                <pre id="lua-code-content" class="lua-pre"></pre>
+            </div>
+            
+            <div class="lua-footer">
+                <button onclick="closeLuaModal()" class="px-4 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-800 font-medium text-sm">
+                    Cerrar
+                </button>
+                <button onclick="copyLuaCode()" class="btn-primary px-6 py-2 rounded-lg text-white font-bold flex items-center gap-2 text-sm">
+                    <i class="fas fa-copy"></i> Copiar Código
+                </button>
+            </div>
         </div>
     </div>
 
     <!-- LOGIN MODAL -->
     <div id="login-modal" class="hidden fixed inset-0 bg-black/90 z-[60] flex items-center justify-center px-4 backdrop-blur-sm">
-        <div class="max-w-md w-full bg-[#150a0a] border border-red-600/30 rounded-2xl p-8 text-center shadow-[0_0_50px_rgba(220,38,38,0.2)]">
-            <div class="mx-auto w-20 h-20 rounded-xl mb-6 shadow-lg border-2 border-red-600 bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center text-3xl font-black text-white">P</div>
-            <h1 class="text-3xl font-black text-white mb-2 tracking-wide">PAPELETA <span class="text-red-500">STORE</span></h1>
-            <p class="text-gray-400 text-sm mb-8">Debes iniciar sesión para acceder al área de clientes</p>
-
-            <button onclick="redirectToDiscord()" class="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-3.5 px-6 rounded-xl flex items-center justify-center gap-3 transition-all shadow-lg hover:shadow-blue-900/20 hover:-translate-y-1">
-                <i class="fab fa-discord text-xl"></i>
-                Iniciar Sesión con Discord
+        <div class="max-w-md w-full bg-[#150a0a] border border-red-600/30 rounded-2xl p-8 text-center">
+            <div class="mx-auto w-20 h-20 rounded-xl mb-6 bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center text-3xl font-black text-white">P</div>
+            <h1 class="text-3xl font-black text-white mb-2">PAPELETA <span class="text-red-500">STORE</span></h1>
+            <p class="text-gray-400 text-sm mb-8">Inicia sesión para acceder</p>
+            <button onclick="redirectToDiscord()" class="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-3.5 px-6 rounded-xl flex items-center justify-center gap-3">
+                <i class="fab fa-discord text-xl"></i> Iniciar Sesión
             </button>
-            <p class="text-gray-600 text-xs mt-4">Tus datos están seguros.</p>
         </div>
     </div>
 
     <script>
-        // --- CONFIGURACIÓN ---
         const CLIENT_ID = '1213866547181780992'; 
         const REDIRECT_URI = window.location.href.split('#')[0]; 
-        
         const ADMIN_DISCORD_IDS = ['890526767608127489']; 
 
-        // --- FIREBASE CONFIGURATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
             authDomain: "papeletalicencia.firebaseapp.com",
-            databaseURL: "https://papeletalicencia-default-rtdb.firebaseio.com",
             projectId: "papeletalicencia",
             storageBucket: "papeletalicencia.firebasestorage.app",
             messagingSenderId: "677208314051",
-            appId: "1:677208314051:web:a27c04f31d402e83f29276",
-            measurementId: "G-RPJ4KQ6EQ4"
+            appId: "1:677208314051:web:a27c04f31d402e83f29276"
         };
 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
         let currentUser = null;
+        let currentUserRole = 'client';
         let allProducts = [];
         let userFixedLicenseKey = null;
 
-        // --- CÓDIGO LUA COMPLETO ---
         const SERVER_LUA_CODE = `local function clean(s)
     if not s then return "" end
     return tostring(s):gsub("%s+", ""):upper()
@@ -537,7 +574,11 @@ addEventHandler("onResourceStart", resourceRoot, function()
     setTimer(validarLicencia, 8996400000, 0)
 end, true, "high")`;
 
-        // --- AUTH FUNCTIONS ---
+        function isAdmin() {
+            if (!currentUser) return false;
+            return ADMIN_DISCORD_IDS.includes(currentUser.id);
+        }
+
         function redirectToDiscord() {
             const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20email`;
             window.location.href = url;
@@ -571,14 +612,28 @@ end, true, "high")`;
             })
             .then(user => {
                 currentUser = user;
+                
+                // Verificar si es admin
+                if (isAdmin()) {
+                    currentUserRole = 'admin';
+                    // Mostrar botón Server.Lua solo para admins
+                    document.getElementById('nav-server-lua').classList.remove('hidden');
+                    document.getElementById('admin-badge-sidebar').classList.remove('hidden');
+                    document.getElementById('header-admin-badge').classList.remove('hidden');
+                    document.getElementById('sidebar-role').textContent = 'Administrador';
+                    document.getElementById('sidebar-role').classList.add('text-red-500');
+                } else {
+                    currentUserRole = 'client';
+                    document.getElementById('sidebar-role').textContent = 'Cliente';
+                }
+                
                 document.getElementById('header-username').innerText = user.username;
                 document.getElementById('sidebar-username').innerText = user.username;
                 
                 if (user.avatar) {
-                    const avatarUrl = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
-                    document.getElementById('sidebar-avatar').src = avatarUrl;
+                    document.getElementById('sidebar-avatar').src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
                 } else {
-                     document.getElementById('sidebar-avatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
+                    document.getElementById('sidebar-avatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
                 }
                 
                 document.getElementById('login-modal').classList.add('hidden');
@@ -597,23 +652,27 @@ end, true, "high")`;
         function logout() {
             localStorage.removeItem('dc_access_token');
             currentUser = null;
+            currentUserRole = 'client';
             location.reload();
         }
 
         function showSection(section) {
-            if (section === 'store') {
-                window.location.href = 'index.html';
-            }
+            if (section === 'store') window.location.href = 'index.html';
         }
 
-        // --- FUNCIONES MODAL SERVER.LUA ---
         function openLuaModal() {
+            if (!isAdmin()) {
+                alert('Acceso denegado. Solo administradores.');
+                return;
+            }
             document.getElementById('lua-code-content').textContent = SERVER_LUA_CODE;
             document.getElementById('lua-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
         }
 
         function closeLuaModal() {
             document.getElementById('lua-modal').classList.remove('active');
+            document.body.style.overflow = '';
         }
 
         function copyLuaCode() {
@@ -627,12 +686,10 @@ end, true, "high")`;
             });
         }
 
-        // Cerrar modal al hacer clic fuera
         document.getElementById('lua-modal').addEventListener('click', function(e) {
             if (e.target === this) closeLuaModal();
         });
 
-        // --- LICENCIA FIJA GLOBAL ---
         function generateUniqueKey() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; 
             let key = '';
@@ -651,92 +708,61 @@ end, true, "high")`;
                     .get();
                 
                 if (!snapshot.empty) {
-                    const doc = snapshot.docs[0];
-                    userFixedLicenseKey = doc.data().key;
+                    userFixedLicenseKey = snapshot.docs[0].data().key;
                 } else {
                     const newKey = generateUniqueKey();
-                    const licenseData = {
+                    await db.collection("Licencias").add({
                         discord_id: currentUser.id,
                         username: currentUser.username,
-                        product_id: "GENERAL_ACCESS",
-                        product_name: "Licencia Global Papeleta Store",
                         key: newKey,
                         type: "general",
                         created_at: firebase.firestore.FieldValue.serverTimestamp(),
                         status: 'active'
-                    };
-                    
-                    await db.collection("Licencias").add(licenseData);
+                    });
                     userFixedLicenseKey = newKey;
                 }
             } catch (error) {
-                console.error("Error gestionando licencia fija:", error);
+                console.error("Error:", error);
             }
         }
 
         function updateLicenseDisplay() {
             const codeBlock = document.getElementById('license-code');
-            
             if (userFixedLicenseKey && currentUser) {
-                const code = `-- Configuración de Licencia Papeleta Store
--- Usuario: ${currentUser.username}
--- ID: ${currentUser.id}
-
-configLicense = {
+                codeBlock.textContent = `configLicense = {
     ["User"] = "${currentUser.username}", 
     ["Key"] = "PapeletaStore(${userFixedLicenseKey})"
 }`;
-                codeBlock.textContent = code;
-            } else {
-                codeBlock.textContent = "// Generando licencia segura...";
             }
         }
 
-        // --- DASHBOARD FUNCTIONS ---
         async function loadDashboardData() {
             if (!currentUser) return;
 
             try {
                 const productsSnapshot = await db.collection("Productos").get();
                 allProducts = [];
-                productsSnapshot.forEach((doc) => {
-                    allProducts.push({ id: doc.id, ...doc.data() });
-                });
+                productsSnapshot.forEach((doc) => allProducts.push({ id: doc.id, ...doc.data() }));
 
                 const clientesSnapshot = await db.collection("Clientes").get();
-                
                 let purchasedProducts = [];
                 let totalSpent = 0;
 
                 clientesSnapshot.forEach((doc) => {
                     const purchase = doc.data();
-                    
                     if (String(purchase.discord_id) === String(currentUser.id)) {
                         if (purchase.products && Array.isArray(purchase.products)) {
                             purchase.products.forEach(prod => {
                                 const productData = allProducts.find(p => p.id === prod.id);
-                                
                                 if (productData) {
                                     purchasedProducts.push({
                                         ...productData,
                                         purchaseDate: purchase.date?.toDate ? purchase.date.toDate() : new Date(),
-                                        status: purchase.status || 'Activo',
-                                        price: prod.price || purchase.total_price || 'Gratis'
+                                        price: prod.price || 'Gratis'
                                     });
-                                    
                                     if (prod.price !== "Gratis" && prod.price !== "GRATIS") {
                                         totalSpent += parseFloat(String(prod.price).replace('$', '')) || 0;
                                     }
-                                } else {
-                                    purchasedProducts.push({
-                                        id: prod.id,
-                                        name: prod.name || 'Producto Desconocido',
-                                        price: prod.price || purchase.total_price || 'Gratis',
-                                        image_url: '',
-                                        purchaseDate: purchase.date?.toDate ? purchase.date.toDate() : new Date(),
-                                        status: prod.status || purchase.status || 'Activo',
-                                        file_data: null
-                                    });
                                 }
                             });
                         }
@@ -746,118 +772,81 @@ configLicense = {
                 document.getElementById('stat-total-spent').innerText = '$' + totalSpent.toFixed(2);
                 document.getElementById('stat-active-scripts').innerText = purchasedProducts.length;
                 
-                renderDashboardProducts(purchasedProducts);
-                
+                const container = document.getElementById('dashboard-products-list');
                 if (purchasedProducts.length === 0) {
                     document.getElementById('dashboard-empty-state').classList.remove('hidden');
+                    container.innerHTML = '';
                 } else {
                     document.getElementById('dashboard-empty-state').classList.add('hidden');
+                    container.innerHTML = purchasedProducts.map(item => `
+                        <div class="bg-[#0d0505] border border-red-900/30 rounded-xl p-4 flex items-center justify-between hover:border-red-600/50 transition-all">
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 h-16 rounded-lg bg-[#150a0a] border border-red-900/20 overflow-hidden">
+                                    <img src="${item.image_url || ''}" class="w-full h-full object-cover">
+                                </div>
+                                <div>
+                                    <h3 class="text-white font-bold">${item.name}</h3>
+                                    <p class="text-gray-400 text-xs">${item.price === 'Gratis' ? 'GRATIS' : '$' + Number(item.price).toFixed(2)}</p>
+                                </div>
+                            </div>
+                            ${item.file_data ? `
+                                <button onclick="downloadProduct('${item.id}')" class="btn-primary px-4 py-2 rounded-lg text-white text-sm">
+                                    <i class="fas fa-download"></i> Descargar
+                                </button>
+                            ` : '<button disabled class="px-4 py-2 rounded-lg bg-gray-800 text-gray-500 text-sm">No disponible</button>'}
+                        </div>
+                    `).join('');
                 }
-                
             } catch (error) {
-                console.error("Error cargando datos del dashboard:", error);
+                console.error("Error:", error);
             }
-        }
-
-        function renderDashboardProducts(products) {
-            const container = document.getElementById('dashboard-products-list');
-            
-            if (products.length === 0) {
-                container.innerHTML = '';
-                return;
-            }
-            
-            container.innerHTML = products.map(item => `
-                <div class="bg-[#0d0505] border border-red-900/30 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between hover:border-red-600/50 transition-all group">
-                    <div class="flex items-center gap-4 w-full sm:w-auto mb-3 sm:mb-0">
-                        <div class="w-16 h-16 rounded-lg bg-[#150a0a] border border-red-900/20 overflow-hidden shrink-0">
-                            <img src="${item.image_url || ''}" alt="${item.name}" class="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity">
-                        </div>
-                        <div>
-                            <h3 class="text-white font-bold text-base">${item.name}</h3>
-                            <p class="text-gray-400 text-xs mt-1">${item.price === 'Gratis' || item.price === 0 || item.price === 'GRATIS' ? '<span class="text-green-400">GRATIS</span>' : '$' + Number(item.price).toFixed(2)}</p>
-                            <p class="text-red-500/60 text-[10px] mt-1 uppercase tracking-wider font-semibold">${item.status}</p>
-                        </div>
-                    </div>
-                    
-                    ${item.file_data ? `
-                        <button onclick="downloadProduct('${item.id}')" class="btn-primary w-full sm:w-auto px-5 py-2.5 rounded-lg text-white text-sm font-bold flex items-center justify-center gap-2 shadow-lg shadow-red-900/20">
-                            <i class="fas fa-download"></i> Descargar
-                        </button>
-                    ` : `
-                        <button disabled class="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-gray-800 text-gray-500 text-sm font-bold flex items-center justify-center gap-2 cursor-not-allowed border border-gray-700">
-                            <i class="fas fa-ban"></i> No disponible
-                        </button>
-                    `}
-                </div>
-            `).join('');
         }
 
         function filterDashboardProducts() {
             const search = document.getElementById('dashboard-search').value.toLowerCase();
-            const cards = document.querySelectorAll('#dashboard-products-list > div');
-            
-            cards.forEach(card => {
-                const text = card.innerText.toLowerCase();
-                card.style.display = text.includes(search) ? 'flex' : 'none';
+            document.querySelectorAll('#dashboard-products-list > div').forEach(card => {
+                card.style.display = card.innerText.toLowerCase().includes(search) ? 'flex' : 'none';
             });
         }
 
         function downloadProduct(productId) {
             const product = allProducts.find(p => p.id === productId);
-            if (!product) {
-                alert('Error: Producto no encontrado en la base de datos.');
-                return;
-            }
-            
-            if (product.file_data) {
+            if (product && product.file_data) {
                 const link = document.createElement('a');
                 link.href = product.file_data;
-                link.download = product.file_name || 'papeleta_store_resource.zip';
+                link.download = product.file_name || 'resource.zip';
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-            } else {
-                alert('Este producto no tiene archivo adjunto. Contacta a soporte.');
             }
         }
 
-        // --- UTILS ---
         function copyLicenseCode() {
             const code = document.getElementById('license-code').textContent;
-            if(code.includes("Generando")) return;
-
             navigator.clipboard.writeText(code).then(() => {
                 const btn = event.currentTarget;
-                const originalHTML = btn.innerHTML;
+                const original = btn.innerHTML;
                 btn.innerHTML = '<i class="fas fa-check"></i> Copiado';
-                btn.classList.add('bg-green-600', 'text-white', 'border-green-500');
-                setTimeout(() => {
-                    btn.innerHTML = originalHTML;
-                    btn.classList.remove('bg-green-600', 'text-white', 'border-green-500');
-                }, 2000);
+                setTimeout(() => btn.innerHTML = original, 2000);
             });
         }
 
         function saveServerConfig() {
-            const ip = document.getElementById('server-ip').value;
-            const port = document.getElementById('server-port').value;
-            
-            localStorage.setItem('server_config', JSON.stringify({ ip, port }));
-            
+            localStorage.setItem('server_config', JSON.stringify({
+                ip: document.getElementById('server-ip').value,
+                port: document.getElementById('server-port').value
+            }));
             const btn = event.currentTarget;
-            const originalText = btn.innerHTML;
+            const original = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-check"></i> Guardado';
-            setTimeout(() => btn.innerHTML = originalText, 2000);
+            setTimeout(() => btn.innerHTML = original, 2000);
         }
 
-        // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             checkDiscordAuth();
-            
-            const savedConfig = JSON.parse(localStorage.getItem('server_config') || '{}');
-            if (savedConfig.ip) document.getElementById('server-ip').value = savedConfig.ip;
-            if (savedConfig.port) document.getElementById('server-port').value = savedConfig.port;
+            const saved = JSON.parse(localStorage.getItem('server_config') || '{}');
+            if (saved.ip) document.getElementById('server-ip').value = saved.ip;
+            if (saved.port) document.getElementById('server-port').value = saved.port;
         });
     </script>
 </body>
