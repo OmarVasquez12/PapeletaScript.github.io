@@ -245,9 +245,7 @@
                 Productos en la Tienda
             </h3>
             <div id="admin-products-list" class="space-y-3">
-                <p class="text-gray-500 text-sm text-center py-8">
-                    <i class="fas fa-spinner animate-spin mr-2"></i>Cargando productos...
-                </p>
+                <!-- Se llena dinámicamente -->
             </div>
         </div>
     </main>
@@ -263,8 +261,18 @@
             appId: "1:677208314051:web:a27c04f31d402e83f29276"
         };
 
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        // Inicializar Firebase con verificación
+        let db;
+        try {
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            db = firebase.firestore();
+            console.log('✅ Firebase inicializado correctamente');
+        } catch (error) {
+            console.error('❌ Error al inicializar Firebase:', error);
+            alert('Error de conexión con la base de datos');
+        }
 
         let tempImages = [];
         let allProducts = [];
@@ -316,7 +324,6 @@
                     reader.readAsDataURL(file);
                 });
             }
-            // Reset input para permitir seleccionar el mismo archivo si es necesario
             input.value = '';
         }
 
@@ -388,7 +395,13 @@
                         const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
                         resolve(dataUrl);
                     };
+                    img.onerror = function() {
+                        resolve(event.target.result);
+                    };
                     img.src = event.target.result;
+                };
+                reader.onerror = function() {
+                    resolve(null);
                 };
                 reader.readAsDataURL(file);
             });
@@ -397,14 +410,19 @@
         function fileToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
-                reader.readAsDataURL(file);
                 reader.onload = () => resolve(reader.result);
                 reader.onerror = error => reject(error);
+                reader.readAsDataURL(file);
             });
         }
 
         async function handleProductSubmit(e) {
             e.preventDefault();
+            
+            if (!db) {
+                alert('Error: No hay conexión con la base de datos');
+                return;
+            }
             
             const name = document.getElementById('prod-name').value;
             const price = parseFloat(document.getElementById('prod-price').value);
@@ -424,11 +442,14 @@
             }
             
             try {
-                // Redimensionar todas las imágenes
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+                
                 const resizedImages = [];
                 for (let i = 0; i < tempImages.length; i++) {
                     const resized = await resizeImage(tempImages[i].file);
-                    resizedImages.push(resized);
+                    if (resized) resizedImages.push(resized);
                 }
                 
                 const fileBase64 = await fileToBase64(downloadFile);
@@ -439,7 +460,7 @@
                     price: price,
                     category: category,
                     description: description,
-                    image_url: resizedImages[0],
+                    image_url: resizedImages[0] || '',
                     images: resizedImages,
                     youtube_url: youtubeUrl || null,
                     youtube_id: youtubeVideoId || null,
@@ -452,7 +473,6 @@
                 
                 alert('✅ Producto guardado exitosamente en la tienda');
                 
-                // Reset form
                 document.getElementById('product-form').reset();
                 document.getElementById('multiple-images-preview').innerHTML = '';
                 document.getElementById('file-label-text').innerText = 'Haz clic para subir el archivo descargable';
@@ -463,19 +483,29 @@
                 youtubeVideoId = null;
                 updateImageCount();
                 
-                // Recargar lista
-                loadProducts();
+                await loadProducts();
                 
             } catch (error) {
                 console.error(error);
-                alert('❌ Error al guardar: ' + error.message);
+                alert(' Error al guardar: ' + error.message);
+            } finally {
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Agregar Producto a la Tienda';
             }
         }
 
         async function loadProducts() {
             const container = document.getElementById('admin-products-list');
             
+            if (!db) {
+                container.innerHTML = '<p class="text-red-400 text-sm text-center py-8"><i class="fas fa-exclamation-triangle mr-2"></i>Error de conexión con Firebase</p>';
+                return;
+            }
+            
             try {
+                container.innerHTML = '<p class="text-gray-500 text-sm text-center py-8"><i class="fas fa-spinner fa-spin mr-2"></i>Cargando productos...</p>';
+                
                 const snapshot = await db.collection("Productos").get();
                 allProducts = [];
                 snapshot.forEach((doc) => {
@@ -483,13 +513,19 @@
                 });
                 
                 if (allProducts.length === 0) {
-                    container.innerHTML = '<p class="text-gray-500 text-sm text-center py-8">No hay productos en la tienda aún.</p>';
+                    container.innerHTML = `
+                        <div class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl">
+                            <i class="fas fa-box-open text-gray-600 text-5xl mb-4"></i>
+                            <p class="text-gray-400 text-lg mb-2">No hay productos en la tienda</p>
+                            <p class="text-gray-500 text-sm">¡Sube tu primer producto usando el formulario de arriba!</p>
+                        </div>
+                    `;
                     return;
                 }
                 
                 container.innerHTML = allProducts.map(p => `
                     <div class="flex items-center gap-4 bg-[#0d0505] border border-red-950/40 rounded-xl p-4 hover:border-red-500/30 transition-colors">
-                        <img src="${p.image_url}" class="w-16 h-16 rounded-lg object-cover border border-red-900/30">
+                        <img src="${p.image_url || 'https://via.placeholder.com/64'}" class="w-16 h-16 rounded-lg object-cover border border-red-900/30" onerror="this.src='https://via.placeholder.com/64'">
                         <div class="flex-grow min-w-0">
                             <p class="text-white font-semibold truncate">${escapeHTML(p.name)}</p>
                             <p class="${Number(p.price) === 0 ? 'text-green-400' : 'text-red-400'} text-sm font-bold">
@@ -508,18 +544,32 @@
                 `).join('');
                 
             } catch (error) {
-                console.error(error);
-                container.innerHTML = '<p class="text-red-400 text-sm text-center py-8">Error al cargar productos</p>';
+                console.error("Error loading products:", error);
+                container.innerHTML = `
+                    <div class="text-center py-12 text-red-400">
+                        <i class="fas fa-exclamation-triangle text-3xl mb-3"></i>
+                        <p>Error al cargar productos</p>
+                        <p class="text-xs text-gray-500 mt-2">${error.message}</p>
+                        <button onclick="loadProducts()" class="mt-4 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-white text-sm">
+                            <i class="fas fa-redo mr-2"></i>Reintentar
+                        </button>
+                    </div>
+                `;
             }
         }
 
         async function deleteProduct(id) {
             if (!confirm('¿Estás seguro de eliminar este producto de la tienda?')) return;
             
+            if (!db) {
+                alert('Error: No hay conexión con la base de datos');
+                return;
+            }
+            
             try {
                 await db.collection("Productos").doc(id).delete();
                 alert('✅ Producto eliminado correctamente');
-                loadProducts();
+                await loadProducts();
             } catch (error) {
                 console.error(error);
                 alert('❌ Error al eliminar: ' + error.message);
@@ -527,6 +577,7 @@
         }
 
         function escapeHTML(str) {
+            if (!str) return '';
             return String(str).replace(/[&<>'"]/g, tag => ({
                 '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
             }[tag] || tag));
@@ -534,6 +585,7 @@
 
         // Cargar productos al iniciar
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM cargado, iniciando carga de productos...');
             loadProducts();
         });
     </script>
