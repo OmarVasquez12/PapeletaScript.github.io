@@ -1408,72 +1408,87 @@
             tick();
         }
 
-        // --- NUEVA FUNCIÓN: CARGAR RESEÑAS PÚBLICAS ---
-        async function loadPublicReviews() {
-            const slider = document.getElementById('reviews-slider');
-            try {
-                // Obtenemos las últimas 10 reseñas
-                const snapshot = await db.collection("Resenas")
-                    .limit(10)
-                    .get();
-                
-                let reviewsHTML = '';
-                let count = 0;
+    async function loadPublicReviews() {
+    const slider = document.getElementById('reviews-slider');
+    try {
+        const productsSnapshot = await db.collection("Productos").get();
+        const productsMap = {}; // Mapa: product_id -> nombre del producto
+        
+        productsSnapshot.forEach(doc => {
+            const data = doc.data();
+            // Guardamos tanto el ID del documento como el ID interno del producto
+            productsMap[doc.id] = data.name || 'Producto';
+            if (data.id) {
+                productsMap[data.id] = data.name || 'Producto';
+            }
+        });
 
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    // Solo mostramos reseñas de 5 estrellas para mantener la estética premium
-                    if (data.rating === 5) {
-                        const stars = '★'.repeat(data.rating);
-                        const date = data.created_at?.toDate ? data.created_at.toDate().toLocaleDateString('es-ES') : '';
-                        const avatar = data.user_avatar || 'https://cdn.discordapp.com/embed/avatars/0.png';
-                        const username = data.username || 'Usuario Anónimo';
-                        const text = data.text || '';
-                        const productName = data.product_name || 'Producto Premium';
-                        
-                        reviewsHTML += `
-                            <div class="review-card-slide">
-                                <div>
-                                    <div class="review-header">
-                                        <img src="${avatar}" alt="${username}" class="review-avatar">
-                                        <div class="review-user-info">
-                                            <h4>${escapeHTML(username)}</h4>
-                                            <p class="review-date">${date}</p>
-                                        </div>
-                                    </div>
-                                    <div class="review-stars">${stars}</div>
-                                    <p class="review-text">${escapeHTML(text)}</p>
-                                </div>
-                                <div class="review-product-tag">
-                                    <i class="fas fa-cube"></i> ${escapeHTML(productName)}
+        // 2. Ahora obtenemos las últimas reseñas
+        const reviewsSnapshot = await db.collection("Resenas")
+            .limit(15) // Aumentamos el límite para tener más opciones
+            .get();
+        
+        let reviewsHTML = '';
+        let count = 0;
+
+        reviewsSnapshot.forEach(doc => {
+            const data = doc.data();
+            
+            // Solo mostramos reseñas de 4 o 5 estrellas para mantener calidad
+            if (data.rating >= 4) {
+                const stars = '★'.repeat(data.rating);
+                const date = data.created_at?.toDate ? data.created_at.toDate().toLocaleDateString('es-ES') : '';
+                const avatar = data.user_avatar || 'https://cdn.discordapp.com/embed/avatars/0.png';
+                const username = data.username || 'Usuario Anónimo';
+                const text = data.text || '';
+                
+                // CORRECCIÓN: Buscamos el nombre real del producto usando el product_id
+                const productId = data.product_id;
+                const productName = productsMap[productId] || 'Producto Premium';
+                
+                reviewsHTML += `
+                    <div class="review-card-slide">
+                        <div>
+                            <div class="review-header">
+                                <img src="${avatar}" alt="${username}" class="review-avatar">
+                                <div class="review-user-info">
+                                    <h4>${escapeHTML(username)}</h4>
+                                    <p class="review-date">${date}</p>
                                 </div>
                             </div>
-                        `;
-                        count++;
-                    }
-                });
-
-                if (count > 0) {
-                    slider.innerHTML = reviewsHTML;
-                } else {
-                    slider.innerHTML = `
-                        <div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;">
-                            <i class="fas fa-comment-slash text-3xl text-gray-600"></i>
-                            <span class="text-gray-400">Aún no hay reseñas destacadas.</span>
+                            <div class="review-stars">${stars}</div>
+                            <p class="review-text">${escapeHTML(text)}</p>
                         </div>
-                    `;
-                }
-
-            } catch (error) {
-                console.error("Error cargando reseñas públicas:", error);
-                slider.innerHTML = `
-                    <div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;">
-                        <i class="fas fa-exclamation-triangle text-3xl text-red-500"></i>
-                        <span class="text-gray-400">No se pudieron cargar las opiniones.</span>
+                        <div class="review-product-tag">
+                            <i class="fas fa-cube"></i> ${escapeHTML(productName)}
+                        </div>
                     </div>
                 `;
+                count++;
             }
+        });
+
+        if (count > 0) {
+            slider.innerHTML = reviewsHTML;
+        } else {
+            slider.innerHTML = `
+                <div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;">
+                    <i class="fas fa-comment-slash text-3xl text-gray-600"></i>
+                    <span class="text-gray-400">Aún no hay reseñas destacadas.</span>
+                </div>
+            `;
         }
+
+    } catch (error) {
+        console.error("Error cargando reseñas públicas:", error);
+        slider.innerHTML = `
+            <div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;">
+                <i class="fas fa-exclamation-triangle text-3xl text-red-500"></i>
+                <span class="text-gray-400">No se pudieron cargar las opiniones.</span>
+            </div>
+        `;
+    }
+}
 
         document.addEventListener('DOMContentLoaded', () => { 
             checkDiscordAuth(); 
