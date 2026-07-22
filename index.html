@@ -344,6 +344,44 @@
         </div>
     </aside>
 
+    <!-- PANEL DE CONFIGURACIÓN LATERAL (ADMIN) -->
+    <div id="config-overlay" class="config-panel-overlay" onclick="toggleConfigPanel()"></div>
+    <aside id="config-panel" class="config-panel">
+        <div class="flex justify-between items-center mb-6 pb-4 border-b border-white/10">
+            <h2 class="text-xl font-black text-white flex items-center gap-2"><i class="fas fa-cog text-red-500"></i> CONFIGURACIÓN</h2>
+            <button onclick="toggleConfigPanel()" class="text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+        </div>
+        <div class="space-y-2">
+            <a href="SubirProducto.html" class="config-menu-item">
+                <div class="config-menu-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                <div class="config-menu-text"><h4>Subir Producto</h4><p>Agregar nuevos recursos a la tienda</p></div>
+            </a>
+            <a href="LicenciaUsuario.html" class="config-menu-item">
+                <div class="config-menu-icon"><i class="fas fa-key"></i></div>
+                <div class="config-menu-text"><h4>Licencias Usuario</h4><p>Ver historial de compras y reclamos</p></div>
+            </a>
+            <a href="Encriptar.html" class="config-menu-item">
+                <div class="config-menu-icon"><i class="fas fa-lock"></i></div>
+                <div class="config-menu-text"><h4>Encriptar Script</h4><p>Proteger archivos Lua de MTA:SA</p></div>
+            </a>
+            <div class="config-menu-item" onclick="openAssignProductModal()">
+                <div class="config-menu-icon"><i class="fas fa-user-plus"></i></div>
+                <div class="config-menu-text"><h4>Pasar a Usuarios</h4><p>Asignar productos gratis manualmente</p></div>
+            </div>
+            <a href="UsuariosAutorizado.html" class="config-menu-item">
+                <div class="config-menu-icon"><i class="fas fa-users-cog"></i></div>
+                <div class="config-menu-text"><h4>Usuarios Autorizados</h4><p>Gestionar roles Admin y Mod</p></div>
+            </a>
+            <a href="CrearRol.html" class="config-menu-item">
+                <div class="config-menu-icon"><i class="fas fa-id-badge"></i></div>
+                <div class="config-menu-text"><h4>Crear Rol</h4><p>Definir permisos personalizados</p></div>
+            </a>
+        </div>
+        <div class="mt-8 pt-6 border-t border-white/10 text-center">
+            <p class="text-xs text-gray-500">Panel exclusivo para staff</p>
+        </div>
+    </aside>
+
     <!-- MAIN CONTENT -->
     <div id="main-content" class="relative z-10 flex-grow flex flex-col">
         <header class="bg-[#0d0505]/90 backdrop-blur border-b red-border sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
@@ -356,6 +394,11 @@
                 <a href="#" onclick="showPage('inicio')" data-page="inicio" class="nav-link hover:text-red-400 transition-colors">Inicio</a>
                 <a href="#" onclick="showPage('productos')" data-page="productos" class="nav-link hover:text-red-400 transition-colors">Productos</a>
                 <a href="#" onclick="showPage('preguntas')" data-page="preguntas" class="nav-link hover:text-red-400 transition-colors">Preguntas</a>
+                
+                <!-- BOTÓN CONFIG (SOLO ADMIN/MOD) -->
+                <a href="#" onclick="toggleConfigPanel()" data-page="config" id="nav-config" class="nav-link hover:text-red-400 transition-colors hidden flex items-center gap-2">
+                    <i class="fas fa-cog"></i> Config
+                </a>
             </nav>
 
             <div class="flex items-center gap-3">
@@ -511,7 +554,7 @@
         let tempImages = [];
 
         const firebaseConfig = {
-            apiKey: ********,
+            apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
             authDomain: "papeletalicencia.firebaseapp.com",
             databaseURL: "https://papeletalicencia-default-rtdb.firebaseio.com",
             projectId: "papeletalicencia",
@@ -559,6 +602,19 @@
                     roleBadgeHeader.textContent = 'Cliente';
                 }
             }
+        }
+
+        // --- FUNCIONES PANEL CONFIG ---
+        function toggleConfigPanel() {
+            const panel = document.getElementById('config-panel');
+            const overlay = document.getElementById('config-overlay');
+            panel.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function openAssignProductModal() {
+            alert("Redirigiendo a módulo de asignación manual...");
+            // window.location.href = 'AsignarProducto.html'; 
         }
 
         // Preview de múltiples imágenes
@@ -930,12 +986,15 @@
                 
                 closeLoginModal();
                 
-                // LÓGICA DE ROLES (la configuración ahora vive en AreaCliente.html)
+                // LÓGICA DE ROLES PARA EL BOTÓN CONFIG
                 if (isAdmin(user)) {
+                    document.getElementById('nav-config').classList.remove('hidden');
                     currentUserRole = 'admin';
                 } else {
+                    // Verificar si tiene rol de Mod u otro rol con acceso a config
                     const savedData = JSON.parse(localStorage.getItem('papeleta_user_' + user.id) || '{}');
                     if(savedData.role && ['mod', 'staff', 'developer'].includes(savedData.role.toLowerCase())) {
+                         document.getElementById('nav-config').classList.remove('hidden');
                          currentUserRole = savedData.role;
                     } else {
                         currentUserRole = 'cliente';
@@ -1064,9 +1123,12 @@
         function logout() {
             localStorage.removeItem('dc_access_token');
             currentUser = null; currentUserRole = 'user';
-            // Cerrar panel de usuario si está abierto
+            document.getElementById('nav-config').classList.add('hidden');
+            // Cerrar paneles si están abiertos
             document.getElementById('user-panel').classList.remove('active');
             document.getElementById('user-panel-overlay').classList.remove('active');
+            document.getElementById('config-panel').classList.remove('active');
+            document.getElementById('config-overlay').classList.remove('active');
             updateAuthUI(); loadProducts();
         }
 
