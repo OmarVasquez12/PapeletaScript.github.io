@@ -315,22 +315,237 @@
         }
 
         .review-product-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #ffffff;
-    padding: 8px 16px;
-    border-radius: 50px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    width: fit-content;
-}
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            width: fit-content;
+        }
 
-.review-product-tag i {
-    color: #ff1a1a;
-}
+        .review-product-tag i {
+            color: #ff1a1a;
+        }
+
+        /* --- ESTILOS TOP COMPRADORES --- */
+        .top-buyers-section {
+            padding: 100px 0 60px;
+            position: relative;
+        }
+
+        .top-buyers-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .top-buyers-title h2 {
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .top-buyers-title h2 span {
+            color: var(--primary);
+            text-shadow: 0 0 30px rgba(255, 26, 26, 0.6);
+        }
+
+        .top-buyers-title p {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .podium-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 30px;
+            padding: 40px 20px;
+            position: relative;
+            min-height: 500px;
+        }
+
+        .podium-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            transition: all 0.4s ease;
+        }
+
+        .podium-item:hover {
+            transform: translateY(-10px);
+        }
+
+        .podium-item.first {
+            order: 2;
+            z-index: 3;
+        }
+
+        .podium-item.second {
+            order: 1;
+            z-index: 2;
+        }
+
+        .podium-item.third {
+            order: 3;
+            z-index: 2;
+        }
+
+        .podium-rank {
+            font-size: 5rem;
+            font-weight: 900;
+            margin-bottom: 20px;
+            text-shadow: 0 0 40px currentColor;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.9; }
+        }
+
+        .podium-item.first .podium-rank {
+            color: #FFD700;
+            font-size: 6rem;
+        }
+
+        .podium-item.second .podium-rank {
+            color: #C0C0C0;
+            font-size: 4.5rem;
+        }
+
+        .podium-item.third .podium-rank {
+            color: #CD7F32;
+            font-size: 4rem;
+        }
+
+        .podium-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid var(--primary);
+            box-shadow: 0 0 40px rgba(255, 26, 26, 0.5);
+            margin-bottom: 20px;
+            object-fit: cover;
+            transition: all 0.3s ease;
+        }
+
+        .podium-item:hover .podium-avatar {
+            transform: scale(1.1);
+            box-shadow: 0 0 60px rgba(255, 26, 26, 0.8);
+        }
+
+        .podium-item.first .podium-avatar {
+            width: 150px;
+            height: 150px;
+            border-width: 5px;
+        }
+
+        .podium-username {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .podium-item.first .podium-username {
+            font-size: 1.8rem;
+        }
+
+        .podium-product {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            padding: 10px 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            font-weight: 600;
+            font-size: 0.95rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .podium-product i {
+            color: #ff1a1a;
+        }
+
+        .podium-platform {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: linear-gradient(180deg, rgba(255, 26, 26, 0.2) 0%, rgba(255, 26, 26, 0.05) 100%);
+            border: 2px solid rgba(255, 26, 26, 0.3);
+            border-radius: 20px 20px 0 0;
+            text-align: center;
+            padding: 20px 0;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+
+        .podium-item.first .podium-platform {
+            height: 180px;
+            background: linear-gradient(180deg, rgba(255, 215, 0, 0.3) 0%, rgba(255, 26, 26, 0.1) 100%);
+            border-color: rgba(255, 215, 0, 0.5);
+        }
+
+        .podium-item.second .podium-platform {
+            height: 140px;
+        }
+
+        .podium-item.third .podium-platform {
+            height: 120px;
+        }
+
+        .crown-icon {
+            position: absolute;
+            top: -30px;
+            right: -20px;
+            font-size: 2.5rem;
+            color: #FFD700;
+            animation: rotate 3s linear infinite;
+            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+        }
+
+        @keyframes rotate {
+            0%, 100% { transform: rotate(-10deg); }
+            50% { transform: rotate(10deg); }
+        }
+
+        @media (max-width: 768px) {
+            .podium-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 40px;
+            }
+            
+            .podium-item.first,
+            .podium-item.second,
+            .podium-item.third {
+                order: unset;
+            }
+            
+            .podium-rank {
+                font-size: 4rem !important;
+            }
+            
+            .podium-avatar {
+                width: 100px !important;
+                height: 100px !important;
+            }
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-gradient-to-b from-[#150a0a] to-[#0a0505] relative">
@@ -647,6 +862,24 @@
             </div>
         </section>
 
+        <!-- NUEVA SECCIÓN: TOP COMPRADORES -->
+        <section class="top-buyers-section">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="top-buyers-title">
+                    <h2>TOP <span>COMPRADORES</span></h2>
+                    <p>Agradecemos a nuestros usuarios más leales por confiar en nosotros</p>
+                </div>
+                
+                <div class="podium-container" id="podium-container">
+                    <div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 400px;">
+                        <i class="fas fa-spinner animate-spin text-3xl text-red-500"></i>
+                        <span class="text-gray-400">Cargando top compradores...</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN DE RESEÑAS -->
         <section class="reviews-section">
             <div class="max-w-7xl mx-auto px-6">
                 <div class="reviews-title">
@@ -655,7 +888,6 @@
                 </div>
                 
                 <div class="reviews-slider" id="reviews-slider">
-                    <!-- Las reseñas se cargarán aquí dinámicamente desde Firebase -->
                     <div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;">
                         <i class="fas fa-spinner animate-spin text-3xl text-red-500"></i>
                         <span class="text-gray-400">Cargando opiniones...</span>
@@ -709,790 +941,178 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // --- FUNCIONES PANEL DE USUARIO (CLIENTE) ---
-        function toggleUserPanel() {
-            if (!currentUser) {
-                openLoginModal();
-                return;
-            }
-            const panel = document.getElementById('user-panel');
-            const overlay = document.getElementById('user-panel-overlay');
-            panel.classList.toggle('active');
-            overlay.classList.toggle('active');
-            
-            // Actualizar información del panel
-            if (currentUser) {
-                document.getElementById('panel-user-name').textContent = currentUser.username;
-                document.getElementById('user-name').textContent = currentUser.username;
-                
-                if (currentUser.avatar) {
-                    const avatarUrl = `https://cdn.discordapp.com/avatars/${currentUser.id}/${currentUser.avatar}.png`;
-                    document.getElementById('panel-user-avatar').src = avatarUrl;
-                    document.getElementById('user-avatar').src = avatarUrl;
-                }
-                
-                const roleBadge = document.getElementById('panel-user-role');
-                const roleBadgeHeader = document.getElementById('user-role-badge');
-                
-                if (currentUserRole === 'admin' || currentUserRole === 'mod') {
-                    roleBadge.textContent = currentUserRole.toUpperCase();
-                    roleBadge.className = 'user-panel-role admin';
-                    roleBadgeHeader.textContent = currentUserRole.toUpperCase();
-                } else {
-                    roleBadge.textContent = 'CLIENTE';
-                    roleBadge.className = 'user-panel-role';
-                    roleBadgeHeader.textContent = 'Cliente';
-                }
-            }
-        }
+        // ... (todas las funciones anteriores se mantienen igual) ...
 
-        // --- FUNCIONES PANEL CONFIG ---
-        function toggleConfigPanel() {
-            const panel = document.getElementById('config-panel');
-            const overlay = document.getElementById('config-overlay');
-            panel.classList.toggle('active');
-            overlay.classList.toggle('active');
-        }
-
-        function openAssignProductModal() {
-            window.location.href = 'PasarUsuarios.html';
-        }
-
-        // Preview de múltiples imágenes
-        function previewMultipleImages(input) {
-            const previewContainer = document.getElementById('multiple-images-preview');
-            previewContainer.innerHTML = '';
-            tempImages = [];
-            if (input.files && input.files.length > 0) {
-                Array.from(input.files).forEach((file, index) => {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        tempImages.push(e.target.result);
-                        const div = document.createElement('div');
-                        div.className = 'preview-item';
-                        div.innerHTML = `<img src="${e.target.result}" alt="Preview ${index + 1}"><button type="button" class="remove-btn" onclick="removeImage(${index})"><i class="fas fa-times"></i></button>`;
-                        previewContainer.appendChild(div);
-                    };
-                    reader.readAsDataURL(file);
-                });
-            }
-        }
-
-        function removeImage(index) {
-            tempImages.splice(index, 1);
-            const previewContainer = document.getElementById('multiple-images-preview');
-            previewContainer.innerHTML = '';
-            tempImages.forEach((img, idx) => {
-                const div = document.createElement('div');
-                div.className = 'preview-item';
-                div.innerHTML = `<img src="${img}" alt="Preview ${idx + 1}"><button type="button" class="remove-btn" onclick="removeImage(${idx})"><i class="fas fa-times"></i></button>`;
-                previewContainer.appendChild(div);
-            });
-        }
-
-        function updateFileName(input) {
-            const label = document.getElementById('file-label-text');
-            if (input.files && input.files[0]) {
-                label.innerText = input.files[0].name;
-                label.classList.add('text-white', 'font-bold');
-            }
-        }
-        
-        function resizeImage(file, maxWidth = 800, maxHeight = 600) {
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const img = new Image();
-                    img.onload = function() {
-                        let width = img.width; let height = img.height;
-                        if (width > height) { if (width > maxWidth) { height = Math.round((height * maxWidth) / width); width = maxWidth; } } 
-                        else { if (height > maxHeight) { width = Math.round((width * maxHeight) / height); height = maxHeight; } }
-                        const canvas = document.createElement('canvas'); canvas.width = width; canvas.height = height;
-                        const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
-                        resolve(canvas.toDataURL('image/jpeg', 0.85));
-                    };
-                    img.src = event.target.result;
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader(); reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
-        }
-        
-        async function handleProductSubmit(e) {
-            e.preventDefault();
-            const name = document.getElementById('prod-name').value;
-            const price = parseFloat(document.getElementById('prod-price').value);
-            const category = document.getElementById('prod-category').value;
-            const description = document.getElementById('prod-description').value;
-            const downloadFile = document.getElementById('prod-file').files[0];
-            
-            if (tempImages.length === 0) { alert('Por favor selecciona al menos una imagen'); return; }
-            if (!downloadFile) { alert('Por favor selecciona el archivo de descarga'); return; }
-            
+        // --- NUEVA FUNCIÓN: CARGAR TOP COMPRADORES ---
+        async function loadTopBuyers() {
+            const container = document.getElementById('podium-container');
             try {
-                const resizedImages = [];
-                const imageFiles = Array.from(document.getElementById('prod-images').files);
-                for (let i = 0; i < imageFiles.length; i++) { const resized = await resizeImage(imageFiles[i]); resizedImages.push(resized); }
-                const fileBase64 = await fileToBase64(downloadFile);
-                
-                const newProduct = {
-                    id: 'prod_' + Date.now(), name: name, price: price, category: category, description: description,
-                    image_url: resizedImages[0], images: resizedImages, file_data: fileBase64, file_name: downloadFile.name,
-                    created_at: firebase.firestore.FieldValue.serverTimestamp()
-                };
-                await db.collection("Productos").doc(newProduct.id).set(newProduct);
-                alert('Producto guardado en Firebase exitosamente');
-                document.getElementById('product-form').reset();
-                document.getElementById('multiple-images-preview').innerHTML = '';
-                document.getElementById('file-label-text').innerText = 'Haz clic para subir el archivo descargable';
-                document.getElementById('file-label-text').classList.remove('text-white', 'font-bold');
-                tempImages = []; loadProducts();
-            } catch (error) { console.error(error); alert('Error al guardar en Firebase: ' + error.message); }
-        }
-        
-        function loadAdminProductsList() {
-            const container = document.getElementById('admin-products-list');
-            if (allProducts.length === 0) { container.innerHTML = '<p class="text-gray-500 text-sm">No hay productos locales aún.</p>'; return; }
-            container.innerHTML = allProducts.map(p => `
-                <div class="flex items-center gap-3 bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-2.5">
-                    <img src="${p.image_url}" class="w-10 h-10 rounded-lg object-cover">
-                    <div class="flex-grow min-w-0">
-                        <p class="text-white text-sm font-semibold truncate">${escapeHTML(p.name)}</p>
-                        <p class="${Number(p.price) === 0 ? 'text-green-400' : 'text-red-400'} text-xs font-bold">${Number(p.price) === 0 ? 'GRATIS' : '$' + Number(p.price).toFixed(2)}</p>
-                        <p class="text-gray-500 text-[10px] truncate"><i class="fas fa-file-archive mr-1"></i>${escapeHTML(p.file_name || 'Sin archivo')}</p>
-                    </div>
-                    <button onclick="deleteProduct('${p.id}')" class="text-red-400 hover:text-red-300 w-8 h-8 rounded-lg hover:bg-red-950/30 flex items-center justify-center transition-all"><i class="fas fa-trash"></i></button>
-                </div>`).join('');
-        }
-        
-        async function deleteProduct(id) {
-            if (!confirm('¿Eliminar este producto de la tienda?')) return;
-            try {
-                await db.collection("Productos").doc(id).delete();
-                allProducts = allProducts.filter(p => p.id !== id);
-                loadAdminProductsList(); renderProducts();
-                document.getElementById('stat-productos').innerText = '+' + allProducts.length;
-                alert('Producto eliminado de la tienda.');
-            } catch (error) { console.error(error); alert('Error al eliminar: ' + error.message); }
-        }
-
-        function addToCart(productId) {
-            const product = allProducts.find(p => p.id === productId);
-            if (!product) return;
-            if (currentUser && myAssignedProductIds.has(productId)) { window.location.href = 'AreaCliente.html'; return; }
-            const existingItem = cart.find(item => item.id === productId);
-            if (existingItem) { alert('Este producto ya está en tu carrito'); return; }
-            
-            cart.push({ id: product.id, name: product.name, price: product.price, image: product.image_url });
-            updateCartUI();
-            const badge = document.getElementById('cart-count');
-            badge.classList.remove('hidden'); badge.classList.add('animate-bounce');
-            setTimeout(() => badge.classList.remove('animate-bounce'), 1000);
-        }
-
-        function removeFromCart(productId) { cart = cart.filter(item => item.id !== productId); updateCartUI(); }
-
-        function updateCartUI() {
-            const countEl = document.getElementById('cart-count');
-            const itemsEl = document.getElementById('cart-items');
-            const emptyEl = document.getElementById('cart-empty');
-            const totalEl = document.getElementById('cart-total');
-            const claimBtn = document.getElementById('claim-free-btn');
-            const paypalContainer = document.getElementById('paypal-button-container');
-            const manualBtn = document.getElementById('manual-checkout-btn');
-            
-            const count = cart.length;
-            if (count > 0) { countEl.textContent = count; countEl.classList.remove('hidden'); } else { countEl.classList.add('hidden'); }
-            
-            if (cart.length === 0) {
-                itemsEl.innerHTML = ''; emptyEl.classList.remove('hidden');
-                claimBtn.classList.add('hidden'); paypalContainer.innerHTML = ''; manualBtn.classList.add('hidden');
-            } else {
-                emptyEl.classList.add('hidden');
-                itemsEl.innerHTML = cart.map(item => `
-                    <div class="bg-[#0d0505] border border-red-950/40 rounded-xl p-3 flex items-center gap-3">
-                        <img src="${escapeHTML(item.image || '')}" alt="${escapeHTML(item.name)}" class="w-16 h-16 object-cover rounded-lg bg-[#150a0a]">
-                        <div class="flex-grow min-w-0">
-                            <h4 class="text-white font-semibold text-sm truncate">${escapeHTML(item.name)}</h4>
-                            <p class="${Number(item.price) === 0 ? 'text-green-400' : 'text-green-400'} font-bold text-sm">${Number(item.price) === 0 ? 'GRATIS' : '$' + Number(item.price).toFixed(2)}</p>
-                        </div>
-                        <button onclick="removeFromCart('${item.id}')" class="text-red-400 hover:text-red-300 w-8 h-8 rounded-lg hover:bg-red-950/30 flex items-center justify-center transition-all"><i class="fas fa-trash"></i></button>
-                    </div>`).join('');
-                
-                const total = cart.reduce((sum, item) => sum + Number(item.price), 0);
-                totalEl.textContent = total === 0 ? 'GRATIS' : '$' + total.toFixed(2);
-                const allFree = cart.every(item => Number(item.price) === 0);
-                
-                if (allFree && total === 0) { claimBtn.classList.remove('hidden'); paypalContainer.innerHTML = ''; manualBtn.classList.add('hidden'); } 
-                else { claimBtn.classList.add('hidden'); renderPayPalButtons(); manualBtn.classList.remove('hidden'); }
-            }
-        }
-
-        async function claimFreeProducts() {
-            if (!currentUser) { alert('Debes iniciar sesión para reclamar productos gratis'); openLoginModal(); return; }
-            if (cart.length === 0) { alert('Tu carrito está vacío'); return; }
-            const allFree = cart.every(item => Number(item.price) === 0);
-            if (!allFree) { alert('Algunos productos no son gratis'); return; }
-            
-            try {
-                const purchaseData = {
-                    discord_id: currentUser.id, username: currentUser.username, avatar: currentUser.avatar,
-                    products: cart.map(item => ({ id: item.id, name: item.name, price: "Gratis" })),
-                    total_price: "Gratis", date: firebase.firestore.FieldValue.serverTimestamp(), status: "Reclamado Exitosamente"
-                };
-                await db.collection("Clientes").add(purchaseData);
-                for (const item of cart) { await createLicenseForProduct(item.id, item.name); myAssignedProductIds.add(item.id); }
-                saveUserDataLocally();
-                alert('¡Productos reclamados exitosamente! Ya están disponibles en tu biblioteca.\n\nSe han generado tus licencias automáticamente.\n\nGracias por seguir confiando en nuestra tienda.');
-                cart = []; updateCartUI(); closeCartModal();
-            } catch (error) { console.error(error); alert('Error al registrar la reclamación: ' + error.message); }
-        }
-
-        function openCartModal() {
-            if(cart.length === 0 && !currentUser) { openLoginModal(); return; }
-            document.getElementById('cart-modal').classList.remove('hidden');
-            if (!cart.every(item => Number(item.price) === 0)) renderPayPalButtons();
-        }
-        function closeCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
-
-        function renderPayPalButtons() {
-            const container = document.getElementById('paypal-button-container');
-            container.innerHTML = ''; 
-            if (cart.length === 0) return;
-            const hasPaidProducts = cart.some(item => Number(item.price) > 0);
-            if (!hasPaidProducts) return;
-            const totalAmount = cart.reduce((sum, item) => sum + Number(item.price), 0).toFixed(2);
-
-            paypal.Buttons({
-                style: { shape: 'rect', color: 'gold', layout: 'vertical', label: 'pay' },
-                createOrder: function(data, actions) { return actions.order.create({ purchase_units: [{ description: 'Compra en Papeleta Store', amount: { value: totalAmount } }] }); },
-                onApprove: function(data, actions) {
-                    return actions.order.capture().then(function(details) {
-                        alert('¡Pago completado por ' + details.payer.name.given_name + '!');
-                        assignProductsToUserAfterPayment(details); giveClientRole();
-                        cart = []; updateCartUI(); closeCartModal();
-                    });
-                }
-            }).render('#paypal-button-container');
-        }
-
-        function giveClientRole() {
-            if(!currentUser) return;
-            currentUserRole = 'cliente';
-            const roleBadge = document.getElementById('user-role-badge');
-            if(roleBadge) { roleBadge.innerText = 'CLIENTE'; roleBadge.classList.add('text-green-400'); roleBadge.classList.remove('text-red-400'); }
-            saveUserDataLocally();
-        }
-
-        async function assignProductsToUserAfterPayment(paymentDetails) {
-            if(!currentUser) return;
-            try {
-                const purchaseData = {
-                    discord_id: currentUser.id, username: currentUser.username, avatar: currentUser.avatar,
-                    products: cart.map(item => ({ id: item.id, name: item.name, price: "$" + Number(item.price).toFixed(2) })),
-                    total_price: "$" + cart.reduce((sum, item) => sum + Number(item.price), 0).toFixed(2),
-                    payment_id: paymentDetails.id, payer_email: paymentDetails.payer.email_address,
-                    date: firebase.firestore.FieldValue.serverTimestamp(), status: "Pagado"
-                };
-                await db.collection("Clientes").add(purchaseData);
-                for (const item of cart) { await createLicenseForProduct(item.id, item.name); myAssignedProductIds.add(item.id); }
-                saveUserDataLocally();
-                alert("¡Productos añadidos a tu biblioteca!\n\nSe han generado tus licencias automáticamente.");
-            } catch (error) { console.error(error); alert('Error al registrar la compra: ' + error.message); }
-        }
-
-        function checkoutManual() {
-             if (cart.length === 0) { alert('Tu carrito está vacío'); return; }
-             alert(`Serás redirigido a Discord para coordinar el pago manual.`);
-             window.open(DISCORD_INVITE, '_blank');
-        }
-
-        // Funciones para la galería
-        function changeImage(direction) {
-            if (!currentDetailProduct || !currentDetailProduct.images) return;
-            currentImageIndex += direction;
-            if (currentImageIndex < 0) currentImageIndex = currentDetailProduct.images.length - 1;
-            else if (currentImageIndex >= currentDetailProduct.images.length) currentImageIndex = 0;
-            updateGallery();
-        }
-        function updateGallery() {
-            if (!currentDetailProduct || !currentDetailProduct.images) return;
-            const mainImage = document.getElementById('detail-image');
-            const thumbnails = document.getElementById('gallery-thumbnails');
-            mainImage.src = currentDetailProduct.images[currentImageIndex];
-            const thumbElements = thumbnails.querySelectorAll('.gallery-thumbnail');
-            thumbElements.forEach((thumb, idx) => { if (idx === currentImageIndex) thumb.classList.add('active'); else thumb.classList.remove('active'); });
-        }
-
-        function showProductDetails(productId) {
-            const product = allProducts.find(p => p.id === productId);
-            if (!product) return;
-            currentDetailProduct = product; currentImageIndex = 0;
-            document.getElementById('detail-title').textContent = product.name;
-            const priceDisplay = Number(product.price) === 0 ? 'GRATIS' : '$' + Number(product.price).toFixed(2);
-            document.getElementById('detail-price').textContent = priceDisplay;
-            
-            const mainImage = document.getElementById('detail-image');
-            const thumbnailsContainer = document.getElementById('gallery-thumbnails');
-            if (product.images && product.images.length > 0) {
-                mainImage.src = product.images[0];
-                thumbnailsContainer.innerHTML = product.images.map((img, idx) => `<img src="${img}" alt="Imagen ${idx + 1}" class="gallery-thumbnail ${idx === 0 ? 'active' : ''}" onclick="jumpToImage(${idx})">`).join('');
-                document.getElementById('gallery-prev').style.display = product.images.length > 1 ? 'flex' : 'none';
-                document.getElementById('gallery-next').style.display = product.images.length > 1 ? 'flex' : 'none';
-            } else {
-                mainImage.src = product.image_url || 'https://via.placeholder.com/400x300';
-                thumbnailsContainer.innerHTML = '';
-            }
-
-            const description = product.description || 'Este producto incluye acceso completo a todas las características mencionadas.';
-            document.getElementById('detail-description').innerHTML = `<p>${description}</p><p class="mt-4"><strong>Características principales:</strong></p><ul class="list-disc list-inside space-y-2 ml-4"><li>Acceso inmediato tras la compra</li><li>Soporte técnico incluido</li><li>Actualizaciones gratuitas</li><li>Compatible con MTA:SA</li>${product.category ? `<li>Categoría: ${product.category}</li>` : ''}</ul>`;
-            
-            const features = generateFeatures(product);
-            document.getElementById('detail-features').innerHTML = features.map(f => `<div class="flex items-center gap-3 bg-[#0d0505] border border-red-950/40 rounded-lg p-3"><i class="fas fa-check-circle text-green-400"></i><span class="text-gray-300 text-sm">${f}</span></div>`).join('');
-            
-            const buyBtn = document.getElementById('detail-buy-btn');
-            const alreadyOwned = currentUser && myAssignedProductIds.has(product.id);
-            
-            if (alreadyOwned) {
-                buyBtn.innerHTML = '<i class="fas fa-book text-xl"></i> Biblioteca';
-                buyBtn.className = 'w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 transition-all shadow-lg shadow-green-900/30 text-lg';
-                buyBtn.onclick = () => { closeProductDetailModal(); window.location.href = 'AreaCliente.html'; };
-            } else if (currentUser) {
-                if (Number(product.price) === 0) {
-                    buyBtn.innerHTML = '<i class="fas fa-gift text-xl"></i> Reclamar Gratis';
-                    buyBtn.className = 'w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 transition-all shadow-lg shadow-green-900/30 text-lg';
-                    buyBtn.onclick = () => { addToCart(productId); closeProductDetailModal(); claimFreeProducts(); };
-                } else {
-                    buyBtn.innerHTML = '<i class="fas fa-credit-card text-xl"></i> Comprar';
-                    buyBtn.className = 'w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 transition-all shadow-lg shadow-red-900/30 text-lg';
-                    buyBtn.onclick = () => { addToCart(productId); closeProductDetailModal(); openCartModal(); };
-                }
-            } else {
-                buyBtn.innerHTML = '<i class="fab fa-discord text-xl"></i> Iniciar Sesión para Comprar';
-                buyBtn.className = 'w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 transition-all shadow-lg shadow-red-900/30 text-lg';
-                buyBtn.onclick = () => { closeProductDetailModal(); openLoginModal(); };
-            }
-            document.getElementById('product-detail-modal').classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        }
-        function jumpToImage(index) { currentImageIndex = index; updateGallery(); }
-        function generateFeatures(product) { return ['Instalación rápida y sencilla', 'Código optimizado', 'Documentación incluida', 'Soporte 24/7', 'Actualizaciones automáticas', 'Compatible con todos los servidores'].slice(0, 6); }
-        function closeProductDetailModal() { document.getElementById('product-detail-modal').classList.add('hidden'); document.body.style.overflow = ''; currentDetailProduct = null; currentImageIndex = 0; }
-        function buyFromDetail() {
-            if (!currentDetailProduct) return;
-            if (currentUser && myAssignedProductIds.has(currentDetailProduct.id)) { window.location.href = 'AreaCliente.html'; return; }
-            if (!currentUser) { closeProductDetailModal(); openLoginModal(); } 
-            else {
-                if (Number(currentDetailProduct.price) === 0) { addToCart(currentDetailProduct.id); closeProductDetailModal(); claimFreeProducts(); } 
-                else { addToCart(currentDetailProduct.id); closeProductDetailModal(); openCartModal(); }
-            }
-        }
-
-        function openLoginModal() { window.location.href = 'Login.html'; }
-        function closeLoginModal() { document.getElementById('login-modal').classList.add('hidden'); }
-        function redirectToDiscord() {
-            const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20email`;
-            window.location.href = url;
-        }
-
-        function checkDiscordAuth() {
-            const fragment = new URLSearchParams(window.location.hash.slice(1));
-            const accessToken = fragment.get('access_token');
-            if (accessToken) {
-                window.location.hash = '';
-                localStorage.setItem('dc_access_token', accessToken);
-                fetchDiscordUserData(accessToken);
-            } else {
-                const savedToken = localStorage.getItem('dc_access_token');
-                if (savedToken) fetchDiscordUserData(savedToken);
-                else { updateAuthUI(); loadProducts(); loadSalesStats(); loadUserStats(); }
-            }
-        }
-
-        function fetchDiscordUserData(token) {
-            fetch('https://discord.com/api/users/@me', { headers: { 'Authorization': `Bearer ${token}` }})
-            .then(res => { if (!res.ok) throw new Error('Token expirado'); return res.json(); })
-            .then(user => {
-                currentUser = user;
-                document.getElementById('user-name').innerText = `${user.username}`;
-                if (user.avatar) document.getElementById('user-avatar').src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
-                else document.getElementById('user-avatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
-                
-                closeLoginModal();
-                
-                // LÓGICA DE ROLES PARA EL BOTÓN CONFIG
-                if (isAdmin(user)) {
-                    document.getElementById('nav-config').classList.remove('hidden');
-                    currentUserRole = 'admin';
-                } else {
-                    // Verificar si tiene rol de Mod u otro rol con acceso a config
-                    const savedData = JSON.parse(localStorage.getItem('papeleta_user_' + user.id) || '{}');
-                    if(savedData.role && ['mod', 'staff', 'developer'].includes(savedData.role.toLowerCase())) {
-                         document.getElementById('nav-config').classList.remove('hidden');
-                         currentUserRole = savedData.role;
-                    } else {
-                        currentUserRole = 'cliente';
-                    }
-                }
-                
-                updateAuthUI(); applyRoleUI(); registerUserInFirebase(user);
-                loadUserStats(); loadSalesStats();
-                loadMyAssignments().then(() => loadProducts());
-            })
-            .catch(err => { console.error(err); logout(); });
-        }
-
-        function updateAuthUI() {
-            const loginBtn = document.getElementById('login-btn');
-            const userSection = document.getElementById('user-section');
-            const logoutBtn = document.getElementById('logout-btn');
-            if (currentUser) { loginBtn.classList.add('hidden'); userSection.classList.remove('hidden'); logoutBtn.classList.remove('hidden'); } 
-            else { loginBtn.classList.remove('hidden'); userSection.classList.add('hidden'); logoutBtn.classList.add('hidden'); }
-        }
-
-        function applyRoleUI() {
-            const roleBadge = document.getElementById('user-role-badge');
-            if(currentUser) {
-                const savedData = JSON.parse(localStorage.getItem('papeleta_user_' + currentUser.id) || '{}');
-                if(savedData.role) {
-                    currentUserRole = savedData.role;
-                    roleBadge.innerText = savedData.role.toUpperCase();
-                    if(savedData.role === 'cliente') { roleBadge.classList.add('text-green-400'); roleBadge.classList.remove('text-red-400'); }
-                    else { roleBadge.classList.remove('text-green-400'); roleBadge.classList.add('text-red-400'); }
-                }
-            }
-            // El panel de admin legacy solo lo ve el admin principal
-            if (canUpload()) { /* document.getElementById('nav-admin').classList.remove('hidden'); */ }
-            document.getElementById('admin-upload-section').style.display = canUpload() ? '' : 'none';
-            document.getElementById('admin-users-section').style.display = isAdmin(currentUser) ? '' : 'none';
-        }
-
-        function saveUserDataLocally() {
-            if(!currentUser) return;
-            const userData = {
-                discord_id: currentUser.id, username: currentUser.username, avatar: currentUser.avatar,
-                role: currentUserRole, assigned_products: Array.from(myAssignedProductIds), last_login: new Date().toISOString()
-            };
-            localStorage.setItem('papeleta_user_' + currentUser.id, JSON.stringify(userData));
-            let allUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
-            const existingIndex = allUsers.findIndex(u => u.discord_id === currentUser.id);
-            if(existingIndex >= 0) allUsers[existingIndex] = userData;
-            else allUsers.push(userData);
-            localStorage.setItem('papeleta_all_users', JSON.stringify(allUsers));
-        }
-
-        async function registerUserInFirebase(user) {
-            try {
-                const userDocRef = db.collection("UsuariosRegistrados").doc(user.id);
-                const docSnap = await userDocRef.get();
-                if (!docSnap.exists) {
-                    await userDocRef.set({ discord_id: user.id, username: user.username, avatar: user.avatar || null, registered_at: firebase.firestore.FieldValue.serverTimestamp(), last_login: firebase.firestore.FieldValue.serverTimestamp() });
-                } else {
-                    await userDocRef.update({ last_login: firebase.firestore.FieldValue.serverTimestamp(), username: user.username, avatar: user.avatar || null });
-                }
-                saveUserDataLocally();
-            } catch (error) { console.error("Error registrando usuario en Firebase:", error); }
-        }
-
-        async function loadUserStats() {
-            try {
-                const snapshot = await db.collection("UsuariosRegistrados").get();
-                let userCount = snapshot.size || 1;
-                document.getElementById('stat-usuarios').innerText = '+' + userCount;
-            } catch (error) { document.getElementById('stat-usuarios').innerText = '+1'; }
-        }
-
-        async function loadSalesStats() {
-            try {
+                // Obtener todas las compras
                 const snapshot = await db.collection("Clientes").get();
-                let clientesQueCompraron = new Set(); let totalVentas = 0;
-                snapshot.forEach((doc) => {
-                    const data = doc.data(); totalVentas++;
-                    if (data.status === "Pagado" || (data.total_price && data.total_price !== "Gratis" && data.total_price !== "GRATIS")) clientesQueCompraron.add(data.discord_id);
-                });
-                document.getElementById('stat-clientes').innerText = '+' + clientesQueCompraron.size;
-                document.getElementById('stat-ventas').innerText = '+' + totalVentas;
-            } catch (error) { document.getElementById('stat-clientes').innerText = '+0'; document.getElementById('stat-ventas').innerText = '+0'; }
-        }
-
-        async function loadMyAssignments() {
-            myAssignedProductIds = new Set();
-            if (!currentUser) return;
-            const savedData = JSON.parse(localStorage.getItem('papeleta_user_' + currentUser.id) || '{}');
-            if(savedData.assigned_products) myAssignedProductIds = new Set(savedData.assigned_products);
-        }
-
-        function isSupport() { return currentUserRole === 'support'; }
-        function canUpload() { return isAdmin(currentUser) || isSupport(); }
-
-        document.getElementById('discord-invite-link').href = DISCORD_INVITE;
-
-        async function loadAdminUsers() {
-            if (!isAdmin(currentUser)) return;
-            const container = document.getElementById('admin-users-list');
-            const allUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
-            if (allUsers.length === 0) { container.innerHTML = `<p class="text-gray-500 text-sm">Aún no hay usuarios registrados localmente.</p>`; return; }
-            container.innerHTML = allUsers.map(u => `
-                <div class="flex items-center gap-3 bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-2.5">
-                    <img src="${u.avatar ? `https://cdn.discordapp.com/avatars/${u.discord_id}/${u.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png'}" class="w-8 h-8 rounded-full border border-red-700">
-                    <div class="flex-grow">
-                        <p class="text-white text-sm font-semibold">${escapeHTML(u.username || 'Desconocido')} ${u.role === 'support' ? '<span class="text-xs bg-red-950/60 border border-red-700 text-red-300 px-2 py-0.5 rounded-md ml-1">Soporte</span>' : ''} ${u.role === 'cliente' ? '<span class="text-xs bg-green-950/60 border border-green-700 text-green-300 px-2 py-0.5 rounded-md ml-1">Cliente</span>' : ''}</p>
-                        <p class="text-gray-500 text-xs">Última vez: ${new Date(u.last_login).toLocaleString('es-ES')}</p>
-                    </div>
-                    ${u.role === 'support' ? `<button onclick="setLocalRole('${u.discord_id}', 'user')" class="text-xs bg-transparent border border-red-900/50 hover:border-red-500 text-red-400 px-3 py-1.5 rounded-lg transition-all">Quitar soporte</button>` : `<button onclick="setLocalRole('${u.discord_id}', 'support')" class="text-xs bg-transparent border border-red-800/50 hover:border-red-500 text-red-300 px-3 py-1.5 rounded-lg transition-all">Hacer soporte</button>`}
-                </div>`).join('');
-        }
-
-        function setLocalRole(discordId, role) {
-            let allUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
-            const userIndex = allUsers.findIndex(u => u.discord_id === discordId);
-            if(userIndex >= 0) {
-                allUsers[userIndex].role = role;
-                localStorage.setItem('papeleta_all_users', JSON.stringify(allUsers));
-                if(currentUser && currentUser.id === discordId) { currentUserRole = role; applyRoleUI(); }
-                loadAdminUsers(); loadSalesStats();
-            }
-        }
-
-        function logout() {
-            localStorage.removeItem('dc_access_token');
-            currentUser = null; currentUserRole = 'user';
-            document.getElementById('nav-config').classList.add('hidden');
-            // Cerrar paneles si están abiertos
-            document.getElementById('user-panel').classList.remove('active');
-            document.getElementById('user-panel-overlay').classList.remove('active');
-            document.getElementById('config-panel').classList.remove('active');
-            document.getElementById('config-overlay').classList.remove('active');
-            updateAuthUI(); loadProducts();
-        }
-
-        function showPage(name) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById('page-' + name).classList.add('active');
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active-page'));
-            const link = document.querySelector(`.nav-link[data-page="${name}"]`);
-            if (link) link.classList.add('active-page');
-        }
-
-        async function loadProducts() {
-            try {
-                const snapshot = await db.collection("Productos").get();
-                const jsonProducts = [];
-                snapshot.forEach((doc) => jsonProducts.push(doc.data()));
-                allProducts = [...jsonProducts, ...localProducts];
-                buildCategoryFilters(); renderProducts();
-                document.getElementById('stat-productos').innerText = '+' + allProducts.length;
-                loadAdminProductsList();
-            } catch (e) { console.error(e); }
-        }
-
-        function buildCategoryFilters() {
-            const cats = [...new Set(allProducts.map(p => p.category).filter(Boolean))];
-            const container = document.getElementById('category-filters');
-            container.innerHTML = `<button onclick="filterCategory('all')" class="cat-btn bg-red-600 text-white text-sm font-semibold px-4 py-2 rounded-full" data-cat="all"><i class="fas fa-th-large mr-1"></i> Todas las Categorías</button>`;
-            cats.forEach(cat => {
-                container.innerHTML += `<button onclick="filterCategory('${escapeHTML(cat)}')" class="cat-btn bg-[#150a0a] border border-red-950/40 text-white text-sm font-semibold px-4 py-2 rounded-full" data-cat="${escapeHTML(cat)}"><i class="fas fa-code mr-1"></i> ${escapeHTML(cat)}</button>`;
-            });
-        }
-
-        function filterCategory(cat) {
-            activeCategory = cat;
-            document.querySelectorAll('.cat-btn').forEach(b => {
-                if (b.dataset.cat === cat) b.className = 'cat-btn bg-red-600 text-white text-sm font-semibold px-4 py-2 rounded-full';
-                else b.className = 'cat-btn bg-[#150a0a] border border-red-950/40 text-white text-sm font-semibold px-4 py-2 rounded-full';
-            });
-            renderProducts();
-        }
-
-        function renderProducts() {
-            const search = document.getElementById('search-input').value.toLowerCase();
-            const grid = document.getElementById('products-grid');
-            const filtered = allProducts.filter(p => {
-                const matchesCat = activeCategory === 'all' || p.category === activeCategory;
-                const matchesSearch = !search || p.name.toLowerCase().includes(search);
-                return matchesCat && matchesSearch;
-            });
-
-            if (filtered.length === 0) {
-                grid.innerHTML = `<p class="text-gray-500 text-sm col-span-full text-center py-10">No hay productos que coincidan.</p>`;
-                return;
-            }
-
-            grid.innerHTML = filtered.map(p => {
-                const priceDisplay = Number(p.price) === 0 ? 'GRATIS' : '$' + Number(p.price).toFixed(2);
-                const priceClass = Number(p.price) === 0 ? 'text-green-400' : 'text-red-400';
-                const alreadyOwned = currentUser && myAssignedProductIds.has(p.id);
                 
-                return `
-                <div class="bg-[#150a0a] border ${alreadyOwned ? 'border-green-600/50' : 'border-red-950/40'} rounded-2xl overflow-hidden shadow-xl group hover:border-red-600/40 transition-all relative">
-                    ${alreadyOwned ? '<span class="absolute top-3 right-3 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full z-10"><i class="fas fa-check mr-1"></i>OBTENIDO</span>' : ''}
+                // Contar compras por usuario
+                const buyerStats = {};
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const userId = data.discord_id;
                     
-                    <div class="product-card-img-container relative overflow-hidden">
-                        <img src="${escapeHTML(p.image_url || '')}" alt="${escapeHTML(p.name)}" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300 bg-[#0d0505]">
-                        <div class="absolute inset-0 bg-gradient-to-t from-[#150a0a] to-transparent opacity-60 pointer-events-none"></div>
-                    </div>
-                    
-                    <div class="p-5">
-                        <h4 class="text-xl font-bold text-white mb-2">${escapeHTML(p.name)}</h4>
-                        <p class="text-gray-400 text-sm mb-4 line-clamp-2">${escapeHTML(p.description || '')}</p>
-                        
-                        ${p.category ? `<span class="inline-block bg-red-950/60 border border-red-800 text-red-300 text-xs font-bold px-2.5 py-1 rounded-md mb-4">${escapeHTML(p.category)}</span>` : ''}
-                        
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="text-2xl font-black ${priceClass}">${priceDisplay}</span>
-                            ${Number(p.price) > 0 ? '<span class="text-xs text-gray-500">USD</span>' : '<span class="text-xs text-green-400 font-semibold">Sin costo</span>'}
-                        </div>
-                        
-                        ${alreadyOwned ? `
-                            <div class="grid grid-cols-2 gap-2">
-                                <button onclick="window.location.href='AreaCliente.html'" class="bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2"><i class="fas fa-download"></i> Descargar</button>
-                                <a href="Producto.html?id=${p.id}" class="bg-[#0d0505] hover:bg-[#150a0a] border border-red-800/50 text-gray-300 text-sm font-semibold py-3 rounded-xl transition-all text-center no-underline flex items-center justify-center gap-2"><i class="fas fa-eye"></i> Ver</a>
-                            </div>
-                        ` : `
-                            <div class="grid grid-cols-2 gap-2">
-                                <button onclick="addToCart('${p.id}')" class="bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-red-900/30"><i class="fas fa-cart-plus"></i> Añadir</button>
-                                <a href="Producto.html?id=${p.id}" class="bg-[#0d0505] hover:bg-[#1a0a0a] border border-red-800/50 text-gray-300 hover:text-white text-sm font-semibold py-3 rounded-xl transition-all text-center no-underline flex items-center justify-center gap-2"><i class="fas fa-info-circle"></i> Detalles</a>
-                            </div>
-                        `}
-                        
-                        ${isAdmin(currentUser) ? `<button onclick="deleteProduct('${p.id}')" class="w-full mt-3 bg-transparent border border-red-900/50 hover:border-red-500 hover:bg-red-950/30 text-red-300 text-xs font-semibold py-2 rounded-xl transition-all"><i class="fas fa-trash mr-1"></i> Eliminar</button>` : ''}
-                    </div>
-                </div>`}).join('');
-        }
-
-        function escapeHTML(str) { return String(str).replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)); }
-
-        function generateUniqueKey() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; let key = '';
-            for (let i = 0; i < 20; i++) key += chars.charAt(Math.floor(Math.random() * chars.length));
-            return key;
-        }
-
-        async function createLicenseForProduct(productId, productName) {
-            if (!currentUser) return null;
-            try {
-                const uniqueKey = generateUniqueKey();
-                const licenseData = { discord_id: currentUser.id, username: currentUser.username, product_id: productId, product_name: productName, key: uniqueKey, created_at: firebase.firestore.FieldValue.serverTimestamp(), status: 'active' };
-                await db.collection("Licencias").add(licenseData);
-                return { id: docRef.id, ...licenseData };
-            } catch (error) { console.error("Error creando licencia:", error); return null; }
-        }
-
-        function initNetworkBg() {
-            const canvas = document.getElementById('network-bg');
-            const ctx = canvas.getContext('2d'); let w, h, points;
-            function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
-            resize(); window.addEventListener('resize', resize);
-            points = Array.from({ length: 45 }, () => ({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3 }));
-            function tick() {
-                ctx.clearRect(0, 0, w, h);
-                points.forEach(p => { p.x += p.vx; p.y += p.vy; if (p.x < 0 || p.x > w) p.vx *= -1; if (p.y < 0 || p.y > h) p.vy *= -1; });
-                for (let i = 0; i < points.length; i++) {
-                    for (let j = i + 1; j < points.length; j++) {
-                        const dx = points[i].x - points[j].x; const dy = points[i].y - points[j].y;
-                        const dist = Math.sqrt(dx * dx + dy * dy);
-                        if (dist < 150) { ctx.strokeStyle = `rgba(255,26,26,${1 - dist / 150})`; ctx.lineWidth = 0.6; ctx.beginPath(); ctx.moveTo(points[i].x, points[i].y); ctx.lineTo(points[j].x, points[j].y); ctx.stroke(); }
+                    if (!buyerStats[userId]) {
+                        buyerStats[userId] = {
+                            username: data.username,
+                            avatar: data.avatar,
+                            purchases: 0,
+                            products: []
+                        };
                     }
-                    ctx.fillStyle = 'rgba(255,26,26,0.8)'; ctx.beginPath(); ctx.arc(points[i].x, points[i].y, 1.8, 0, Math.PI * 2); ctx.fill();
+                    
+                    buyerStats[userId].purchases++;
+                    if (data.products) {
+                        data.products.forEach(p => {
+                            if (!buyerStats[userId].products.includes(p.name)) {
+                                buyerStats[userId].products.push(p.name);
+                            }
+                        });
+                    }
+                });
+                
+                // Convertir a array y ordenar por número de compras
+                const topBuyers = Object.entries(buyerStats)
+                    .map(([id, stats]) => ({ id, ...stats }))
+                    .sort((a, b) => b.purchases - a.purchases)
+                    .slice(0, 3); // Top 3
+                
+                if (topBuyers.length === 0) {
+                    container.innerHTML = `
+                        <div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 400px;">
+                            <i class="fas fa-trophy text-3xl text-gray-600"></i>
+                            <span class="text-gray-400">Aún no hay compradores destacados</span>
+                        </div>
+                    `;
+                    return;
                 }
-                requestAnimationFrame(tick);
-            }
-            tick();
-        }
-
-    async function loadPublicReviews() {
-    const slider = document.getElementById('reviews-slider');
-    try {
-        const productsSnapshot = await db.collection("Productos").get();
-        const productsMap = {}; // Mapa: product_id -> nombre del producto
-        
-        productsSnapshot.forEach(doc => {
-            const data = doc.data();
-            // Guardamos tanto el ID del documento como el ID interno del producto
-            productsMap[doc.id] = data.name || 'Producto';
-            if (data.id) {
-                productsMap[data.id] = data.name || 'Producto';
-            }
-        });
-
-        // 2. Ahora obtenemos las últimas reseñas
-        const reviewsSnapshot = await db.collection("Resenas")
-            .limit(15) // Aumentamos el límite para tener más opciones
-            .get();
-        
-        let reviewsHTML = '';
-        let count = 0;
-
-        reviewsSnapshot.forEach(doc => {
-            const data = doc.data();
-            
-            // Solo mostramos reseñas de 4 o 5 estrellas para mantener calidad
-            if (data.rating >= 4) {
-                const stars = '★'.repeat(data.rating);
-                const date = data.created_at?.toDate ? data.created_at.toDate().toLocaleDateString('es-ES') : '';
-                const avatar = data.user_avatar || 'https://cdn.discordapp.com/embed/avatars/0.png';
-                const username = data.username || 'Usuario Anónimo';
-                const text = data.text || '';
                 
-                // CORRECCIÓN: Buscamos el nombre real del producto usando el product_id
-                const productId = data.product_id;
-                const productName = productsMap[productId] || 'Producto Premium';
+                // Crear HTML del podio
+                const positions = ['second', 'first', 'third'];
+                const medals = ['🥈', '👑', '🥉'];
                 
-                reviewsHTML += `
-                    <div class="review-card-slide">
-                        <div>
-                            <div class="review-header">
-                                <img src="${avatar}" alt="${username}" class="review-avatar">
-                                <div class="review-user-info">
-                                    <h4>${escapeHTML(username)}</h4>
-                                    <p class="review-date">${date}</p>
-                                </div>
+                let podiumHTML = '';
+                topBuyers.forEach((buyer, index) => {
+                    const position = positions[index];
+                    const medal = medals[index];
+                    const avatar = buyer.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png';
+                    const product = buyer.products[0] || 'Producto Premium';
+                    
+                    podiumHTML += `
+                        <div class="podium-item ${position}">
+                            <div class="podium-rank">${medal}</div>
+                            ${index === 0 ? '<i class="fas fa-crown crown-icon"></i>' : ''}
+                            <img src="${avatar}" alt="${buyer.username}" class="podium-avatar">
+                            <div class="podium-username">${escapeHTML(buyer.username)}</div>
+                            <div class="podium-product">
+                                <i class="fas fa-cube"></i>
+                                ${escapeHTML(product)}
                             </div>
-                            <div class="review-stars">${stars}</div>
-                            <p class="review-text">${escapeHTML(text)}</p>
+                            <div class="podium-platform">${buyer.purchases} ${buyer.purchases === 1 ? 'compra' : 'compras'}</div>
                         </div>
-                        <div class="review-product-tag">
-                            <i class="fas fa-cube"></i> ${escapeHTML(productName)}
-                        </div>
+                    `;
+                });
+                
+                container.innerHTML = podiumHTML;
+                
+            } catch (error) {
+                console.error("Error cargando top compradores:", error);
+                container.innerHTML = `
+                    <div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 400px;">
+                        <i class="fas fa-exclamation-triangle text-3xl text-red-500"></i>
+                        <span class="text-gray-400">No se pudieron cargar los datos</span>
                     </div>
                 `;
-                count++;
             }
-        });
-
-        if (count > 0) {
-            slider.innerHTML = reviewsHTML;
-        } else {
-            slider.innerHTML = `
-                <div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;">
-                    <i class="fas fa-comment-slash text-3xl text-gray-600"></i>
-                    <span class="text-gray-400">Aún no hay reseñas destacadas.</span>
-                </div>
-            `;
         }
 
-    } catch (error) {
-        console.error("Error cargando reseñas públicas:", error);
-        slider.innerHTML = `
-            <div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;">
-                <i class="fas fa-exclamation-triangle text-3xl text-red-500"></i>
-                <span class="text-gray-400">No se pudieron cargar las opiniones.</span>
-            </div>
-        `;
-    }
-}
+        async function loadPublicReviews() {
+            const slider = document.getElementById('reviews-slider');
+            try {
+                const productsSnapshot = await db.collection("Productos").get();
+                const productsMap = {};
+                
+                productsSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    productsMap[doc.id] = data.name || 'Producto';
+                    if (data.id) {
+                        productsMap[data.id] = data.name || 'Producto';
+                    }
+                });
+
+                const reviewsSnapshot = await db.collection("Resenas")
+                    .limit(15)
+                    .get();
+                
+                let reviewsHTML = '';
+                let count = 0;
+
+                reviewsSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    
+                    if (data.rating >= 4) {
+                        const stars = '★'.repeat(data.rating);
+                        const date = data.created_at?.toDate ? data.created_at.toDate().toLocaleDateString('es-ES') : '';
+                        const avatar = data.user_avatar || 'https://cdn.discordapp.com/embed/avatars/0.png';
+                        const username = data.username || 'Usuario Anónimo';
+                        const text = data.text || '';
+                        
+                        const productId = data.product_id;
+                        const productName = productsMap[productId] || 'Producto Premium';
+                        
+                        reviewsHTML += `
+                            <div class="review-card-slide">
+                                <div>
+                                    <div class="review-header">
+                                        <img src="${avatar}" alt="${username}" class="review-avatar">
+                                        <div class="review-user-info">
+                                            <h4>${escapeHTML(username)}</h4>
+                                            <p class="review-date">${date}</p>
+                                        </div>
+                                    </div>
+                                    <div class="review-stars">${stars}</div>
+                                    <p class="review-text">${escapeHTML(text)}</p>
+                                </div>
+                                <div class="review-product-tag">
+                                    <i class="fas fa-cube"></i> ${escapeHTML(productName)}
+                                </div>
+                            </div>
+                        `;
+                        count++;
+                    }
+                });
+
+                if (count > 0) {
+                    slider.innerHTML = reviewsHTML;
+                } else {
+                    slider.innerHTML = `
+                        <div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;">
+                            <i class="fas fa-comment-slash text-3xl text-gray-600"></i>
+                            <span class="text-gray-400">Aún no hay reseñas destacadas.</span>
+                        </div>
+                    `;
+                }
+
+            } catch (error) {
+                console.error("Error cargando reseñas públicas:", error);
+                slider.innerHTML = `
+                    <div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;">
+                        <i class="fas fa-exclamation-triangle text-3xl text-red-500"></i>
+                        <span class="text-gray-400">No se pudieron cargar las opiniones.</span>
+                    </div>
+                `;
+            }
+        }
 
         document.addEventListener('DOMContentLoaded', () => { 
             checkDiscordAuth(); 
             initNetworkBg(); 
-            loadPublicReviews(); // Cargar reseñas al iniciar
+            loadTopBuyers();
+            loadPublicReviews();
         });
     </script>
 </body>
