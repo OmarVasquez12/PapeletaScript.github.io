@@ -14,182 +14,64 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap');
-        
         * { font-family: 'Inter', sans-serif; }
-        
-        body {
-            background: linear-gradient(135deg, #050507 0%, #150a0a 100%);
-            color: #e2e8f0;
-        }
-        
-        .sidebar {
-            background: rgba(10, 5, 5, 0.95);
-            backdrop-filter: blur(10px);
-            border-right: 1px solid rgba(255, 26, 26, 0.1);
-        }
-        
-        .card {
-            background: rgba(21, 10, 10, 0.6);
-            border: 1px solid rgba(255, 26, 26, 0.15);
-            backdrop-filter: blur(10px);
-        }
-        
+        body { background: linear-gradient(135deg, #050507 0%, #150a0a 100%); color: #e2e8f0; }
+        .sidebar { background: rgba(10, 5, 5, 0.95); backdrop-filter: blur(10px); border-right: 1px solid rgba(255, 26, 26, 0.1); }
+        .card { background: rgba(21, 10, 10, 0.6); border: 1px solid rgba(255, 26, 26, 0.15); backdrop-filter: blur(10px); }
         .nav-item { transition: all 0.3s ease; }
         .nav-item:hover { background: rgba(255, 26, 26, 0.1); color: white; }
-        .nav-item.active {
-            background: rgba(255, 26, 26, 0.15);
-            border-left: 3px solid #ff1a1a;
-            color: #ff6b6b;
-        }
-        
-        .stat-card {
-            background: linear-gradient(135deg, rgba(21, 10, 10, 0.8) 0%, rgba(13, 5, 5, 0.8) 100%);
-            border: 1px solid rgba(255, 26, 26, 0.15);
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-            transition: all 0.3s ease;
-        }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(220, 38, 38, 0.3);
-        }
-        
-        .input-field {
-            background: rgba(13, 5, 5, 0.8);
-            border: 1px solid rgba(255, 26, 26, 0.2);
-        }
+        .nav-item.active { background: rgba(255, 26, 26, 0.15); border-left: 3px solid #ff1a1a; color: #ff6b6b; }
+        .stat-card { background: linear-gradient(135deg, rgba(21, 10, 10, 0.8) 0%, rgba(13, 5, 5, 0.8) 100%); border: 1px solid rgba(255, 26, 26, 0.15); }
+        .btn-primary { background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); transition: all 0.3s ease; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(220, 38, 38, 0.3); }
+        .input-field { background: rgba(13, 5, 5, 0.8); border: 1px solid rgba(255, 26, 26, 0.2); }
         .input-field:focus { border-color: #ff1a1a; outline: none; }
-        
-        .code-block {
-            background: rgba(5, 5, 7, 0.9);
-            border: 1px solid rgba(255, 26, 26, 0.2);
-        }
-        
-        .gradient-text {
-            background: linear-gradient(135deg, #ff1a1a 0%, #ff6b6b 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
+        .code-block { background: rgba(5, 5, 7, 0.9); border: 1px solid rgba(255, 26, 26, 0.2); }
+        .gradient-text { background: linear-gradient(135deg, #ff1a1a 0%, #ff6b6b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #0a0505; }
         ::-webkit-scrollbar-thumb { background: #7f1d1d; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #ef4444; }
 
-        /* Modal Server.Lua */
-        .lua-modal {
-            position: fixed; inset: 0; z-index: 100;
-            background: rgba(0,0,0,0.9); backdrop-filter: blur(8px);
-            display: none; align-items: center; justify-content: center; padding: 20px;
-            animation: fadeIn 0.3s ease;
-        }
+        .lua-modal { position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.9); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.3s ease; }
         .lua-modal.active { display: flex; }
-        
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        
-        .lua-code-container {
-            background: #0a0505; border: 2px solid #dc2626; border-radius: 16px; padding: 0;
-            width: 100%; max-width: 1000px; max-height: 85vh;
-            display: flex; flex-direction: column;
-            box-shadow: 0 0 60px rgba(220, 38, 38, 0.3);
-            animation: slideUp 0.3s ease;
-        }
-        
+        .lua-code-container { background: #0a0505; border: 2px solid #dc2626; border-radius: 16px; padding: 0; width: 100%; max-width: 1000px; max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 0 60px rgba(220, 38, 38, 0.3); animation: slideUp 0.3s ease; }
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        
-        .lua-header {
-            background: linear-gradient(135deg, #150a0a 0%, #0d0505 100%);
-            border-bottom: 2px solid #dc2626; padding: 20px 24px;
-            display: flex; align-items: center; justify-content: space-between;
-        }
-        
+        .lua-header { background: linear-gradient(135deg, #150a0a 0%, #0d0505 100%); border-bottom: 2px solid #dc2626; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; }
         .lua-body { flex: 1; overflow: auto; padding: 24px; background: #050507; }
-        
-        .lua-pre {
-            font-family: 'Fira Code', monospace; color: #ffffff; font-size: 13px; 
-            line-height: 1.7; white-space: pre-wrap; word-break: break-all; margin: 0;
-        }
-        
-        .lua-footer {
-            background: #0d0505; border-top: 1px solid rgba(220, 38, 38, 0.3);
-            padding: 16px 24px; display: flex; justify-content: flex-end; gap: 12px;
-        }
-        
-        .admin-badge {
-            background: rgba(220, 38, 38, 0.2); border: 1px solid rgba(220, 38, 38, 0.5);
-            color: #ff6b6b; padding: 2px 8px; border-radius: 4px; font-size: 10px;
-            font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-left: 8px;
-        }
+        .lua-pre { font-family: 'Fira Code', monospace; color: #ffffff; font-size: 13px; line-height: 1.7; white-space: pre-wrap; word-break: break-all; margin: 0; }
+        .lua-footer { background: #0d0505; border-top: 1px solid rgba(220, 38, 38, 0.3); padding: 16px 24px; display: flex; justify-content: flex-end; gap: 12px; }
+        .admin-badge { background: rgba(220, 38, 38, 0.2); border: 1px solid rgba(220, 38, 38, 0.5); color: #ff6b6b; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-left: 8px; }
 
-        /* --- SISTEMA DE NOTIFICACIONES TOAST --- */
-        .toast-container {
-            position: fixed; top: 20px; right: 20px; z-index: 9999;
-            display: flex; flex-direction: column; gap: 10px;
-        }
-        .toast {
-            background: rgba(21, 10, 10, 0.95); border: 1px solid rgba(255, 26, 26, 0.3);
-            border-left: 4px solid #dc2626; border-radius: 12px; padding: 16px 20px;
-            min-width: 320px; max-width: 450px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
-            animation: slideInRight 0.4s ease, fadeOut 0.4s ease 4.6s forwards;
-            display: flex; align-items: center; gap: 12px; position: relative; overflow: hidden;
-        }
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: rgba(21, 10, 10, 0.95); border: 1px solid rgba(255, 26, 26, 0.3); border-left: 4px solid #dc2626; border-radius: 12px; padding: 16px 20px; min-width: 320px; max-width: 450px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px); animation: slideInRight 0.4s ease, fadeOut 0.4s ease 4.6s forwards; display: flex; align-items: center; gap: 12px; position: relative; overflow: hidden; }
         .toast.success { border-left-color: #10b981; }
         .toast.error { border-left-color: #ef4444; }
         .toast.warning { border-left-color: #f59e0b; }
-        
         .toast-icon { font-size: 20px; flex-shrink: 0; }
         .toast.success .toast-icon { color: #10b981; }
         .toast.error .toast-icon { color: #ef4444; }
         .toast.warning .toast-icon { color: #f59e0b; }
-        
         .toast-content { flex: 1; }
         .toast-title { font-weight: 600; font-size: 14px; color: white; margin-bottom: 2px; }
         .toast-message { font-size: 13px; color: #9ca3af; }
-        
-        .toast-timer {
-            position: absolute; bottom: 0; left: 0; height: 3px;
-            background: rgba(220, 38, 38, 0.5); border-radius: 0 0 0 12px;
-            animation: timerShrink 5s linear forwards;
-        }
+        .toast-timer { position: absolute; bottom: 0; left: 0; height: 3px; background: rgba(220, 38, 38, 0.5); border-radius: 0 0 0 12px; animation: timerShrink 5s linear forwards; }
         .toast.success .toast-timer { background: rgba(16, 185, 129, 0.5); }
-
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(100%); } }
         @keyframes timerShrink { from { width: 100%; } to { width: 0%; } }
 
-        /* --- MODAL RESEÑA --- */
-        .review-modal {
-            position: fixed; inset: 0; z-index: 200;
-            background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(8px);
-            display: none; align-items: center; justify-content: center; padding: 20px;
-            animation: fadeIn 0.3s ease;
-        }
+        .review-modal { position: fixed; inset: 0; z-index: 200; background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.3s ease; }
         .review-modal.active { display: flex; }
-        
-        .review-modal-content {
-            background: linear-gradient(135deg, #150a0a 0%, #0d0505 100%);
-            border: 2px solid rgba(220, 38, 38, 0.5); border-radius: 16px; padding: 32px;
-            width: 100%; max-width: 500px;
-            box-shadow: 0 0 60px rgba(220, 38, 38, 0.3);
-            animation: slideUp 0.3s ease;
-        }
-        
+        .review-modal-content { background: linear-gradient(135deg, #150a0a 0%, #0d0505 100%); border: 2px solid rgba(220, 38, 38, 0.5); border-radius: 16px; padding: 32px; width: 100%; max-width: 500px; box-shadow: 0 0 60px rgba(220, 38, 38, 0.3); animation: slideUp 0.3s ease; }
         .star-rating { display: flex; gap: 8px; justify-content: center; margin: 20px 0; }
         .star { font-size: 32px; color: #374151; cursor: pointer; transition: all 0.2s ease; }
         .star:hover, .star.active { color: #fbbf24; transform: scale(1.1); }
-        
         .review-textarea { width: 100%; min-height: 120px; resize: vertical; }
-        
         .section { display: none; }
         .section.active { display: block; }
-        
-        .review-card {
-            background: rgba(13, 5, 5, 0.8); border: 1px solid rgba(255, 26, 26, 0.2);
-            border-radius: 12px; padding: 20px; margin-bottom: 16px;
-        }
+        .review-card { background: rgba(13, 5, 5, 0.8); border: 1px solid rgba(255, 26, 26, 0.2); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
         .review-stars { color: #fbbf24; font-size: 18px; margin-bottom: 8px; }
         .review-author { font-weight: 600; color: white; margin-bottom: 4px; }
         .review-date { font-size: 12px; color: #6b7280; margin-bottom: 8px; }
@@ -198,7 +80,6 @@
 </head>
 <body class="min-h-screen flex">
 
-    <!-- SIDEBAR -->
     <aside class="sidebar w-64 fixed left-0 top-0 h-full z-50 hidden md:block">
         <div class="p-6">
             <div class="flex items-center gap-3 mb-8 cursor-pointer" onclick="window.location.href='index.html'">
@@ -208,37 +89,16 @@
                     <span id="admin-badge-sidebar" class="admin-badge hidden">ADMIN</span>
                 </div>
             </div>
-
             <nav class="space-y-2">
                 <div class="text-xs text-gray-500 uppercase font-semibold mb-4 px-3 tracking-wider">Principal</div>
-                
-                <a href="#" onclick="showSection('dashboard')" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
-                    <i class="fas fa-home w-5"></i><span>Inicio</span>
-                </a>
-                
-                <a href="index.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
-                    <i class="fas fa-store w-5"></i><span>Tienda</span>
-                </a>
-                
-                <a href="#" onclick="showSection('reviews')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
-                    <i class="fas fa-star w-5"></i><span>Mis Reseñas</span>
-                </a>
-                
-                <a href="#" id="nav-server-lua" onclick="openLuaModal()" class="nav-item hidden flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:text-red-400 border border-transparent hover:border-red-600/30">
-                    <i class="fas fa-file-code w-5 text-red-400"></i><span>Server.Lua</span>
-                    <i class="fas fa-shield-alt ml-auto text-xs text-red-500/50"></i>
-                </a>
-                
-                <a href="#" onclick="showSection('support')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
-                    <i class="fas fa-headset w-5"></i><span>Soporte</span>
-                </a>
-                
-                <a href="https://discord.gg/rvxEdWcGkf" target="_blank" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
-                    <i class="fab fa-discord w-5"></i><span>Discord</span>
-                </a>
+                <a href="#" onclick="showSection('dashboard')" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fas fa-home w-5"></i><span>Inicio</span></a>
+                <a href="index.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fas fa-store w-5"></i><span>Tienda</span></a>
+                <a href="#" onclick="showSection('reviews')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fas fa-star w-5"></i><span>Mis Reseñas</span></a>
+                <a href="#" id="nav-server-lua" onclick="openLuaModal()" class="nav-item hidden flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:text-red-400 border border-transparent hover:border-red-600/30"><i class="fas fa-file-code w-5 text-red-400"></i><span>Server.Lua</span><i class="fas fa-shield-alt ml-auto text-xs text-red-500/50"></i></a>
+                <a href="#" onclick="showSection('support')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fas fa-headset w-5"></i><span>Soporte</span></a>
+                <a href="https://discord.gg/rvxEdWcGkf" target="_blank" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fab fa-discord w-5"></i><span>Discord</span></a>
             </nav>
         </div>
-
         <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-red-900/20 bg-[#0a0505]/50">
             <div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-red-900/10 border border-red-900/20">
                 <img id="sidebar-avatar" src="" alt="User" class="w-10 h-10 rounded-full border-2 border-red-600 object-cover">
@@ -246,71 +106,44 @@
                     <p id="sidebar-username" class="text-white font-medium text-sm truncate">Usuario</p>
                     <p id="sidebar-role" class="text-red-400 text-xs font-bold uppercase">Cliente</p>
                 </div>
-                <button onclick="logout()" class="text-gray-400 hover:text-red-400 transition-colors" title="Cerrar Sesión">
-                    <i class="fas fa-sign-out-alt"></i>
-                </button>
+                <button onclick="logout()" class="text-gray-400 hover:text-red-400 transition-colors" title="Cerrar Sesión"><i class="fas fa-sign-out-alt"></i></button>
             </div>
         </div>
     </aside>
 
-    <!-- MAIN CONTENT -->
     <main class="main-content flex-1 md:ml-64 min-h-screen flex flex-col">
         <header class="border-b border-red-900/20 px-8 py-6 bg-[#0a0505]/30 backdrop-blur-sm sticky top-0 z-40">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 class="text-2xl font-bold text-white mb-1">
-                        Bienvenido, <span id="header-username" class="gradient-text">usuario</span>
-                        <span id="header-admin-badge" class="admin-badge hidden ml-2">ADMIN</span>
-                    </h1>
+                    <h1 class="text-2xl font-bold text-white mb-1">Bienvenido, <span id="header-username" class="gradient-text">usuario</span><span id="header-admin-badge" class="admin-badge hidden ml-2">ADMIN</span></h1>
                     <p class="text-gray-400 text-sm">Gestiona tus productos y licencias desde aquí</p>
                 </div>
-                
-                <a href="index.html" class="btn-primary px-5 py-2.5 rounded-lg text-white font-bold flex items-center gap-2 shadow-lg shadow-red-900/20">
-                    <i class="fas fa-shopping-cart"></i> Ir al Catálogo
-                </a>
+                <a href="index.html" class="btn-primary px-5 py-2.5 rounded-lg text-white font-bold flex items-center gap-2 shadow-lg shadow-red-900/20"><i class="fas fa-shopping-cart"></i> Ir al Catálogo</a>
             </div>
         </header>
 
         <div class="p-6 md:p-8 flex-grow">
-            <!-- SECCIÓN DASHBOARD -->
             <div id="section-dashboard" class="section active">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div class="stat-card rounded-xl p-6 relative overflow-hidden group">
                         <div class="absolute right-0 top-0 w-24 h-24 bg-red-600/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
                         <div class="flex items-center justify-between relative z-10">
-                            <div>
-                                <p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Total Invertido</p>
-                                <p id="stat-total-spent" class="text-2xl font-bold text-white">$0.00</p>
-                            </div>
-                            <div class="w-12 h-12 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
-                                <i class="fas fa-wallet text-red-400 text-xl"></i>
-                            </div>
+                            <div><p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Total Invertido</p><p id="stat-total-spent" class="text-2xl font-bold text-white">$0.00</p></div>
+                            <div class="w-12 h-12 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center"><i class="fas fa-wallet text-red-400 text-xl"></i></div>
                         </div>
                     </div>
-
                     <div class="stat-card rounded-xl p-6 relative overflow-hidden group">
                         <div class="absolute right-0 top-0 w-24 h-24 bg-green-600/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
                         <div class="flex items-center justify-between relative z-10">
-                            <div>
-                                <p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Scripts Activos</p>
-                                <p id="stat-active-scripts" class="text-2xl font-bold text-white">0</p>
-                            </div>
-                            <div class="w-12 h-12 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center justify-center">
-                                <i class="fas fa-lock text-green-400 text-xl"></i>
-                            </div>
+                            <div><p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Scripts Activos</p><p id="stat-active-scripts" class="text-2xl font-bold text-white">0</p></div>
+                            <div class="w-12 h-12 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center justify-center"><i class="fas fa-lock text-green-400 text-xl"></i></div>
                         </div>
                     </div>
-
                     <div class="stat-card rounded-xl p-6 relative overflow-hidden group">
                         <div class="absolute right-0 top-0 w-24 h-24 bg-blue-600/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
                         <div class="flex items-center justify-between relative z-10">
-                            <div>
-                                <p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Estado de Cuenta</p>
-                                <p id="stat-account-status" class="text-lg font-bold text-red-400">Cliente Verificado</p>
-                            </div>
-                            <div class="w-12 h-12 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
-                                <i class="fas fa-user-shield text-red-400 text-xl"></i>
-                            </div>
+                            <div><p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Estado de Cuenta</p><p id="stat-account-status" class="text-lg font-bold text-red-400">Cliente Verificado</p></div>
+                            <div class="w-12 h-12 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center"><i class="fas fa-user-shield text-red-400 text-xl"></i></div>
                         </div>
                     </div>
                 </div>
@@ -318,21 +151,16 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="lg:col-span-2 card rounded-xl p-6">
                         <div class="flex items-center gap-3 mb-6">
-                            <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
-                                <i class="fas fa-cube text-red-400"></i>
-                            </div>
+                            <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center"><i class="fas fa-cube text-red-400"></i></div>
                             <h2 class="text-lg font-bold text-white">Mis Productos Activos</h2>
                         </div>
-
                         <div class="mb-6">
                             <div class="relative">
                                 <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
                                 <input type="text" id="dashboard-search" oninput="filterDashboardProducts()" placeholder="Buscar entre tus recursos..." class="input-field w-full pl-12 pr-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none">
                             </div>
                         </div>
-
                         <div id="dashboard-products-list" class="space-y-3 max-h-[500px] overflow-y-auto custom-scrollbar pr-2"></div>
-
                         <div id="dashboard-empty-state" class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5">
                             <i class="fas fa-box-open text-gray-600 text-4xl mb-3"></i>
                             <p class="text-gray-400 mb-4">No tienes productos activos aún.</p>
@@ -342,23 +170,13 @@
 
                     <div class="card rounded-xl p-6 h-fit">
                         <div class="flex items-center gap-3 mb-6">
-                            <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
-                                <i class="fas fa-server text-red-400"></i>
-                            </div>
+                            <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center"><i class="fas fa-server text-red-400"></i></div>
                             <h2 class="text-lg font-bold text-white">Configuración MTA</h2>
                         </div>
-
                         <div class="space-y-4 mb-6">
-                            <div>
-                                <label class="block text-gray-400 text-xs uppercase font-semibold mb-2 tracking-wider">Server IP</label>
-                                <input type="text" id="server-ip" value="213.181.88.154" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none font-mono text-sm">
-                            </div>
-                            <div>
-                                <label class="block text-gray-400 text-xs uppercase font-semibold mb-2 tracking-wider">Puerto</label>
-                                <input type="text" id="server-port" value="22003" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none font-mono text-sm">
-                            </div>
+                            <div><label class="block text-gray-400 text-xs uppercase font-semibold mb-2 tracking-wider">Server IP</label><input type="text" id="server-ip" value="213.181.88.154" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none font-mono text-sm"></div>
+                            <div><label class="block text-gray-400 text-xs uppercase font-semibold mb-2 tracking-wider">Puerto</label><input type="text" id="server-port" value="22003" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none font-mono text-sm"></div>
                         </div>
-
                         <div class="mb-6">
                             <div class="flex items-center justify-between mb-2">
                                 <label class="block text-gray-400 text-xs uppercase font-semibold tracking-wider">Código de Licencia</label>
@@ -368,26 +186,18 @@
                                 <pre class="text-red-300 whitespace-pre-wrap break-all"><code id="license-code">Generando...</code></pre>
                             </div>
                         </div>
-
                         <div class="grid grid-cols-2 gap-3 mb-4">
-                            <button onclick="saveServerConfig()" class="btn-primary px-4 py-2.5 rounded-lg text-white font-medium flex items-center justify-center gap-2 text-sm">
-                                <i class="fas fa-save"></i> Guardar
-                            </button>
-                            <button onclick="copyLicenseCode()" class="px-4 py-2.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 font-medium flex items-center justify-center gap-2 text-sm">
-                                <i class="fas fa-copy"></i> Copiar
-                            </button>
+                            <button onclick="saveServerConfig()" class="btn-primary px-4 py-2.5 rounded-lg text-white font-medium flex items-center justify-center gap-2 text-sm"><i class="fas fa-save"></i> Guardar</button>
+                            <button onclick="copyLicenseCode()" class="px-4 py-2.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 font-medium flex items-center justify-center gap-2 text-sm"><i class="fas fa-copy"></i> Copiar</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- SECCIÓN MIS RESEÑAS -->
             <div id="section-reviews" class="section">
                 <div class="card rounded-xl p-6">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-8 h-8 rounded-lg bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center">
-                            <i class="fas fa-star text-yellow-400"></i>
-                        </div>
+                        <div class="w-8 h-8 rounded-lg bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center"><i class="fas fa-star text-yellow-400"></i></div>
                         <h2 class="text-lg font-bold text-white">Mis Reseñas</h2>
                     </div>
                     <div id="reviews-list" class="space-y-4">
@@ -400,13 +210,10 @@
                 </div>
             </div>
 
-            <!-- SECCIÓN SOPORTE -->
             <div id="section-support" class="section">
                 <div class="card rounded-xl p-6">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
-                            <i class="fas fa-headset text-blue-400"></i>
-                        </div>
+                        <div class="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center"><i class="fas fa-headset text-blue-400"></i></div>
                         <h2 class="text-lg font-bold text-white">Soporte</h2>
                     </div>
                     <p class="text-gray-400">Contenido de soporte próximamente...</p>
@@ -415,16 +222,12 @@
         </div>
     </main>
 
-    <!-- MODAL SERVER.LUA -->
     <div id="lua-modal" class="lua-modal">
         <div class="lua-code-container">
             <div class="lua-header">
                 <div class="flex items-center gap-3">
                     <i class="fas fa-file-code text-red-500 text-2xl"></i>
-                    <div>
-                        <h3 class="text-xl font-bold text-white">Server.Lua</h3>
-                        <p class="text-gray-400 text-xs">Sistema de Validación de Licencias</p>
-                    </div>
+                    <div><h3 class="text-xl font-bold text-white">Server.Lua</h3><p class="text-gray-400 text-xs">Sistema de Validación de Licencias</p></div>
                 </div>
                 <button onclick="closeLuaModal()" class="text-gray-400 hover:text-white text-2xl transition-colors"><i class="fas fa-times"></i></button>
             </div>
@@ -436,25 +239,17 @@
         </div>
     </div>
 
-    <!-- MODAL DEJAR RESEÑA -->
     <div id="review-modal" class="review-modal">
         <div class="review-modal-content">
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-xl font-bold text-white">Dejar Reseña</h3>
                 <button onclick="closeReviewModal()" class="text-gray-400 hover:text-white text-2xl"><i class="fas fa-times"></i></button>
             </div>
-            <div class="mb-4">
-                <p class="text-gray-400 text-sm mb-2">Producto:</p>
-                <p id="review-product-name" class="text-white font-bold text-lg"></p>
-            </div>
+            <div class="mb-4"><p class="text-gray-400 text-sm mb-2">Producto:</p><p id="review-product-name" class="text-white font-bold text-lg"></p></div>
             <div class="mb-6">
                 <p class="text-gray-400 text-sm mb-3">Tu calificación:</p>
                 <div class="star-rating" id="star-rating">
-                    <i class="fas fa-star star" data-rating="1"></i>
-                    <i class="fas fa-star star" data-rating="2"></i>
-                    <i class="fas fa-star star" data-rating="3"></i>
-                    <i class="fas fa-star star" data-rating="4"></i>
-                    <i class="fas fa-star star" data-rating="5"></i>
+                    <i class="fas fa-star star" data-rating="1"></i><i class="fas fa-star star" data-rating="2"></i><i class="fas fa-star star" data-rating="3"></i><i class="fas fa-star star" data-rating="4"></i><i class="fas fa-star star" data-rating="5"></i>
                 </div>
                 <p id="rating-text" class="text-center text-gray-400 text-sm">Selecciona una calificación</p>
             </div>
@@ -469,19 +264,15 @@
         </div>
     </div>
 
-    <!-- LOGIN MODAL -->
     <div id="login-modal" class="hidden fixed inset-0 bg-black/90 z-[60] flex items-center justify-center px-4 backdrop-blur-sm">
         <div class="max-w-md w-full bg-[#150a0a] border border-red-600/30 rounded-2xl p-8 text-center">
             <div class="mx-auto w-20 h-20 rounded-xl mb-6 bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center text-3xl font-black text-white">P</div>
             <h1 class="text-3xl font-black text-white mb-2">PAPELETA <span class="text-red-500">STORE</span></h1>
             <p class="text-gray-400 text-sm mb-8">Inicia sesión para acceder</p>
-            <button onclick="redirectToDiscord()" class="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-3.5 px-6 rounded-xl flex items-center justify-center gap-3">
-                <i class="fab fa-discord text-xl"></i> Iniciar Sesión
-            </button>
+            <button onclick="redirectToDiscord()" class="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-3.5 px-6 rounded-xl flex items-center justify-center gap-3"><i class="fab fa-discord text-xl"></i> Iniciar Sesión</button>
         </div>
     </div>
 
-    <!-- TOAST CONTAINER -->
     <div id="toast-container" class="toast-container"></div>
 
     <script>
@@ -516,7 +307,6 @@ end
 local function tienePermisoACL()
     local resourceName = getResourceName(getThisResource())
     local resObj = "resource." .. resourceName
-    
     if not isObjectInACLGroup(resObj, aclGetGroup("Admin")) then
         outputDebugString("[Papeleta Progamador] El resource '"..resourceName.."' NO tiene permiso en ACL 'Admin'", 1)
         return false
@@ -535,7 +325,6 @@ local function validarLicencia()
         stopResource(getThisResource())
         return
     end
-
     local userLocal = clean(configLicense["User"])
     local keyLocal = clean(configLicense["Key"])
     local resourceName = clean(getResourceName(getThisResource()))
@@ -545,18 +334,12 @@ local function validarLicencia()
         local ipActual = ""
         if ipErr == 0 then
             local ipTable = fromJSON(ipData)
-            if ipTable and ipTable.ip then
-                ipActual = clean(ipTable.ip)
-            end
+            if ipTable and ipTable.ip then ipActual = clean(ipTable.ip) end
         end
-        
         if ipActual == "" or ipActual == "0.0.0.0" then
             ipActual = clean(getServerConfigSetting("serverip") or "")
-            if ipActual == "auto" or ipActual == "" then
-                outputDebugString("[Papeleta Progamador] ADVERTENCIA: No se pudo detectar IP automáticamente", 2)
-            end
+            if ipActual == "auto" or ipActual == "" then outputDebugString("[Papeleta Progamador] ADVERTENCIA: No se pudo detectar IP automáticamente", 2) end
         end
-        
         local ipPortCompleto = ipActual .. ":" .. portActual
         validarConFirebase(ipPortCompleto, userLocal, keyLocal, resourceName)
     end)
@@ -564,57 +347,42 @@ end
 
 function validarConFirebase(ipPortCompleto, userLocal, keyLocal, resourceName)
     local urlBase = "https://firestore.googleapis.com/v1/projects/licenciapapeleta12/databases/(default)/documents/licencias"
-    
     fetchRemote(urlBase, function(data, err)
         if err ~= 0 then
             outputDebugString("[Papeleta Progamador] Fallo de conexión a Firestore", 1)
             stopResource(getThisResource())
             return
         end
-
         local db = fromJSON(data)
         local autorizado = false
         local keyEncontradaPeroMalSistema = false
-
         if db and db.documents then
             for _, doc in ipairs(db.documents) do
                 local f = doc.fields
                 if f and f.user and f.key and f.ip and f.port and f.active and f.resource then
                     local fireUser = clean(f.user.stringValue)
                     local fireKey = clean(f.key.stringValue)
-                    local fireIp   = clean(f.ip.stringValue)
+                    local fireIp = clean(f.ip.stringValue)
                     local firePort = clean(f.port.stringValue)
                     local fireResource = clean(f.resource.stringValue)
                     local fireIpPort = fireIp .. ":" .. firePort
                     local fireStatus = f.active.booleanValue
-
                     if fireKey == keyLocal then
                         if fireResource == resourceName then
-                            if fireUser == userLocal and fireIpPort == ipPortCompleto and fireStatus == true then
-                                autorizado = true
-                            end
+                            if fireUser == userLocal and fireIpPort == ipPortCompleto and fireStatus == true then autorizado = true end
                         else
                             keyEncontradaPeroMalSistema = true
                             outputDebugString("[Papeleta Progamador] ERROR: Key válida pero pertenece al sistema '" .. fireResource .. "'", 1)
-                            outputDebugString("[Papeleta Progamador] Este sistema es '" .. resourceName .. "'. Licencia denegada.", 1)
                         end
                         break
                     end
                 end
             end
         end
-
         if autorizado then
-            if not _G["ScriptYaCargado"] then
-                outputDebugString("[Papeleta Progamador] LICENCIA VERIFICADA EXITOSAMENTE", 3)
-                cargarScriptPrincipal()
-            end
+            if not _G["ScriptYaCargado"] then outputDebugString("[Papeleta Progamador] LICENCIA VERIFICADA EXITOSAMENTE", 3); cargarScriptPrincipal() end
         else
-            if keyEncontradaPeroMalSistema then
-                outputDebugString("[Papeleta Progamador] LICENCIA NO VALIDAD", 1)
-            else
-                outputDebugString("[Papeleta Progamador] LICENCIA NO VERIFICADA ", 1)
-            end
+            outputDebugString("[Papeleta Progamador] LICENCIA NO VERIFICADA", 1)
             stopResource(getThisResource())
         end
     end)
@@ -631,42 +399,26 @@ addEventHandler("onResourceStart", resourceRoot, function()
     setTimer(validarLicencia, 8996400000, 0)
 end, true, "high")`;
 
-        // --- SISTEMA DE NOTIFICACIONES TOAST ---
         function showToast(message, type = 'success', title = '') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
-            
             const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', warning: 'fa-exclamation-triangle' };
             const titles = { success: title || '¡Éxito!', error: title || 'Error', warning: title || 'Advertencia' };
-            
-            toast.innerHTML = `
-                <i class="fas ${icons[type]} toast-icon"></i>
-                <div class="toast-content">
-                    <div class="toast-title">${titles[type]}</div>
-                    <div class="toast-message">${message}</div>
-                </div>
-                <div class="toast-timer"></div>
-            `;
-            
+            toast.innerHTML = `<i class="fas ${icons[type]} toast-icon"></i><div class="toast-content"><div class="toast-title">${titles[type]}</div><div class="toast-message">${message}</div></div><div class="toast-timer"></div>`;
             container.appendChild(toast);
             setTimeout(() => { if (toast.parentNode) toast.remove(); }, 5000);
         }
 
-        function isAdmin() {
-            if (!currentUser) return false;
-            return ADMIN_DISCORD_IDS.includes(currentUser.id);
-        }
+        function isAdmin() { return currentUser && ADMIN_DISCORD_IDS.includes(currentUser.id); }
 
         function redirectToDiscord() {
-            const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20email`;
-            window.location.href = url;
+            window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20email`;
         }
 
         function checkDiscordAuth() {
             const fragment = new URLSearchParams(window.location.hash.slice(1));
             const accessToken = fragment.get('access_token');
-
             if (accessToken) {
                 window.location.hash = '';
                 localStorage.setItem('dc_access_token', accessToken);
@@ -683,7 +435,6 @@ end, true, "high")`;
             .then(res => { if (!res.ok) throw new Error('Token expirado'); return res.json(); })
             .then(user => {
                 currentUser = user;
-                
                 if (isAdmin()) {
                     currentUserRole = 'admin';
                     document.getElementById('nav-server-lua').classList.remove('hidden');
@@ -695,22 +446,11 @@ end, true, "high")`;
                     currentUserRole = 'client';
                     document.getElementById('sidebar-role').textContent = 'Cliente';
                 }
-                
                 document.getElementById('header-username').innerText = user.username;
                 document.getElementById('sidebar-username').innerText = user.username;
-                
-                if (user.avatar) {
-                    document.getElementById('sidebar-avatar').src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
-                } else {
-                    document.getElementById('sidebar-avatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
-                }
-                
+                document.getElementById('sidebar-avatar').src = user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png';
                 document.getElementById('login-modal').classList.add('hidden');
-                
-                ensureFixedLicense().then(() => {
-                    loadDashboardData();
-                    updateLicenseDisplay();
-                });
+                ensureFixedLicense().then(() => { loadDashboardData(); updateLicenseDisplay(); });
             })
             .catch(err => { console.error(err); logout(); });
         }
@@ -725,13 +465,9 @@ end, true, "high")`;
         function showSection(section) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            
             document.getElementById(`section-${section}`).classList.add('active');
             event.currentTarget.classList.add('active');
-            
-            if (section === 'reviews') {
-                loadMyReviews();
-            }
+            if (section === 'reviews') loadMyReviews();
         }
 
         function openLuaModal() {
@@ -755,21 +491,15 @@ end, true, "high")`;
             });
         }
 
-        document.getElementById('lua-modal').addEventListener('click', function(e) {
-            if (e.target === this) closeLuaModal();
-        });
+        document.getElementById('lua-modal').addEventListener('click', function(e) { if (e.target === this) closeLuaModal(); });
 
-        // --- SISTEMA DE RESEÑAS ---
         function openReviewModal(productId, productName) {
             currentReviewProduct = productId;
             selectedRating = 0;
-            
             document.getElementById('review-product-name').textContent = productName;
             document.getElementById('review-text').value = '';
-            
             document.querySelectorAll('#star-rating .star').forEach(star => star.classList.remove('active'));
             document.getElementById('rating-text').textContent = 'Selecciona una calificación';
-            
             document.getElementById('review-modal').classList.add('active');
             document.body.style.overflow = 'hidden';
         }
@@ -785,30 +515,19 @@ end, true, "high")`;
             const stars = document.querySelectorAll('#star-rating .star');
             stars.forEach(star => {
                 star.addEventListener('click', function() {
-                    const rating = parseInt(this.dataset.rating);
-                    selectedRating = rating;
-                    stars.forEach((s, index) => {
-                        if (index < rating) s.classList.add('active');
-                        else s.classList.remove('active');
-                    });
+                    selectedRating = parseInt(this.dataset.rating);
+                    stars.forEach((s, index) => { s.classList.toggle('active', index < selectedRating); });
                     const ratingTexts = ['', 'Muy malo', 'Malo', 'Regular', 'Bueno', 'Excelente'];
-                    document.getElementById('rating-text').textContent = ratingTexts[rating];
+                    document.getElementById('rating-text').textContent = ratingTexts[selectedRating];
                 });
-                
                 star.addEventListener('mouseenter', function() {
                     const rating = parseInt(this.dataset.rating);
-                    stars.forEach((s, index) => {
-                        s.style.color = index < rating ? '#fbbf24' : '#374151';
-                    });
+                    stars.forEach((s, index) => { s.style.color = index < rating ? '#fbbf24' : '#374151'; });
                 });
             });
-            
             document.getElementById('star-rating').addEventListener('mouseleave', function() {
-                stars.forEach((s, index) => {
-                    s.style.color = index < selectedRating ? '#fbbf24' : '#374151';
-                });
+                stars.forEach((s, index) => { s.style.color = index < selectedRating ? '#fbbf24' : '#374151'; });
             });
-
             checkDiscordAuth();
             const saved = JSON.parse(localStorage.getItem('server_config') || '{}');
             if (saved.ip) document.getElementById('server-ip').value = saved.ip;
@@ -818,24 +537,20 @@ end, true, "high")`;
         async function submitReview() {
             if (!currentReviewProduct) return;
             if (selectedRating === 0) { showToast('Por favor selecciona una calificación', 'warning'); return; }
-            
             const reviewText = document.getElementById('review-text').value.trim();
             if (!reviewText) { showToast('Por favor escribe tu reseña', 'warning'); return; }
             
             try {
-                const existingReview = await db.collection("Reseñas")
+                // CORREGIDO: "Resenas" sin ñ
+                const existingReview = await db.collection("Resenas")
                     .where("product_id", "==", currentReviewProduct)
                     .where("user_id", "==", currentUser.id)
-                    .limit(1)
-                    .get();
+                    .limit(1).get();
                 
-                if (!existingReview.empty) {
-                    showToast('Ya has dejado una reseña para este producto', 'error');
-                    closeReviewModal();
-                    return;
-                }
+                if (!existingReview.empty) { showToast('Ya has dejado una reseña para este producto', 'error'); closeReviewModal(); return; }
                 
-                await db.collection("Reseñas").add({
+                // CORREGIDO: "Resenas" sin ñ
+                await db.collection("Resenas").add({
                     product_id: currentReviewProduct,
                     user_id: currentUser.id,
                     username: currentUser.username,
@@ -848,11 +563,7 @@ end, true, "high")`;
                 
                 showToast('¡Reseña enviada exitosamente!', 'success');
                 closeReviewModal();
-                
-                if (document.getElementById('section-reviews').classList.contains('active')) {
-                    loadMyReviews();
-                }
-                
+                if (document.getElementById('section-reviews').classList.contains('active')) loadMyReviews();
             } catch (error) {
                 console.error("Error al enviar reseña:", error);
                 showToast('Error al enviar la reseña', 'error');
@@ -860,97 +571,53 @@ end, true, "high")`;
         }
 
         async function loadMyReviews() {
-    if (!currentUser) return;
-    const container = document.getElementById('reviews-list');
-    
-    try {
-        console.log("Cargando reseñas...");
-        
-        // Asegurar que allProducts esté cargado
-        if (allProducts.length === 0) {
-            console.log("Cargando productos primero...");
-            const productsSnapshot = await db.collection("Productos").get();
-            allProducts = [];
-            productsSnapshot.forEach((doc) => {
-                const data = doc.data();
-                allProducts.push({ 
-                    docId: doc.id, 
-                    id: data.id || doc.id, 
-                    ...data 
+            if (!currentUser) return;
+            const container = document.getElementById('reviews-list');
+            try {
+                if (allProducts.length === 0) {
+                    const productsSnapshot = await db.collection("Productos").get();
+                    allProducts = [];
+                    productsSnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        allProducts.push({ docId: doc.id, id: data.id || doc.id, ...data });
+                    });
+                }
+                
+                // CORREGIDO: "Resenas" sin ñ
+                const snapshot = await db.collection("Resenas").where("user_id", "==", currentUser.id).get();
+                
+                if (snapshot.empty) {
+                    container.innerHTML = `<div class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5"><i class="fas fa-comment-slash text-gray-600 text-4xl mb-3"></i><p class="text-gray-400">Aún no has dejado ninguna reseña.</p><p class="text-gray-500 text-sm mt-2">Ve a tus productos activos y deja tu opinión.</p></div>`;
+                    return;
+                }
+                
+                let reviews = [];
+                snapshot.forEach(doc => reviews.push({ id: doc.id, ...doc.data() }));
+                reviews.sort((a, b) => (b.created_at?.seconds || 0) - (a.created_at?.seconds || 0));
+                
+                let reviewsHTML = '';
+                reviews.forEach(review => {
+                    const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+                    const date = review.created_at?.toDate ? review.created_at.toDate().toLocaleDateString('es-ES') : 'Fecha desconocida';
+                    // CORREGIDO: Comparación como String para asegurar coincidencia
+                    const product = allProducts.find(p => String(p.id) === String(review.product_id) || String(p.docId) === String(review.product_id));
+                    const productName = product ? product.name : 'Producto no encontrado';
+                    const safeProductName = productName.replace(/'/g, "\\'");
+                    
+                    reviewsHTML += `<div class="review-card"><div class="flex items-start justify-between mb-3"><div><div class="review-stars">${stars}</div><p class="review-author">${safeProductName}</p><p class="review-date">${date}</p></div>${isAdmin() ? `<button onclick="deleteReview('${review.id}')" class="text-red-400 hover:text-red-300 text-sm"><i class="fas fa-trash"></i></button>` : ''}</div><p class="review-text">${review.text}</p></div>`;
                 });
-            });
+                container.innerHTML = reviewsHTML;
+            } catch (error) {
+                console.error("Error detallado al cargar reseñas:", error);
+                container.innerHTML = `<div class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5"><i class="fas fa-exclamation-triangle text-red-500 text-4xl mb-3"></i><p class="text-red-400 font-semibold">Error al cargar las reseñas</p><p class="text-gray-500 text-sm mt-2">${error.message}</p></div>`;
+            }
         }
-        
-        const snapshot = await db.collection("Reseñas")
-            .where("user_id", "==", currentUser.id)
-            .get();
-        
-        console.log("Reseñas encontradas:", snapshot.size);
-        
-        if (snapshot.empty) {
-            container.innerHTML = `
-                <div class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5">
-                    <i class="fas fa-comment-slash text-gray-600 text-4xl mb-3"></i>
-                    <p class="text-gray-400">Aún no has dejado ninguna reseña.</p>
-                    <p class="text-gray-500 text-sm mt-2">Ve a tus productos activos y deja tu opinión.</p>
-                </div>`;
-            return;
-        }
-        
-        let reviews = [];
-        snapshot.forEach(doc => {
-            console.log("Reseña:", doc.data());
-            reviews.push({ id: doc.id, ...doc.data() });
-        });
-        
-        reviews.sort((a, b) => (b.created_at?.seconds || 0) - (a.created_at?.seconds || 0));
-        
-        let reviewsHTML = '';
-        reviews.forEach(review => {
-            const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
-            const date = review.created_at?.toDate ? review.created_at.toDate().toLocaleDateString('es-ES') : 'Fecha desconocida';
-            
-            const product = allProducts.find(p => p.id === review.product_id || p.docId === review.product_id);
-            const productName = product ? product.name : 'Producto no encontrado';
-            const safeProductName = productName.replace(/'/g, "\\'");
-            
-            reviewsHTML += `
-                <div class="review-card">
-                    <div class="flex items-start justify-between mb-3">
-                        <div>
-                            <div class="review-stars">${stars}</div>
-                            <p class="review-author">${safeProductName}</p>
-                            <p class="review-date">${date}</p>
-                        </div>
-                        ${isAdmin() ? `
-                            <button onclick="deleteReview('${review.id}')" class="text-red-400 hover:text-red-300 text-sm">
-                                <i class="fas fa-trash"></i>
-                            </button>` : ''}
-                    </div>
-                    <p class="review-text">${review.text}</p>
-                </div>`;
-        });
-        
-        container.innerHTML = reviewsHTML;
-        
-    } catch (error) {
-        console.error("Error detallado al cargar reseñas:", error);
-        container.innerHTML = `
-            <div class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5">
-                <i class="fas fa-exclamation-triangle text-red-500 text-4xl mb-3"></i>
-                <p class="text-red-400 font-semibold">Error al cargar las reseñas</p>
-                <p class="text-gray-500 text-sm mt-2">${error.message}</p>
-                <button onclick="loadMyReviews()" class="mt-4 btn-primary px-4 py-2 rounded-lg text-white text-sm">
-                    <i class="fas fa-redo mr-2"></i> Reintentar
-                </button>
-            </div>`;
-    }
-}
 
         async function deleteReview(reviewId) {
             if (!confirm('¿Estás seguro de eliminar esta reseña?')) return;
             try {
-                await db.collection("Reseñas").doc(reviewId).delete();
+                // CORREGIDO: "Resenas" sin ñ
+                await db.collection("Resenas").doc(reviewId).delete();
                 showToast('Reseña eliminada', 'success');
                 loadMyReviews();
             } catch (error) {
@@ -969,23 +636,14 @@ end, true, "high")`;
         async function ensureFixedLicense() {
             if (!currentUser) return;
             try {
-                const snapshot = await db.collection("Licencias")
-                    .where("discord_id", "==", currentUser.id)
-                    .where("type", "==", "general")
-                    .limit(1)
-                    .get();
-                
+                const snapshot = await db.collection("Licencias").where("discord_id", "==", currentUser.id).where("type", "==", "general").limit(1).get();
                 if (!snapshot.empty) {
                     userFixedLicenseKey = snapshot.docs[0].data().key;
                 } else {
                     const newKey = generateUniqueKey();
                     await db.collection("Licencias").add({
-                        discord_id: currentUser.id,
-                        username: currentUser.username,
-                        key: newKey,
-                        type: "general",
-                        created_at: firebase.firestore.FieldValue.serverTimestamp(),
-                        status: 'active'
+                        discord_id: currentUser.id, username: currentUser.username, key: newKey, type: "general",
+                        created_at: firebase.firestore.FieldValue.serverTimestamp(), status: 'active'
                     });
                     userFixedLicenseKey = newKey;
                 }
@@ -1001,18 +659,12 @@ end, true, "high")`;
 
         async function loadDashboardData() {
             if (!currentUser) return;
-
             try {
                 const productsSnapshot = await db.collection("Productos").get();
                 allProducts = [];
                 productsSnapshot.forEach((doc) => {
                     const data = doc.data();
-                    // CORRECCIÓN: Guardamos tanto el ID del documento como el ID interno del producto
-                    allProducts.push({ 
-                        docId: doc.id, 
-                        id: data.id || doc.id, 
-                        ...data 
-                    });
+                    allProducts.push({ docId: doc.id, id: data.id || doc.id, ...data });
                 });
 
                 const clientesSnapshot = await db.collection("Clientes").get();
@@ -1024,19 +676,12 @@ end, true, "high")`;
                     if (String(purchase.discord_id) === String(currentUser.id)) {
                         if (purchase.products && Array.isArray(purchase.products)) {
                             purchase.products.forEach(prod => {
-                                // CORRECCIÓN: Buscar producto comparando ambos tipos de ID
-                                const productData = allProducts.find(p => 
-                                    p.id === prod.id || p.docId === prod.id
-                                );
-                                
+                                // CORREGIDO: Comparación como String para asegurar que encuentre el producto
+                                const productData = allProducts.find(p => String(p.id) === String(prod.id) || String(p.docId) === String(prod.id));
                                 if (productData) {
-                                    purchasedProducts.push({
-                                        ...productData,
-                                        purchaseDate: purchase.date?.toDate ? purchase.date.toDate() : new Date(),
-                                        price: prod.price || 'Gratis'
-                                    });
-                                    if (prod.price !== "Gratis" && prod.price !== "GRATIS") {
-                                        totalSpent += parseFloat(String(prod.price).replace('$', '')) || 0;
+                                    purchasedProducts.push({ ...productData, purchaseDate: purchase.date?.toDate ? purchase.date.toDate() : new Date(), price: prod.price || 'Gratis' });
+                                    if (String(prod.price).toLowerCase() !== 'gratis') {
+                                        totalSpent += parseFloat(String(prod.price).replace('$', '').replace(',', '')) || 0;
                                     }
                                 }
                             });
@@ -1054,47 +699,25 @@ end, true, "high")`;
                 } else {
                     document.getElementById('dashboard-empty-state').classList.add('hidden');
                     
-                    // Verificar reseñas existentes
-                    const reviewsSnapshot = await db.collection("Reseñas")
-                        .where("user_id", "==", currentUser.id)
-                        .get();
-                    
+                    // CORREGIDO: "Resenas" sin ñ
+                    const reviewsSnapshot = await db.collection("Resenas").where("user_id", "==", currentUser.id).get();
                     const reviewedProductIds = new Set();
-                    reviewsSnapshot.forEach(doc => {
-                        reviewedProductIds.add(doc.data().product_id);
-                    });
+                    reviewsSnapshot.forEach(doc => reviewedProductIds.add(doc.data().product_id));
                     
                     container.innerHTML = purchasedProducts.map(item => {
-                        // CORRECCIÓN: Verificar si tiene reseña usando ambos IDs
-                        const hasReview = reviewedProductIds.has(item.id) || reviewedProductIds.has(item.docId);
+                        const hasReview = reviewedProductIds.has(String(item.id)) || reviewedProductIds.has(String(item.docId));
                         const safeName = item.name.replace(/'/g, "\\'");
                         
-                        return `
-                            <div class="bg-[#0d0505] border border-red-900/30 rounded-xl p-4 flex items-center justify-between hover:border-red-600/50 transition-all">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-16 h-16 rounded-lg bg-[#150a0a] border border-red-900/20 overflow-hidden">
-                                        <img src="${item.image_url || ''}" class="w-full h-full object-cover">
-                                    </div>
-                                    <div>
-                                        <h3 class="text-white font-bold">${item.name}</h3>
-                                        <p class="text-gray-400 text-xs">${item.price === 'Gratis' ? 'GRATIS' : '$' + Number(item.price).toFixed(2)}</p>
-                                    </div>
-                                </div>
-                                <div class="flex gap-2">
-                                    ${item.file_data ? `
-                                        <button onclick="downloadProduct('${item.id}')" class="btn-primary px-4 py-2 rounded-lg text-white text-sm">
-                                            <i class="fas fa-download"></i> Descargar
-                                        </button>` : '<button disabled class="px-4 py-2 rounded-lg bg-gray-800 text-gray-500 text-sm">No disponible</button>'}
-                                    
-                                    ${hasReview ? `
-                                        <button disabled class="px-4 py-2 rounded-lg bg-green-900/30 border border-green-600/30 text-green-400 text-sm cursor-not-allowed">
-                                            <i class="fas fa-check mr-1"></i> Reseñado
-                                        </button>` : `
-                                        <button onclick="openReviewModal('${item.id}', '${safeName}')" class="px-4 py-2 rounded-lg bg-yellow-900/30 border border-yellow-600/30 text-yellow-400 hover:bg-yellow-900/50 text-sm">
-                                            <i class="fas fa-star mr-1"></i> Reseñar
-                                        </button>`}
-                                </div>
-                            </div>`;
+                        return `<div class="bg-[#0d0505] border border-red-900/30 rounded-xl p-4 flex items-center justify-between hover:border-red-600/50 transition-all">
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 h-16 rounded-lg bg-[#150a0a] border border-red-900/20 overflow-hidden"><img src="${item.image_url || ''}" class="w-full h-full object-cover"></div>
+                                <div><h3 class="text-white font-bold">${item.name}</h3><p class="text-gray-400 text-xs">${String(item.price).toLowerCase() === 'gratis' ? 'GRATIS' : '$' + Number(item.price).toFixed(2)}</p></div>
+                            </div>
+                            <div class="flex gap-2">
+                                ${item.file_data ? `<button onclick="downloadProduct('${item.id}')" class="btn-primary px-4 py-2 rounded-lg text-white text-sm"><i class="fas fa-download"></i> Descargar</button>` : '<button disabled class="px-4 py-2 rounded-lg bg-gray-800 text-gray-500 text-sm">No disponible</button>'}
+                                ${hasReview ? `<button disabled class="px-4 py-2 rounded-lg bg-green-900/30 border border-green-600/30 text-green-400 text-sm cursor-not-allowed"><i class="fas fa-check mr-1"></i> Reseñado</button>` : `<button onclick="openReviewModal('${item.id}', '${safeName}')" class="px-4 py-2 rounded-lg bg-yellow-900/30 border border-yellow-600/30 text-yellow-400 hover:bg-yellow-900/50 text-sm"><i class="fas fa-star mr-1"></i> Reseñar</button>`}
+                            </div>
+                        </div>`;
                     }).join('');
                 }
             } catch (error) {
@@ -1111,8 +734,8 @@ end, true, "high")`;
         }
 
         function downloadProduct(productId) {
-            // CORRECCIÓN: Buscar por ambos IDs
-            const product = allProducts.find(p => p.id === productId || p.docId === productId);
+            // CORREGIDO: Comparación como String
+            const product = allProducts.find(p => String(p.id) === String(productId) || String(p.docId) === String(productId));
             if (product && product.file_data) {
                 const link = document.createElement('a');
                 link.href = product.file_data;
@@ -1135,10 +758,7 @@ end, true, "high")`;
         }
 
         function saveServerConfig() {
-            localStorage.setItem('server_config', JSON.stringify({
-                ip: document.getElementById('server-ip').value,
-                port: document.getElementById('server-port').value
-            }));
+            localStorage.setItem('server_config', JSON.stringify({ ip: document.getElementById('server-ip').value, port: document.getElementById('server-port').value }));
             const btn = event.currentTarget;
             const original = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-check"></i> Guardado';
