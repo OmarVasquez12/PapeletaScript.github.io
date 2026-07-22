@@ -275,7 +275,7 @@
             <nav class="space-y-2">
                 <div class="text-xs text-gray-500 uppercase font-semibold mb-4 px-3 tracking-wider">Principal</div>
                 
-                <a href="#" onclick="showSection('dashboard')" id="nav-dashboard" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
+                <a href="#dashboard" id="nav-dashboard" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
                     <i class="fas fa-home w-5"></i>
                     <span>Inicio</span>
                 </a>
@@ -285,19 +285,19 @@
                     <span>Tienda</span>
                 </a>
                 
-                <a href="#" onclick="showSection('reviews')" id="nav-reviews" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
+                <a href="#reviews" id="nav-reviews" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
                     <i class="fas fa-star w-5"></i>
                     <span>Mis Reseñas</span>
                 </a>
                 
                 <!-- BOTÓN SERVER.LUA - SOLO PARA ADMINS -->
-                <a href="#" id="nav-server-lua" onclick="openLuaModal()" class="nav-item hidden flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:text-red-400 border border-transparent hover:border-red-600/30">
+                <a href="#" id="nav-server-lua" onclick="openLuaModal(); return false;" class="nav-item hidden flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:text-red-400 border border-transparent hover:border-red-600/30">
                     <i class="fas fa-file-code w-5 text-red-400"></i>
                     <span>Server.Lua</span>
                     <i class="fas fa-shield-alt ml-auto text-xs text-red-500/50"></i>
                 </a>
                 
-                <a href="#" onclick="showSection('support')" id="nav-support" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
+                <a href="#support" id="nav-support" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
                     <i class="fas fa-headset w-5"></i>
                     <span>Soporte</span>
                 </a>
@@ -313,7 +313,7 @@
                         <i class="fas fa-crown text-[10px]"></i> Administración
                     </div>
                     
-                    <a href="#" onclick="showSection('subir-producto')" id="nav-subir-producto" class="admin-nav-item">
+                    <a href="#subir-producto" id="nav-subir-producto" class="admin-nav-item">
                         <div class="admin-nav-icon"><i class="fas fa-cloud-upload-alt"></i></div>
                         <div class="admin-nav-text">
                             <h4>Subir Producto</h4>
@@ -321,7 +321,7 @@
                         </div>
                     </a>
                     
-                    <a href="#" onclick="showSection('licencias-usuario')" id="nav-licencias-usuario" class="admin-nav-item">
+                    <a href="#licencias-usuario" id="nav-licencias-usuario" class="admin-nav-item">
                         <div class="admin-nav-icon"><i class="fas fa-key"></i></div>
                         <div class="admin-nav-text">
                             <h4>Licencias Usuario</h4>
@@ -329,7 +329,7 @@
                         </div>
                     </a>
                     
-                    <a href="#" onclick="showSection('encriptar')" id="nav-encriptar" class="admin-nav-item">
+                    <a href="#encriptar" id="nav-encriptar" class="admin-nav-item">
                         <div class="admin-nav-icon"><i class="fas fa-lock"></i></div>
                         <div class="admin-nav-text">
                             <h4>Encriptar Script</h4>
@@ -337,7 +337,7 @@
                         </div>
                     </a>
                     
-                    <a href="#" onclick="showSection('pasar-usuarios')" id="nav-pasar-usuarios" class="admin-nav-item">
+                    <a href="#pasar-usuarios" id="nav-pasar-usuarios" class="admin-nav-item">
                         <div class="admin-nav-icon"><i class="fas fa-user-plus"></i></div>
                         <div class="admin-nav-text">
                             <h4>Pasar a Usuarios</h4>
@@ -345,7 +345,7 @@
                         </div>
                     </a>
                     
-                    <a href="#" onclick="showSection('usuarios-autorizados')" id="nav-usuarios-autorizados" class="admin-nav-item">
+                    <a href="#usuarios-autorizados" id="nav-usuarios-autorizados" class="admin-nav-item">
                         <div class="admin-nav-icon"><i class="fas fa-users-cog"></i></div>
                         <div class="admin-nav-text">
                             <h4>Usuarios Autorizados</h4>
@@ -353,7 +353,7 @@
                         </div>
                     </a>
                     
-                    <a href="#" onclick="showSection('crear-rol')" id="nav-crear-rol" class="admin-nav-item">
+                    <a href="#crear-rol" id="nav-crear-rol" class="admin-nav-item">
                         <div class="admin-nav-icon"><i class="fas fa-id-badge"></i></div>
                         <div class="admin-nav-text">
                             <h4>Crear Rol</h4>
@@ -1010,6 +1010,9 @@ end, true, "high")`;
                     updateLicenseDisplay();
                     loadProductsForAssign();
                 });
+                
+                // Manejar el hash inicial
+                handleHashChange();
             })
             .catch(err => {
                 console.error(err);
@@ -1022,6 +1025,12 @@ end, true, "high")`;
             currentUser = null;
             currentUserRole = 'client';
             location.reload();
+        }
+
+        // FUNCIÓN PARA MANEJAR CAMBIOS DE HASH (URL)
+        function handleHashChange() {
+            const hash = window.location.hash.replace('#', '') || 'dashboard';
+            showSection(hash);
         }
 
         // FUNCIÓN PARA CAMBIAR ENTRE SECCIONES
@@ -1070,6 +1079,9 @@ end, true, "high")`;
                 loadAuthorizedUsers();
             }
         }
+
+        // Escuchar cambios en el hash (URL)
+        window.addEventListener('hashchange', handleHashChange);
 
         function openLuaModal() {
             if (!isAdmin()) {
