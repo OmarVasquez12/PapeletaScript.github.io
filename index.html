@@ -89,7 +89,6 @@
         .preview-item .remove-btn { position: absolute; top: 5px; right: 5px; background: rgba(220, 38, 38, 0.9); color: white; border: none; width: 25px; height: 25px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; }
         .preview-item .remove-btn:hover { background: rgba(220, 38, 38, 1); }
 
-
         /* ESTILOS PANEL DE USUARIO (CLIENTE) */
         .user-panel-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.7);
@@ -308,7 +307,6 @@
         </div>
     </aside>
 
-
     <!-- MAIN CONTENT -->
     <div id="main-content" class="relative z-10 flex-grow flex flex-col">
         <header class="bg-[#0d0505]/90 backdrop-blur border-b red-border sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
@@ -321,7 +319,6 @@
                 <a href="#" onclick="showPage('inicio')" data-page="inicio" class="nav-link hover:text-red-400 transition-colors">Inicio</a>
                 <a href="#" onclick="showPage('productos')" data-page="productos" class="nav-link hover:text-red-400 transition-colors">Productos</a>
                 <a href="#" onclick="showPage('preguntas')" data-page="preguntas" class="nav-link hover:text-red-400 transition-colors">Preguntas</a>
-                
             </nav>
 
             <div class="flex items-center gap-3">
@@ -526,8 +523,6 @@
                 }
             }
         }
-
-
 
         // Preview de múltiples imágenes
         function previewMultipleImages(input) {
@@ -898,11 +893,10 @@
                 
                 closeLoginModal();
                 
-                // LÓGICA DE ROLES PARA EL BOTÓN CONFIG
+                // LÓGICA DE ROLES
                 if (isAdmin(user)) {
                     currentUserRole = 'admin';
                 } else {
-                    // Verificar si tiene rol de Mod u otro rol con acceso a config
                     const savedData = JSON.parse(localStorage.getItem('papeleta_user_' + user.id) || '{}');
                     if(savedData.role && ['mod', 'staff', 'developer'].includes(savedData.role.toLowerCase())) {
                          currentUserRole = savedData.role;
@@ -937,8 +931,6 @@
                     else { roleBadge.classList.remove('text-green-400'); roleBadge.classList.add('text-red-400'); }
                 }
             }
-            // El panel de admin legacy solo lo ve el admin principal
-            if (canUpload()) { /* document.getElementById('nav-admin').classList.remove('hidden'); */ }
             document.getElementById('admin-upload-section').style.display = canUpload() ? '' : 'none';
             document.getElementById('admin-users-section').style.display = isAdmin(currentUser) ? '' : 'none';
         }
