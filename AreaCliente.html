@@ -860,64 +860,92 @@ end, true, "high")`;
         }
 
         async function loadMyReviews() {
-            if (!currentUser) return;
-            const container = document.getElementById('reviews-list');
-            
-            try {
-                // CORRECCIÓN: Sin orderBy para evitar error de índices compuestos en Firebase
-                const snapshot = await db.collection("Reseñas")
-                    .where("user_id", "==", currentUser.id)
-                    .get();
-                
-                if (snapshot.empty) {
-                    container.innerHTML = `
-                        <div class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5">
-                            <i class="fas fa-comment-slash text-gray-600 text-4xl mb-3"></i>
-                            <p class="text-gray-400">Aún no has dejado ninguna reseña.</p>
-                            <p class="text-gray-500 text-sm mt-2">Ve a tus productos activos y deja tu opinión.</p>
-                        </div>`;
-                    return;
-                }
-                
-                // Ordenar manualmente en JS
-                let reviews = [];
-                snapshot.forEach(doc => reviews.push({ id: doc.id, ...doc.data() }));
-                reviews.sort((a, b) => (b.created_at?.seconds || 0) - (a.created_at?.seconds || 0));
-                
-                let reviewsHTML = '';
-                reviews.forEach(review => {
-                    const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
-                    const date = review.created_at?.toDate ? review.created_at.toDate().toLocaleDateString('es-ES') : 'Fecha desconocida';
-                    
-                    // CORRECCIÓN: Buscar producto por ID interno O por campo id personalizado
-                    const product = allProducts.find(p => p.id === review.product_id || p.docId === review.product_id);
-                    const productName = product ? product.name : 'Producto desconocido';
-                    const safeProductName = productName.replace(/'/g, "\\'");
-                    
-                    reviewsHTML += `
-                        <div class="review-card">
-                            <div class="flex items-start justify-between mb-3">
-                                <div>
-                                    <div class="review-stars">${stars}</div>
-                                    <p class="review-author">${safeProductName}</p>
-                                    <p class="review-date">${date}</p>
-                                </div>
-                                ${isAdmin() ? `
-                                    <button onclick="deleteReview('${review.id}')" class="text-red-400 hover:text-red-300 text-sm">
-                                        <i class="fas fa-trash"></i>
-                                    </button>` : ''}
-                            </div>
-                            <p class="review-text">${review.text}</p>
-                        </div>`;
+    if (!currentUser) return;
+    const container = document.getElementById('reviews-list');
+    
+    try {
+        console.log("Cargando reseñas...");
+        
+        // Asegurar que allProducts esté cargado
+        if (allProducts.length === 0) {
+            console.log("Cargando productos primero...");
+            const productsSnapshot = await db.collection("Productos").get();
+            allProducts = [];
+            productsSnapshot.forEach((doc) => {
+                const data = doc.data();
+                allProducts.push({ 
+                    docId: doc.id, 
+                    id: data.id || doc.id, 
+                    ...data 
                 });
-                
-                container.innerHTML = reviewsHTML;
-                
-            } catch (error) {
-                console.error("Error al cargar reseñas:", error);
-                container.innerHTML = '<p class="text-red-400 text-center">Error al cargar las reseñas. Revisa la consola.</p>';
-            }
+            });
         }
+        
+        const snapshot = await db.collection("Reseñas")
+            .where("user_id", "==", currentUser.id)
+            .get();
+        
+        console.log("Reseñas encontradas:", snapshot.size);
+        
+        if (snapshot.empty) {
+            container.innerHTML = `
+                <div class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5">
+                    <i class="fas fa-comment-slash text-gray-600 text-4xl mb-3"></i>
+                    <p class="text-gray-400">Aún no has dejado ninguna reseña.</p>
+                    <p class="text-gray-500 text-sm mt-2">Ve a tus productos activos y deja tu opinión.</p>
+                </div>`;
+            return;
+        }
+        
+        let reviews = [];
+        snapshot.forEach(doc => {
+            console.log("Reseña:", doc.data());
+            reviews.push({ id: doc.id, ...doc.data() });
+        });
+        
+        reviews.sort((a, b) => (b.created_at?.seconds || 0) - (a.created_at?.seconds || 0));
+        
+        let reviewsHTML = '';
+        reviews.forEach(review => {
+            const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+            const date = review.created_at?.toDate ? review.created_at.toDate().toLocaleDateString('es-ES') : 'Fecha desconocida';
+            
+            const product = allProducts.find(p => p.id === review.product_id || p.docId === review.product_id);
+            const productName = product ? product.name : 'Producto no encontrado';
+            const safeProductName = productName.replace(/'/g, "\\'");
+            
+            reviewsHTML += `
+                <div class="review-card">
+                    <div class="flex items-start justify-between mb-3">
+                        <div>
+                            <div class="review-stars">${stars}</div>
+                            <p class="review-author">${safeProductName}</p>
+                            <p class="review-date">${date}</p>
+                        </div>
+                        ${isAdmin() ? `
+                            <button onclick="deleteReview('${review.id}')" class="text-red-400 hover:text-red-300 text-sm">
+                                <i class="fas fa-trash"></i>
+                            </button>` : ''}
+                    </div>
+                    <p class="review-text">${review.text}</p>
+                </div>`;
+        });
+        
+        container.innerHTML = reviewsHTML;
+        
+    } catch (error) {
+        console.error("Error detallado al cargar reseñas:", error);
+        container.innerHTML = `
+            <div class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5">
+                <i class="fas fa-exclamation-triangle text-red-500 text-4xl mb-3"></i>
+                <p class="text-red-400 font-semibold">Error al cargar las reseñas</p>
+                <p class="text-gray-500 text-sm mt-2">${error.message}</p>
+                <button onclick="loadMyReviews()" class="mt-4 btn-primary px-4 py-2 rounded-lg text-white text-sm">
+                    <i class="fas fa-redo mr-2"></i> Reintentar
+                </button>
+            </div>`;
+    }
+}
 
         async function deleteReview(reviewId) {
             if (!confirm('¿Estás seguro de eliminar esta reseña?')) return;
