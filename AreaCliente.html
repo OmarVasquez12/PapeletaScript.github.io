@@ -87,6 +87,40 @@
             -webkit-text-fill-color: transparent;
         }
 
+        
+        /* ==== PANEL CONFIG (ADMIN) DENTRO DEL AREA CLIENTE ==== */
+        .config-menu-btn {
+            display: flex; align-items: center; gap: 14px;
+            padding: 18px 20px;
+            background: rgba(21, 10, 10, 0.6);
+            border: 1px solid rgba(255, 26, 26, 0.15);
+            border-radius: 14px;
+            cursor: pointer; transition: all 0.25s ease;
+            text-align: left; width: 100%;
+            color: inherit; text-decoration: none;
+        }
+        .config-menu-btn:hover {
+            background: rgba(255, 26, 26, 0.08);
+            border-color: rgba(255, 26, 26, 0.45);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(220, 38, 38, 0.15);
+        }
+        .config-menu-btn .icon-box {
+            width: 44px; height: 44px; border-radius: 10px;
+            background: rgba(255, 26, 26, 0.12); color: #ff6b6b;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; flex-shrink: 0;
+        }
+        .config-menu-btn h4 { margin: 0; font-size: 15px; font-weight: 700; color: #fff; }
+        .config-menu-btn p  { margin: 3px 0 0; font-size: 12px; color: #9496a1; }
+        #config-frame-wrap { display: none; }
+        #config-frame-wrap.active { display: block; }
+        #config-frame {
+            width: 100%; min-height: calc(100vh - 220px);
+            border: 1px solid rgba(255, 26, 26, 0.15);
+            border-radius: 14px; background: #0a0505;
+        }
+
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #0a0505; }
         ::-webkit-scrollbar-thumb { background: #7f1d1d; border-radius: 4px; }
@@ -181,26 +215,6 @@
             letter-spacing: 0.5px;
             margin-left: 8px;
         }
-
-        /* ESTILOS PANEL DE CONFIGURACIÓN (ADMIN) */
-        .config-menu-item {
-            display: flex; align-items: center; gap: 12px;
-            padding: 14px 16px; margin-bottom: 8px;
-            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 12px; cursor: pointer; transition: all 0.2s;
-            text-decoration: none; color: inherit;
-        }
-        .config-menu-item:hover {
-            background: rgba(255, 26, 26, 0.1); border-color: rgba(255, 26, 26, 0.4);
-            transform: translateX(4px);
-        }
-        .config-menu-icon {
-            width: 36px; height: 36px; border-radius: 8px;
-            background: rgba(255, 26, 26, 0.1); color: #ff1a1a;
-            display: flex; align-items: center; justify-content: center; font-size: 16px;
-        }
-        .config-menu-text h4 { margin: 0; font-size: 14px; font-weight: 700; color: #fff; }
-        .config-menu-text p { margin: 2px 0 0; font-size: 11px; color: #9496a1; }
     </style>
 </head>
 <body class="min-h-screen flex">
@@ -221,7 +235,7 @@
             <nav class="space-y-2">
                 <div class="text-xs text-gray-500 uppercase font-semibold mb-4 px-3 tracking-wider">Principal</div>
                 
-                <a href="#" onclick="showSection('dashboard')" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
+                <a href="#" data-section="dashboard" onclick="showSection('dashboard')" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
                     <i class="fas fa-home w-5"></i>
                     <span>Inicio</span>
                 </a>
@@ -237,6 +251,12 @@
                 </a>
                 
                 <!-- BOTÓN SERVER.LUA - SOLO PARA ADMINS -->
+                <a href="#" id="nav-config" data-section="config" onclick="showSection('config'); return false;" class="nav-item hidden flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:text-red-400 border border-transparent hover:border-red-600/30">
+                    <i class="fas fa-cog w-5"></i>
+                    <span>Config</span>
+                    <span class="admin-badge ml-auto">ADMIN</span>
+                </a>
+                
                 <a href="#" id="nav-server-lua" onclick="openLuaModal()" class="nav-item hidden flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:text-red-400 border border-transparent hover:border-red-600/30">
                     <i class="fas fa-file-code w-5 text-red-400"></i>
                     <span>Server.Lua</span>
@@ -252,36 +272,6 @@
                     <i class="fab fa-discord w-5"></i>
                     <span>Discord</span>
                 </a>
-
-                <!-- SECCIÓN ADMIN CONFIG - SOLO PARA ADMINS/MODS -->
-                <div id="admin-config-section" class="hidden">
-                    <div class="text-xs text-gray-500 uppercase font-semibold mb-4 mt-6 px-3 tracking-wider">Configuración</div>
-                    
-                    <a href="SubirProducto.html" class="config-menu-item">
-                        <div class="config-menu-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-                        <div class="config-menu-text"><h4>Subir Producto</h4><p>Agregar nuevos recursos a la tienda</p></div>
-                    </a>
-                    <a href="LicenciaUsuario.html" class="config-menu-item">
-                        <div class="config-menu-icon"><i class="fas fa-key"></i></div>
-                        <div class="config-menu-text"><h4>Licencias Usuario</h4><p>Ver historial de compras y reclamos</p></div>
-                    </a>
-                    <a href="Encriptar.html" class="config-menu-item">
-                        <div class="config-menu-icon"><i class="fas fa-lock"></i></div>
-                        <div class="config-menu-text"><h4>Encriptar Script</h4><p>Proteger archivos Lua de MTA:SA</p></div>
-                    </a>
-                    <div class="config-menu-item" onclick="openAssignProductModal()">
-                        <div class="config-menu-icon"><i class="fas fa-user-plus"></i></div>
-                        <div class="config-menu-text"><h4>Pasar a Usuarios</h4><p>Asignar productos gratis manualmente</p></div>
-                    </div>
-                    <a href="UsuariosAutorizado.html" class="config-menu-item">
-                        <div class="config-menu-icon"><i class="fas fa-users-cog"></i></div>
-                        <div class="config-menu-text"><h4>Usuarios Autorizados</h4><p>Gestionar roles Admin y Mod</p></div>
-                    </a>
-                    <a href="CrearRol.html" class="config-menu-item">
-                        <div class="config-menu-icon"><i class="fas fa-id-badge"></i></div>
-                        <div class="config-menu-text"><h4>Crear Rol</h4><p>Definir permisos personalizados</p></div>
-                    </a>
-                </div>
             </nav>
         </div>
 
@@ -319,6 +309,8 @@
         </header>
 
         <div class="p-6 md:p-8 flex-grow">
+            <!-- ============ SECCIÓN DASHBOARD ============ -->
+            <div id="section-dashboard">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div class="stat-card rounded-xl p-6 relative overflow-hidden group">
                     <div class="absolute right-0 top-0 w-24 h-24 bg-red-600/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
@@ -431,6 +423,65 @@
                             <i class="fas fa-copy"></i> Copiar
                         </button>
                     </div>
+                </div>
+            </div>
+
+            </div><!-- /section-dashboard -->
+
+            <!-- ============ SECCIÓN CONFIG (ADMIN) ============ -->
+            <div id="section-config" class="hidden">
+                <div id="config-menu-view">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                            <i class="fas fa-cog text-red-400 text-lg"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-white">Panel de Configuración</h2>
+                            <p class="text-gray-400 text-sm">Herramientas exclusivas de administración</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <button type="button" class="config-menu-btn" onclick="openConfigTool('SubirProducto.html','Subir Producto')">
+                            <div class="icon-box"><i class="fas fa-cloud-upload-alt"></i></div>
+                            <div><h4>Subir Producto</h4><p>Agregar nuevos recursos a la tienda</p></div>
+                        </button>
+                        <button type="button" class="config-menu-btn" onclick="openConfigTool('LicenciaUsuario.html','Licencias Usuario')">
+                            <div class="icon-box"><i class="fas fa-key"></i></div>
+                            <div><h4>Licencias Usuario</h4><p>Ver historial de compras y reclamos</p></div>
+                        </button>
+                        <button type="button" class="config-menu-btn" onclick="openConfigTool('Encriptar.html','Encriptar Script')">
+                            <div class="icon-box"><i class="fas fa-lock"></i></div>
+                            <div><h4>Encriptar Script</h4><p>Proteger archivos Lua de MTA:SA</p></div>
+                        </button>
+                        <button type="button" class="config-menu-btn" onclick="openConfigTool('PasarUsuarios.html','Pasar a Usuarios')">
+                            <div class="icon-box"><i class="fas fa-user-plus"></i></div>
+                            <div><h4>Pasar a Usuarios</h4><p>Asignar productos gratis manualmente</p></div>
+                        </button>
+                        <button type="button" class="config-menu-btn" onclick="openConfigTool('UsuariosAutorizado.html','Usuarios Autorizados')">
+                            <div class="icon-box"><i class="fas fa-users-cog"></i></div>
+                            <div><h4>Usuarios Autorizados</h4><p>Gestionar roles Admin y Mod</p></div>
+                        </button>
+                        <button type="button" class="config-menu-btn" onclick="openConfigTool('CrearRol.html','Crear Rol')">
+                            <div class="icon-box"><i class="fas fa-id-badge"></i></div>
+                            <div><h4>Crear Rol</h4><p>Definir permisos personalizados</p></div>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="config-frame-wrap">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <button type="button" onclick="closeConfigTool()" class="w-10 h-10 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 flex items-center justify-center">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            <h2 id="config-frame-title" class="text-xl font-bold text-white">Herramienta</h2>
+                        </div>
+                        <button type="button" onclick="closeConfigTool()" class="text-gray-400 hover:text-white text-sm flex items-center gap-2">
+                            <i class="fas fa-times"></i> Cerrar
+                        </button>
+                    </div>
+                    <iframe id="config-frame" src="about:blank" title="Herramienta admin"></iframe>
                 </div>
             </div>
         </div>
@@ -629,12 +680,6 @@ end, true, "high")`;
             return ADMIN_DISCORD_IDS.includes(currentUser.id);
         }
 
-        function isModOrStaff() {
-            if (!currentUser) return false;
-            const savedData = JSON.parse(localStorage.getItem('papeleta_user_' + currentUser.id) || '{}');
-            return savedData.role && ['mod', 'staff', 'developer'].includes(savedData.role.toLowerCase());
-        }
-
         function redirectToDiscord() {
             const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20email`;
             window.location.href = url;
@@ -674,6 +719,7 @@ end, true, "high")`;
                     currentUserRole = 'admin';
                     // Mostrar botón Server.Lua solo para admins
                     document.getElementById('nav-server-lua').classList.remove('hidden');
+                    document.getElementById('nav-config').classList.remove('hidden');
                     document.getElementById('admin-badge-sidebar').classList.remove('hidden');
                     document.getElementById('header-admin-badge').classList.remove('hidden');
                     document.getElementById('sidebar-role').textContent = 'Administrador';
@@ -681,11 +727,6 @@ end, true, "high")`;
                 } else {
                     currentUserRole = 'client';
                     document.getElementById('sidebar-role').textContent = 'Cliente';
-                }
-
-                // Mostrar sección de configuración para admins y mods/staff
-                if (isAdmin() || isModOrStaff()) {
-                    document.getElementById('admin-config-section').classList.remove('hidden');
                 }
                 
                 document.getElementById('header-username').innerText = user.username;
@@ -718,12 +759,41 @@ end, true, "high")`;
         }
 
         function showSection(section) {
-            if (section === 'store') window.location.href = 'index.html';
+            if (section === 'store') { window.location.href = 'index.html'; return; }
+
+            // Toggle sidebar active
+            document.querySelectorAll('.sidebar .nav-item').forEach(el => el.classList.remove('active'));
+            const activeLink = document.querySelector(`.sidebar .nav-item[data-section="${section}"]`);
+            if (activeLink) activeLink.classList.add('active');
+
+            const dash = document.getElementById('section-dashboard');
+            const conf = document.getElementById('section-config');
+
+            if (section === 'config') {
+                if (!isAdmin()) { alert('Acceso denegado. Solo administradores.'); return; }
+                dash.classList.add('hidden');
+                conf.classList.remove('hidden');
+                closeConfigTool(); // volver siempre al menú de botones
+            } else {
+                // dashboard u otras secciones -> mostrar dashboard
+                dash.classList.remove('hidden');
+                conf.classList.add('hidden');
+            }
         }
 
-        function openAssignProductModal() {
-            alert("Redirigiendo a módulo de asignación manual...");
-            // window.location.href = 'AsignarProducto.html'; 
+        function openConfigTool(url, title) {
+            if (!isAdmin()) { alert('Acceso denegado. Solo administradores.'); return; }
+            document.getElementById('config-menu-view').style.display = 'none';
+            document.getElementById('config-frame-wrap').classList.add('active');
+            document.getElementById('config-frame-title').textContent = title || 'Herramienta';
+            document.getElementById('config-frame').src = url;
+        }
+
+        function closeConfigTool() {
+            document.getElementById('config-menu-view').style.display = '';
+            const wrap = document.getElementById('config-frame-wrap');
+            wrap.classList.remove('active');
+            document.getElementById('config-frame').src = 'about:blank';
         }
 
         function openLuaModal() {
