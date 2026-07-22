@@ -89,6 +89,43 @@
         .preview-item .remove-btn { position: absolute; top: 5px; right: 5px; background: rgba(220, 38, 38, 0.9); color: white; border: none; width: 25px; height: 25px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; }
         .preview-item .remove-btn:hover { background: rgba(220, 38, 38, 1); }
 
+        /* ESTILOS PANEL CONFIGURACIÓN */
+        .config-panel-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px); z-index: 100;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .config-panel-overlay.active { opacity: 1; pointer-events: auto; }
+        
+        .config-panel {
+            position: fixed; top: 0; right: -400px; width: 350px; height: 100vh;
+            background: linear-gradient(180deg, #150a0a 0%, #0a0505 100%);
+            border-left: 1px solid rgba(255, 26, 26, 0.3);
+            box-shadow: -10px 0 40px rgba(0,0,0,0.8);
+            z-index: 101; transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 24px; overflow-y: auto;
+        }
+        .config-panel.active { right: 0; }
+
+        .config-menu-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px 16px; margin-bottom: 8px;
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px; cursor: pointer; transition: all 0.2s;
+            text-decoration: none; color: inherit;
+        }
+        .config-menu-item:hover {
+            background: rgba(255, 26, 26, 0.1); border-color: rgba(255, 26, 26, 0.4);
+            transform: translateX(-4px);
+        }
+        .config-menu-icon {
+            width: 36px; height: 36px; border-radius: 8px;
+            background: rgba(255, 26, 26, 0.1); color: #ff1a1a;
+            display: flex; align-items: center; justify-content: center; font-size: 16px;
+        }
+        .config-menu-text h4 { margin: 0; font-size: 14px; font-weight: 700; color: #fff; }
+        .config-menu-text p { margin: 2px 0 0; font-size: 11px; color: #9496a1; }
+
         /* ESTILOS PANEL DE USUARIO (CLIENTE) */
         .user-panel-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.7);
@@ -307,6 +344,44 @@
         </div>
     </aside>
 
+    <!-- PANEL DE CONFIGURACIÓN LATERAL (ADMIN) -->
+    <div id="config-overlay" class="config-panel-overlay" onclick="toggleConfigPanel()"></div>
+    <aside id="config-panel" class="config-panel">
+        <div class="flex justify-between items-center mb-6 pb-4 border-b border-white/10">
+            <h2 class="text-xl font-black text-white flex items-center gap-2"><i class="fas fa-cog text-red-500"></i> CONFIGURACIÓN</h2>
+            <button onclick="toggleConfigPanel()" class="text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+        </div>
+        <div class="space-y-2">
+            <a href="SubirProducto.html" class="config-menu-item">
+                <div class="config-menu-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                <div class="config-menu-text"><h4>Subir Producto</h4><p>Agregar nuevos recursos a la tienda</p></div>
+            </a>
+            <a href="LicenciaUsuario.html" class="config-menu-item">
+                <div class="config-menu-icon"><i class="fas fa-key"></i></div>
+                <div class="config-menu-text"><h4>Licencias Usuario</h4><p>Ver historial de compras y reclamos</p></div>
+            </a>
+            <a href="Encriptar.html" class="config-menu-item">
+                <div class="config-menu-icon"><i class="fas fa-lock"></i></div>
+                <div class="config-menu-text"><h4>Encriptar Script</h4><p>Proteger archivos Lua de MTA:SA</p></div>
+            </a>
+            <div class="config-menu-item" onclick="openAssignProductModal()">
+                <div class="config-menu-icon"><i class="fas fa-user-plus"></i></div>
+                <div class="config-menu-text"><h4>Pasar a Usuarios</h4><p>Asignar productos gratis manualmente</p></div>
+            </div>
+            <a href="UsuariosAutorizado.html" class="config-menu-item">
+                <div class="config-menu-icon"><i class="fas fa-users-cog"></i></div>
+                <div class="config-menu-text"><h4>Usuarios Autorizados</h4><p>Gestionar roles Admin y Mod</p></div>
+            </a>
+            <a href="CrearRol.html" class="config-menu-item">
+                <div class="config-menu-icon"><i class="fas fa-id-badge"></i></div>
+                <div class="config-menu-text"><h4>Crear Rol</h4><p>Definir permisos personalizados</p></div>
+            </a>
+        </div>
+        <div class="mt-8 pt-6 border-t border-white/10 text-center">
+            <p class="text-xs text-gray-500">Panel exclusivo para staff</p>
+        </div>
+    </aside>
+
     <!-- MAIN CONTENT -->
     <div id="main-content" class="relative z-10 flex-grow flex flex-col">
         <header class="bg-[#0d0505]/90 backdrop-blur border-b red-border sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
@@ -319,6 +394,11 @@
                 <a href="#" onclick="showPage('inicio')" data-page="inicio" class="nav-link hover:text-red-400 transition-colors">Inicio</a>
                 <a href="#" onclick="showPage('productos')" data-page="productos" class="nav-link hover:text-red-400 transition-colors">Productos</a>
                 <a href="#" onclick="showPage('preguntas')" data-page="preguntas" class="nav-link hover:text-red-400 transition-colors">Preguntas</a>
+                
+                <!-- BOTÓN CONFIG (SOLO ADMIN/MOD) -->
+                <a href="#" onclick="toggleConfigPanel()" data-page="config" id="nav-config" class="nav-link hover:text-red-400 transition-colors hidden flex items-center gap-2">
+                    <i class="fas fa-cog"></i> Config
+                </a>
             </nav>
 
             <div class="flex items-center gap-3">
@@ -522,6 +602,19 @@
                     roleBadgeHeader.textContent = 'Cliente';
                 }
             }
+        }
+
+        // --- FUNCIONES PANEL CONFIG ---
+        function toggleConfigPanel() {
+            const panel = document.getElementById('config-panel');
+            const overlay = document.getElementById('config-overlay');
+            panel.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function openAssignProductModal() {
+            alert("Redirigiendo a módulo de asignación manual...");
+            // window.location.href = 'AsignarProducto.html'; 
         }
 
         // Preview de múltiples imágenes
@@ -893,12 +986,15 @@
                 
                 closeLoginModal();
                 
-                // LÓGICA DE ROLES
+                // LÓGICA DE ROLES PARA EL BOTÓN CONFIG
                 if (isAdmin(user)) {
+                    document.getElementById('nav-config').classList.remove('hidden');
                     currentUserRole = 'admin';
                 } else {
+                    // Verificar si tiene rol de Mod u otro rol con acceso a config
                     const savedData = JSON.parse(localStorage.getItem('papeleta_user_' + user.id) || '{}');
                     if(savedData.role && ['mod', 'staff', 'developer'].includes(savedData.role.toLowerCase())) {
+                         document.getElementById('nav-config').classList.remove('hidden');
                          currentUserRole = savedData.role;
                     } else {
                         currentUserRole = 'cliente';
@@ -931,6 +1027,8 @@
                     else { roleBadge.classList.remove('text-green-400'); roleBadge.classList.add('text-red-400'); }
                 }
             }
+            // El panel de admin legacy solo lo ve el admin principal
+            if (canUpload()) { /* document.getElementById('nav-admin').classList.remove('hidden'); */ }
             document.getElementById('admin-upload-section').style.display = canUpload() ? '' : 'none';
             document.getElementById('admin-users-section').style.display = isAdmin(currentUser) ? '' : 'none';
         }
@@ -1025,9 +1123,12 @@
         function logout() {
             localStorage.removeItem('dc_access_token');
             currentUser = null; currentUserRole = 'user';
+            document.getElementById('nav-config').classList.add('hidden');
             // Cerrar paneles si están abiertos
             document.getElementById('user-panel').classList.remove('active');
             document.getElementById('user-panel-overlay').classList.remove('active');
+            document.getElementById('config-panel').classList.remove('active');
+            document.getElementById('config-overlay').classList.remove('active');
             updateAuthUI(); loadProducts();
         }
 
