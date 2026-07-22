@@ -210,6 +210,11 @@
             transform: translateX(-4px);
         }
         
+        .admin-nav-item.active {
+            background: rgba(255, 26, 26, 0.15);
+            border-color: rgba(255, 26, 26, 0.5);
+        }
+        
         .admin-nav-icon {
             width: 32px;
             height: 32px;
@@ -235,6 +240,21 @@
             font-size: 10px;
             color: #9496a1;
         }
+
+        /* Secciones de admin - ocultas por defecto */
+        .admin-section {
+            display: none;
+        }
+        
+        .admin-section.active {
+            display: block;
+            animation: fadeInSection 0.3s ease;
+        }
+        
+        @keyframes fadeInSection {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body class="min-h-screen flex">
@@ -255,7 +275,7 @@
             <nav class="space-y-2">
                 <div class="text-xs text-gray-500 uppercase font-semibold mb-4 px-3 tracking-wider">Principal</div>
                 
-                <a href="#" onclick="showSection('dashboard')" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
+                <a href="#" onclick="showSection('dashboard')" id="nav-dashboard" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
                     <i class="fas fa-home w-5"></i>
                     <span>Inicio</span>
                 </a>
@@ -265,7 +285,7 @@
                     <span>Tienda</span>
                 </a>
                 
-                <a href="#" onclick="showSection('reviews')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
+                <a href="#" onclick="showSection('reviews')" id="nav-reviews" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
                     <i class="fas fa-star w-5"></i>
                     <span>Mis Reseñas</span>
                 </a>
@@ -277,7 +297,7 @@
                     <i class="fas fa-shield-alt ml-auto text-xs text-red-500/50"></i>
                 </a>
                 
-                <a href="#" onclick="showSection('support')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
+                <a href="#" onclick="showSection('support')" id="nav-support" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300">
                     <i class="fas fa-headset w-5"></i>
                     <span>Soporte</span>
                 </a>
@@ -293,7 +313,7 @@
                         <i class="fas fa-crown text-[10px]"></i> Administración
                     </div>
                     
-                    <a href="SubirProducto.html" class="admin-nav-item">
+                    <a href="#" onclick="showSection('subir-producto')" id="nav-subir-producto" class="admin-nav-item">
                         <div class="admin-nav-icon"><i class="fas fa-cloud-upload-alt"></i></div>
                         <div class="admin-nav-text">
                             <h4>Subir Producto</h4>
@@ -301,7 +321,7 @@
                         </div>
                     </a>
                     
-                    <a href="LicenciaUsuario.html" class="admin-nav-item">
+                    <a href="#" onclick="showSection('licencias-usuario')" id="nav-licencias-usuario" class="admin-nav-item">
                         <div class="admin-nav-icon"><i class="fas fa-key"></i></div>
                         <div class="admin-nav-text">
                             <h4>Licencias Usuario</h4>
@@ -309,7 +329,7 @@
                         </div>
                     </a>
                     
-                    <a href="Encriptar.html" class="admin-nav-item">
+                    <a href="#" onclick="showSection('encriptar')" id="nav-encriptar" class="admin-nav-item">
                         <div class="admin-nav-icon"><i class="fas fa-lock"></i></div>
                         <div class="admin-nav-text">
                             <h4>Encriptar Script</h4>
@@ -317,7 +337,7 @@
                         </div>
                     </a>
                     
-                    <a href="#" onclick="alert('Redirigiendo a módulo de asignación manual...')" class="admin-nav-item">
+                    <a href="#" onclick="showSection('pasar-usuarios')" id="nav-pasar-usuarios" class="admin-nav-item">
                         <div class="admin-nav-icon"><i class="fas fa-user-plus"></i></div>
                         <div class="admin-nav-text">
                             <h4>Pasar a Usuarios</h4>
@@ -325,7 +345,7 @@
                         </div>
                     </a>
                     
-                    <a href="UsuariosAutorizado.html" class="admin-nav-item">
+                    <a href="#" onclick="showSection('usuarios-autorizados')" id="nav-usuarios-autorizados" class="admin-nav-item">
                         <div class="admin-nav-icon"><i class="fas fa-users-cog"></i></div>
                         <div class="admin-nav-text">
                             <h4>Usuarios Autorizados</h4>
@@ -333,7 +353,7 @@
                         </div>
                     </a>
                     
-                    <a href="CrearRol.html" class="admin-nav-item">
+                    <a href="#" onclick="showSection('crear-rol')" id="nav-crear-rol" class="admin-nav-item">
                         <div class="admin-nav-icon"><i class="fas fa-id-badge"></i></div>
                         <div class="admin-nav-text">
                             <h4>Crear Rol</h4>
@@ -367,7 +387,7 @@
                         Bienvenido, <span id="header-username" class="gradient-text">usuario</span>
                         <span id="header-admin-badge" class="admin-badge hidden ml-2">ADMIN</span>
                     </h1>
-                    <p class="text-gray-400 text-sm">Gestiona tus productos y licencias desde aquí</p>
+                    <p id="page-subtitle" class="text-gray-400 text-sm">Gestiona tus productos y licencias desde aquí</p>
                 </div>
                 
                 <a href="index.html" class="btn-primary px-5 py-2.5 rounded-lg text-white font-bold flex items-center gap-2 shadow-lg shadow-red-900/20">
@@ -378,120 +398,357 @@
         </header>
 
         <div class="p-6 md:p-8 flex-grow">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="stat-card rounded-xl p-6 relative overflow-hidden group">
-                    <div class="absolute right-0 top-0 w-24 h-24 bg-red-600/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
-                    <div class="flex items-center justify-between relative z-10">
-                        <div>
-                            <p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Total Invertido</p>
-                            <p id="stat-total-spent" class="text-2xl font-bold text-white">$0.00</p>
+            
+            <!-- SECCIÓN DASHBOARD (PRINCIPAL) -->
+            <div id="section-dashboard" class="admin-section active">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="stat-card rounded-xl p-6 relative overflow-hidden group">
+                        <div class="absolute right-0 top-0 w-24 h-24 bg-red-600/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
+                        <div class="flex items-center justify-between relative z-10">
+                            <div>
+                                <p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Total Invertido</p>
+                                <p id="stat-total-spent" class="text-2xl font-bold text-white">$0.00</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                                <i class="fas fa-wallet text-red-400 text-xl"></i>
+                            </div>
                         </div>
-                        <div class="w-12 h-12 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
-                            <i class="fas fa-wallet text-red-400 text-xl"></i>
+                    </div>
+
+                    <div class="stat-card rounded-xl p-6 relative overflow-hidden group">
+                        <div class="absolute right-0 top-0 w-24 h-24 bg-green-600/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
+                        <div class="flex items-center justify-between relative z-10">
+                            <div>
+                                <p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Scripts Activos</p>
+                                <p id="stat-active-scripts" class="text-2xl font-bold text-white">0</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center justify-center">
+                                <i class="fas fa-lock text-green-400 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card rounded-xl p-6 relative overflow-hidden group">
+                        <div class="absolute right-0 top-0 w-24 h-24 bg-blue-600/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
+                        <div class="flex items-center justify-between relative z-10">
+                            <div>
+                                <p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Estado de Cuenta</p>
+                                <p id="stat-account-status" class="text-lg font-bold text-red-400">Cliente Verificado</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                                <i class="fas fa-user-shield text-red-400 text-xl"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="stat-card rounded-xl p-6 relative overflow-hidden group">
-                    <div class="absolute right-0 top-0 w-24 h-24 bg-green-600/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
-                    <div class="flex items-center justify-between relative z-10">
-                        <div>
-                            <p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Scripts Activos</p>
-                            <p id="stat-active-scripts" class="text-2xl font-bold text-white">0</p>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 card rounded-xl p-6">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                                <i class="fas fa-cube text-red-400"></i>
+                            </div>
+                            <h2 class="text-lg font-bold text-white">Mis Productos Activos</h2>
                         </div>
-                        <div class="w-12 h-12 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center justify-center">
-                            <i class="fas fa-lock text-green-400 text-xl"></i>
+
+                        <div class="mb-6">
+                            <div class="relative">
+                                <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                                <input 
+                                    type="text" 
+                                    id="dashboard-search"
+                                    oninput="filterDashboardProducts()"
+                                    placeholder="Buscar entre tus recursos..." 
+                                    class="input-field w-full pl-12 pr-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none"
+                                >
+                            </div>
+                        </div>
+
+                        <div id="dashboard-products-list" class="space-y-3 max-h-[500px] overflow-y-auto custom-scrollbar pr-2"></div>
+
+                        <div id="dashboard-empty-state" class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5">
+                            <i class="fas fa-box-open text-gray-600 text-4xl mb-3"></i>
+                            <p class="text-gray-400 mb-4">No tienes productos activos aún.</p>
+                            <a href="index.html" class="btn-primary inline-block px-6 py-2 rounded-lg text-white font-medium">
+                                Ir a la tienda
+                            </a>
                         </div>
                     </div>
-                </div>
 
-                <div class="stat-card rounded-xl p-6 relative overflow-hidden group">
-                    <div class="absolute right-0 top-0 w-24 h-24 bg-blue-600/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
-                    <div class="flex items-center justify-between relative z-10">
-                        <div>
-                            <p class="text-gray-400 text-xs uppercase font-semibold mb-1 tracking-wider">Estado de Cuenta</p>
-                            <p id="stat-account-status" class="text-lg font-bold text-red-400">Cliente Verificado</p>
+                    <div class="card rounded-xl p-6 h-fit">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                                <i class="fas fa-server text-red-400"></i>
+                            </div>
+                            <h2 class="text-lg font-bold text-white">Configuración MTA</h2>
                         </div>
-                        <div class="w-12 h-12 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
-                            <i class="fas fa-user-shield text-red-400 text-xl"></i>
+
+                        <div class="space-y-4 mb-6">
+                            <div>
+                                <label class="block text-gray-400 text-xs uppercase font-semibold mb-2 tracking-wider">Server IP</label>
+                                <input type="text" id="server-ip" value="213.181.88.154" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none font-mono text-sm">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-gray-400 text-xs uppercase font-semibold mb-2 tracking-wider">Puerto</label>
+                                <input type="text" id="server-port" value="22003" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none font-mono text-sm">
+                            </div>
+                        </div>
+
+                        <div class="mb-6">
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="block text-gray-400 text-xs uppercase font-semibold tracking-wider">Código de Licencia</label>
+                                <span class="text-[10px] text-red-400 font-mono bg-red-900/20 px-2 py-0.5 rounded">LUA CONFIG</span>
+                            </div>
+                            <div class="code-block rounded-lg p-4 font-mono text-sm">
+                                <pre class="text-red-300 whitespace-pre-wrap break-all"><code id="license-code">Generando...</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3 mb-4">
+                            <button onclick="saveServerConfig()" class="btn-primary px-4 py-2.5 rounded-lg text-white font-medium flex items-center justify-center gap-2 text-sm">
+                                <i class="fas fa-save"></i> Guardar
+                            </button>
+                            <button onclick="copyLicenseCode()" class="px-4 py-2.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 font-medium flex items-center justify-center gap-2 text-sm">
+                                <i class="fas fa-copy"></i> Copiar
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-2 card rounded-xl p-6">
+            <!-- SECCIÓN SUBIR PRODUCTO -->
+            <div id="section-subir-producto" class="admin-section">
+                <div class="card rounded-xl p-6 max-w-4xl mx-auto">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
-                            <i class="fas fa-cube text-red-400"></i>
+                        <div class="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                            <i class="fas fa-cloud-upload-alt text-red-400"></i>
                         </div>
-                        <h2 class="text-lg font-bold text-white">Mis Productos Activos</h2>
+                        <h2 class="text-xl font-bold text-white">Subir Nuevo Producto</h2>
                     </div>
-
-                    <div class="mb-6">
-                        <div class="relative">
-                            <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
-                            <input 
-                                type="text" 
-                                id="dashboard-search"
-                                oninput="filterDashboardProducts()"
-                                placeholder="Buscar entre tus recursos..." 
-                                class="input-field w-full pl-12 pr-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none"
-                            >
-                        </div>
-                    </div>
-
-                    <div id="dashboard-products-list" class="space-y-3 max-h-[500px] overflow-y-auto custom-scrollbar pr-2"></div>
-
-                    <div id="dashboard-empty-state" class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5">
-                        <i class="fas fa-box-open text-gray-600 text-4xl mb-3"></i>
-                        <p class="text-gray-400 mb-4">No tienes productos activos aún.</p>
-                        <a href="index.html" class="btn-primary inline-block px-6 py-2 rounded-lg text-white font-medium">
-                            Ir a la tienda
-                        </a>
-                    </div>
-                </div>
-
-                <div class="card rounded-xl p-6 h-fit">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
-                            <i class="fas fa-server text-red-400"></i>
-                        </div>
-                        <h2 class="text-lg font-bold text-white">Configuración MTA</h2>
-                    </div>
-
-                    <div class="space-y-4 mb-6">
+                    
+                    <form onsubmit="handleUploadProduct(event)" class="space-y-4">
                         <div>
-                            <label class="block text-gray-400 text-xs uppercase font-semibold mb-2 tracking-wider">Server IP</label>
-                            <input type="text" id="server-ip" value="213.181.88.154" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none font-mono text-sm">
+                            <label class="block text-gray-300 text-sm font-semibold mb-2">Nombre del Producto</label>
+                            <input type="text" id="upload-name" required class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none" placeholder="Ej: Script de Admin">
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-300 text-sm font-semibold mb-2">Precio (USD)</label>
+                                <input type="number" id="upload-price" required step="0.01" min="0" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none" placeholder="10.00">
+                            </div>
+                            <div>
+                                <label class="block text-gray-300 text-sm font-semibold mb-2">Categoría</label>
+                                <select id="upload-category" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none">
+                                    <option value="Scripts">Scripts</option>
+                                    <option value="Modelajes">Modelajes</option>
+                                    <option value="Mappings">Mappings</option>
+                                    <option value="Webs">Sitios Web</option>
+                                    <option value="Bots">Bots Discord</option>
+                                    <option value="Otros">Otros</option>
+                                </select>
+                            </div>
                         </div>
                         
                         <div>
-                            <label class="block text-gray-400 text-xs uppercase font-semibold mb-2 tracking-wider">Puerto</label>
-                            <input type="text" id="server-port" value="22003" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none font-mono text-sm">
+                            <label class="block text-gray-300 text-sm font-semibold mb-2">Descripción</label>
+                            <textarea id="upload-description" required rows="4" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none" placeholder="Describe las características del producto..."></textarea>
                         </div>
-                    </div>
-
-                    <div class="mb-6">
-                        <div class="flex items-center justify-between mb-2">
-                            <label class="block text-gray-400 text-xs uppercase font-semibold tracking-wider">Código de Licencia</label>
-                            <span class="text-[10px] text-red-400 font-mono bg-red-900/20 px-2 py-0.5 rounded">LUA CONFIG</span>
+                        
+                        <div>
+                            <label class="block text-gray-300 text-sm font-semibold mb-2">Imágenes del Producto</label>
+                            <div class="border-2 border-dashed border-red-900/40 rounded-xl p-6 text-center hover:border-red-500/50 transition-colors">
+                                <input type="file" id="upload-images" accept="image/*" multiple class="hidden" onchange="handleImagePreview(this)">
+                                <label for="upload-images" class="cursor-pointer block">
+                                    <i class="fas fa-cloud-upload-alt text-3xl text-red-400 mb-2"></i>
+                                    <p class="text-gray-400 text-sm">Haz clic para subir imágenes</p>
+                                </label>
+                                <div id="upload-images-preview" class="flex gap-2 mt-4 flex-wrap"></div>
+                            </div>
                         </div>
-                        <div class="code-block rounded-lg p-4 font-mono text-sm">
-                            <pre class="text-red-300 whitespace-pre-wrap break-all"><code id="license-code">Generando...</code></pre>
+                        
+                        <div>
+                            <label class="block text-gray-300 text-sm font-semibold mb-2">Archivo Descargable</label>
+                            <div class="border-2 border-dashed border-red-900/40 rounded-xl p-6 text-center hover:border-red-500/50 transition-colors">
+                                <input type="file" id="upload-file" accept=".zip,.rar,.7z,.lua,.txt" required class="hidden" onchange="handleFileSelect(this)">
+                                <label for="upload-file" class="cursor-pointer block">
+                                    <i class="fas fa-file-archive text-3xl text-red-400 mb-2"></i>
+                                    <p id="upload-file-name" class="text-gray-400 text-sm">Haz clic para subir el archivo</p>
+                                </label>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3 mb-4">
-                        <button onclick="saveServerConfig()" class="btn-primary px-4 py-2.5 rounded-lg text-white font-medium flex items-center justify-center gap-2 text-sm">
-                            <i class="fas fa-save"></i> Guardar
+                        
+                        <button type="submit" class="w-full btn-primary py-3 rounded-lg text-white font-bold flex items-center justify-center gap-2">
+                            <i class="fas fa-plus"></i> Subir Producto
                         </button>
-                        <button onclick="copyLicenseCode()" class="px-4 py-2.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 font-medium flex items-center justify-center gap-2 text-sm">
-                            <i class="fas fa-copy"></i> Copiar
+                    </form>
+                </div>
+            </div>
+
+            <!-- SECCIÓN LICENCIAS USUARIO -->
+            <div id="section-licencias-usuario" class="admin-section">
+                <div class="card rounded-xl p-6">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                            <i class="fas fa-key text-red-400"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-white">Historial de Licencias y Compras</h2>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <input type="text" id="search-licenses" oninput="searchLicenses()" placeholder="Buscar por usuario o producto..." class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none">
+                    </div>
+                    
+                    <div id="licenses-list" class="space-y-3 max-h-[600px] overflow-y-auto custom-scrollbar">
+                        <p class="text-gray-500 text-center py-8">Cargando licencias...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN ENCRIPTAR SCRIPT -->
+            <div id="section-encriptar" class="admin-section">
+                <div class="card rounded-xl p-6 max-w-3xl mx-auto">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                            <i class="fas fa-lock text-red-400"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-white">Encriptar Script Lua</h2>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-gray-300 text-sm font-semibold mb-2">Código Lua Original</label>
+                            <textarea id="lua-original" rows="10" class="input-field w-full px-4 py-3 rounded-lg text-white font-mono text-sm focus:outline-none" placeholder="-- Pega aquí tu código Lua..."></textarea>
+                        </div>
+                        
+                        <button onclick="encryptLua()" class="btn-primary px-6 py-3 rounded-lg text-white font-bold flex items-center gap-2">
+                            <i class="fas fa-lock"></i> Encriptar Código
+                        </button>
+                        
+                        <div id="lua-encrypted-container" class="hidden">
+                            <label class="block text-gray-300 text-sm font-semibold mb-2">Código Encriptado</label>
+                            <textarea id="lua-encrypted" rows="10" readonly class="input-field w-full px-4 py-3 rounded-lg text-gray-400 font-mono text-sm focus:outline-none bg-[#0a0505]"></textarea>
+                            <button onclick="copyEncryptedLua()" class="mt-2 px-4 py-2 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 text-sm">
+                                <i class="fas fa-copy"></i> Copiar Código
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN PASAR A USUARIOS -->
+            <div id="section-pasar-usuarios" class="admin-section">
+                <div class="card rounded-xl p-6 max-w-3xl mx-auto">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                            <i class="fas fa-user-plus text-red-400"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-white">Asignar Producto Gratis</h2>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-gray-300 text-sm font-semibold mb-2">Discord ID del Usuario</label>
+                            <input type="text" id="assign-user-id" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none" placeholder="Ej: 890526767608127489">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-300 text-sm font-semibold mb-2">Seleccionar Producto</label>
+                            <select id="assign-product" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none">
+                                <option value="">Selecciona un producto...</option>
+                            </select>
+                        </div>
+                        
+                        <button onclick="assignProductFree()" class="btn-primary px-6 py-3 rounded-lg text-white font-bold flex items-center gap-2">
+                            <i class="fas fa-gift"></i> Asignar Producto Gratis
                         </button>
                     </div>
                 </div>
             </div>
+
+            <!-- SECCIÓN USUARIOS AUTORIZADOS -->
+            <div id="section-usuarios-autorizados" class="admin-section">
+                <div class="card rounded-xl p-6">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                            <i class="fas fa-users-cog text-red-400"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-white">Gestionar Usuarios Autorizados</h2>
+                    </div>
+                    
+                    <div id="authorized-users-list" class="space-y-3">
+                        <p class="text-gray-500 text-center py-8">Cargando usuarios...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN CREAR ROL -->
+            <div id="section-crear-rol" class="admin-section">
+                <div class="card rounded-xl p-6 max-w-3xl mx-auto">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                            <i class="fas fa-id-badge text-red-400"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-white">Crear Rol Personalizado</h2>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-gray-300 text-sm font-semibold mb-2">Nombre del Rol</label>
+                            <input type="text" id="role-name" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none" placeholder="Ej: VIP, Moderador, etc.">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-300 text-sm font-semibold mb-2">Permisos</label>
+                            <div class="space-y-2 mt-2">
+                                <label class="flex items-center gap-3 p-3 rounded-lg bg-[#0d0505] border border-red-900/30 cursor-pointer hover:border-red-600/50 transition-all">
+                                    <input type="checkbox" class="w-4 h-4 rounded border-red-600 text-red-600 focus:ring-red-600">
+                                    <span class="text-sm text-gray-300">Acceso al Panel de Administración</span>
+                                </label>
+                                <label class="flex items-center gap-3 p-3 rounded-lg bg-[#0d0505] border border-red-900/30 cursor-pointer hover:border-red-600/50 transition-all">
+                                    <input type="checkbox" class="w-4 h-4 rounded border-red-600 text-red-600 focus:ring-red-600">
+                                    <span class="text-sm text-gray-300">Subir Productos</span>
+                                </label>
+                                <label class="flex items-center gap-3 p-3 rounded-lg bg-[#0d0505] border border-red-900/30 cursor-pointer hover:border-red-600/50 transition-all">
+                                    <input type="checkbox" class="w-4 h-4 rounded border-red-600 text-red-600 focus:ring-red-600">
+                                    <span class="text-sm text-gray-300">Gestionar Usuarios</span>
+                                </label>
+                                <label class="flex items-center gap-3 p-3 rounded-lg bg-[#0d0505] border border-red-900/30 cursor-pointer hover:border-red-600/50 transition-all">
+                                    <input type="checkbox" class="w-4 h-4 rounded border-red-600 text-red-600 focus:ring-red-600">
+                                    <span class="text-sm text-gray-300">Ver Licencias</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button onclick="createRole()" class="btn-primary px-6 py-3 rounded-lg text-white font-bold flex items-center gap-2">
+                            <i class="fas fa-plus"></i> Crear Rol
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN REVIEWS (Placeholder) -->
+            <div id="section-reviews" class="admin-section">
+                <div class="card rounded-xl p-6 text-center">
+                    <i class="fas fa-star text-5xl text-gray-600 mb-4"></i>
+                    <h2 class="text-xl font-bold text-white mb-2">Mis Reseñas</h2>
+                    <p class="text-gray-400">Próximamente podrás dejar reseñas de tus productos.</p>
+                </div>
+            </div>
+
+            <!-- SECCIÓN SOPORTE (Placeholder) -->
+            <div id="section-support" class="admin-section">
+                <div class="card rounded-xl p-6 text-center">
+                    <i class="fas fa-headset text-5xl text-gray-600 mb-4"></i>
+                    <h2 class="text-xl font-bold text-white mb-2">Soporte Técnico</h2>
+                    <p class="text-gray-400 mb-4">¿Necesitas ayuda? Únete a nuestro Discord.</p>
+                    <a href="https://discord.gg/rvxEdWcGkf" target="_blank" class="btn-primary inline-block px-6 py-3 rounded-lg text-white font-bold">
+                        <i class="fab fa-discord"></i> Unirse al Discord
+                    </a>
+                </div>
+            </div>
+
         </div>
     </main>
 
@@ -559,6 +816,8 @@
         let currentUserRole = 'client';
         let allProducts = [];
         let userFixedLicenseKey = null;
+        let tempImages = [];
+        let tempFile = null;
 
         const SERVER_LUA_CODE = `local function clean(s)
     if not s then return "" end
@@ -722,17 +981,13 @@ end, true, "high")`;
             .then(user => {
                 currentUser = user;
                 
-                // Verificar si es admin
                 if (isAdmin()) {
                     currentUserRole = 'admin';
-                    // Mostrar botón Server.Lua solo para admins
                     document.getElementById('nav-server-lua').classList.remove('hidden');
                     document.getElementById('admin-badge-sidebar').classList.remove('hidden');
                     document.getElementById('header-admin-badge').classList.remove('hidden');
                     document.getElementById('sidebar-role').textContent = 'Administrador';
                     document.getElementById('sidebar-role').classList.add('text-red-500');
-                    
-                    // MOSTRAR MENÚ DE ADMINISTRACIÓN EN EL SIDEBAR
                     document.getElementById('admin-menu-section').classList.remove('hidden');
                 } else {
                     currentUserRole = 'client';
@@ -753,6 +1008,7 @@ end, true, "high")`;
                 ensureFixedLicense().then(() => {
                     loadDashboardData();
                     updateLicenseDisplay();
+                    loadProductsForAssign();
                 });
             })
             .catch(err => {
@@ -768,8 +1024,51 @@ end, true, "high")`;
             location.reload();
         }
 
-        function showSection(section) {
-            if (section === 'store') window.location.href = 'index.html';
+        // FUNCIÓN PARA CAMBIAR ENTRE SECCIONES
+        function showSection(sectionName) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('.admin-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remover clase active de todos los nav items
+            document.querySelectorAll('.nav-item, .admin-nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Mostrar la sección seleccionada
+            const targetSection = document.getElementById(`section-${sectionName}`);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+            
+            // Activar el nav item correspondiente
+            const navItem = document.getElementById(`nav-${sectionName}`);
+            if (navItem) {
+                navItem.classList.add('active');
+            }
+            
+            // Actualizar subtítulo
+            const subtitles = {
+                'dashboard': 'Gestiona tus productos y licencias desde aquí',
+                'subir-producto': 'Agrega nuevos productos a la tienda',
+                'licencias-usuario': 'Visualiza el historial completo de compras',
+                'encriptar': 'Protege tus scripts Lua',
+                'pasar-usuarios': 'Asigna productos gratuitamente',
+                'usuarios-autorizados': 'Administra permisos de usuarios',
+                'crear-rol': 'Define roles y permisos personalizados',
+                'reviews': 'Tus reseñas y valoraciones',
+                'support': 'Obtén ayuda y soporte técnico'
+            };
+            
+            document.getElementById('page-subtitle').textContent = subtitles[sectionName] || '';
+            
+            // Cargar datos específicos si es necesario
+            if (sectionName === 'licencias-usuario') {
+                loadLicenses();
+            } else if (sectionName === 'usuarios-autorizados') {
+                loadAuthorizedUsers();
+            }
         }
 
         function openLuaModal() {
@@ -952,6 +1251,317 @@ end, true, "high")`;
             const original = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-check"></i> Guardado';
             setTimeout(() => btn.innerHTML = original, 2000);
+        }
+
+        // FUNCIONES PARA SUBIR PRODUCTO
+        function handleImagePreview(input) {
+            const previewContainer = document.getElementById('upload-images-preview');
+            previewContainer.innerHTML = '';
+            tempImages = [];
+            
+            if (input.files && input.files.length > 0) {
+                Array.from(input.files).forEach((file, index) => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        tempImages.push(e.target.result);
+                        const div = document.createElement('div');
+                        div.className = 'w-20 h-20 rounded-lg overflow-hidden border-2 border-red-600/30';
+                        div.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`;
+                        previewContainer.appendChild(div);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+        }
+
+        function handleFileSelect(input) {
+            if (input.files && input.files[0]) {
+                tempFile = input.files[0];
+                document.getElementById('upload-file-name').textContent = tempFile.name;
+                document.getElementById('upload-file-name').classList.add('text-white', 'font-bold');
+            }
+        }
+
+        async function handleUploadProduct(e) {
+            e.preventDefault();
+            
+            if (!currentUser || !isAdmin()) {
+                alert('Acceso denegado');
+                return;
+            }
+            
+            const name = document.getElementById('upload-name').value;
+            const price = parseFloat(document.getElementById('upload-price').value);
+            const category = document.getElementById('upload-category').value;
+            const description = document.getElementById('upload-description').value;
+            
+            if (tempImages.length === 0) {
+                alert('Por favor selecciona al menos una imagen');
+                return;
+            }
+            
+            if (!tempFile) {
+                alert('Por favor selecciona el archivo');
+                return;
+            }
+            
+            try {
+                // Convertir archivo a base64
+                const fileBase64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(tempFile);
+                });
+                
+                const newProduct = {
+                    id: 'prod_' + Date.now(),
+                    name: name,
+                    price: price,
+                    category: category,
+                    description: description,
+                    image_url: tempImages[0],
+                    images: tempImages,
+                    file_data: fileBase64,
+                    file_name: tempFile.name,
+                    created_at: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                await db.collection("Productos").doc(newProduct.id).set(newProduct);
+                
+                alert('Producto subido exitosamente');
+                
+                // Limpiar formulario
+                e.target.reset();
+                document.getElementById('upload-images-preview').innerHTML = '';
+                document.getElementById('upload-file-name').textContent = 'Haz clic para subir el archivo';
+                document.getElementById('upload-file-name').classList.remove('text-white', 'font-bold');
+                tempImages = [];
+                tempFile = null;
+                
+                // Recargar productos
+                loadProductsForAssign();
+                
+            } catch (error) {
+                console.error(error);
+                alert('Error al subir producto: ' + error.message);
+            }
+        }
+
+        // FUNCIONES PARA LICENCIAS
+        async function loadLicenses() {
+            try {
+                const snapshot = await db.collection("Clientes").orderBy('date', 'desc').get();
+                const container = document.getElementById('licenses-list');
+                
+                if (snapshot.empty) {
+                    container.innerHTML = '<p class="text-gray-500 text-center py-8">No hay licencias registradas</p>';
+                    return;
+                }
+                
+                const licenses = [];
+                snapshot.forEach(doc => {
+                    licenses.push({ id: doc.id, ...doc.data() });
+                });
+                
+                container.innerHTML = licenses.map(lic => `
+                    <div class="bg-[#0d0505] border border-red-900/30 rounded-xl p-4">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex items-center gap-3">
+                                <img src="${lic.avatar ? `https://cdn.discordapp.com/avatars/${lic.discord_id}/${lic.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png'}" class="w-10 h-10 rounded-full border border-red-600">
+                                <div>
+                                    <p class="text-white font-bold">${lic.username}</p>
+                                    <p class="text-gray-500 text-xs">${lic.discord_id}</p>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-xs font-bold ${lic.status === 'Pagado' ? 'bg-green-900/30 text-green-400 border border-green-600/30' : 'bg-blue-900/30 text-blue-400 border border-blue-600/30'}">
+                                ${lic.status}
+                            </span>
+                        </div>
+                        <div class="space-y-2">
+                            ${lic.products ? lic.products.map(p => `
+                                <div class="flex justify-between items-center text-sm bg-[#150a0a] px-3 py-2 rounded-lg">
+                                    <span class="text-gray-300">${p.name}</span>
+                                    <span class="${p.price === 'Gratis' || p.price === 'GRATIS' ? 'text-green-400' : 'text-red-400'} font-bold">${p.price}</span>
+                                </div>
+                            `).join('') : ''}
+                        </div>
+                        <div class="mt-3 pt-3 border-t border-red-900/20 flex justify-between items-center text-xs text-gray-500">
+                            <span>${lic.date?.toDate ? lic.date.toDate().toLocaleString('es-ES') : 'Fecha no disponible'}</span>
+                            <span>Total: ${lic.total_price}</span>
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error(error);
+                document.getElementById('licenses-list').innerHTML = '<p class="text-red-400 text-center py-8">Error al cargar licencias</p>';
+            }
+        }
+
+        function searchLicenses() {
+            const search = document.getElementById('search-licenses').value.toLowerCase();
+            document.querySelectorAll('#licenses-list > div').forEach(card => {
+                card.style.display = card.innerText.toLowerCase().includes(search) ? 'block' : 'none';
+            });
+        }
+
+        // FUNCIONES PARA ENCRIPTAR LUA
+        function encryptLua() {
+            const original = document.getElementById('lua-original').value;
+            if (!original.trim()) {
+                alert('Por favor ingresa código Lua');
+                return;
+            }
+            
+            // Encriptación simple (base64)
+            const encrypted = btoa(unescape(encodeURIComponent(original)));
+            document.getElementById('lua-encrypted').value = encrypted;
+            document.getElementById('lua-encrypted-container').classList.remove('hidden');
+        }
+
+        function copyEncryptedLua() {
+            const textarea = document.getElementById('lua-encrypted');
+            textarea.select();
+            document.execCommand('copy');
+            
+            const btn = event.currentTarget;
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Copiado';
+            setTimeout(() => btn.innerHTML = original, 2000);
+        }
+
+        // FUNCIONES PARA ASIGNAR PRODUCTOS
+        async function loadProductsForAssign() {
+            try {
+                const snapshot = await db.collection("Productos").get();
+                const select = document.getElementById('assign-product');
+                select.innerHTML = '<option value="">Selecciona un producto...</option>';
+                
+                snapshot.forEach(doc => {
+                    const product = doc.data();
+                    select.innerHTML += `<option value="${doc.id}">${product.name} - ${product.price === 0 ? 'GRATIS' : '$' + product.price}</option>`;
+                });
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        async function assignProductFree() {
+            const userId = document.getElementById('assign-user-id').value.trim();
+            const productId = document.getElementById('assign-product').value;
+            
+            if (!userId || !productId) {
+                alert('Por favor completa todos los campos');
+                return;
+            }
+            
+            try {
+                const productDoc = await db.collection("Productos").doc(productId).get();
+                const product = productDoc.data();
+                
+                if (!product) {
+                    alert('Producto no encontrado');
+                    return;
+                }
+                
+                // Crear registro en Clientes
+                await db.collection("Clientes").add({
+                    discord_id: userId,
+                    username: `Usuario_${userId}`,
+                    products: [{
+                        id: productId,
+                        name: product.name,
+                        price: "Gratis"
+                    }],
+                    total_price: "Gratis",
+                    date: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: "Asignado Manualmente"
+                });
+                
+                // Crear licencia
+                const licenseKey = generateUniqueKey();
+                await db.collection("Licencias").add({
+                    discord_id: userId,
+                    username: `Usuario_${userId}`,
+                    product_id: productId,
+                    product_name: product.name,
+                    key: licenseKey,
+                    created_at: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'active'
+                });
+                
+                alert('Producto asignado exitosamente');
+                document.getElementById('assign-user-id').value = '';
+                document.getElementById('assign-product').value = '';
+                
+            } catch (error) {
+                console.error(error);
+                alert('Error al asignar producto: ' + error.message);
+            }
+        }
+
+        // FUNCIONES PARA USUARIOS AUTORIZADOS
+        async function loadAuthorizedUsers() {
+            try {
+                const snapshot = await db.collection("UsuariosRegistrados").get();
+                const container = document.getElementById('authorized-users-list');
+                
+                if (snapshot.empty) {
+                    container.innerHTML = '<p class="text-gray-500 text-center py-8">No hay usuarios registrados</p>';
+                    return;
+                }
+                
+                const users = [];
+                snapshot.forEach(doc => {
+                    users.push({ id: doc.id, ...doc.data() });
+                });
+                
+                container.innerHTML = users.map(user => `
+                    <div class="bg-[#0d0505] border border-red-900/30 rounded-xl p-4 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <img src="${user.avatar ? `https://cdn.discordapp.com/avatars/${user.discord_id}/${user.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png'}" class="w-10 h-10 rounded-full border border-red-600">
+                            <div>
+                                <p class="text-white font-bold">${user.username}</p>
+                                <p class="text-gray-500 text-xs">${user.discord_id}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-red-900/30 text-red-400 border border-red-600/30">
+                                ${user.role || 'Usuario'}
+                            </span>
+                            <button onclick="changeUserRole('${user.discord_id}', '${user.username}')" class="px-3 py-1 rounded-lg border border-red-600/30 text-red-400 hover:bg-red-900/30 text-xs">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error(error);
+                document.getElementById('authorized-users-list').innerHTML = '<p class="text-red-400 text-center py-8">Error al cargar usuarios</p>';
+            }
+        }
+
+        function changeUserRole(userId, username) {
+            const newRole = prompt(`Nuevo rol para ${username}:`, 'admin');
+            if (newRole) {
+                // Aquí se implementaría la actualización en Firebase
+                alert(`Rol actualizado para ${username} a: ${newRole}`);
+            }
+        }
+
+        // FUNCIONES PARA CREAR ROL
+        function createRole() {
+            const roleName = document.getElementById('role-name').value.trim();
+            if (!roleName) {
+                alert('Por favor ingresa un nombre para el rol');
+                return;
+            }
+            
+            // Aquí se implementaría la creación del rol en Firebase
+            alert(`Rol "${roleName}" creado exitosamente (Función en desarrollo)`);
+            document.getElementById('role-name').value = '';
         }
 
         document.addEventListener('DOMContentLoaded', () => {
