@@ -3,278 +3,311 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Lua Master</title>
-    <!-- Importamos una fuente moderna -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Admin Panel - Server Control</title>
+    
+    <!-- Iconos y Tailwind -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
+        /* --- TUS VARIABLES Y ESTILOS BASE --- */
         :root {
             --bg-body: #050507;
             --bg-card: rgba(20, 10, 10, 0.6);
-            --bg-glass: rgba(255, 255, 255, 0.03);
-            --bg-glass-strong: rgba(20, 10, 10, 0.85);
             --primary: #ff1a1a;
             --primary-glow: rgba(255, 26, 26, 0.4);
             --secondary: #cc1b1b;
-            --success: #00ff44;
-            --danger: #ff0000;
-            --discord-blue: #5865F2;
             --text-main: #ffffff;
             --text-muted: #9496a1;
-            --text-dim: #6b7280;
             --border-color: rgba(255, 26, 26, 0.15);
-            --border-hover: rgba(255, 26, 26, 0.3);
-            --radius-sm: 8px;
-            --radius-md: 16px;
-            --radius-lg: 24px;
-            --container-width: 1400px;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap');
+        
+        * { font-family: 'Inter', sans-serif; }
+        
+        body { 
+            background: linear-gradient(135deg, #050507 0%, #150a0a 100%); 
+            color: #e2e8f0; 
+            overflow-x: hidden;
         }
 
-        body {
-            background-color: var(--bg-body);
-            /* Fondo sutil con gradiente radial para profundidad */
-            background-image: radial-gradient(circle at 50% 0%, #2a0505 0%, var(--bg-body) 60%);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+        /* Sidebar Estilo Glass */
+        .sidebar { 
+            background: rgba(10, 5, 5, 0.95); 
+            backdrop-filter: blur(10px); 
+            border-right: 1px solid rgba(255, 26, 26, 0.1); 
         }
 
-        .admin-container {
-            width: 100%;
-            max-width: 450px; /* Ancho contenido para lista vertical */
-            background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 40px 30px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 
-                        0 0 30px rgba(255, 26, 26, 0.05);
+        /* Items del Menú */
+        .nav-item { 
+            transition: all 0.3s ease; 
             position: relative;
             overflow: hidden;
-        }
-
-        /* Efecto de brillo superior */
-        .admin-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--primary), transparent);
-            opacity: 0.7;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        h1 {
-            font-size: 24px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            color: var(--text-main);
-            text-shadow: 0 0 15px var(--primary-glow);
-            margin-bottom: 5px;
-        }
-
-        p.subtitle {
-            color: var(--text-muted);
-            font-size: 14px;
-            font-weight: 300;
-        }
-
-        .menu-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .btn-admin {
-            position: relative;
-            background: var(--bg-glass);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 18px 25px;
-            border-radius: var(--radius-md);
-            font-size: 15px;
-            font-weight: 500;
-            cursor: pointer;
-            text-align: left;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            overflow: hidden;
-            text-decoration: none;
-        }
-
-        /* Iconos SVG simples */
-        .btn-icon {
-            width: 20px;
-            height: 20px;
-            fill: currentColor;
-            opacity: 0.7;
-            transition: opacity 0.3s ease;
-            margin-right: 15px;
-        }
-
-        .btn-content {
-            display: flex;
-            align-items: center;
-        }
-
-        /* Hover Effects */
-        .btn-admin:hover {
-            background: rgba(255, 26, 26, 0.08);
-            border-color: var(--primary);
-            transform: translateX(5px);
-            box-shadow: 0 0 20px var(--primary-glow);
-        }
-
-        .btn-admin:hover .btn-icon {
-            opacity: 1;
-            fill: var(--primary);
-            filter: drop-shadow(0 0 5px var(--primary));
-        }
-
-        .btn-arrow {
-            opacity: 0;
-            transform: translateX(-10px);
-            transition: all 0.3s ease;
-            color: var(--primary);
-        }
-
-        .btn-admin:hover .btn-arrow {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        /* Estilo especial para Server.lua (El último) */
-        .btn-special {
-            margin-top: 10px;
-            background: linear-gradient(45deg, rgba(20, 10, 10, 0.9), rgba(60, 10, 10, 0.9));
-            border: 1px solid var(--secondary);
-        }
-
-        .btn-special:hover {
-            background: linear-gradient(45deg, var(--secondary), var(--primary));
-            color: white;
-            border-color: transparent;
         }
         
-        .btn-special:hover .btn-icon {
-            fill: white;
-            filter: none;
+        .nav-item:hover { 
+            background: rgba(255, 26, 26, 0.1); 
+            color: white; 
+            padding-left: 1.5rem; /* Efecto de desplazamiento */
+        }
+        
+        .nav-item.active { 
+            background: rgba(255, 26, 26, 0.15); 
+            border-left: 3px solid #ff1a1a; 
+            color: #ff6b6b; 
         }
 
-        /* Animación de entrada */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Tarjetas Principales */
+        .card { 
+            background: rgba(21, 10, 10, 0.6); 
+            border: 1px solid rgba(255, 26, 26, 0.15); 
+            backdrop-filter: blur(10px); 
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
         }
 
-        .btn-admin {
-            animation: fadeIn 0.5s ease forwards;
-            opacity: 0;
+        /* Botones de Acción */
+        .btn-action {
+            background: linear-gradient(135deg, rgba(255, 26, 26, 0.1) 0%, rgba(20, 10, 10, 0.8) 100%);
+            border: 1px solid rgba(255, 26, 26, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-action:hover {
+            border-color: #ff1a1a;
+            box-shadow: 0 0 15px rgba(255, 26, 26, 0.2);
+            transform: translateY(-2px);
         }
 
-        .btn-admin:nth-child(1) { animation-delay: 0.1s; }
-        .btn-admin:nth-child(2) { animation-delay: 0.2s; }
-        .btn-admin:nth-child(3) { animation-delay: 0.3s; }
-        .btn-admin:nth-child(4) { animation-delay: 0.4s; }
-        .btn-admin:nth-child(5) { animation-delay: 0.5s; }
-        .btn-admin:nth-child(6) { animation-delay: 0.6s; }
-        .btn-admin:nth-child(7) { animation-delay: 0.7s; }
+        /* Scrollbar personalizado */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0505; }
+        ::-webkit-scrollbar-thumb { background: #7f1d1d; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #ef4444; }
 
+        /* Animaciones */
+        .fade-in { animation: fadeIn 0.5s ease forwards; opacity: 0; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Badge Admin */
+        .admin-badge { 
+            background: rgba(220, 38, 38, 0.2); 
+            border: 1px solid rgba(220, 38, 38, 0.5); 
+            color: #ff6b6b; 
+            padding: 2px 8px; 
+            border-radius: 4px; 
+            font-size: 10px; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+        }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex">
 
-    <div class="admin-container">
-        <header>
-            <h1>Panel de Control</h1>
-            <p class="subtitle">Administración del Servidor & Scripts</p>
+    <!-- SIDEBAR DE NAVEGACIÓN -->
+    <aside class="sidebar w-72 fixed left-0 top-0 h-full z-50 hidden md:flex flex-col justify-between">
+        <div class="p-6">
+            <!-- Logo / Header -->
+            <div class="flex items-center gap-3 mb-10 cursor-pointer group">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center font-black text-white shadow-lg shadow-red-900/50 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div>
+                    <span class="text-white font-bold text-lg tracking-wide block">ADMIN PANEL</span>
+                    <span class="text-xs text-red-500 font-mono">v2.0.4 STABLE</span>
+                </div>
+            </div>
+
+            <!-- Menú Vertical -->
+            <nav class="space-y-2">
+                <div class="text-xs text-gray-500 uppercase font-semibold mb-4 px-3 tracking-wider">Gestión General</div>
+                
+                <!-- 1. Subir Archivo -->
+                <a href="#" onclick="activateSection(this, 'upload')" class="nav-item active flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
+                    <i class="fas fa-cloud-upload-alt w-5 text-center"></i>
+                    <span>Subir Archivo</span>
+                </a>
+
+                <!-- 2. Usuarios -->
+                <a href="#" onclick="activateSection(this, 'users')" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
+                    <i class="fas fa-users w-5 text-center"></i>
+                    <span>Usuarios</span>
+                </a>
+
+                <!-- 3. Licencias Usuario -->
+                <a href="#" onclick="activateSection(this, 'licenses')" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
+                    <i class="fas fa-key w-5 text-center"></i>
+                    <span>Licencias Usuario</span>
+                </a>
+
+                <div class="text-xs text-gray-500 uppercase font-semibold mt-8 mb-4 px-3 tracking-wider">Herramientas Lua</div>
+
+                <!-- 4. Encriptador Lua -->
+                <a href="#" onclick="activateSection(this, 'encryptor')" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
+                    <i class="fas fa-lock w-5 text-center"></i>
+                    <span>Encriptador Lua</span>
+                </a>
+
+                <!-- 5. Pasar a Usuarios -->
+                <a href="#" onclick="activateSection(this, 'migrate')" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
+                    <i class="fas fa-exchange-alt w-5 text-center"></i>
+                    <span>Pasar a Usuarios</span>
+                </a>
+
+                <!-- 6. Gestión de Roles -->
+                <a href="#" onclick="activateSection(this, 'roles')" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
+                    <i class="fas fa-user-tag w-5 text-center"></i>
+                    <span>Gestión de Roles</span>
+                </a>
+
+                <div class="mt-8 pt-4 border-t border-red-900/20">
+                    <!-- 7. Server.lua (Destacado) -->
+                    <a href="#" onclick="openServerLua()" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg bg-red-900/10 border border-red-600/20 text-red-400 hover:bg-red-900/20 hover:border-red-500/50">
+                        <i class="fas fa-file-code w-5 text-center animate-pulse"></i>
+                        <span class="font-bold">Server.lua</span>
+                        <i class="fas fa-bolt ml-auto text-xs text-yellow-500"></i>
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Footer Sidebar -->
+        <div class="p-4 border-t border-red-900/20 bg-[#0a0505]/50">
+            <div class="flex items-center gap-3 px-2">
+                <div class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-xs">AD</div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-white font-medium text-sm truncate">Administrador</p>
+                    <p class="text-green-500 text-xs">● En línea</p>
+                </div>
+                <button class="text-gray-400 hover:text-red-400"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="main-content flex-1 md:ml-72 min-h-screen p-8">
+        
+        <!-- Header Superior -->
+        <header class="flex justify-between items-center mb-10 fade-in" style="animation-delay: 0.1s;">
+            <div>
+                <h1 id="page-title" class="text-3xl font-bold text-white mb-1">Subir Archivo</h1>
+                <p class="text-gray-400 text-sm">Panel de control y administración del servidor</p>
+            </div>
+            <div class="flex gap-4">
+                <div class="card px-4 py-2 rounded-lg flex items-center gap-2">
+                    <i class="fas fa-server text-red-500"></i>
+                    <span class="text-sm font-mono text-gray-300">Status: <span class="text-green-400">Online</span></span>
+                </div>
+            </div>
         </header>
 
-        <nav class="menu-list">
-            <!-- Botón 1 -->
-            <button class="btn-admin">
-                <div class="btn-content">
-                    <svg class="btn-icon" viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
-                    Subir Archivo
+        <!-- Área Dinámica (Ejemplo visual de Subir Archivo) -->
+        <div id="content-area" class="fade-in" style="animation-delay: 0.2s;">
+            
+            <!-- Grid de Estadísticas Rápidas -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="card rounded-xl p-5 flex items-center justify-between border-l-4 border-l-red-600">
+                    <div>
+                        <p class="text-gray-400 text-xs uppercase font-bold">Usuarios Totales</p>
+                        <h3 class="text-2xl font-bold text-white mt-1">1,245</h3>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-red-900/30 flex items-center justify-center text-red-400"><i class="fas fa-users"></i></div>
                 </div>
-                <span class="btn-arrow">➜</span>
-            </button>
+                <div class="card rounded-xl p-5 flex items-center justify-between border-l-4 border-l-blue-600">
+                    <div>
+                        <p class="text-gray-400 text-xs uppercase font-bold">Licencias Activas</p>
+                        <h3 class="text-2xl font-bold text-white mt-1">892</h3>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-blue-900/30 flex items-center justify-center text-blue-400"><i class="fas fa-key"></i></div>
+                </div>
+                <div class="card rounded-xl p-5 flex items-center justify-between border-l-4 border-l-purple-600">
+                    <div>
+                        <p class="text-gray-400 text-xs uppercase font-bold">Scripts Protegidos</p>
+                        <h3 class="text-2xl font-bold text-white mt-1">45</h3>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-purple-900/30 flex items-center justify-center text-purple-400"><i class="fas fa-shield-alt"></i></div>
+                </div>
+            </div>
 
-            <!-- Botón 2 -->
-            <button class="btn-admin">
-                <div class="btn-content">
-                    <svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                    Usuarios
+            <!-- Zona de Contenido Activo (Simulación) -->
+            <div class="card rounded-xl p-8 min-h-[400px] flex flex-col items-center justify-center border-dashed border-2 border-red-900/30 bg-red-900/5">
+                <div class="w-20 h-20 rounded-full bg-red-900/20 flex items-center justify-center mb-4 animate-bounce">
+                    <i class="fas fa-cloud-upload-alt text-4xl text-red-500"></i>
                 </div>
-                <span class="btn-arrow">➜</span>
-            </button>
+                <h3 class="text-xl font-bold text-white mb-2">Arrastra tus archivos aquí</h3>
+                <p class="text-gray-400 text-center max-w-md mb-6">Soporta archivos .lua, .zip y configuraciones .conf. El sistema validará la integridad automáticamente.</p>
+                <button class="btn-action px-6 py-3 rounded-lg text-white font-bold flex items-center gap-2">
+                    <i class="fas fa-folder-open"></i> Seleccionar Archivo
+                </button>
+            </div>
 
-            <!-- Botón 3 -->
-            <button class="btn-admin">
-                <div class="btn-content">
-                    <svg class="btn-icon" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
-                    Licencias Usuario
-                </div>
-                <span class="btn-arrow">➜</span>
-            </button>
+        </div>
+    </main>
 
-            <!-- Botón 4 -->
-            <button class="btn-admin">
-                <div class="btn-content">
-                    <svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
-                    Encriptador Lua
+    <!-- MODAL SERVER.LUA (Oculto por defecto) -->
+    <div id="lua-modal" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-[#0a0505] border border-red-600 w-full max-w-4xl rounded-xl shadow-2xl shadow-red-900/20 flex flex-col max-h-[90vh]">
+            <div class="p-4 border-b border-red-900/30 flex justify-between items-center bg-red-900/10">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-file-code text-red-500 text-xl"></i>
+                    <div>
+                        <h3 class="text-white font-bold">Server.lua</h3>
+                        <p class="text-xs text-gray-400">Edición en tiempo real</p>
+                    </div>
                 </div>
-                <span class="btn-arrow">➜</span>
-            </button>
+                <button onclick="closeServerLua()" class="text-gray-400 hover:text-white transition-colors"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="p-0 flex-1 overflow-hidden relative">
+                <textarea class="w-full h-[500px] bg-[#050507] text-gray-300 font-mono text-sm p-6 focus:outline-none resize-none" spellcheck="false">
+-- [SYSTEM CORE]
+-- Autorizado por Admin Panel v2
 
-            <!-- Botón 5 -->
-            <button class="btn-admin">
-                <div class="btn-content">
-                    <svg class="btn-icon" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-                    Pasar a Usuarios
-                </div>
-                <span class="btn-arrow">➜</span>
-            </button>
+function onResourceStart()
+    print("[SISTEMA] Iniciando validación de licencias...")
+    checkPermissions()
+end
 
-            <!-- Botón 6 -->
-            <button class="btn-admin">
-                <div class="btn-content">
-                    <svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-                    Gestión de Roles
-                </div>
-                <span class="btn-arrow">➜</span>
-            </button>
-
-            <!-- Botón 7 (Especial) -->
-            <button class="btn-admin btn-special">
-                <div class="btn-content">
-                    <svg class="btn-icon" viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
-                    Server.lua
-                </div>
-                <span class="btn-arrow">⚡</span>
-            </button>
-        </nav>
+addEventHandler("onResourceStart", resourceRoot, onResourceStart)
+                </textarea>
+            </div>
+            <div class="p-4 border-t border-red-900/30 flex justify-end gap-3 bg-[#0a0505]">
+                <button onclick="closeServerLua()" class="px-4 py-2 rounded text-gray-400 hover:text-white text-sm">Cancelar</button>
+                <button class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded text-sm font-bold shadow-lg shadow-red-900/50">Guardar Cambios</button>
+            </div>
+        </div>
     </div>
 
+    <script>
+        // Función simple para cambiar el título y resaltar el botón activo
+        function activateSection(element, sectionName) {
+            // Remover clase active de todos
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            // Añadir al clickeado
+            element.classList.add('active');
+            
+            // Cambiar Título
+            const titles = {
+                'upload': 'Subir Archivo',
+                'users': 'Gestión de Usuarios',
+                'licenses': 'Licencias de Usuario',
+                'encryptor': 'Encriptador de Código Lua',
+                'migrate': 'Migrar Datos a Usuarios',
+                'roles': 'Configuración de Roles',
+            };
+            
+            document.getElementById('page-title').innerText = titles[sectionName] || 'Panel';
+            
+            // Aquí podrías agregar lógica para mostrar/ocultar divs de contenido real
+        }
+
+        // Modal Server.lua
+        function openServerLua() {
+            document.getElementById('lua-modal').classList.remove('hidden');
+        }
+
+        function closeServerLua() {
+            document.getElementById('lua-modal').classList.add('hidden');
+        }
+    </script>
 </body>
 </html>
