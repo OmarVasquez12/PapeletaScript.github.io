@@ -9,6 +9,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         * { font-family: 'Inter', sans-serif; }
@@ -42,6 +46,10 @@
         /* Upload Area */
         .upload-area { border: 2px dashed rgba(255, 26, 26, 0.3); transition: all 0.3s; }
         .upload-area:hover { border-color: #ff1a1a; background: rgba(255, 26, 26, 0.05); }
+        
+        /* Preview Images */
+        .preview-container { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+        .preview-img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid #ff1a1a; }
     </style>
 </head>
 <body class="min-h-screen flex overflow-hidden">
@@ -60,36 +68,53 @@
         
         <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
             <div class="text-xs text-gray-500 uppercase font-semibold mb-4 px-3 tracking-wider mt-4">Gestión</div>
-            <a href="#" class="nav-item active flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
+            
+            <!-- BOTÓN: DASHBOARD -->
+            <a onclick="showSection('dashboard')" class="nav-item active flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
                 <i class="fas fa-chart-pie w-5 text-center"></i><span>Dashboard</span>
             </a>
-            <a href="#" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
+            
+            <!-- BOTÓN: SUBIR PRODUCTO -->
+            <a onclick="showSection('upload-product')" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
                 <i class="fas fa-cloud-upload-alt w-5 text-center"></i><span>Subir Producto</span>
             </a>
-            <a href="#" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
+            
+            <!-- BOTÓN: USUARIOS -->
+            <a onclick="showSection('users')" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
                 <i class="fas fa-users w-5 text-center"></i><span>Usuarios</span>
             </a>
             
             <div class="text-xs text-gray-500 uppercase font-semibold mb-4 px-3 tracking-wider mt-6">Herramientas</div>
-            <a href="#" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
-                <i class="fas fa-key w-5 text-center"></i><span>Licencias</span>
+            
+            <!-- BOTÓN: LICENCIAS -->
+            <a onclick="showSection('licenses')" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
+                <i class="fas fa-key w-5 text-center"></i><span>Licencias Usuario</span>
             </a>
-            <a href="#" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
+            
+            <!-- BOTÓN: ENCRIPTADOR -->
+            <a onclick="showSection('encryptor')" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
                 <i class="fas fa-lock w-5 text-center"></i><span>Encriptador Lua</span>
             </a>
-            <a href="#" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
+            
+            <!-- BOTÓN: ASIGNAR PRODUCTOS (PASAR A USUARIOS) -->
+            <a onclick="showSection('assign-products')" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
+                <i class="fas fa-user-plus w-5 text-center"></i><span>Pasar a Usuarios</span>
+            </a>
+            
+            <!-- BOTÓN: GESTIÓN DE ROLES -->
+            <a onclick="showSection('roles')" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
                 <i class="fas fa-id-badge w-5 text-center"></i><span>Gestión de Roles</span>
             </a>
         </nav>
 
         <div class="p-4 border-t border-red-900/20 bg-[#0a0505]/50">
             <div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-red-900/10 border border-red-900/20">
-                <img src="" alt="Admin" class="w-9 h-9 rounded-full border border-red-600 object-cover">
+                <img id="admin-avatar" src="https://cdn.discordapp.com/embed/avatars/0.png" alt="Admin" class="w-9 h-9 rounded-full border border-red-600 object-cover">
                 <div class="flex-1 min-w-0">
-                    <p class="text-white font-medium text-sm truncate">Admin</p>
+                    <p id="admin-name" class="text-white font-medium text-sm truncate">Cargando...</p>
                     <p class="text-red-400 text-[10px] font-bold uppercase">Administrador</p>
                 </div>
-                <button class="text-gray-400 hover:text-red-400 transition-colors" title="Salir"><i class="fas fa-sign-out-alt"></i></button>
+                <button onclick="logout()" class="text-gray-400 hover:text-red-400 transition-colors" title="Salir"><i class="fas fa-sign-out-alt"></i></button>
             </div>
         </div>
     </aside>
@@ -98,7 +123,7 @@
     <main class="flex-1 md:ml-64 min-h-screen flex flex-col relative">
         <!-- Header -->
         <header class="border-b border-red-900/20 px-8 py-5 bg-[#0a0505]/30 backdrop-blur-sm sticky top-0 z-40 flex justify-between items-center">
-            <h1 class="text-xl font-bold text-white">Dashboard General</h1>
+            <h1 id="page-title" class="text-xl font-bold text-white">Dashboard General</h1>
             <a href="index.html" class="text-sm text-gray-400 hover:text-white flex items-center gap-2 transition-colors">
                 <i class="fas fa-arrow-left"></i> Volver a la Tienda
             </a>
@@ -107,13 +132,13 @@
         <div class="p-6 md:p-8 flex-grow overflow-y-auto custom-scrollbar">
             
             <!-- SECTION: DASHBOARD -->
-            <div class="section active">
+            <div id="sec-dashboard" class="section active">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                     <div class="stat-card rounded-xl p-5">
                         <div class="flex justify-between items-start">
                             <div>
                                 <p class="text-gray-400 text-xs uppercase font-bold mb-1">Ventas Totales</p>
-                                <h3 class="text-2xl font-bold text-white">0</h3>
+                                <h3 id="dash-sales" class="text-2xl font-bold text-white">0</h3>
                             </div>
                             <div class="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center text-green-400"><i class="fas fa-dollar-sign"></i></div>
                         </div>
@@ -122,7 +147,7 @@
                         <div class="flex justify-between items-start">
                             <div>
                                 <p class="text-gray-400 text-xs uppercase font-bold mb-1">Productos</p>
-                                <h3 class="text-2xl font-bold text-white">0</h3>
+                                <h3 id="dash-products" class="text-2xl font-bold text-white">0</h3>
                             </div>
                             <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400"><i class="fas fa-box"></i></div>
                         </div>
@@ -131,7 +156,7 @@
                         <div class="flex justify-between items-start">
                             <div>
                                 <p class="text-gray-400 text-xs uppercase font-bold mb-1">Usuarios</p>
-                                <h3 class="text-2xl font-bold text-white">0</h3>
+                                <h3 id="dash-users" class="text-2xl font-bold text-white">0</h3>
                             </div>
                             <div class="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400"><i class="fas fa-users"></i></div>
                         </div>
@@ -140,7 +165,7 @@
                         <div class="flex justify-between items-start">
                             <div>
                                 <p class="text-gray-400 text-xs uppercase font-bold mb-1">Ingresos Est.</p>
-                                <h3 class="text-2xl font-bold text-white">$0</h3>
+                                <h3 id="dash-revenue" class="text-2xl font-bold text-white">$0</h3>
                             </div>
                             <div class="w-10 h-10 rounded-lg bg-yellow-500/10 flex items-center justify-center text-yellow-400"><i class="fas fa-wallet"></i></div>
                         </div>
@@ -160,8 +185,8 @@
                                     <th class="pb-3">Fecha</th>
                                 </tr>
                             </thead>
-                            <tbody class="text-sm text-gray-300">
-                                <tr><td colspan="5" class="py-8 text-center text-gray-500">Sin datos</td></tr>
+                            <tbody id="recent-sales-body" class="text-sm text-gray-300">
+                                <tr><td colspan="5" class="py-8 text-center text-gray-500">Cargando datos...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -169,24 +194,24 @@
             </div>
 
             <!-- SECTION: UPLOAD PRODUCT -->
-            <div class="section">
+            <div id="sec-upload-product" class="section">
                 <div class="max-w-4xl mx-auto card rounded-xl p-8">
                     <h2 class="text-2xl font-bold text-white mb-6">Agregar Nuevo Recurso</h2>
-                    <form class="space-y-6">
+                    <form id="product-form" onsubmit="handleProductSubmit(event)" class="space-y-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-gray-400 text-sm font-semibold mb-2">Nombre del Producto</label>
-                                <input type="text" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none" placeholder="Ej: Sistema Anti-Cheat v2">
+                                <input type="text" id="prod-name" required class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none" placeholder="Ej: Sistema Anti-Cheat v2">
                             </div>
                             <div>
                                 <label class="block text-gray-400 text-sm font-semibold mb-2">Precio (USD)</label>
-                                <input type="number" step="0.01" min="0" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none" placeholder="15.00">
+                                <input type="number" id="prod-price" step="0.01" min="0" required class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none" placeholder="15.00">
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-gray-400 text-sm font-semibold mb-2">Categoría</label>
-                            <select class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none">
+                            <select id="prod-category" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none">
                                 <option value="Scripts">Scripts MTA</option>
                                 <option value="Modelajes">Modelajes / Mapas</option>
                                 <option value="Webs">Sitios Web</option>
@@ -197,25 +222,25 @@
 
                         <div>
                             <label class="block text-gray-400 text-sm font-semibold mb-2">Descripción</label>
-                            <textarea rows="4" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none" placeholder="Detalles técnicos, características..."></textarea>
+                            <textarea id="prod-description" required rows="4" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none" placeholder="Detalles técnicos, características..."></textarea>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-gray-400 text-sm font-semibold mb-2">Imágenes (Múltiple)</label>
                                 <div class="upload-area rounded-lg p-6 text-center cursor-pointer relative">
-                                    <input type="file" accept="image/*" multiple class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                                    <input type="file" id="prod-images" accept="image/*" multiple onchange="previewMultipleImages(this)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                                     <i class="fas fa-images text-3xl text-red-400 mb-2"></i>
                                     <p class="text-gray-400 text-sm">Click para subir imágenes</p>
-                                    <div class="flex gap-2 mt-3 justify-center flex-wrap"></div>
+                                    <div id="multiple-images-preview" class="preview-container mt-3"></div>
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-gray-400 text-sm font-semibold mb-2">Archivo (.zip/.lua)</label>
                                 <div class="upload-area rounded-lg p-6 text-center cursor-pointer relative h-full flex flex-col justify-center">
-                                    <input type="file" accept=".zip,.rar,.7z,.lua" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                                    <input type="file" id="prod-file" accept=".zip,.rar,.7z,.lua" required onchange="updateFileName(this)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                                     <i class="fas fa-file-archive text-3xl text-red-400 mb-2"></i>
-                                    <p class="text-gray-400 text-sm">Click para subir archivo</p>
+                                    <p id="file-label-text" class="text-gray-400 text-sm">Click para subir archivo</p>
                                 </div>
                             </div>
                         </div>
@@ -228,11 +253,11 @@
             </div>
 
             <!-- SECTION: USERS -->
-            <div class="section">
+            <div id="sec-users" class="section">
                 <div class="card rounded-xl p-6">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-lg font-bold text-white">Base de Datos de Usuarios</h2>
-                        <button class="text-red-400 hover:text-white text-sm"><i class="fas fa-sync-alt mr-1"></i> Refrescar</button>
+                        <button onclick="loadUsers()" class="text-red-400 hover:text-white text-sm"><i class="fas fa-sync-alt mr-1"></i> Refrescar</button>
                     </div>
                     <div class="overflow-x-auto max-h-[600px] overflow-y-auto custom-scrollbar">
                         <table class="w-full text-left border-collapse">
@@ -246,10 +271,123 @@
                                     <th class="pb-3 text-right">Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody class="text-sm text-gray-300">
+                            <tbody id="users-table-body" class="text-sm text-gray-300">
                                 <tr><td colspan="6" class="text-center py-4 text-gray-500">Sin datos</td></tr>
                             </tbody>
                         </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION: LICENSES -->
+            <div id="sec-licenses" class="section">
+                <div class="card rounded-xl p-6">
+                    <h2 class="text-lg font-bold text-white mb-4">Historial de Licencias Generadas</h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="text-gray-500 text-xs uppercase border-b border-red-900/30">
+                                    <th class="pb-3 pl-2">Key</th>
+                                    <th class="pb-3">Producto</th>
+                                    <th class="pb-3">Usuario</th>
+                                    <th class="pb-3">Estado</th>
+                                    <th class="pb-3">Fecha</th>
+                                </tr>
+                            </thead>
+                            <tbody id="licenses-table-body" class="text-sm text-gray-300">
+                                <tr><td colspan="5" class="text-center py-4 text-gray-500">Cargando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION: ENCRYPTOR -->
+            <div id="sec-encryptor" class="section">
+                <div class="max-w-4xl mx-auto card rounded-xl p-8">
+                    <h2 class="text-2xl font-bold text-white mb-2">Encriptador de Scripts Lua</h2>
+                    <p class="text-gray-400 text-sm mb-6">Protege tus archivos antes de subirlos a la tienda.</p>
+                    
+                    <div class="space-y-4">
+                        <textarea id="lua-code-input" rows="10" class="input-field w-full px-4 py-3 rounded-lg text-white font-mono text-sm focus:outline-none" placeholder="-- Pega tu código Lua aquí..."></textarea>
+                        
+                        <div class="flex gap-4">
+                            <button onclick="simulateEncryption()" class="btn-primary px-6 py-3 rounded-lg text-white font-bold flex items-center gap-2">
+                                <i class="fas fa-shield-alt"></i> Encriptar Código
+                            </button>
+                            <button onclick="document.getElementById('lua-code-input').value = ''" class="bg-gray-700 hover:bg-gray-600 px-6 py-3 rounded-lg text-white font-bold transition-colors">
+                                Limpiar
+                            </button>
+                        </div>
+                        
+                        <div id="encryption-result" class="hidden mt-4 p-4 bg-black/50 rounded-lg border border-green-900/50">
+                            <p class="text-green-400 text-sm font-bold mb-2"><i class="fas fa-check-circle"></i> Código Encriptado:</p>
+                            <textarea readonly rows="5" class="w-full bg-transparent text-gray-300 font-mono text-xs resize-none focus:outline-none">-- Función de simulación de encriptación activada --</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION: ASSIGN PRODUCTS (PASAR A USUARIOS) -->
+            <div id="sec-assign-products" class="section">
+                <div class="max-w-4xl mx-auto card rounded-xl p-8">
+                    <h2 class="text-2xl font-bold text-white mb-6">Asignar Productos Manualmente</h2>
+                    <p class="text-gray-400 mb-6">Da acceso gratuito a un usuario específico sin pasar por la pasarela de pago.</p>
+                    
+                    <form onsubmit="event.preventDefault(); alert('Funcionalidad de asignación manual simulada');" class="space-y-6">
+                        <div>
+                            <label class="block text-gray-400 text-sm font-semibold mb-2">ID de Discord del Usuario</label>
+                            <input type="text" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none" placeholder="Ej: 890526767608127489">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-400 text-sm font-semibold mb-2">Seleccionar Producto</label>
+                            <select id="assign-product-select" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none">
+                                <option>Cargando productos...</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn-primary w-full py-4 rounded-xl text-white font-bold text-lg shadow-lg shadow-red-900/20 flex items-center justify-center gap-2">
+                            <i class="fas fa-gift"></i> Asignar Gratis
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- SECTION: ROLES -->
+            <div id="sec-roles" class="section">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="card rounded-xl p-6">
+                        <h2 class="text-lg font-bold text-white mb-4">Crear Nuevo Rol</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-400 text-sm font-semibold mb-2">Nombre del Rol</label>
+                                <input type="text" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none" placeholder="Ej: VIP Gold">
+                            </div>
+                            <div>
+                                <label class="block text-gray-400 text-sm font-semibold mb-2">Color (Hex)</label>
+                                <input type="color" class="w-full h-10 rounded cursor-pointer bg-transparent">
+                            </div>
+                            <button class="btn-primary w-full py-3 rounded-lg text-white font-bold">Guardar Rol</button>
+                        </div>
+                    </div>
+
+                    <div class="card rounded-xl p-6">
+                        <h2 class="text-lg font-bold text-white mb-4">Roles Existentes</h2>
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center p-3 bg-[#0d0505] rounded border border-red-900/30">
+                                <span class="text-white font-bold">Admin</span>
+                                <span class="text-xs bg-red-900/50 text-red-300 px-2 py-1 rounded">Full Access</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-[#0d0505] rounded border border-red-900/30">
+                                <span class="text-white font-bold">Moderador</span>
+                                <span class="text-xs bg-blue-900/50 text-blue-300 px-2 py-1 rounded">Manage Users</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-[#0d0505] rounded border border-red-900/30">
+                                <span class="text-white font-bold">Cliente</span>
+                                <span class="text-xs bg-green-900/50 text-green-300 px-2 py-1 rounded">Basic</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -259,20 +397,241 @@
 
     <script>
         // ==========================================
-        // ESPACIO PARA AGREGAR FUNCIONALIDADES
+        // CONFIGURACIÓN FIREBASE
         // ==========================================
-        // Aquí irán las funciones que me envíes una por una
+        const firebaseConfig = {
+            apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
+            authDomain: "papeletalicencia.firebaseapp.com",
+            databaseURL: "https://papeletalicencia-default-rtdb.firebaseio.com",
+            projectId: "papeletalicencia",
+            storageBucket: "papeletalicencia.firebasestorage.app",
+            messagingSenderId: "677208314051",
+            appId: "1:677208314051:web:a27c04f31d402e83f29276",
+            measurementId: "G-RPJ4KQ6EQ4"
+        };
+
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // ==========================================
+        // LÓGICA DE NAVEGACIÓN Y UI
+        // ==========================================
         
-        // Ejemplo de estructura:
-        /*
-        function miFuncion() {
-            // Código aquí
+        function showSection(sectionId) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            
+            // Mostrar la seleccionada
+            document.getElementById('sec-' + sectionId).classList.add('active');
+            
+            // Actualizar título
+            const titles = {
+                'dashboard': 'Dashboard General',
+                'upload-product': 'Subir Nuevo Producto',
+                'users': 'Gestión de Usuarios',
+                'licenses': 'Licencias Generadas',
+                'encryptor': 'Herramienta de Encriptación',
+                'assign-products': 'Asignar Productos Gratis',
+                'roles': 'Gestión de Roles y Permisos'
+            };
+            document.getElementById('page-title').innerText = titles[sectionId];
+
+            // Marcar link activo
+            const links = document.querySelectorAll('.nav-item');
+            // Esta lógica es simple, busca por texto o índice si fuera necesario, 
+            // pero para este ejemplo visual funciona bien con el click directo.
+            event.currentTarget.classList.add('active');
         }
+
+        // ==========================================
+        // FUNCIONES DE PRODUCTOS (UPLOAD)
+        // ==========================================
+        let tempImages = [];
+
+        function previewMultipleImages(input) {
+            const container = document.getElementById('multiple-images-preview');
+            container.innerHTML = '';
+            tempImages = [];
+            if (input.files) {
+                Array.from(input.files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = e => {
+                        tempImages.push(e.target.result);
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'preview-img';
+                        container.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+        }
+
+        function updateFileName(input) {
+            const label = document.getElementById('file-label-text');
+            if (input.files && input.files[0]) {
+                label.innerText = input.files[0].name;
+                label.classList.add('text-white', 'font-bold');
+            }
+        }
+
+        async function handleProductSubmit(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner animate-spin"></i> Subiendo...';
+            
+            try {
+                // Simulación básica de subida (aquí iría la lógica real de resize y base64 del código anterior)
+                const newProduct = {
+                    name: document.getElementById('prod-name').value,
+                    price: parseFloat(document.getElementById('prod-price').value),
+                    category: document.getElementById('prod-category').value,
+                    description: document.getElementById('prod-description').value,
+                    image_url: tempImages[0] || '',
+                    created_at: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                await db.collection("Productos").add(newProduct);
+                alert('¡Producto subido exitosamente!');
+                e.target.reset();
+                document.getElementById('multiple-images-preview').innerHTML = '';
+                loadStats(); // Recargar stats
+            } catch (error) {
+                console.error(error);
+                alert('Error al subir: ' + error.message);
+            } finally {
+                btn.innerHTML = originalText;
+            }
+        }
+
+        // ==========================================
+        // FUNCIONES DE DATOS (STATS & USERS)
+        // ==========================================
         
+        async function loadStats() {
+            try {
+                // Productos
+                const prodSnap = await db.collection("Productos").get();
+                document.getElementById('dash-products').innerText = prodSnap.size;
+                
+                // Ventas / Clientes
+                const salesSnap = await db.collection("Clientes").get();
+                let totalRevenue = 0;
+                let salesCount = 0;
+                
+                const salesBody = document.getElementById('recent-sales-body');
+                salesBody.innerHTML = '';
+
+                salesSnap.forEach(doc => {
+                    const data = doc.data();
+                    salesCount++;
+                    // Parseo simple de precio (en producción usar números guardados)
+                    const priceStr = data.total_price || "$0";
+                    const priceNum = parseFloat(priceStr.replace('$','')) || 0;
+                    totalRevenue += priceNum;
+
+                    // Añadir a tabla (limitado a últimos 5 visualmente)
+                    if(salesBody.children.length < 5) {
+                        const row = `
+                            <tr class="border-b border-red-900/10 hover:bg-white/5 transition-colors">
+                                <td class="py-3 pl-2 flex items-center gap-2">
+                                    <img src="${data.avatar || 'https://via.placeholder.com/30'}" class="w-6 h-6 rounded-full">
+                                    ${data.username}
+                                </td>
+                                <td>${data.products ? data.products[0].name : 'Pack'}</td>
+                                <td class="text-green-400">${priceStr}</td>
+                                <td><span class="px-2 py-1 rounded text-xs ${data.status === 'Pagado' ? 'bg-green-900/30 text-green-400' : 'bg-yellow-900/30 text-yellow-400'}">${data.status}</span></td>
+                                <td class="text-gray-500 text-xs">${data.date ? new Date(data.date.seconds * 1000).toLocaleDateString() : '-'}</td>
+                            </tr>
+                        `;
+                        salesBody.innerHTML += row;
+                    }
+                });
+
+                document.getElementById('dash-sales').innerText = salesCount;
+                document.getElementById('dash-revenue').innerText = '$' + totalRevenue.toFixed(2);
+
+                // Usuarios
+                const userSnap = await db.collection("UsuariosRegistrados").get();
+                document.getElementById('dash-users').innerText = userSnap.size;
+
+            } catch (error) {
+                console.error("Error cargando stats:", error);
+            }
+        }
+
+        async function loadUsers() {
+            // Carga desde LocalStorage como en el ejemplo original, o Firebase si se prefiere
+            const allUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
+            const tbody = document.getElementById('users-table-body');
+            tbody.innerHTML = '';
+
+            if(allUsers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-500">No hay usuarios locales registrados.</td></tr>';
+                return;
+            }
+
+            allUsers.forEach(u => {
+                const row = `
+                    <tr class="border-b border-red-900/10 hover:bg-white/5">
+                        <td class="py-3 pl-2"><img src="${u.avatar ? `https://cdn.discordapp.com/avatars/${u.discord_id}/${u.avatar}.png` : 'https://via.placeholder.com/30'}" class="w-8 h-8 rounded-full"></td>
+                        <td class="font-bold text-white">${u.username}</td>
+                        <td class="text-xs text-gray-500 font-mono">${u.discord_id}</td>
+                        <td><span class="text-xs uppercase px-2 py-1 rounded ${u.role === 'admin' ? 'bg-red-900/50 text-red-400' : 'bg-blue-900/50 text-blue-400'}">${u.role || 'user'}</span></td>
+                        <td class="text-xs text-gray-500">${new Date(u.last_login).toLocaleDateString()}</td>
+                        <td class="text-right">
+                            <button class="text-gray-400 hover:text-white"><i class="fas fa-edit"></i></button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        async function loadProductsForSelect() {
+            const select = document.getElementById('assign-product-select');
+            const snapshot = await db.collection("Productos").get();
+            select.innerHTML = '';
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const opt = document.createElement('option');
+                opt.value = doc.id;
+                opt.text = `${data.name} ($${data.price})`;
+                select.appendChild(opt);
+            });
+        }
+
+        function simulateEncryption() {
+            const resultDiv = document.getElementById('encryption-result');
+            resultDiv.classList.remove('hidden');
+            resultDiv.querySelector('textarea').value = "-- [ENCRIPTADO POR PAPELETA STORE]\n-- Key: " + Math.random().toString(36).substring(7) + "\nreturn loadstring(...)";
+        }
+
+        // ==========================================
+        // INICIALIZACIÓN
+        // ==========================================
         document.addEventListener('DOMContentLoaded', () => {
-            // Inicialización
+            loadStats();
+            loadUsers();
+            loadProductsForSelect();
+            
+            // Verificar sesión simple (simulada)
+            const savedUser = JSON.parse(localStorage.getItem('papeleta_user_' + (localStorage.getItem('last_discord_id') || '')) || '{}');
+            if(savedUser.username) {
+                document.getElementById('admin-name').innerText = savedUser.username;
+                if(savedUser.avatar) document.getElementById('admin-avatar').src = `https://cdn.discordapp.com/avatars/${savedUser.discord_id}/${savedUser.avatar}.png`;
+            } else {
+                 // Si no hay usuario logueado, redirigir o mostrar genérico
+                 document.getElementById('admin-name').innerText = "Invitado";
+            }
         });
-        */
+
+        function logout() {
+            localStorage.removeItem('dc_access_token');
+            window.location.href = 'index.html';
+        }
     </script>
 </body>
 </html>
