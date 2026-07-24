@@ -207,12 +207,11 @@
             transform: translateY(-2px);
         }
 
-        /* --- NUEVOS ESTILOS PARA SECCIÓN DE RESEÑAS --- */
+        /* --- NUEVOS ESTILOS PARA SECCIÓN DE RESEÑAS (INFINITO) --- */
         .reviews-section {
             padding: 80px 0;
             position: relative;
             overflow: hidden;
-            /* Ajuste para que ocupe todo el ancho disponible */
             width: 100vw;
             margin-left: calc(50% - 50vw);
             background: linear-gradient(to bottom, transparent, rgba(20, 10, 10, 0.4), transparent);
@@ -240,18 +239,31 @@
             font-size: 1.1rem;
         }
 
+        /* Contenedor del slider infinito */
         .reviews-slider {
             display: flex;
             gap: 25px;
-            overflow-x: auto;
-            padding: 20px 40px;
-            scroll-snap-type: x mandatory;
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE/Edge */
+            padding: 20px 0;
+            /* Ancho dinámico basado en el contenido para permitir el scroll */
+            width: max-content; 
+            /* Animación infinita */
+            animation: scroll-infinite 40s linear infinite;
         }
-        
-        .reviews-slider::-webkit-scrollbar {
-            display: none; /* Chrome/Safari */
+
+        /* Pausar animación al pasar el mouse */
+        .reviews-slider:hover {
+            animation-play-state: paused;
+        }
+
+        /* Definición de la animación de desplazamiento */
+        @keyframes scroll-infinite {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                /* Se mueve exactamente la mitad del ancho total (porque duplicamos el contenido) */
+                transform: translateX(-50%);
+            }
         }
 
         .review-card-slide {
@@ -261,12 +273,12 @@
             border: 1px solid var(--border-color);
             border-radius: 20px;
             padding: 30px;
-            scroll-snap-align: start;
-            transition: transform 0.3s ease, border-color 0.3s ease;
+            /* Eliminamos scroll-snap ya que ahora es automático */
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, border-color 0.3s ease;
         }
 
         .review-card-slide:hover {
@@ -661,8 +673,8 @@
                         <p>No lo decimos nosotros. Lo dicen quienes ya confían en nuestros scripts</p>
                     </div>
                     
+                    <!-- Slider Infinito -->
                     <div class="reviews-slider" id="reviews-slider">
-                        <!-- Las reseñas se cargarán aquí dinámicamente desde Firebase -->
                         <div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;">
                             <i class="fas fa-spinner animate-spin text-3xl text-red-500"></i>
                             <span class="text-gray-400">Cargando opiniones...</span>
@@ -1430,86 +1442,85 @@
         }
 
     async function loadPublicReviews() {
-    const slider = document.getElementById('reviews-slider');
-    try {
-        const productsSnapshot = await db.collection("Productos").get();
-        const productsMap = {}; // Mapa: product_id -> nombre del producto
-        
-        productsSnapshot.forEach(doc => {
-            const data = doc.data();
-            // Guardamos tanto el ID del documento como el ID interno del producto
-            productsMap[doc.id] = data.name || 'Producto';
-            if (data.id) {
-                productsMap[data.id] = data.name || 'Producto';
-            }
-        });
-
-        // 2. Ahora obtenemos las últimas reseñas
-        const reviewsSnapshot = await db.collection("Resenas")
-            .limit(15) // Aumentamos el límite para tener más opciones
-            .get();
-        
-        let reviewsHTML = '';
-        let count = 0;
-
-        reviewsSnapshot.forEach(doc => {
-            const data = doc.data();
+        const slider = document.getElementById('reviews-slider');
+        try {
+            const productsSnapshot = await db.collection("Productos").get();
+            const productsMap = {}; 
             
-            // Solo mostramos reseñas de 4 o 5 estrellas para mantener calidad
-            if (data.rating >= 4) {
-                const stars = '★'.repeat(data.rating);
-                const date = data.created_at?.toDate ? data.created_at.toDate().toLocaleDateString('es-ES') : '';
-                const avatar = data.user_avatar || 'https://cdn.discordapp.com/embed/avatars/0.png';
-                const username = data.username || 'Usuario Anónimo';
-                const text = data.text || '';
+            productsSnapshot.forEach(doc => {
+                const data = doc.data();
+                productsMap[doc.id] = data.name || 'Producto';
+                if (data.id) {
+                    productsMap[data.id] = data.name || 'Producto';
+                }
+            });
+
+            const reviewsSnapshot = await db.collection("Resenas")
+                .limit(15) 
+                .get();
+            
+            let reviewsHTML = '';
+            let count = 0;
+
+            reviewsSnapshot.forEach(doc => {
+                const data = doc.data();
                 
-                // CORRECCIÓN: Buscamos el nombre real del producto usando el product_id
-                const productId = data.product_id;
-                const productName = productsMap[productId] || 'Producto Premium';
-                
-                reviewsHTML += `
-                    <div class="review-card-slide">
-                        <div>
-                            <div class="review-header">
-                                <img src="${avatar}" alt="${username}" class="review-avatar">
-                                <div class="review-user-info">
-                                    <h4>${escapeHTML(username)}</h4>
-                                    <p class="review-date">${date}</p>
+                if (data.rating >= 4) {
+                    const stars = '★'.repeat(data.rating);
+                    const date = data.created_at?.toDate ? data.created_at.toDate().toLocaleDateString('es-ES') : '';
+                    const avatar = data.user_avatar || 'https://cdn.discordapp.com/embed/avatars/0.png';
+                    const username = data.username || 'Usuario Anónimo';
+                    const text = data.text || '';
+                    
+                    const productId = data.product_id;
+                    const productName = productsMap[productId] || 'Producto Premium';
+                    
+                    reviewsHTML += `
+                        <div class="review-card-slide">
+                            <div>
+                                <div class="review-header">
+                                    <img src="${avatar}" alt="${username}" class="review-avatar">
+                                    <div class="review-user-info">
+                                        <h4>${escapeHTML(username)}</h4>
+                                        <p class="review-date">${date}</p>
+                                    </div>
                                 </div>
+                                <div class="review-stars">${stars}</div>
+                                <p class="review-text">${escapeHTML(text)}</p>
                             </div>
-                            <div class="review-stars">${stars}</div>
-                            <p class="review-text">${escapeHTML(text)}</p>
+                            <div class="review-product-tag">
+                                <i class="fas fa-cube"></i> ${escapeHTML(productName)}
+                            </div>
                         </div>
-                        <div class="review-product-tag">
-                            <i class="fas fa-cube"></i> ${escapeHTML(productName)}
-                        </div>
+                    `;
+                    count++;
+                }
+            });
+
+            if (count > 0) {
+                // DUPLICAMOS EL CONTENIDO PARA CREAR EL EFECTO INFINITO
+                // Al tener dos copias idénticas, cuando la primera termina de pasar,
+                // la segunda ya está visible y la animación se reinicia imperceptiblemente.
+                slider.innerHTML = reviewsHTML + reviewsHTML;
+            } else {
+                slider.innerHTML = `
+                    <div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;">
+                        <i class="fas fa-comment-slash text-3xl text-gray-600"></i>
+                        <span class="text-gray-400">Aún no hay reseñas destacadas.</span>
                     </div>
                 `;
-                count++;
             }
-        });
 
-        if (count > 0) {
-            slider.innerHTML = reviewsHTML;
-        } else {
+        } catch (error) {
+            console.error("Error cargando reseñas públicas:", error);
             slider.innerHTML = `
                 <div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;">
-                    <i class="fas fa-comment-slash text-3xl text-gray-600"></i>
-                    <span class="text-gray-400">Aún no hay reseñas destacadas.</span>
+                    <i class="fas fa-exclamation-triangle text-3xl text-red-500"></i>
+                    <span class="text-gray-400">No se pudieron cargar las opiniones.</span>
                 </div>
             `;
         }
-
-    } catch (error) {
-        console.error("Error cargando reseñas públicas:", error);
-        slider.innerHTML = `
-            <div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;">
-                <i class="fas fa-exclamation-triangle text-3xl text-red-500"></i>
-                <span class="text-gray-400">No se pudieron cargar las opiniones.</span>
-            </div>
-        `;
     }
-}
 
         document.addEventListener('DOMContentLoaded', () => { 
             checkDiscordAuth(); 
