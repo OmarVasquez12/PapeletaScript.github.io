@@ -371,6 +371,38 @@
             position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
             cursor: pointer; border: none; padding: 0;
         }
+
+        /* ESTILOS DE NOTIFICACIONES (TOASTS) */
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { 
+            background: rgba(21, 10, 10, 0.95); 
+            border: 1px solid rgba(255, 26, 26, 0.3); 
+            border-left: 4px solid #dc2626; 
+            border-radius: 12px; 
+            padding: 16px 20px; 
+            min-width: 320px; max-width: 450px; 
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); 
+            backdrop-filter: blur(10px); 
+            animation: slideInRight 0.4s ease, fadeOut 0.4s ease 4.6s forwards; 
+            display: flex; align-items: center; gap: 12px; 
+            position: relative; overflow: hidden; 
+            pointer-events: auto;
+        }
+        .toast.success { border-left-color: #10b981; }
+        .toast.error { border-left-color: #ef4444; }
+        .toast.warning { border-left-color: #f59e0b; }
+        .toast-icon { font-size: 20px; flex-shrink: 0; }
+        .toast.success .toast-icon { color: #10b981; }
+        .toast.error .toast-icon { color: #ef4444; }
+        .toast.warning .toast-icon { color: #f59e0b; }
+        .toast-content { flex: 1; }
+        .toast-title { font-weight: 600; font-size: 14px; color: white; margin-bottom: 2px; }
+        .toast-message { font-size: 13px; color: #9ca3af; }
+        .toast-timer { position: absolute; bottom: 0; left: 0; height: 3px; background: rgba(220, 38, 38, 0.5); border-radius: 0 0 0 12px; animation: timerShrink 5s linear forwards; }
+        .toast.success .toast-timer { background: rgba(16, 185, 129, 0.5); }
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(100%); } }
+        @keyframes timerShrink { from { width: 100%; } to { width: 0%; } }
     </style>
 </head>
 <body class="min-h-screen flex">
@@ -1131,6 +1163,9 @@ end, true, "high")
         </div>
     </div>
 
+    <!-- TOAST CONTAINER -->
+    <div id="toast-container" class="toast-container"></div>
+
     <script>
         const CLIENT_ID = '1213866547181780992';
         const REDIRECT_URI = window.location.href.split('#')[0];
@@ -1177,6 +1212,25 @@ end, true, "high")
         // Variables para Crear Roles
         let currentPermissions = {};
         let existingRoles = [];
+
+        // ========== SISTEMA DE NOTIFICACIONES (TOASTS) ==========
+        function showToast(message, type = 'success', title = '') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', warning: 'fa-exclamation-triangle' };
+            const titles = { success: title || '¡Éxito!', error: title || 'Error', warning: title || 'Advertencia' };
+            toast.innerHTML = `
+                <i class="fas ${icons[type]} toast-icon"></i>
+                <div class="toast-content">
+                    <div class="toast-title">${titles[type]}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <div class="toast-timer"></div>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => { if (toast.parentNode) toast.remove(); }, 5000);
+        }
 
         // ========== AUTH DISCORD ==========
         function isAdmin() {
@@ -1239,6 +1293,7 @@ end, true, "high")
                 loadUsers();
                 loadMigrateData();
                 loadRoles();
+                showToast('Bienvenido, ' + user.username, 'success');
             })
             .catch(err => {
                 console.error(err);
@@ -1373,8 +1428,8 @@ end, true, "high")
             const youtubeUrl = document.getElementById('prod-youtube').value;
             const downloadFile = document.getElementById('prod-file').files[0];
             
-            if (tempImages.length === 0) { alert('Selecciona al menos una imagen'); return; }
-            if (!downloadFile) { alert('Selecciona el archivo de descarga'); return; }
+            if (tempImages.length === 0) { showToast('Selecciona al menos una imagen', 'warning'); return; }
+            if (!downloadFile) { showToast('Selecciona el archivo de descarga', 'warning'); return; }
             
             try {
                 const resizedImages = [];
@@ -1397,12 +1452,12 @@ end, true, "high")
                 };
                 
                 await db.collection("Productos").doc(newProduct.id).set(newProduct);
-                alert('✅ Producto guardado exitosamente');
+                showToast('Producto guardado exitosamente', 'success');
                 resetForm();
                 loadProducts();
             } catch (error) {
                 console.error(error);
-                alert('❌ Error: ' + error.message);
+                showToast('Error: ' + error.message, 'error');
             }
         }
 
@@ -1453,10 +1508,10 @@ end, true, "high")
             if (!confirm('¿Eliminar este producto?')) return;
             try {
                 await db.collection("Productos").doc(id).delete();
-                alert('✅ Eliminado');
+                showToast('Producto eliminado', 'success');
                 loadProducts();
             } catch (error) {
-                alert('❌ Error: ' + error.message);
+                showToast('Error: ' + error.message, 'error');
             }
         }
 
@@ -1612,10 +1667,10 @@ end, true, "high")
 
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(() => {
-                alert('✅ Licencia copiada al portapapeles');
+                showToast('Licencia copiada al portapapeles', 'success');
             }).catch(err => {
                 console.error('Error al copiar:', err);
-                alert('❌ Error al copiar la licencia');
+                showToast('Error al copiar la licencia', 'error');
             });
         }
 
@@ -1855,7 +1910,7 @@ end, true, "high")
             if (!user) return;
 
             if (isAdminHardcoded(user)) {
-                alert('⚠️ No se puede cambiar el rol de un administrador principal');
+                showToast('No se puede cambiar el rol de un administrador principal', 'warning');
                 return;
             }
 
@@ -1891,11 +1946,11 @@ end, true, "high")
                 updateUsersStats();
                 renderUsers();
 
-                alert(`✅ Rol de ${user.username} actualizado a "${newRole}"`);
+                showToast(`Rol de ${user.username} actualizado a "${newRole}"`, 'success');
 
             } catch (error) {
                 console.error("Error setting role:", error);
-                alert('❌ Error al actualizar el rol: ' + error.message);
+                showToast('Error al actualizar el rol: ' + error.message, 'error');
             }
         }
 
@@ -2099,7 +2154,7 @@ end, true, "high")
 
         async function assignProductToUser() {
             if (!migrateSelectedUser || !migrateSelectedProduct) {
-                alert('❌ Debes seleccionar un usuario y un producto');
+                showToast('Debes seleccionar un usuario y un producto', 'warning');
                 return;
             }
 
@@ -2136,7 +2191,7 @@ end, true, "high")
                     assigned_by_admin: true
                 });
 
-                alert(`✅ Producto asignado exitosamente!\n\nUsuario: ${migrateSelectedUser.username}\nProducto: ${migrateSelectedProduct.name}\nLicencia: ${licenseKey}`);
+                showToast(`Producto asignado a ${migrateSelectedUser.username}`, 'success');
 
                 migrateSelectedUser = null;
                 migrateSelectedProduct = null;
@@ -2149,7 +2204,7 @@ end, true, "high")
 
             } catch (error) {
                 console.error("Error assigning product:", error);
-                alert('❌ Error al asignar el producto: ' + error.message);
+                showToast('Error al asignar el producto: ' + error.message, 'error');
             }
         }
 
@@ -2221,13 +2276,13 @@ end, true, "high")
             const description = document.getElementById('role-desc').value.trim();
 
             if (!name) {
-                alert('❌ El nombre del rol es obligatorio');
+                showToast('El nombre del rol es obligatorio', 'warning');
                 return;
             }
 
             const exists = existingRoles.some(r => r.name.toLowerCase() === name.toLowerCase());
             if (exists) {
-                alert('⚠️ Ya existe un rol con ese nombre');
+                showToast('Ya existe un rol con ese nombre', 'warning');
                 return;
             }
 
@@ -2245,21 +2300,20 @@ end, true, "high")
                 existingRoles.push(newRole);
                 localStorage.setItem('papeleta_custom_roles', JSON.stringify(existingRoles));
 
-                alert(`✅ Rol "${name}" creado exitosamente`);
+                showToast(`Rol "${name}" creado exitosamente`, 'success');
 
                 document.getElementById('create-role-form').reset();
                 updateColorPreview('#ff1a1a');
                 initPermissions();
 
                 renderRoles();
-                // Actualizar también la lista de usuarios si está visible
                 if(document.getElementById('section-users').classList.contains('active')) {
                     loadUsers();
                 }
 
             } catch (error) {
                 console.error("Error creating role:", error);
-                alert('❌ Error al crear el rol: ' + error.message);
+                showToast('Error al crear el rol: ' + error.message, 'error');
             }
         }
 
@@ -2341,7 +2395,7 @@ end, true, "high")
             existingRoles = existingRoles.filter(r => r.id !== roleId);
             localStorage.setItem('papeleta_custom_roles', JSON.stringify(existingRoles));
             renderRoles();
-            alert('✅ Rol eliminado correctamente');
+            showToast('Rol eliminado correctamente', 'success');
         }
 
         function formatPermName(key) {
@@ -2360,10 +2414,10 @@ end, true, "high")
         function copyServerLua() {
             const code = document.getElementById('server-lua-code').value;
             navigator.clipboard.writeText(code).then(() => {
-                alert('✅ Código Server.lua copiado al portapapeles');
+                showToast('Código Server.lua copiado al portapapeles', 'success');
             }).catch(err => {
                 console.error('Error al copiar:', err);
-                alert('❌ Error al copiar el código');
+                showToast('Error al copiar el código', 'error');
             });
         }
 
