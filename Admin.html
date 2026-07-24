@@ -8,6 +8,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- Librerías necesarias para el Compilador -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://resource.trickle.so/vendor_lib/unpkg/react@18/umd/react.production.min.js"></script>
+    <script src="https://resource.trickle.so/vendor_lib/unpkg/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
@@ -195,7 +199,7 @@
         .badge-gratis { background: rgba(74, 222, 128, 0.2); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.3); }
         .badge-reclamado { background: rgba(59, 130, 246, 0.2); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); }
 
-        .filter-btn {
+        .filter-btn, .role-filter-btn {
             transition: all 0.3s ease;
         }
 
@@ -212,7 +216,6 @@
             transform: translateX(4px);
         }
 
-        /* Badges de Rol */
         .role-badge {
             padding: 4px 12px;
             border-radius: 20px;
@@ -224,26 +227,11 @@
             align-items: center;
             gap: 6px;
         }
-        .role-admin { 
-            background: rgba(220, 38, 38, 0.2); 
-            color: #dc2626; 
-            border: 1px solid rgba(220, 38, 38, 0.4);
-        }
-        .role-mod { 
-            background: rgba(245, 158, 11, 0.2); 
-            color: #f59e0b; 
-            border: 1px solid rgba(245, 158, 11, 0.4);
-        }
-        .role-user { 
-            background: rgba(107, 114, 128, 0.2); 
-            color: #6b7280; 
-            border: 1px solid rgba(107, 114, 128, 0.3);
-        }
-        .role-custom {
-            border: 1px solid;
-        }
+        .role-admin { background: rgba(220, 38, 38, 0.2); color: #dc2626; border: 1px solid rgba(220, 38, 38, 0.4); }
+        .role-mod { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); }
+        .role-user { background: rgba(107, 114, 128, 0.2); color: #6b7280; border: 1px solid rgba(107, 114, 128, 0.3); }
+        .role-custom { border: 1px solid; }
 
-        /* Botones de Rol Base */
         .btn-role {
             transition: all 0.2s ease;
             font-size: 12px;
@@ -252,28 +240,13 @@
             border-radius: 8px;
             position: relative;
         }
-        .btn-role-admin {
-            background: rgba(220, 38, 38, 0.1);
-            border: 1px solid rgba(220, 38, 38, 0.3);
-            color: #dc2626;
-        }
+        .btn-role-admin { background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.3); color: #dc2626; }
         .btn-role-admin:hover:not(:disabled) { background: rgba(220, 38, 38, 0.3); border-color: rgba(220, 38, 38, 0.6); }
-        
-        .btn-role-mod {
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            color: #f59e0b;
-        }
+        .btn-role-mod { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); color: #f59e0b; }
         .btn-role-mod:hover:not(:disabled) { background: rgba(245, 158, 11, 0.3); border-color: rgba(245, 158, 11, 0.6); }
-        
-        .btn-role-user {
-            background: rgba(107, 114, 128, 0.1);
-            border: 1px solid rgba(107, 114, 128, 0.3);
-            color: #6b7280;
-        }
+        .btn-role-user { background: rgba(107, 114, 128, 0.1); border: 1px solid rgba(107, 114, 128, 0.3); color: #6b7280; }
         .btn-role-user:hover:not(:disabled) { background: rgba(107, 114, 128, 0.3); border-color: rgba(107, 114, 128, 0.6); }
 
-        /* Dropdown de Roles Personalizados */
         .custom-roles-dropdown {
             position: absolute;
             bottom: 100%;
@@ -289,11 +262,7 @@
             display: none;
         }
         .custom-roles-dropdown.active { display: block; animation: slideUp 0.2s ease; }
-        
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .custom-role-option {
             display: flex;
@@ -307,20 +276,121 @@
             color: #e5e7eb;
         }
         .custom-role-option:hover { background: rgba(255, 255, 255, 0.05); }
-        
-        .role-color-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
+        .role-color-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 
-        .role-filter-btn {
-            transition: all 0.3s ease;
+        /* ESTILOS ESPECÍFICOS DEL COMPILADOR/ENCRIPTADOR */
+        :root {
+            --enc-bg: #070707;
+            --enc-card-bg: rgba(21, 10, 10, 0.6);
+            --enc-muted: #666;
+            --enc-accent: #ff1a1a;
+            --enc-accent-2: #cc1b1b;
+            --enc-white: #eee;
         }
+        
+        .upload-zone{
+            border:2px dashed rgba(255,26,26,0.3);
+            border-radius:12px;padding:40px 20px;
+            text-align:center;cursor:pointer;
+            background:linear-gradient(180deg,rgba(255,26,26,0.02),transparent);
+            transition:all .2s ease;
+        }
+        .upload-zone:hover, .upload-zone.dragover{
+            transform:translateY(-4px);
+            border-color:var(--enc-accent);
+            background:linear-gradient(180deg,rgba(255,26,26,0.08),transparent);
+            box-shadow:0 8px 24px rgba(255,26,26,0.15);
+        }
+        .upload-zone i{font-size:46px;color:var(--enc-accent);margin-bottom:10px}
+        
+        .mode-selector{ display:flex; gap:10px; justify-content:center; margin-top:20px; flex-wrap:wrap; }
+        .mode-btn{
+            background:rgba(255,255,255,0.03);
+            border:2px solid rgba(255,26,26,0.25);
+            color:var(--enc-white);
+            padding:14px 22px;
+            border-radius:12px;
+            cursor:pointer;
+            font-weight:800;
+            font-size:14px;
+            transition:all .25s ease;
+            display:inline-flex;
+            align-items:center;
+            gap:10px;
+            text-transform:uppercase;
+            letter-spacing:1px;
+            min-width:180px;
+            justify-content:center;
+        }
+        .mode-btn:hover{
+            border-color:var(--enc-accent);
+            background:rgba(255,26,26,0.08);
+            transform:translateY(-3px);
+            box-shadow:0 6px 18px rgba(255,26,26,0.25);
+        }
+        
+        .resource-summary{
+            background:linear-gradient(135deg, rgba(255,26,26,0.08), rgba(255,26,26,0.02));
+            border:1px solid rgba(255,26,26,0.3);
+            border-left:4px solid var(--enc-accent);
+            border-radius:14px;
+            padding:22px;
+            margin-bottom:18px;
+            animation:slideUp .4s ease-out;
+        }
+        .resource-summary-header{ display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom:16px; padding-bottom:14px; border-bottom:1px dashed rgba(255,26,26,0.2); }
+        .resource-summary-info{ display:flex; align-items:center; gap:14px; flex:1; min-width:240px; }
+        .resource-summary-icon{ width:56px; height:56px; border-radius:12px; background:linear-gradient(135deg, var(--enc-accent), var(--enc-accent-2)); display:flex; align-items:center; justify-content:center; font-size:26px; color:#fff; box-shadow:0 0 18px rgba(255,26,26,0.5); flex-shrink:0; }
+        .resource-summary-text{ display:flex; flex-direction:column; gap:4px; }
+        .resource-summary-label{ font-size:10px; color:var(--enc-muted); text-transform:uppercase; letter-spacing:2px; font-weight:700; }
+        .resource-summary-name{ font-size:22px; font-weight:900; color:var(--enc-white); font-family:"JetBrains Mono", monospace; word-break:break-all; }
+        .resource-summary-stats{ display:flex; gap:10px; flex-wrap:wrap; }
+        .stat-chip{ background:rgba(0,0,0,0.4); border:1px solid rgba(255,26,26,0.2); padding:10px 16px; border-radius:10px; display:flex; flex-direction:column; align-items:center; gap:4px; min-width:90px; }
+        .stat-chip-label{ font-size:9px; color:var(--enc-muted); text-transform:uppercase; letter-spacing:1.5px; font-weight:700; }
+        .stat-chip .stat-num{ color:var(--enc-accent); font-size:20px; font-weight:900; font-family:"JetBrains Mono", monospace; }
+        
+        .detected-files-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); gap:8px; margin-top:10px; }
+        .file-chip{ background:rgba(0,0,0,0.4); border:1px solid rgba(255,26,26,0.2); border-radius:8px; padding:10px 12px; display:flex; align-items:center; gap:8px; font-family:"JetBrains Mono", monospace; font-size:12px; font-weight:600; color:var(--enc-white); transition:all .2s ease; position:relative; overflow:hidden; }
+        .file-chip::before{ content:""; position:absolute; left:0;top:0;bottom:0; width:3px; background:var(--enc-accent); }
+        .file-chip:hover{ border-color:var(--enc-accent); background:rgba(255,26,26,0.08); transform:translateX(3px); }
+        
+        .file-list{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow-y:auto;padding-right:6px}
+        .file-row{ display:flex;align-items:center;gap:12px; padding:12px 14px;border-radius:10px; background:rgba(13,6,6,0.8); border-left:3px solid var(--enc-accent); transition:all .2s; }
+        .file-row:hover{background:rgba(255,26,26,0.08);transform:translateX(4px)}
+        .file-row input[type="checkbox"]{ width:20px;height:20px;accent-color:var(--enc-accent);cursor:pointer; }
+        
+        .progress-container{ height:12px;background:rgba(0,0,0,0.5);border-radius:999px; margin-top:16px;overflow:hidden; border:1px solid rgba(255,255,255,0.05); }
+        .progress-bar{ height:100%;width:0%; background:linear-gradient(90deg,var(--enc-accent),var(--enc-accent-2)); transition:width .3s linear; box-shadow:0 0 10px var(--enc-accent); }
+        
+        .btn-compile {
+            background:linear-gradient(90deg,var(--enc-accent),var(--enc-accent-2));
+            color:#fff;border:none;font-weight:800;
+            padding:12px 22px;border-radius:10px;cursor:pointer;
+            box-shadow:0 0 12px rgba(255,26,26,0.4);
+            transition:all .3s ease;font-size:15px;
+            display:inline-flex;align-items:center;gap:8px;
+        }
+        .btn-compile:hover:not(:disabled){ transform:translateY(-2px); box-shadow:0 0 20px rgba(255,26,26,0.7); }
+        .btn-compile:disabled{opacity:.4;cursor:not-allowed}
+
+        /* Modal de Advertencia */
+        #papeletaModal{ display:none; position:fixed;inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(5px); z-index:99999; align-items:center;justify-content:center; }
+        #papeletaModal.active{display:flex}
+        .papeleta-modal-card{ background:var(--enc-card-bg); border:2px solid var(--enc-accent); padding:40px; border-radius:24px; text-align:center; max-width:480px;width:90%; box-shadow:0 0 30px rgba(255,26,26,0.4); animation:modalPop .3s ease; }
+        @keyframes modalPop{ from{transform:scale(.85);opacity:0} to{transform:scale(1);opacity:1} }
     </style>
 </head>
 <body class="min-h-screen flex">
+
+    <!-- MODAL DE ADVERTENCIA (ANTI-COPIA) -->
+    <div id="papeletaModal">
+      <div class="papeleta-modal-card">
+        <div class="modal-icon" style="font-size:54px;color:var(--enc-accent);margin-bottom:14px;"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <h2 id="papeletaTitle" style="color:var(--enc-accent);margin:0 0 10px;font-size:22px;font-weight:900;">ADVERTENCIA</h2>
+        <p id="papeletaMsg" style="color:var(--enc-white);margin:10px 0 20px;">Accion no permitida.</p>
+        <button onclick="closePapeletaModal()" style="background:linear-gradient(90deg,var(--enc-accent),var(--enc-accent-2));color:#fff;border:none;padding:12px 32px;border-radius:10px;font-weight:900;cursor:pointer;">ACEPTAR</button>
+      </div>
+    </div>
 
     <!-- SIDEBAR -->
     <aside class="sidebar w-72 fixed left-0 top-0 h-full z-50 hidden md:flex flex-col justify-between">
@@ -643,30 +713,47 @@
 
         </section>
 
-        <!-- SECCIÓN 4: ENCRIPTADOR LUA -->
+        <!-- SECCIÓN 4: ENCRIPTADOR LUA (COMPILADOR) -->
         <section id="section-encryptor" class="section-content fade-in">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <div class="card rounded-xl p-6 mb-6 border-l-4 border-l-red-600">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center text-white text-2xl shadow-lg shadow-red-900/50">
+                        <i class="fas fa-shield-halved"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">PL <span class="text-gray-400 font-normal">COMPILADOR MTA</span></h2>
+                        <p class="text-sm text-gray-400">Compilación segura y ofuscación oficial para tus recursos</p>
+                    </div>
+                </div>
+
+                <!-- Contenedor React para el Compilador -->
+                <div id="root-compiler"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="card rounded-xl p-6">
                     <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                        <i class="fas fa-code text-red-500"></i>
-                        Código Original
+                        <i class="fas fa-server text-red-500"></i> Características
                     </h3>
-                    <textarea class="input-field w-full h-[400px] p-4 rounded-lg text-white font-mono text-sm resize-none" placeholder="Pega tu código Lua aquí..."></textarea>
+                    <ul class="space-y-3 text-gray-300 text-sm">
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-green-500 mt-1"></i> Compilación real via luac.mtasa.com</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-green-500 mt-1"></i> Soporte para Carpetas completas o ZIP</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-green-500 mt-1"></i> Selección flexible de archivos</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-green-500 mt-1"></i> Actualización automática de meta.xml</li>
+                    </ul>
                 </div>
                 <div class="card rounded-xl p-6">
                     <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                        <i class="fas fa-lock text-red-500"></i>
-                        Código Encriptado
+                        <i class="fas fa-circle-question text-red-500"></i> Cómo usar
                     </h3>
-                    <textarea class="input-field w-full h-[400px] p-4 rounded-lg text-white font-mono text-sm resize-none" placeholder="El código encriptado aparecerá aquí..." readonly></textarea>
-                    <div class="flex gap-3 mt-4">
-                        <button class="btn-primary flex-1 py-3 rounded-lg text-white font-bold">
-                            <i class="fas fa-magic mr-2"></i>Encriptar
-                        </button>
-                        <button class="btn-action flex-1 py-3 rounded-lg text-white font-bold">
-                            <i class="fas fa-copy mr-2"></i>Copiar
-                        </button>
-                    </div>
+                    <ol class="space-y-2 text-gray-300 text-sm list-decimal list-inside">
+                        <li>Sube un .zip o selecciona una carpeta.</li>
+                        <li>El sistema detectará automáticamente los archivos .lua.</li>
+                        <li>Marca los archivos que deseas compilar/ofuscar.</li>
+                        <li>Haz clic en "COMPILAR Y DESCARGAR".</li>
+                        <li>Sube el ZIP resultante a tu servidor MTA.</li>
+                    </ol>
                 </div>
             </div>
         </section>
@@ -1654,6 +1741,448 @@ end, true, "high")
         document.addEventListener('DOMContentLoaded', () => {
             checkDiscordAuth();
         });
+    </script>
+
+    <!-- SCRIPT DEL COMPILADOR/ENCRIPTADOR -->
+    <script>
+        // Modal Logic
+        window.openPapeletaModal = function(title, message){
+          const modal = document.getElementById('papeletaModal');
+          document.getElementById('papeletaTitle').innerText = title || 'ADVERTENCIA';
+          document.getElementById('papeletaMsg').innerText = message || 'Acción no permitida.';
+          modal.classList.add('active');
+        };
+        window.closePapeletaModal = function(){
+          document.getElementById('papeletaModal').classList.remove('active');
+        };
+
+        // Anti-Devtools Simple
+        document.addEventListener('keydown', function(e){
+          if(e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['i','j','c'].includes((e.key||'').toLowerCase()))){
+            e.preventDefault();
+            openPapeletaModal('PROHIBIDO', 'Acceso a herramientas de desarrollador bloqueado.');
+            return false;
+          }
+        }, true);
+
+        // Compiler API
+        const MTA_API_URL = "https://proxy-api.trickle-app.host/?url=https://luac.mtasa.com/";
+
+        async function compileLuaFile(content, obfuscateLevel = 3) {
+          const formData = new FormData();
+          const blob = new Blob([content], { type: "text/plain" });
+          formData.append("luasource", blob, "script.lua");
+          formData.append("compile", "1");
+          formData.append("debug", "0");
+          formData.append("obfuscate", obfuscateLevel.toString());
+
+          const response = await fetch(MTA_API_URL, { method: "POST", body: formData });
+          if (!response.ok) throw new Error("Error al compilar archivo");
+
+          const result = await response.arrayBuffer();
+          const text = new TextDecoder().decode(result);
+          if (text.startsWith("ERROR")) throw new Error(text);
+          return new Uint8Array(result);
+        }
+
+        const e = React.createElement;
+
+        function classifyFile(fileName) {
+          const name = fileName.toLowerCase();
+          if (name.includes('client') || name.includes('c_')) return 'client';
+          if (name.includes('server') || name.includes('s_')) return 'server';
+          if (name.includes('config') || name.includes('settings')) return 'config';
+          if (name.includes('shared') || name.includes('util') || name.includes('helper')) return 'shared';
+          return 'other';
+        }
+
+        function getFileTagClass(fileName) {
+          const type = classifyFile(fileName);
+          if (type === 'client') return 'tag-client';
+          if (type === 'server') return 'tag-server';
+          if (type === 'config') return 'tag-config';
+          if (type === 'shared') return 'tag-shared';
+          return '';
+        }
+
+        function ResourceSummary({ resourceName, files, selectedCount, sourceType }) {
+          const totalFiles = files.length;
+          
+          return e("div", { className: "resource-summary" },
+            e("div", { className: "resource-summary-header" },
+              e("div", { className: "resource-summary-info" },
+                e("div", { className: "resource-summary-icon" },
+                  e("i", { className: sourceType === "folder" ? "fa-solid fa-folder-tree" : "fa-solid fa-file-zipper" })
+                ),
+                e("div", { className: "resource-summary-text" },
+                  e("span", { className: "resource-summary-label" }, "Recurso detectado"),
+                  e("span", { className: "resource-summary-name" }, resourceName),
+                  e("span", { className: "resource-summary-type" },
+                    e("i", { className: "fa-solid fa-circle-info" }),
+                    sourceType === "folder" ? "CARGADO DESDE CARPETA" : "CARGADO DESDE ZIP"
+                  )
+                )
+              ),
+              e("div", { className: "resource-summary-stats" },
+                e("div", { className: "stat-chip" },
+                  e("i", { className: "fa-solid fa-file-code" }),
+                  e("span", { className: "stat-chip-label" }, "Scripts"),
+                  e("span", { className: "stat-num" }, totalFiles)
+                ),
+                e("div", { className: "stat-chip" },
+                  e("i", { className: "fa-solid fa-circle-check" }),
+                  e("span", { className: "stat-chip-label" }, "A compilar"),
+                  e("span", { className: "stat-num" }, selectedCount)
+                )
+              )
+            ),
+            
+            e("div", { className: "detected-files-section" },
+              e("div", { className: "detected-files-title" },
+                e("i", { className: "fa-solid fa-list" }),
+                "Archivos .lua detectados"
+              ),
+              e("div", { className: "detected-files-grid" },
+                files.map((file, idx) => 
+                  e("div", { 
+                    key: idx, 
+                    className: `file-chip ${getFileTagClass(file.name)}`
+                  },
+                    e("i", { className: "fa-solid fa-file-code" }),
+                    e("span", { className: "file-chip-name", title: file.path }, file.name)
+                  )
+                )
+              )
+            )
+          );
+        }
+
+        function FileUploader({ onFilesLoaded }) {
+          const [isDragging, setIsDragging] = React.useState(false);
+          const zipInputRef = React.useRef(null);
+          const folderInputRef = React.useRef(null);
+
+          const processZip = async (file) => {
+            const zip = await JSZip.loadAsync(file);
+            const fileList = [];
+            zip.forEach((relativePath, zipEntry) => {
+              if (!zipEntry.dir && relativePath.endsWith(".lua")) {
+                const fileName = relativePath.split("/").pop();
+                fileList.push({ path: relativePath, name: fileName, selected: true });
+              }
+            });
+            const originalName = file.name.replace(".zip", "");
+            onFilesLoaded(fileList, zip, originalName, "zip");
+          };
+
+          const processFolder = async (fileListRaw) => {
+            if (!fileListRaw || fileListRaw.length === 0) return;
+            
+            const firstPath = fileListRaw[0].webkitRelativePath || "";
+            const folderName = firstPath.split("/")[0] || "carpeta_seleccionada";
+            
+            const virtualZip = new JSZip();
+            const luaFiles = [];
+            
+            for (const file of fileListRaw) {
+              const relativePath = file.webkitRelativePath;
+              virtualZip.file(relativePath, file);
+              
+              if (file.name.toLowerCase().endsWith(".lua")) {
+                luaFiles.push({
+                  path: relativePath,
+                  name: file.name,
+                  selected: true
+                });
+              }
+            }
+            
+            if (luaFiles.length === 0) {
+              alert("⚠️ No se encontraron archivos .lua en la carpeta seleccionada.");
+              return;
+            }
+            
+            onFilesLoaded(luaFiles, virtualZip, folderName, "folder");
+          };
+
+          const handleDrop = (ev) => {
+            ev.preventDefault();
+            setIsDragging(false);
+            const file = ev.dataTransfer.files[0];
+            if (file && file.name.endsWith(".zip")) {
+              processZip(file);
+            } else {
+              alert("Para arrastrar, usa un archivo .zip. Para carpetas, usa el botón 'Seleccionar Carpeta'.");
+            }
+          };
+
+          const handleZipSelect = (ev) => {
+            const file = ev.target.files[0];
+            if (file) processZip(file);
+            ev.target.value = "";
+          };
+
+          const handleFolderSelect = (ev) => {
+            const files = ev.target.files;
+            if (files && files.length > 0) processFolder(files);
+            ev.target.value = "";
+          };
+
+          return e("div", { className: "card slide-up", id: "compiler-section" },
+            e("div", {
+              className: `upload-zone ${isDragging ? "dragover" : ""}`,
+              onDragOver: (ev) => { ev.preventDefault(); setIsDragging(true); },
+              onDragLeave: () => setIsDragging(false),
+              onDrop: handleDrop,
+              onClick: () => zipInputRef.current?.click()
+            },
+              e("i", { className: "fa-solid fa-cloud-arrow-up" }),
+              e("h3", null, "Arrastra tu archivo ZIP aquí"),
+              e("p", null, "o haz clic para seleccionar un .zip")
+            ),
+            
+            e("div", { className: "mode-selector" },
+              e("button", {
+                className: "mode-btn",
+                onClick: () => zipInputRef.current?.click()
+              },
+                e("i", { className: "fa-solid fa-file-zipper" }),
+                e("div", null,
+                  e("div", null, "Subir ZIP"),
+                  e("small", null, "Archivo comprimido")
+                )
+              ),
+              e("button", {
+                className: "mode-btn",
+                onClick: () => folderInputRef.current?.click()
+              },
+                e("i", { className: "fa-solid fa-folder-open" }),
+                e("div", null,
+                  e("div", null, "Seleccionar Carpeta"),
+                  e("small", null, "Carpeta completa")
+                )
+              )
+            ),
+            
+            e("input", {
+              ref: zipInputRef, type: "file", accept: ".zip",
+              onChange: handleZipSelect, style: { display: "none" }
+            }),
+            e("input", {
+              ref: folderInputRef, type: "file",
+              webkitdirectory: "true",
+              directory: "true",
+              multiple: true,
+              onChange: handleFolderSelect, style: { display: "none" }
+            })
+          );
+        }
+
+        function FileItem({ file, onToggle }) {
+          return e("div", { className: "file-row" },
+            e("input", { type: "checkbox", checked: file.selected, onChange: onToggle }),
+            e("i", { className: "fa-solid fa-file-code fi" }),
+            e("div", { style: { flex: 1, minWidth: 0 } },
+              e("div", { className: "fn" }, file.name),
+              e("div", { className: "fp" }, file.path)
+            )
+          );
+        }
+
+        function FileList({ files, onToggle, onSelectAll, onDeselectAll, zipFile, zipFileName, isCompiling, setIsCompiling, sourceType }) {
+          const [progress, setProgress] = React.useState({ current: 0, total: 0, file: "", status: "" });
+          const [errors, setErrors] = React.useState([]);
+          const selectedCount = files.filter(f => f.selected).length;
+
+          const handleCompile = async () => {
+            setIsCompiling(true);
+            setErrors([]);
+            setProgress({ current: 0, total: selectedCount, file: "", status: "Iniciando..." });
+
+            try {
+              const onProgress = (current, total, fileName, success, error) => {
+                setProgress({ current, total, file: fileName, status: success ? "Compilado" : "Error" });
+                if (!success && error) setErrors(prev => [...prev, { file: fileName, error }]);
+              };
+
+              const compiledZip = await compileScripts(zipFile, files, onProgress);
+              const blob = await compiledZip.generateAsync({ type: "blob" });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `${zipFileName}_compiled.zip`;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+            } catch (err) {
+              console.error("Compilation error:", err);
+              alert("Error durante la compilación: " + err.message);
+            }
+            setIsCompiling(false);
+          };
+
+          return e("div", { className: "card slide-up" },
+
+            e(ResourceSummary, {
+              resourceName: zipFileName,
+              files: files,
+              selectedCount: selectedCount,
+              sourceType: sourceType
+            }),
+
+            e("div", { className: "section-header" },
+              e("h2", null, e("i", { className: "fa-solid fa-box-archive" }), " Archivos a procesar"),
+              e("div", { style: { display: "flex", gap: "8px" } },
+                e("button", { onClick: onSelectAll, className: "btn-secondary" },
+                  e("i", { className: "fa-solid fa-check-double" }), " Marcar todos"),
+                e("button", { onClick: onDeselectAll, className: "btn-secondary" },
+                  e("i", { className: "fa-solid fa-xmark" }), " Desmarcar")
+              )
+            ),
+
+            e("div", { className: "file-list" },
+              files.length === 0
+                ? e("div", { className: "empty-state" },
+                    e("i", { className: "fa-regular fa-folder-open" }),
+                    e("p", { style: { margin: 0 } }, "No se encontraron archivos .lua")
+                  )
+                : files.map((file, index) =>
+                    e(FileItem, { key: file.path, file, onToggle: () => onToggle(index) })
+                  )
+            ),
+
+            isCompiling && e("div", { className: "status-box" },
+              e("div", { style: { display: "flex", justifyContent: "space-between", marginBottom: "8px", fontSize: "14px" } },
+                e("span", { style: { color: "var(--enc-accent)" } },
+                  e("i", { className: "fa-solid fa-spinner fa-spin" }), " Compilando: ", e("strong", null, progress.file)),
+                e("span", { style: { color: "var(--enc-muted)" } }, progress.current, " / ", progress.total)
+              ),
+              e("div", { className: "progress-container" },
+                e("div", {
+                  className: "progress-bar",
+                  style: { width: progress.total ? `${(progress.current / progress.total) * 100}%` : "0%" }
+                })
+              )
+            ),
+
+            errors.length > 0 && e("div", { className: "status-box error" },
+              e("strong", null, e("i", { className: "fa-solid fa-triangle-exclamation" }), " Errores de compilación:"),
+              errors.map((err, i) => e("p", { key: i }, e("strong", null, err.file, ": "), err.error))
+            ),
+
+            e("div", {
+              style: {
+                display: "flex", justifyContent: "space-between", alignItems: "center",
+                paddingTop: "16px", marginTop: "16px",
+                borderTop: "1px solid rgba(255,255,255,0.05)",
+                flexWrap: "wrap", gap: "10px"
+              }
+            },
+              e("span", { style: { color: "var(--enc-muted)", fontSize: "14px" } },
+                e("i", { className: "fa-solid fa-circle-check", style: { color: "var(--enc-accent)" } }),
+                " ", selectedCount, " de ", files.length, " archivos seleccionados"),
+              e("button", {
+                onClick: handleCompile,
+                disabled: selectedCount === 0 || isCompiling,
+                className: "btn-compile"
+              },
+                isCompiling
+                  ? e(React.Fragment, null, e("i", { className: "fa-solid fa-spinner fa-spin" }), " Compilando...")
+                  : e(React.Fragment, null, e("i", { className: "fa-solid fa-shield-halved" }), " COMPILAR Y DESCARGAR")
+              )
+            )
+          );
+        }
+
+        async function compileScripts(originalZip, files, onProgress) {
+          const newZip = new JSZip();
+          let compiled = 0;
+          const toCompile = files.filter(f => f.selected).length;
+
+          for (const file of files) {
+            const content = await originalZip.file(file.path).async("string");
+            if (file.selected) {
+              try {
+                const compiledContent = await compileLuaFile(content);
+                newZip.file(file.path, compiledContent);
+                compiled++;
+                if (onProgress) onProgress(compiled, toCompile, file.name, true);
+              } catch (err) {
+                newZip.file(file.path, content);
+                if (onProgress) onProgress(compiled, toCompile, file.name, false, err.message);
+              }
+            } else {
+              newZip.file(file.path, content);
+            }
+          }
+
+          const allFiles = [];
+          originalZip.forEach((path, entry) => {
+            if (!entry.dir && !path.endsWith(".lua")) allFiles.push({ path, entry });
+          });
+
+          for (const { path, entry } of allFiles) {
+            if (path.endsWith("meta.xml")) {
+              let metaContent = await entry.async("string");
+              newZip.file(path, metaContent);
+            } else {
+              const content = await entry.async("uint8array");
+              newZip.file(path, content);
+            }
+          }
+          return newZip;
+        }
+
+        function App() {
+          const [files, setFiles] = React.useState([]);
+          const [isCompiling, setIsCompiling] = React.useState(false);
+          const [zipFile, setZipFile] = React.useState(null);
+          const [zipFileName, setZipFileName] = React.useState("");
+          const [sourceType, setSourceType] = React.useState("");
+
+          const handleFilesLoaded = (loadedFiles, originalZip, fileName, type) => {
+            setFiles(loadedFiles);
+            setZipFile(originalZip);
+            setZipFileName(fileName);
+            setSourceType(type);
+          };
+
+          const toggleFile = (index) => {
+            setFiles(prev => prev.map((f, i) => i === index ? { ...f, selected: !f.selected } : f));
+          };
+
+          const selectAll = () => setFiles(prev => prev.map(f => ({ ...f, selected: true })));
+          const deselectAll = () => setFiles(prev => prev.map(f => ({ ...f, selected: false })));
+
+          return e("main", null,
+            e(FileUploader, { onFilesLoaded: handleFilesLoaded }),
+            files.length > 0 && e(FileList, {
+              files, onToggle: toggleFile,
+              onSelectAll: selectAll, onDeselectAll: deselectAll,
+              zipFile, zipFileName, isCompiling, setIsCompiling, sourceType
+            })
+          );
+        }
+
+        // Renderizar el Compilador cuando la sección esté activa
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.target.id === 'section-encryptor' && mutation.target.classList.contains('active')) {
+                    if (!window.compilerRendered) {
+                        const root = ReactDOM.createRoot(document.getElementById("root-compiler"));
+                        root.render(e(App));
+                        window.compilerRendered = true;
+                    }
+                }
+            });
+        });
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const section = document.getElementById('section-encryptor');
+            if (section) observer.observe(section, { attributes: true, attributeFilter: ['class'] });
+        });
+
     </script>
 </body>
 </html>
