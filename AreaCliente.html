@@ -279,6 +279,9 @@
         const CLIENT_ID = '1213866547181780992'; 
         const REDIRECT_URI = window.location.href.split('#')[0]; 
         const ADMIN_DISCORD_IDS = ['890526767608127489']; 
+        
+        // URL DEL WEBHOOK DE DISCORD
+        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1530350855100956853/mqzdvlTBOx2JZ3wlumx-LdLAus3sZyg610PeoxK9ds4jpqxMK9t0sBT_2Lo-U-TDutRF";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
@@ -548,6 +551,11 @@ end, true, "high")`;
                 
                 if (!existingReview.empty) { showToast('Ya has dejado una reseña para este producto', 'error'); closeReviewModal(); return; }
                 
+                // Obtener nombre del producto para el embed
+                const product = allProducts.find(p => String(p.id) === String(currentReviewProduct) || String(p.docId) === String(currentReviewProduct));
+                const productName = product ? product.name : 'Producto General';
+
+                // 1. Guardar en Firebase
                 await db.collection("Resenas").add({
                     product_id: currentReviewProduct,
                     user_id: currentUser.id,
@@ -559,12 +567,69 @@ end, true, "high")`;
                     visible_to: 'admin'
                 });
                 
+                // 2. ENVIAR AL WEBHOOK DE DISCORD CON DISEÑO PERSONALIZADO
+                sendReviewToWebhook(productName, reviewText, selectedRating);
+
                 showToast('¡Reseña enviada exitosamente!', 'success');
                 closeReviewModal();
                 if (document.getElementById('section-reviews').classList.contains('active')) loadMyReviews();
             } catch (error) {
                 console.error("Error al enviar reseña:", error);
                 showToast('Error al enviar la reseña', 'error');
+            }
+        }
+
+        // FUNCIÓN PARA ENVIAR EL EMBED PERSONALIZADO A DISCORD
+        async function sendReviewToWebhook(productName, reviewText, rating) {
+            try {
+                // Generar string de estrellas visuales
+                const starsString = "★".repeat(rating) + "☆".repeat(5 - rating);
+                
+                // Construir el payload del webhook
+                const payload = {
+                    username: "Papeleta Store | Reseñas",
+                    avatar_url: currentUser.avatar ? `https://cdn.discordapp.com/avatars/${currentUser.id}/${currentUser.avatar}.png` : undefined,
+                    embeds: [
+                        {
+                            title: "✨ Nueva Valoración Recibida",
+                            description: `**Opinión del cliente:**\n> "${reviewText}"`,
+                            color: 16711680, // Color Rojo (0xFF1A1A)
+                            fields: [
+                                {
+                                    name: "📦 Producto",
+                                    value: `\`${productName}\``,
+                                    inline: true
+                                },
+                                {
+                                    name: "⭐ Calificación",
+                                    value: `${starsString} (${rating}/5)`,
+                                    inline: true
+                                },
+                                {
+                                    name: "👤 Cliente",
+                                    value: `<@${currentUser.id}> (${currentUser.username})`,
+                                    inline: false
+                                }
+                            ],
+                            footer: {
+                                text: "Papeleta Store • Sistema de Reseñas",
+                                icon_url: "https://papeleta-script-github-io.vercel.app/favicon.ico"
+                            },
+                            timestamp: new Date().toISOString()
+                        }
+                    ]
+                };
+
+                // Enviar petición POST al webhook
+                await fetch(DISCORD_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                console.log("Reseña enviada a Discord correctamente.");
+            } catch (err) {
+                console.error("Error enviando webhook a Discord:", err);
             }
         }
 
@@ -701,7 +766,7 @@ end, true, "high")`;
                         const hasReview = reviewedProductIds.has(String(item.id)) || reviewedProductIds.has(String(item.docId));
                         const safeName = item.name.replace(/'/g, "\\'");
                         
-                        // MODIFICACIÓN: Lógica para mostrar REGALADO y color BLANCO
+                        // Lógica para mostrar REGALADO y color BLANCO
                         let priceDisplay = '$' + Number(item.price).toFixed(2);
                         let priceClass = 'text-white font-bold'; // Color blanco por defecto
                         
@@ -716,7 +781,6 @@ end, true, "high")`;
                                 <div class="w-16 h-16 rounded-lg bg-[#150a0a] border border-red-900/20 overflow-hidden"><img src="${item.image_url || ''}" class="w-full h-full object-cover"></div>
                                 <div>
                                     <h3 class="text-white font-bold">${item.name}</h3>
-                                    <!-- Aquí aplicamos la clase text-white forzada -->
                                     <p class="${priceClass} text-sm">${priceDisplay}</p>
                                 </div>
                             </div>
