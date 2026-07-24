@@ -102,15 +102,6 @@
             background: linear-gradient(135deg, rgba(21, 10, 10, 0.8) 0%, rgba(13, 5, 5, 0.8) 100%); 
             border: 1px solid rgba(255, 26, 26, 0.15); 
         }
-        .user-row {
-            background: rgba(13, 5, 5, 0.6);
-            border: 1px solid rgba(255, 26, 26, 0.1);
-            transition: all 0.3s ease;
-        }
-        .user-row:hover {
-            border-color: rgba(255, 26, 26, 0.3);
-            transform: translateX(5px);
-        }
 
         .gradient-text {
             background: linear-gradient(135deg, #ff1a1a 0%, #ff6b6b 100%);
@@ -205,6 +196,126 @@
         .badge-reclamado { background: rgba(59, 130, 246, 0.2); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); }
 
         .filter-btn {
+            transition: all 0.3s ease;
+        }
+
+        /* Estilos específicos para Gestión de Usuarios */
+        .user-row {
+            background: rgba(13, 5, 5, 0.6);
+            border: 1px solid rgba(255, 26, 26, 0.15);
+            border-radius: 12px;
+            padding: 16px;
+            transition: all 0.3s ease;
+        }
+        .user-row:hover {
+            border-color: rgba(255, 26, 26, 0.4);
+            transform: translateX(4px);
+        }
+
+        /* Badges de Rol */
+        .role-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .role-admin { 
+            background: rgba(220, 38, 38, 0.2); 
+            color: #dc2626; 
+            border: 1px solid rgba(220, 38, 38, 0.4);
+        }
+        .role-mod { 
+            background: rgba(245, 158, 11, 0.2); 
+            color: #f59e0b; 
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+        .role-user { 
+            background: rgba(107, 114, 128, 0.2); 
+            color: #6b7280; 
+            border: 1px solid rgba(107, 114, 128, 0.3);
+        }
+        .role-custom {
+            border: 1px solid;
+        }
+
+        /* Botones de Rol Base */
+        .btn-role {
+            transition: all 0.2s ease;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 8px;
+            position: relative;
+        }
+        .btn-role-admin {
+            background: rgba(220, 38, 38, 0.1);
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            color: #dc2626;
+        }
+        .btn-role-admin:hover:not(:disabled) { background: rgba(220, 38, 38, 0.3); border-color: rgba(220, 38, 38, 0.6); }
+        
+        .btn-role-mod {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: #f59e0b;
+        }
+        .btn-role-mod:hover:not(:disabled) { background: rgba(245, 158, 11, 0.3); border-color: rgba(245, 158, 11, 0.6); }
+        
+        .btn-role-user {
+            background: rgba(107, 114, 128, 0.1);
+            border: 1px solid rgba(107, 114, 128, 0.3);
+            color: #6b7280;
+        }
+        .btn-role-user:hover:not(:disabled) { background: rgba(107, 114, 128, 0.3); border-color: rgba(107, 114, 128, 0.6); }
+
+        /* Dropdown de Roles Personalizados */
+        .custom-roles-dropdown {
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            margin-bottom: 8px;
+            background: #1a0a0a;
+            border: 1px solid rgba(255, 26, 26, 0.3);
+            border-radius: 10px;
+            padding: 6px;
+            min-width: 180px;
+            z-index: 50;
+            box-shadow: 0 -10px 25px rgba(0,0,0,0.5);
+            display: none;
+        }
+        .custom-roles-dropdown.active { display: block; animation: slideUp 0.2s ease; }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .custom-role-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 13px;
+            color: #e5e7eb;
+        }
+        .custom-role-option:hover { background: rgba(255, 255, 255, 0.05); }
+        
+        .role-color-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .role-filter-btn {
             transition: all 0.3s ease;
         }
     </style>
@@ -400,53 +511,64 @@
             </div>
         </section>
 
-        <!-- SECCIÓN 2: USUARIOS -->
+        <!-- SECCIÓN 2: USUARIOS (GESTIÓN DE ROLES) -->
         <section id="section-users" class="section-content fade-in">
-            <div class="card rounded-xl p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <div class="flex items-center gap-4">
-                        <input type="text" placeholder="Buscar usuario..." class="input-field px-4 py-2 rounded-lg text-white w-64">
-                        <button class="btn-primary px-4 py-2 rounded-lg text-white font-medium">
-                            <i class="fas fa-search mr-2"></i>Buscar
-                        </button>
+            
+            <!-- Estadísticas de Roles -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <div class="stat-card rounded-xl p-5 border-l-4 border-l-red-600">
+                    <div class="flex items-center gap-3 mb-2">
+                        <i class="fas fa-shield-alt text-red-500 text-2xl"></i>
+                        <span class="text-gray-400 text-sm font-semibold">Administradores</span>
                     </div>
-                    <button class="btn-primary px-4 py-2 rounded-lg text-white font-medium">
-                        <i class="fas fa-user-plus mr-2"></i>Nuevo Usuario
-                    </button>
+                    <p id="stat-admins" class="text-3xl font-black text-white">0</p>
                 </div>
+                <div class="stat-card rounded-xl p-5 border-l-4 border-l-yellow-600">
+                    <div class="flex items-center gap-3 mb-2">
+                        <i class="fas fa-user-shield text-yellow-500 text-2xl"></i>
+                        <span class="text-gray-400 text-sm font-semibold">Moderadores</span>
+                    </div>
+                    <p id="stat-mods" class="text-3xl font-black text-white">0</p>
+                </div>
+                <div class="stat-card rounded-xl p-5 border-l-4 border-l-gray-600">
+                    <div class="flex items-center gap-3 mb-2">
+                        <i class="fas fa-users text-gray-400 text-2xl"></i>
+                        <span class="text-gray-400 text-sm font-semibold">Otros Roles / Usuarios</span>
+                    </div>
+                    <p id="stat-others" class="text-3xl font-black text-white">0</p>
+                </div>
+            </div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="border-b border-red-900/30">
-                            <tr class="text-left text-gray-400 text-xs uppercase">
-                                <th class="pb-3 font-semibold">Usuario</th>
-                                <th class="pb-3 font-semibold">Email</th>
-                                <th class="pb-3 font-semibold">Rol</th>
-                                <th class="pb-3 font-semibold">Estado</th>
-                                <th class="pb-3 font-semibold">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody class="space-y-2">
-                            <tr class="user-row rounded-lg">
-                                <td class="p-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-xs font-bold">JD</div>
-                                        <div>
-                                            <p class="text-white font-medium">JohnDoe</p>
-                                            <p class="text-xs text-gray-500">ID: 890526767608127489</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="p-4 text-gray-300">john@example.com</td>
-                                <td class="p-4"><span class="admin-badge">Admin</span></td>
-                                <td class="p-4"><span class="text-green-400 text-sm">● Activo</span></td>
-                                <td class="p-4">
-                                    <button class="text-blue-400 hover:text-blue-300 mr-3"><i class="fas fa-edit"></i></button>
-                                    <button class="text-red-400 hover:text-red-300"><i class="fas fa-trash"></i></button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <!-- Filtros -->
+            <div class="glass-panel p-6 mb-8">
+                <div class="flex flex-col md:flex-row gap-4 justify-between items-center">
+                    <div class="relative flex-1 w-full">
+                        <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                        <input type="text" id="search-input" oninput="filterUsers()" 
+                            placeholder="Buscar usuario por nombre o Discord ID..." 
+                            class="w-full bg-[#0d0505] border border-red-950/40 rounded-xl pl-12 pr-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition-colors input-field">
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="filterByRole('all')" class="role-filter-btn active bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all" data-role="all">Todos</button>
+                        <button onclick="filterByRole('admin')" class="role-filter-btn bg-[#0d0505] border border-red-950/40 text-gray-300 px-4 py-2 rounded-lg text-sm font-semibold hover:border-red-500/50 transition-all" data-role="admin">Admins</button>
+                        <button onclick="filterByRole('mod')" class="role-filter-btn bg-[#0d0505] border border-red-950/40 text-gray-300 px-4 py-2 rounded-lg text-sm font-semibold hover:border-red-500/50 transition-all" data-role="mod">Mods</button>
+                        <button onclick="filterByRole('custom')" class="role-filter-btn bg-[#0d0505] border border-red-950/40 text-gray-300 px-4 py-2 rounded-lg text-sm font-semibold hover:border-red-500/50 transition-all" data-role="custom">Personalizados</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Usuarios -->
+            <div class="glass-panel p-6">
+                <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                    <i class="fas fa-users-cog text-red-500"></i>
+                    Gestión de Usuarios y Roles
+                </h3>
+                
+                <div id="users-container" class="space-y-3">
+                    <div class="text-center py-12 text-gray-400">
+                        <i class="fas fa-spinner animate-spin text-3xl mb-3"></i>
+                        <p>Cargando usuarios...</p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -492,7 +614,7 @@
                     <div class="flex items-center gap-3 flex-1 w-full">
                         <div class="relative flex-1">
                             <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
-                            <input type="text" id="search-input" oninput="filterUsers()" 
+                            <input type="text" id="search-input-licenses" oninput="filterUsersLicenses()" 
                                 placeholder="Buscar por nombre de usuario o Discord ID..." 
                                 class="w-full bg-[#0d0505] border border-red-950/40 rounded-xl pl-12 pr-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition-colors input-field">
                         </div>
@@ -512,7 +634,7 @@
             </div>
 
             <!-- Lista de Usuarios con Licencia Única -->
-            <div id="users-container" class="space-y-4">
+            <div id="users-container-licenses" class="space-y-4">
                 <div class="text-center py-12">
                     <i class="fas fa-spinner animate-spin text-red-500 text-3xl mb-3"></i>
                     <p class="text-gray-400">Cargando licencias de usuarios...</p>
@@ -749,6 +871,7 @@ end, true, "high")
         const CLIENT_ID = '1213866547181780992';
         const REDIRECT_URI = window.location.href.split('#')[0];
         const ADMIN_DISCORD_IDS = ['890526767608127489'];
+        const ADMIN_DISCORD_USERNAMES = ['papeleta'];
 
         const firebaseConfig = {
             apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
@@ -771,7 +894,14 @@ end, true, "high")
         let allClientes = [];
         let allLicencias = [];
         let currentFilter = 'all';
-        let searchTerm = '';
+        let searchTermLicenses = '';
+        
+        // Variables para Gestión de Usuarios
+        let allUsers = [];
+        let customRoles = [];
+        let currentRoleFilter = 'all';
+        let searchTermUsers = '';
+        let activeDropdownId = null;
 
         // ========== AUTH DISCORD ==========
         function isAdmin() {
@@ -831,6 +961,7 @@ end, true, "high")
                 document.getElementById('login-modal').classList.add('hidden');
                 loadProducts();
                 loadLicenciasData();
+                loadUsers();
             })
             .catch(err => {
                 console.error(err);
@@ -1055,14 +1186,12 @@ end, true, "high")
         // ========== FUNCIONES DE LICENCIAS (UNA SOLA LICENCIA ÚNICA POR USUARIO) ==========
         async function loadLicenciasData() {
             try {
-                // Cargar clientes
                 const clientesSnapshot = await db.collection("Clientes").orderBy('date', 'desc').get();
                 allClientes = [];
                 clientesSnapshot.forEach((doc) => {
                     allClientes.push({ id: doc.id, ...doc.data() });
                 });
 
-                // Cargar licencias
                 const licenciasSnapshot = await db.collection("Licencias").get();
                 allLicencias = [];
                 licenciasSnapshot.forEach((doc) => {
@@ -1070,10 +1199,10 @@ end, true, "high")
                 });
 
                 updateStats();
-                renderUsers();
+                renderUsersLicenses();
             } catch (error) {
                 console.error("Error loading data:", error);
-                document.getElementById('users-container').innerHTML = `
+                document.getElementById('users-container-licenses').innerHTML = `
                     <div class="text-center py-12 text-red-400">
                         <i class="fas fa-exclamation-triangle text-3xl mb-3"></i>
                         <p>Error al cargar los datos</p>
@@ -1105,25 +1234,25 @@ end, true, "high")
                 }
             });
             
-            renderUsers();
+            renderUsersLicenses();
         }
 
-        function filterUsers() {
-            searchTerm = document.getElementById('search-input').value.toLowerCase();
-            renderUsers();
+        function filterUsersLicenses() {
+            searchTermLicenses = document.getElementById('search-input-licenses').value.toLowerCase();
+            renderUsersLicenses();
         }
 
-        function renderUsers() {
-            const container = document.getElementById('users-container');
+        function renderUsersLicenses() {
+            const container = document.getElementById('users-container-licenses');
             
             let filteredClientes = allClientes.filter(cliente => {
                 if (currentFilter === 'pagado' && cliente.status !== 'Pagado') return false;
                 if (currentFilter === 'gratis' && cliente.status !== 'Reclamado Exitosamente') return false;
                 
-                if (searchTerm) {
+                if (searchTermLicenses) {
                     const username = (cliente.username || '').toLowerCase();
                     const discordId = (cliente.discord_id || '').toLowerCase();
-                    if (!username.includes(searchTerm) && !discordId.includes(searchTerm)) return false;
+                    if (!username.includes(searchTermLicenses) && !discordId.includes(searchTermLicenses)) return false;
                 }
                 
                 return true;
@@ -1139,7 +1268,6 @@ end, true, "high")
             }
 
             container.innerHTML = filteredClientes.map(cliente => {
-                // Obtener la PRIMERA licencia del usuario (licencia única)
                 const userLicense = allLicencias.find(l => l.discord_id === cliente.discord_id);
                 const isGratis = cliente.total_price === 'Gratis' || cliente.total_price === 'GRATIS';
                 const statusClass = isGratis ? 'badge-gratis' : (cliente.status === 'Pagado' ? 'badge-pagado' : 'badge-reclamado');
@@ -1148,7 +1276,6 @@ end, true, "high")
                 return `
                 <div class="license-user-card p-6">
                     <div class="flex flex-col md:flex-row gap-6">
-                        <!-- Avatar e Info Principal -->
                         <div class="flex items-start gap-4 md:w-1/4">
                             <img src="${cliente.avatar ? `https://cdn.discordapp.com/avatars/${cliente.discord_id}/${cliente.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png'}" 
                                 alt="${cliente.username}" 
@@ -1160,7 +1287,6 @@ end, true, "high")
                             </div>
                         </div>
 
-                        <!-- Licencia Única -->
                         <div class="flex-1">
                             <h4 class="text-gray-400 text-sm font-semibold mb-3 flex items-center gap-2">
                                 <i class="fas fa-key text-red-400"></i>
@@ -1184,7 +1310,6 @@ end, true, "high")
                             `}
                         </div>
 
-                        <!-- Fecha y Total -->
                         <div class="md:w-1/5 text-right">
                             <div class="mb-4">
                                 <p class="text-gray-500 text-xs mb-1">Total Pagado</p>
@@ -1215,6 +1340,286 @@ end, true, "high")
                 console.error('Error al copiar:', err);
                 alert('❌ Error al copiar la licencia');
             });
+        }
+
+        // ========== FUNCIONES DE GESTIÓN DE USUARIOS ==========
+        async function loadUsers() {
+            try {
+                const savedRoles = localStorage.getItem('papeleta_custom_roles');
+                customRoles = savedRoles ? JSON.parse(savedRoles) : [];
+
+                const usersSnapshot = await db.collection("UsuariosRegistrados").get();
+                const firestoreUsers = [];
+                usersSnapshot.forEach((doc) => firestoreUsers.push(doc.data()));
+
+                const localUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
+
+                const userMap = new Map();
+                
+                firestoreUsers.forEach(user => {
+                    userMap.set(user.discord_id, { ...user, role: 'user' });
+                });
+
+                localUsers.forEach(localUser => {
+                    if (userMap.has(localUser.discord_id)) {
+                        const existing = userMap.get(localUser.discord_id);
+                        if (localUser.role) existing.role = localUser.role;
+                    } else {
+                        userMap.set(localUser.discord_id, localUser);
+                    }
+                });
+
+                allUsers = Array.from(userMap.values()).map(user => {
+                    if (isAdminHardcoded(user)) user.role = 'admin';
+                    return user;
+                });
+
+                updateUsersStats();
+                renderUsers();
+            } catch (error) {
+                console.error("Error loading users:", error);
+                document.getElementById('users-container').innerHTML = `
+                    <div class="text-center py-12 text-red-400">
+                        <i class="fas fa-exclamation-triangle text-3xl mb-3"></i>
+                        <p>Error al cargar usuarios</p>
+                    </div>`;
+            }
+        }
+
+        function isAdminHardcoded(user) {
+            if (!user) return false;
+            if (ADMIN_DISCORD_IDS.includes(user.discord_id)) return true;
+            if (user.username && ADMIN_DISCORD_USERNAMES.includes(user.username.toLowerCase())) return true;
+            return false;
+        }
+
+        function getCustomRoleData(roleName) {
+            return customRoles.find(r => r.name.toLowerCase() === roleName.toLowerCase());
+        }
+
+        function updateUsersStats() {
+            const admins = allUsers.filter(u => u.role === 'admin').length;
+            const mods = allUsers.filter(u => u.role === 'mod').length;
+            const others = allUsers.filter(u => !['admin', 'mod'].includes(u.role)).length;
+
+            document.getElementById('stat-admins').textContent = admins;
+            document.getElementById('stat-mods').textContent = mods;
+            document.getElementById('stat-others').textContent = others;
+        }
+
+        function filterByRole(role) {
+            currentRoleFilter = role;
+            document.querySelectorAll('.role-filter-btn').forEach(btn => {
+                if (btn.dataset.role === role) {
+                    btn.classList.remove('bg-[#0d0505]', 'text-gray-300');
+                    btn.classList.add('bg-red-600', 'text-white');
+                } else {
+                    btn.classList.add('bg-[#0d0505]', 'text-gray-300');
+                    btn.classList.remove('bg-red-600', 'text-white');
+                }
+            });
+            renderUsers();
+        }
+
+        function filterUsers() {
+            searchTermUsers = document.getElementById('search-input').value.toLowerCase();
+            renderUsers();
+        }
+
+        function renderUsers() {
+            const container = document.getElementById('users-container');
+            
+            let filteredUsers = allUsers.filter(user => {
+                const userRole = user.role || 'user';
+                
+                if (currentRoleFilter === 'admin' && userRole !== 'admin') return false;
+                if (currentRoleFilter === 'mod' && userRole !== 'mod') return false;
+                if (currentRoleFilter === 'custom' && ['admin', 'mod', 'user'].includes(userRole)) return false;
+                
+                if (searchTermUsers) {
+                    const username = (user.username || '').toLowerCase();
+                    const discordId = (user.discord_id || '').toLowerCase();
+                    if (!username.includes(searchTermUsers) && !discordId.includes(searchTermUsers)) return false;
+                }
+                
+                return true;
+            });
+
+            filteredUsers.sort((a, b) => {
+                const getOrder = (r) => {
+                    if (r === 'admin') return 0;
+                    if (r === 'mod') return 1;
+                    if (getCustomRoleData(r)) return 2;
+                    return 3;
+                };
+                return getOrder(a.role) - getOrder(b.role);
+            });
+
+            if (filteredUsers.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 text-gray-500"><i class="fas fa-user-slash text-4xl mb-3"></i><p>No se encontraron usuarios</p></div>`;
+                return;
+            }
+
+            container.innerHTML = filteredUsers.map(user => {
+                const userRole = user.role || 'user';
+                const isAdmin = isAdminHardcoded(user);
+                const customRole = getCustomRoleData(userRole);
+                
+                let roleClass = 'role-user';
+                let roleText = 'USUARIO';
+                let badgeStyle = '';
+
+                if (isAdmin) {
+                    roleClass = 'role-admin';
+                    roleText = 'ADMIN';
+                } else if (userRole === 'mod') {
+                    roleClass = 'role-mod';
+                    roleText = 'MOD';
+                } else if (customRole) {
+                    roleClass = 'role-custom';
+                    roleText = customRole.name.toUpperCase();
+                    badgeStyle = `background-color: ${customRole.color}20; color: ${customRole.color}; border-color: ${customRole.color}60;`;
+                }
+                
+                return `
+                <div class="user-row flex flex-col md:flex-row items-start md:items-center gap-4">
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <img src="${user.avatar ? `https://cdn.discordapp.com/avatars/${user.discord_id}/${user.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png'}" 
+                            alt="${user.username}" 
+                            class="w-12 h-12 rounded-full border-2 ${isAdmin ? 'border-red-500' : (customRole ? 'border-opacity-50' : 'border-gray-600')}"
+                            style="${customRole ? `border-color: ${customRole.color}` : ''}">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2">
+                                <h4 class="text-white font-bold truncate">${escapeHTML(user.username || 'Usuario sin nombre')}</h4>
+                                ${isAdmin ? '<i class="fas fa-crown text-red-500" title="Admin Principal"></i>' : ''}
+                            </div>
+                            <p class="text-gray-500 text-xs font-mono truncate">${user.discord_id}</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <span class="role-badge ${roleClass}" style="${badgeStyle}">${roleText}</span>
+                    </div>
+
+                    <div class="flex gap-2 flex-wrap relative">
+                        ${!isAdmin ? `
+                            <button onclick="setRole('${user.discord_id}', 'admin')" 
+                                class="btn-role btn-role-admin ${userRole === 'admin' ? 'opacity-50 cursor-not-allowed' : ''}"
+                                ${userRole === 'admin' ? 'disabled' : ''}>
+                                <i class="fas fa-shield-alt mr-1"></i>Admin
+                            </button>
+                            <button onclick="setRole('${user.discord_id}', 'mod')" 
+                                class="btn-role btn-role-mod ${userRole === 'mod' ? 'opacity-50 cursor-not-allowed' : ''}"
+                                ${userRole === 'mod' ? 'disabled' : ''}>
+                                <i class="fas fa-user-shield mr-1"></i>Mod
+                            </button>
+                            
+                            ${customRoles.length > 0 ? `
+                            <div class="relative">
+                                <button onclick="toggleCustomRoles('${user.discord_id}', event)" 
+                                    class="btn-role bg-[#0d0505] border border-red-950/40 text-gray-300 hover:border-red-500/50 hover:text-white">
+                                    <i class="fas fa-plus mr-1"></i>Más Roles...
+                                </button>
+                                
+                                <div id="dropdown-${user.discord_id}" class="custom-roles-dropdown">
+                                    ${customRoles.map(role => `
+                                        <div class="custom-role-option" onclick="setRole('${user.discord_id}', '${escapeHTML(role.name)}')">
+                                            <div class="role-color-dot" style="background-color: ${role.color}"></div>
+                                            <span>${escapeHTML(role.name)}</span>
+                                            ${userRole.toLowerCase() === role.name.toLowerCase() ? '<i class="fas fa-check ml-auto text-green-400"></i>' : ''}
+                                        </div>
+                                    `).join('')}
+                                    <div class="border-t border-white/10 my-1"></div>
+                                    <div class="custom-role-option" onclick="setRole('${user.discord_id}', 'user')">
+                                        <div class="role-color-dot" style="background-color: #6b7280"></div>
+                                        <span>Quitar Rol (Usuario)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            ` : ''}
+
+                            <button onclick="setRole('${user.discord_id}', 'user')" 
+                                class="btn-role btn-role-user ${(!customRoles.length && userRole === 'user') ? 'opacity-50 cursor-not-allowed' : ''}"
+                                ${(!customRoles.length && userRole === 'user') ? 'disabled' : ''}>
+                                <i class="fas fa-user mr-1"></i>Usuario
+                            </button>
+                        ` : '<span class="text-gray-500 text-xs italic">Rol fijo</span>'}
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        function toggleCustomRoles(userId, event) {
+            event.stopPropagation();
+            
+            if (activeDropdownId && activeDropdownId !== userId) {
+                const prev = document.getElementById(`dropdown-${activeDropdownId}`);
+                if (prev) prev.classList.remove('active');
+            }
+
+            const dropdown = document.getElementById(`dropdown-${userId}`);
+            if (dropdown) {
+                dropdown.classList.toggle('active');
+                activeDropdownId = dropdown.classList.contains('active') ? userId : null;
+            }
+        }
+
+        document.addEventListener('click', () => {
+            if (activeDropdownId) {
+                const dropdown = document.getElementById(`dropdown-${activeDropdownId}`);
+                if (dropdown) dropdown.classList.remove('active');
+                activeDropdownId = null;
+            }
+        });
+
+        async function setRole(discordId, newRole) {
+            const user = allUsers.find(u => u.discord_id === discordId);
+            if (!user) return;
+
+            if (isAdminHardcoded(user)) {
+                alert('⚠️ No se puede cambiar el rol de un administrador principal');
+                return;
+            }
+
+            const confirmMsg = `¿Estás seguro de cambiar el rol de ${user.username} a "${newRole}"?`;
+            if (!confirm(confirmMsg)) return;
+
+            try {
+                let localUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
+                const userIndex = localUsers.findIndex(u => u.discord_id === discordId);
+                
+                if (userIndex >= 0) {
+                    localUsers[userIndex].role = newRole;
+                } else {
+                    localUsers.push({
+                        discord_id: discordId,
+                        username: user.username,
+                        avatar: user.avatar,
+                        role: newRole,
+                        last_login: new Date().toISOString()
+                    });
+                }
+                
+                localStorage.setItem('papeleta_all_users', JSON.stringify(localUsers));
+
+                user.role = newRole;
+
+                if (activeDropdownId === discordId) {
+                    const dropdown = document.getElementById(`dropdown-${discordId}`);
+                    if (dropdown) dropdown.classList.remove('active');
+                    activeDropdownId = null;
+                }
+
+                updateUsersStats();
+                renderUsers();
+
+                alert(`✅ Rol de ${user.username} actualizado a "${newRole}"`);
+
+            } catch (error) {
+                console.error("Error setting role:", error);
+                alert('❌ Error al actualizar el rol: ' + error.message);
+            }
         }
 
         // ========== NAVEGACIÓN ENTRE SECCIONES ==========
