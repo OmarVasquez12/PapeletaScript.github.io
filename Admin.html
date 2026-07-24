@@ -8,9 +8,6 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
@@ -52,7 +49,7 @@
     <!-- SIDEBAR ADMIN -->
     <aside class="sidebar w-64 fixed left-0 top-0 h-full z-50 hidden md:flex flex-col">
         <div class="p-6 border-b border-red-900/20">
-            <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='index.html'">
+            <div class="flex items-center gap-3 cursor-pointer">
                 <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center font-black text-white shadow-lg shadow-red-900/50">P</div>
                 <div>
                     <span class="text-white font-bold text-lg tracking-wide block">ADMIN PANEL</span>
@@ -63,36 +60,36 @@
         
         <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
             <div class="text-xs text-gray-500 uppercase font-semibold mb-4 px-3 tracking-wider mt-4">Gestión</div>
-            <a onclick="showSection('dashboard')" class="nav-item active flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
+            <a href="#" class="nav-item active flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
                 <i class="fas fa-chart-pie w-5 text-center"></i><span>Dashboard</span>
             </a>
-            <a onclick="showSection('upload')" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
                 <i class="fas fa-cloud-upload-alt w-5 text-center"></i><span>Subir Producto</span>
             </a>
-            <a onclick="showSection('users')" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
                 <i class="fas fa-users w-5 text-center"></i><span>Usuarios</span>
             </a>
             
             <div class="text-xs text-gray-500 uppercase font-semibold mb-4 px-3 tracking-wider mt-6">Herramientas</div>
-            <a href="LicenciaUsuario.html" target="_blank" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
                 <i class="fas fa-key w-5 text-center"></i><span>Licencias</span>
             </a>
-            <a href="Encriptar.html" target="_blank" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
                 <i class="fas fa-lock w-5 text-center"></i><span>Encriptador Lua</span>
             </a>
-            <a href="CrearRol.html" target="_blank" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
                 <i class="fas fa-id-badge w-5 text-center"></i><span>Gestión de Roles</span>
             </a>
         </nav>
 
         <div class="p-4 border-t border-red-900/20 bg-[#0a0505]/50">
             <div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-red-900/10 border border-red-900/20">
-                <img id="admin-avatar" src="" alt="Admin" class="w-9 h-9 rounded-full border border-red-600 object-cover">
+                <img src="" alt="Admin" class="w-9 h-9 rounded-full border border-red-600 object-cover">
                 <div class="flex-1 min-w-0">
-                    <p id="admin-name" class="text-white font-medium text-sm truncate">Cargando...</p>
+                    <p class="text-white font-medium text-sm truncate">Admin</p>
                     <p class="text-red-400 text-[10px] font-bold uppercase">Administrador</p>
                 </div>
-                <button onclick="logout()" class="text-gray-400 hover:text-red-400 transition-colors" title="Salir"><i class="fas fa-sign-out-alt"></i></button>
+                <button class="text-gray-400 hover:text-red-400 transition-colors" title="Salir"><i class="fas fa-sign-out-alt"></i></button>
             </div>
         </div>
     </aside>
@@ -101,7 +98,7 @@
     <main class="flex-1 md:ml-64 min-h-screen flex flex-col relative">
         <!-- Header -->
         <header class="border-b border-red-900/20 px-8 py-5 bg-[#0a0505]/30 backdrop-blur-sm sticky top-0 z-40 flex justify-between items-center">
-            <h1 id="page-title" class="text-xl font-bold text-white">Dashboard General</h1>
+            <h1 class="text-xl font-bold text-white">Dashboard General</h1>
             <a href="index.html" class="text-sm text-gray-400 hover:text-white flex items-center gap-2 transition-colors">
                 <i class="fas fa-arrow-left"></i> Volver a la Tienda
             </a>
@@ -110,13 +107,13 @@
         <div class="p-6 md:p-8 flex-grow overflow-y-auto custom-scrollbar">
             
             <!-- SECTION: DASHBOARD -->
-            <div id="section-dashboard" class="section active">
+            <div class="section active">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                     <div class="stat-card rounded-xl p-5">
                         <div class="flex justify-between items-start">
                             <div>
                                 <p class="text-gray-400 text-xs uppercase font-bold mb-1">Ventas Totales</p>
-                                <h3 class="text-2xl font-bold text-white" id="dash-sales">0</h3>
+                                <h3 class="text-2xl font-bold text-white">0</h3>
                             </div>
                             <div class="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center text-green-400"><i class="fas fa-dollar-sign"></i></div>
                         </div>
@@ -125,7 +122,7 @@
                         <div class="flex justify-between items-start">
                             <div>
                                 <p class="text-gray-400 text-xs uppercase font-bold mb-1">Productos</p>
-                                <h3 class="text-2xl font-bold text-white" id="dash-products">0</h3>
+                                <h3 class="text-2xl font-bold text-white">0</h3>
                             </div>
                             <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400"><i class="fas fa-box"></i></div>
                         </div>
@@ -134,7 +131,7 @@
                         <div class="flex justify-between items-start">
                             <div>
                                 <p class="text-gray-400 text-xs uppercase font-bold mb-1">Usuarios</p>
-                                <h3 class="text-2xl font-bold text-white" id="dash-users">0</h3>
+                                <h3 class="text-2xl font-bold text-white">0</h3>
                             </div>
                             <div class="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400"><i class="fas fa-users"></i></div>
                         </div>
@@ -143,7 +140,7 @@
                         <div class="flex justify-between items-start">
                             <div>
                                 <p class="text-gray-400 text-xs uppercase font-bold mb-1">Ingresos Est.</p>
-                                <h3 class="text-2xl font-bold text-white" id="dash-revenue">$0</h3>
+                                <h3 class="text-2xl font-bold text-white">$0</h3>
                             </div>
                             <div class="w-10 h-10 rounded-lg bg-yellow-500/10 flex items-center justify-center text-yellow-400"><i class="fas fa-wallet"></i></div>
                         </div>
@@ -163,8 +160,8 @@
                                     <th class="pb-3">Fecha</th>
                                 </tr>
                             </thead>
-                            <tbody id="recent-sales-table" class="text-sm text-gray-300">
-                                <tr><td colspan="5" class="py-8 text-center text-gray-500">Cargando datos...</td></tr>
+                            <tbody class="text-sm text-gray-300">
+                                <tr><td colspan="5" class="py-8 text-center text-gray-500">Sin datos</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -172,24 +169,24 @@
             </div>
 
             <!-- SECTION: UPLOAD PRODUCT -->
-            <div id="section-upload" class="section">
+            <div class="section">
                 <div class="max-w-4xl mx-auto card rounded-xl p-8">
                     <h2 class="text-2xl font-bold text-white mb-6">Agregar Nuevo Recurso</h2>
-                    <form id="admin-upload-form" onsubmit="handleProductSubmit(event)" class="space-y-6">
+                    <form class="space-y-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-gray-400 text-sm font-semibold mb-2">Nombre del Producto</label>
-                                <input type="text" id="prod-name" required class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none" placeholder="Ej: Sistema Anti-Cheat v2">
+                                <input type="text" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none" placeholder="Ej: Sistema Anti-Cheat v2">
                             </div>
                             <div>
                                 <label class="block text-gray-400 text-sm font-semibold mb-2">Precio (USD)</label>
-                                <input type="number" id="prod-price" required step="0.01" min="0" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none" placeholder="15.00">
+                                <input type="number" step="0.01" min="0" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none" placeholder="15.00">
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-gray-400 text-sm font-semibold mb-2">Categoría</label>
-                            <select id="prod-category" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none">
+                            <select class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none">
                                 <option value="Scripts">Scripts MTA</option>
                                 <option value="Modelajes">Modelajes / Mapas</option>
                                 <option value="Webs">Sitios Web</option>
@@ -200,25 +197,25 @@
 
                         <div>
                             <label class="block text-gray-400 text-sm font-semibold mb-2">Descripción</label>
-                            <textarea id="prod-description" required rows="4" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none" placeholder="Detalles técnicos, características..."></textarea>
+                            <textarea rows="4" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none" placeholder="Detalles técnicos, características..."></textarea>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-gray-400 text-sm font-semibold mb-2">Imágenes (Múltiple)</label>
                                 <div class="upload-area rounded-lg p-6 text-center cursor-pointer relative">
-                                    <input type="file" id="prod-images" accept="image/*" multiple required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                                    <input type="file" accept="image/*" multiple class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                                     <i class="fas fa-images text-3xl text-red-400 mb-2"></i>
                                     <p class="text-gray-400 text-sm">Click para subir imágenes</p>
-                                    <div id="preview-container" class="flex gap-2 mt-3 justify-center flex-wrap"></div>
+                                    <div class="flex gap-2 mt-3 justify-center flex-wrap"></div>
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-gray-400 text-sm font-semibold mb-2">Archivo (.zip/.lua)</label>
                                 <div class="upload-area rounded-lg p-6 text-center cursor-pointer relative h-full flex flex-col justify-center">
-                                    <input type="file" id="prod-file" accept=".zip,.rar,.7z,.lua" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                                    <input type="file" accept=".zip,.rar,.7z,.lua" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                                     <i class="fas fa-file-archive text-3xl text-red-400 mb-2"></i>
-                                    <p class="text-gray-400 text-sm" id="file-name-display">Click para subir archivo</p>
+                                    <p class="text-gray-400 text-sm">Click para subir archivo</p>
                                 </div>
                             </div>
                         </div>
@@ -231,11 +228,11 @@
             </div>
 
             <!-- SECTION: USERS -->
-            <div id="section-users" class="section">
+            <div class="section">
                 <div class="card rounded-xl p-6">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-lg font-bold text-white">Base de Datos de Usuarios</h2>
-                        <button onclick="loadUsersTable()" class="text-red-400 hover:text-white text-sm"><i class="fas fa-sync-alt mr-1"></i> Refrescar</button>
+                        <button class="text-red-400 hover:text-white text-sm"><i class="fas fa-sync-alt mr-1"></i> Refrescar</button>
                     </div>
                     <div class="overflow-x-auto max-h-[600px] overflow-y-auto custom-scrollbar">
                         <table class="w-full text-left border-collapse">
@@ -249,8 +246,8 @@
                                     <th class="pb-3 text-right">Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody id="users-table-body" class="text-sm text-gray-300">
-                                <tr><td colspan="6" class="text-center py-4 text-gray-500">Haz clic en "Refrescar" para cargar la lista.</td></tr>
+                            <tbody class="text-sm text-gray-300">
+                                <tr><td colspan="6" class="text-center py-4 text-gray-500">Sin datos</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -261,249 +258,21 @@
     </main>
 
     <script>
-        // --- CONFIGURACIÓN FIREBASE Y DISCORD ---
-        const CLIENT_ID = '1213866547181780992'; 
-        const REDIRECT_URI = window.location.href.split('#')[0]; 
-        const ADMIN_DISCORD_IDS = ['890526767608127489']; // TU ID DE ADMIN AQUÍ
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
-            authDomain: "papeletalicencia.firebaseapp.com",
-            projectId: "papeletalicencia",
-            storageBucket: "papeletalicencia.firebasestorage.app",
-            messagingSenderId: "677208314051",
-            appId: "1:677208314051:web:a27c04f31d402e83f29276"
-        };
-
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
-        let currentUser = null;
-        let tempImages = [];
-
-        // --- AUTH CHECK ---
-        function checkAuth() {
-            const fragment = new URLSearchParams(window.location.hash.slice(1));
-            const accessToken = fragment.get('access_token');
-            if (accessToken) {
-                window.location.hash = '';
-                localStorage.setItem('dc_access_token', accessToken);
-                fetchUser(accessToken);
-            } else {
-                const savedToken = localStorage.getItem('dc_access_token');
-                if (savedToken) fetchUser(savedToken);
-                else redirectToDiscord();
-            }
+        // ==========================================
+        // ESPACIO PARA AGREGAR FUNCIONALIDADES
+        // ==========================================
+        // Aquí irán las funciones que me envíes una por una
+        
+        // Ejemplo de estructura:
+        /*
+        function miFuncion() {
+            // Código aquí
         }
-
-        function fetchUser(token) {
-            fetch('https://discord.com/api/users/@me', { headers: { 'Authorization': `Bearer ${token}` }})
-            .then(res => { if (!res.ok) throw new Error('Invalid Token'); return res.json(); })
-            .then(user => {
-                if (!ADMIN_DISCORD_IDS.includes(user.id)) {
-                    alert("ACCESO DENEGADO: No tienes permisos de administrador.");
-                    window.location.href = 'index.html';
-                    return;
-                }
-                currentUser = user;
-                document.getElementById('admin-name').innerText = user.username;
-                document.getElementById('admin-avatar').src = user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png';
-                loadDashboardStats();
-            })
-            .catch(() => { localStorage.removeItem('dc_access_token'); redirectToDiscord(); });
-        }
-
-        function redirectToDiscord() {
-            window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify`;
-        }
-
-        function logout() {
-            localStorage.removeItem('dc_access_token');
-            window.location.href = 'index.html';
-        }
-
-        // --- NAVIGATION ---
-        function showSection(id) {
-            document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            
-            document.getElementById(`section-${id}`).classList.add('active');
-            
-            // Activar el botón del sidebar correspondiente
-            const activeLink = document.querySelector(`a[onclick="showSection('${id}')"]`);
-            if (activeLink) activeLink.classList.add('active');
-            
-            const titles = { 'dashboard': 'Dashboard General', 'upload': 'Subir Nuevo Producto', 'users': 'Gestión de Usuarios' };
-            document.getElementById('page-title').innerText = titles[id] || 'Panel Admin';
-
-            if(id === 'users') loadUsersTable();
-            if(id === 'dashboard') loadDashboardStats();
-        }
-
-        // --- DASHBOARD LOGIC ---
-        async function loadDashboardStats() {
-            try {
-                const prodSnap = await db.collection("Productos").get();
-                document.getElementById('dash-products').innerText = prodSnap.size;
-
-                const salesSnap = await db.collection("Clientes").get();
-                let totalSales = 0;
-                let revenue = 0;
-                let recentSalesHTML = '';
-
-                salesSnap.forEach(doc => {
-                    const data = doc.data();
-                    totalSales++;
-                    
-                    let price = 0;
-                    if(data.total_price && data.total_price !== 'Gratis') {
-                        price = parseFloat(String(data.total_price).replace('$','')) || 0;
-                    }
-                    revenue += price;
-
-                    if (totalSales <= 5) {
-                        const prodName = data.products && data.products[0] ? data.products[0].name : 'Pack Variado';
-                        const date = data.date?.toDate ? data.date.toDate().toLocaleDateString() : 'Reciente';
-                        const statusColor = data.status === 'Pagado' ? 'text-green-400' : 'text-yellow-400';
-                        
-                        recentSalesHTML += `
-                            <tr class="border-b border-red-900/10 hover:bg-red-900/5 transition-colors">
-                                <td class="py-3 pl-2 font-medium text-white">${data.username}</td>
-                                <td class="py-3 text-gray-400">${prodName}</td>
-                                <td class="py-3 text-white">${data.total_price}</td>
-                                <td class="py-3 ${statusColor} font-bold text-xs uppercase">${data.status}</td>
-                                <td class="py-3 text-gray-500 text-xs">${date}</td>
-                            </tr>`;
-                    }
-                });
-
-                document.getElementById('dash-sales').innerText = totalSales;
-                document.getElementById('dash-revenue').innerText = '$' + revenue.toFixed(2);
-                
-                const userSnap = await db.collection("UsuariosRegistrados").get();
-                document.getElementById('dash-users').innerText = userSnap.size;
-
-                const tableBody = document.getElementById('recent-sales-table');
-                if(totalSales === 0) tableBody.innerHTML = '<tr><td colspan="5" class="py-8 text-center text-gray-500">Sin ventas registradas aún.</td></tr>';
-                else tableBody.innerHTML = recentSalesHTML;
-
-            } catch (e) { console.error("Error dashboard:", e); }
-        }
-
-        // --- UPLOAD LOGIC ---
-        document.getElementById('prod-images').addEventListener('change', function(e) {
-            const container = document.getElementById('preview-container');
-            container.innerHTML = '';
-            tempImages = [];
-            Array.from(e.target.files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    tempImages.push(ev.target.result);
-                    const img = document.createElement('img');
-                    img.src = ev.target.result;
-                    img.className = 'w-12 h-12 rounded object-cover border border-red-500/30';
-                    container.appendChild(img);
-                };
-                reader.readAsDataURL(file);
-            });
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inicialización
         });
-
-        document.getElementById('prod-file').addEventListener('change', function(e) {
-            if(e.target.files[0]) document.getElementById('file-name-display').innerText = e.target.files[0].name;
-        });
-
-        async function handleProductSubmit(e) {
-            e.preventDefault();
-            const btn = e.target.querySelector('button[type="submit"]');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Subiendo...';
-            btn.disabled = true;
-
-            try {
-                if(tempImages.length === 0) throw new Error("Faltan imágenes");
-                
-                const fileInput = document.getElementById('prod-file');
-                const file = fileInput.files[0];
-                const fileBase64 = await toBase64(file);
-
-                const newProduct = {
-                    id: 'prod_' + Date.now(),
-                    name: document.getElementById('prod-name').value,
-                    price: parseFloat(document.getElementById('prod-price').value),
-                    category: document.getElementById('prod-category').value,
-                    description: document.getElementById('prod-description').value,
-                    image_url: tempImages[0],
-                    images: tempImages,
-                    file_data: fileBase64,
-                    file_name: file.name,
-                    created_at: firebase.firestore.FieldValue.serverTimestamp()
-                };
-
-                await db.collection("Productos").doc(newProduct.id).set(newProduct);
-                alert("¡Producto subido correctamente!");
-                e.target.reset();
-                document.getElementById('preview-container').innerHTML = '';
-                document.getElementById('file-name-display').innerText = 'Click para subir archivo';
-                showSection('dashboard');
-                loadDashboardStats();
-
-            } catch (err) {
-                alert("Error: " + err.message);
-                console.error(err);
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
-        }
-
-        function toBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
-        }
-
-        // --- USERS LOGIC ---
-        async function loadUsersTable() {
-            const tbody = document.getElementById('users-table-body');
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4"><i class="fas fa-spinner fa-spin text-red-500"></i> Cargando...</td></tr>';
-            
-            try {
-                const snap = await db.collection("UsuariosRegistrados").get();
-                let html = '';
-                
-                snap.forEach(doc => {
-                    const u = doc.data();
-                    const avatar = u.avatar ? `https://cdn.discordapp.com/avatars/${u.discord_id}/${u.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png';
-                    const lastLogin = u.last_login?.toDate ? u.last_login.toDate().toLocaleDateString() : 'N/A';
-                    
-                    let roleBadge = '<span class="bg-gray-700 text-gray-300 px-2 py-0.5 rounded text-xs">Cliente</span>';
-                    if(ADMIN_DISCORD_IDS.includes(u.discord_id)) roleBadge = '<span class="bg-red-900/50 text-red-400 border border-red-500/30 px-2 py-0.5 rounded text-xs">ADMIN</span>';
-
-                    html += `
-                        <tr class="border-b border-red-900/10 hover:bg-red-900/5 transition-colors">
-                            <td class="py-3 pl-2"><img src="${avatar}" class="w-8 h-8 rounded-full border border-red-900/30"></td>
-                            <td class="py-3 font-medium text-white">${u.username}</td>
-                            <td class="py-3 text-gray-500 font-mono text-xs">${u.discord_id}</td>
-                            <td class="py-3">${roleBadge}</td>
-                            <td class="py-3 text-gray-400 text-xs">${lastLogin}</td>
-                            <td class="py-3 text-right">
-                                <button class="text-gray-500 hover:text-white mx-1" title="Ver detalles"><i class="fas fa-eye"></i></button>
-                            </td>
-                        </tr>`;
-                });
-                
-                tbody.innerHTML = html || '<tr><td colspan="6" class="text-center py-4 text-gray-500">No hay usuarios registrados.</td></tr>';
-            } catch(e) { 
-                console.error(e); 
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-red-400">Error al cargar usuarios.</td></tr>';
-            }
-        }
-
-        // Init
-        document.addEventListener('DOMContentLoaded', checkAuth);
+        */
     </script>
 </body>
 </html>
