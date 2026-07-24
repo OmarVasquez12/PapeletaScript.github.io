@@ -525,7 +525,6 @@
                 <a href="#" onclick="showPage('inicio')" data-page="inicio" class="nav-link hover:text-red-400 transition-colors">Inicio</a>
                 <a href="#" onclick="showPage('productos')" data-page="productos" class="nav-link hover:text-red-400 transition-colors">Productos</a>
                 <a href="#" onclick="showPage('preguntas')" data-page="preguntas" class="nav-link hover:text-red-400 transition-colors">Preguntas</a>
-        
             </nav>
 
             <div class="flex items-center gap-3">
@@ -1129,16 +1128,14 @@
                 
                 closeLoginModal();
                 
-                // LÓGICA DE ROLES PARA EL BOTÓN CONFIG
+                // LÓGICA DE ROLES PARA EL BOTÓN CONFIG EN PANEL LATERAL
                 if (isAdmin(user)) {
-                    document.getElementById('nav-config').classList.remove('hidden');
                     document.getElementById('user-panel-config-btn').style.display = 'flex'; // Mostrar botón en panel
                     currentUserRole = 'admin';
                 } else {
                     // Verificar si tiene rol de Mod u otro rol con acceso a config
                     const savedData = JSON.parse(localStorage.getItem('papeleta_user_' + user.id) || '{}');
                     if(savedData.role && ['mod', 'staff', 'developer'].includes(savedData.role.toLowerCase())) {
-                         document.getElementById('nav-config').classList.remove('hidden');
                          document.getElementById('user-panel-config-btn').style.display = 'flex'; // Mostrar botón en panel
                          currentUserRole = savedData.role;
                     } else {
@@ -1269,7 +1266,6 @@
         function logout() {
             localStorage.removeItem('dc_access_token');
             currentUser = null; currentUserRole = 'user';
-            document.getElementById('nav-config').classList.add('hidden');
             document.getElementById('user-panel-config-btn').style.display = 'none'; // Ocultar botón config
             // Cerrar paneles si están abiertos
             document.getElementById('user-panel').classList.remove('active');
