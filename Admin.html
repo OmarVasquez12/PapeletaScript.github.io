@@ -71,14 +71,16 @@
         ::-webkit-scrollbar-track { background: #0a0505; }
         ::-webkit-scrollbar-thumb { background: #7f1d1d; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #ef4444; }
-        .fade-in { animation: fadeIn 0.5s ease forwards; }
+        .fade-in { animation: fadeIn 0.4s ease forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* TODAS las secciones son visibles siempre */
+        /* SECCIONES - Solo la activa se muestra */
         .section-content { 
+            display: none; 
+        }
+        .section-content.active { 
             display: block; 
-            margin-bottom: 3rem;
-            scroll-margin-top: 2rem;
+            animation: fadeIn 0.4s ease;
         }
         
         .admin-badge { 
@@ -104,22 +106,6 @@
             border-color: rgba(255, 26, 26, 0.3);
             transform: translateX(5px);
         }
-        .section-divider {
-            border-top: 2px dashed rgba(255, 26, 26, 0.2);
-            margin: 3rem 0;
-            position: relative;
-        }
-        .section-divider::before {
-            content: '✦';
-            position: absolute;
-            left: 50%;
-            top: -12px;
-            transform: translateX(-50%);
-            background: #050507;
-            padding: 0 1rem;
-            color: #ff1a1a;
-            font-size: 1.2rem;
-        }
     </style>
 </head>
 <body class="min-h-screen flex">
@@ -140,40 +126,40 @@
             <nav class="space-y-2">
                 <div class="text-xs text-gray-500 uppercase font-semibold mb-4 px-3 tracking-wider">Gestión General</div>
                 
-                <a onclick="scrollToSection('upload', this)" class="nav-item active flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
+                <a onclick="showSection('upload', this)" class="nav-item active flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
                     <i class="fas fa-cloud-upload-alt w-5 text-center"></i>
                     <span>Subir Archivo</span>
                 </a>
 
-                <a onclick="scrollToSection('users', this)" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
+                <a onclick="showSection('users', this)" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
                     <i class="fas fa-users w-5 text-center"></i>
                     <span>Usuarios</span>
                 </a>
 
-                <a onclick="scrollToSection('licenses', this)" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
+                <a onclick="showSection('licenses', this)" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
                     <i class="fas fa-key w-5 text-center"></i>
                     <span>Licencias Usuario</span>
                 </a>
 
                 <div class="text-xs text-gray-500 uppercase font-semibold mt-8 mb-4 px-3 tracking-wider">Herramientas Lua</div>
 
-                <a onclick="scrollToSection('encryptor', this)" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
+                <a onclick="showSection('encryptor', this)" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
                     <i class="fas fa-lock w-5 text-center"></i>
                     <span>Encriptador Lua</span>
                 </a>
 
-                <a onclick="scrollToSection('migrate', this)" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
+                <a onclick="showSection('migrate', this)" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
                     <i class="fas fa-exchange-alt w-5 text-center"></i>
                     <span>Pasar a Usuarios</span>
                 </a>
 
-                <a onclick="scrollToSection('roles', this)" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
+                <a onclick="showSection('roles', this)" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
                     <i class="fas fa-user-tag w-5 text-center"></i>
                     <span>Gestión de Roles</span>
                 </a>
 
                 <div class="mt-8 pt-4 border-t border-red-900/20">
-                    <a onclick="scrollToSection('serverlua', this)" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg bg-red-900/10 border border-red-600/20 text-red-400 hover:bg-red-900/20 hover:border-red-500/50">
+                    <a onclick="showSection('serverlua', this)" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg bg-red-900/10 border border-red-600/20 text-red-400 hover:bg-red-900/20 hover:border-red-500/50">
                         <i class="fas fa-file-code w-5 text-center"></i>
                         <span class="font-bold">Server.lua</span>
                         <i class="fas fa-bolt ml-auto text-xs text-yellow-500"></i>
@@ -194,13 +180,13 @@
         </div>
     </aside>
 
-    <!-- MAIN CONTENT - TODAS LAS SECCIONES VISIBLES -->
+    <!-- MAIN CONTENT -->
     <main class="main-content flex-1 md:ml-72 min-h-screen p-8">
         
-        <header class="flex justify-between items-center mb-10 fade-in sticky top-0 z-40 bg-[#050507]/95 backdrop-blur py-4">
+        <header class="flex justify-between items-center mb-10 fade-in">
             <div>
-                <h1 class="text-3xl font-bold text-white mb-1">Panel de Administración</h1>
-                <p class="text-gray-400 text-sm">Todas las secciones visibles - Navega haciendo clic en el menú</p>
+                <h1 id="page-title" class="text-3xl font-bold text-white mb-1">Subir Archivo</h1>
+                <p class="text-gray-400 text-sm">Panel de control y administración del servidor</p>
             </div>
             <div class="flex gap-4">
                 <div class="card px-4 py-2 rounded-lg flex items-center gap-2">
@@ -211,17 +197,7 @@
         </header>
 
         <!-- SECCIÓN 1: SUBIR ARCHIVO -->
-        <section id="section-upload" class="section-content fade-in">
-            <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 rounded-lg bg-red-600 flex items-center justify-center">
-                    <i class="fas fa-cloud-upload-alt text-white text-xl"></i>
-                </div>
-                <div>
-                    <h2 class="text-2xl font-bold text-white">Subir Archivo</h2>
-                    <p class="text-gray-400 text-sm">Gestiona los archivos del servidor</p>
-                </div>
-            </div>
-
+        <section id="section-upload" class="section-content active fade-in">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div class="stat-card rounded-xl p-5 flex items-center justify-between border-l-4 border-l-red-600">
                     <div>
@@ -246,32 +222,20 @@
                 </div>
             </div>
 
-            <div class="card rounded-xl p-8 min-h-[300px] flex flex-col items-center justify-center border-dashed border-2 border-red-900/30 bg-red-900/5">
+            <div class="card rounded-xl p-8 min-h-[400px] flex flex-col items-center justify-center border-dashed border-2 border-red-900/30 bg-red-900/5">
                 <div class="w-20 h-20 rounded-full bg-red-900/20 flex items-center justify-center mb-4">
                     <i class="fas fa-cloud-upload-alt text-4xl text-red-500"></i>
                 </div>
                 <h3 class="text-xl font-bold text-white mb-2">Arrastra tus archivos aquí</h3>
-                <p class="text-gray-400 text-center max-w-md mb-6">Soporta archivos .lua, .zip y configuraciones .conf.</p>
+                <p class="text-gray-400 text-center max-w-md mb-6">Soporta archivos .lua, .zip y configuraciones .conf. El sistema validará la integridad automáticamente.</p>
                 <button class="btn-action px-6 py-3 rounded-lg text-white font-bold flex items-center gap-2">
                     <i class="fas fa-folder-open"></i> Seleccionar Archivo
                 </button>
             </div>
         </section>
 
-        <div class="section-divider"></div>
-
         <!-- SECCIÓN 2: USUARIOS -->
         <section id="section-users" class="section-content fade-in">
-            <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 rounded-lg bg-blue-600 flex items-center justify-center">
-                    <i class="fas fa-users text-white text-xl"></i>
-                </div>
-                <div>
-                    <h2 class="text-2xl font-bold text-white">Usuarios</h2>
-                    <p class="text-gray-400 text-sm">Administra los usuarios del sistema</p>
-                </div>
-            </div>
-
             <div class="card rounded-xl p-6">
                 <div class="flex justify-between items-center mb-6">
                     <div class="flex items-center gap-4">
@@ -339,27 +303,15 @@
             </div>
         </section>
 
-        <div class="section-divider"></div>
-
         <!-- SECCIÓN 3: LICENCIAS -->
         <section id="section-licenses" class="section-content fade-in">
-            <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 rounded-lg bg-yellow-600 flex items-center justify-center">
-                    <i class="fas fa-key text-white text-xl"></i>
-                </div>
-                <div>
-                    <h2 class="text-2xl font-bold text-white">Licencias Usuario</h2>
-                    <p class="text-gray-400 text-sm">Gestiona las licencias activas</p>
-                </div>
-            </div>
-
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="card rounded-xl p-6">
                     <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
                         <i class="fas fa-key text-red-500"></i>
                         Licencias Activas
                     </h3>
-                    <div class="space-y-3 max-h-[400px] overflow-y-auto">
+                    <div class="space-y-3 max-h-[500px] overflow-y-auto">
                         <div class="user-row p-4 rounded-lg flex items-center justify-between">
                             <div>
                                 <p class="text-white font-medium">JohnDoe</p>
@@ -373,6 +325,13 @@
                                 <p class="text-xs text-gray-500 font-mono">PapeletaStore(DEF456UVW012)</p>
                             </div>
                             <span class="text-green-400 text-xs">● Activa</span>
+                        </div>
+                        <div class="user-row p-4 rounded-lg flex items-center justify-between">
+                            <div>
+                                <p class="text-white font-medium">AlexSmith</p>
+                                <p class="text-xs text-gray-500 font-mono">PapeletaStore(GHI789RST345)</p>
+                            </div>
+                            <span class="text-red-400 text-xs">● Expirada</span>
                         </div>
                     </div>
                 </div>
@@ -388,7 +347,20 @@
                             <select class="input-field w-full px-4 py-3 rounded-lg text-white">
                                 <option>JohnDoe</option>
                                 <option>MikeKing</option>
+                                <option>AlexSmith</option>
                             </select>
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 text-xs uppercase font-semibold mb-2">Tipo de Licencia</label>
+                            <select class="input-field w-full px-4 py-3 rounded-lg text-white">
+                                <option>General</option>
+                                <option>Premium</option>
+                                <option>VIP</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 text-xs uppercase font-semibold mb-2">Duración (días)</label>
+                            <input type="number" class="input-field w-full px-4 py-3 rounded-lg text-white" value="30">
                         </div>
                         <button class="btn-primary w-full py-3 rounded-lg text-white font-bold mt-4">
                             <i class="fas fa-magic mr-2"></i>Generar Licencia
@@ -398,87 +370,86 @@
             </div>
         </section>
 
-        <div class="section-divider"></div>
-
-        <!-- SECCIÓN 4: ENCRIPTADOR -->
+        <!-- SECCIÓN 4: ENCRIPTADOR LUA -->
         <section id="section-encryptor" class="section-content fade-in">
-            <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 rounded-lg bg-purple-600 flex items-center justify-center">
-                    <i class="fas fa-lock text-white text-xl"></i>
-                </div>
-                <div>
-                    <h2 class="text-2xl font-bold text-white">Encriptador Lua</h2>
-                    <p class="text-gray-400 text-sm">Protege tu código fuente</p>
-                </div>
-            </div>
-
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="card rounded-xl p-6">
-                    <h3 class="text-lg font-bold text-white mb-4">Código Original</h3>
-                    <textarea class="input-field w-full h-[300px] p-4 rounded-lg text-white font-mono text-sm resize-none" placeholder="Pega tu código Lua aquí..."></textarea>
+                    <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                        <i class="fas fa-code text-red-500"></i>
+                        Código Original
+                    </h3>
+                    <textarea class="input-field w-full h-[400px] p-4 rounded-lg text-white font-mono text-sm resize-none" placeholder="Pega tu código Lua aquí..."></textarea>
                 </div>
                 <div class="card rounded-xl p-6">
-                    <h3 class="text-lg font-bold text-white mb-4">Código Encriptado</h3>
-                    <textarea class="input-field w-full h-[300px] p-4 rounded-lg text-white font-mono text-sm resize-none" placeholder="El código encriptado aparecerá aquí..." readonly></textarea>
+                    <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                        <i class="fas fa-lock text-red-500"></i>
+                        Código Encriptado
+                    </h3>
+                    <textarea class="input-field w-full h-[400px] p-4 rounded-lg text-white font-mono text-sm resize-none" placeholder="El código encriptado aparecerá aquí..." readonly></textarea>
                     <div class="flex gap-3 mt-4">
-                        <button class="btn-primary flex-1 py-3 rounded-lg text-white font-bold">Encriptar</button>
-                        <button class="btn-action flex-1 py-3 rounded-lg text-white font-bold">Copiar</button>
+                        <button class="btn-primary flex-1 py-3 rounded-lg text-white font-bold">
+                            <i class="fas fa-magic mr-2"></i>Encriptar
+                        </button>
+                        <button class="btn-action flex-1 py-3 rounded-lg text-white font-bold">
+                            <i class="fas fa-copy mr-2"></i>Copiar
+                        </button>
                     </div>
                 </div>
             </div>
         </section>
 
-        <div class="section-divider"></div>
-
-        <!-- SECCIÓN 5: MIGRAR -->
+        <!-- SECCIÓN 5: MIGRAR DATOS -->
         <section id="section-migrate" class="section-content fade-in">
-            <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 rounded-lg bg-green-600 flex items-center justify-center">
-                    <i class="fas fa-exchange-alt text-white text-xl"></i>
-                </div>
-                <div>
-                    <h2 class="text-2xl font-bold text-white">Pasar a Usuarios</h2>
-                    <p class="text-gray-400 text-sm">Migra datos entre usuarios</p>
-                </div>
-            </div>
-
             <div class="card rounded-xl p-8">
+                <div class="max-w-2xl mx-auto text-center mb-8">
+                    <div class="w-20 h-20 rounded-full bg-red-900/20 flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-exchange-alt text-4xl text-red-500"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-2">Migrar Datos a Usuarios</h3>
+                    <p class="text-gray-400">Transfiere licencias y permisos entre usuarios de forma segura</p>
+                </div>
+
                 <div class="max-w-2xl mx-auto space-y-6">
                     <div>
                         <label class="block text-gray-400 text-xs uppercase font-semibold mb-2">Usuario de Origen</label>
                         <select class="input-field w-full px-4 py-3 rounded-lg text-white">
                             <option>Seleccionar usuario...</option>
+                            <option>JohnDoe</option>
+                            <option>MikeKing</option>
                         </select>
                     </div>
                     <div>
                         <label class="block text-gray-400 text-xs uppercase font-semibold mb-2">Usuario de Destino</label>
                         <select class="input-field w-full px-4 py-3 rounded-lg text-white">
                             <option>Seleccionar usuario...</option>
+                            <option>AlexSmith</option>
+                            <option>NuevoUsuario</option>
                         </select>
                     </div>
-                    <button class="btn-primary w-full py-3 rounded-lg text-white font-bold">
+                    <div>
+                        <label class="block text-gray-400 text-xs uppercase font-semibold mb-2">Datos a Migrar</label>
+                        <div class="grid grid-cols-2 gap-3 mt-2">
+                            <label class="flex items-center gap-3 p-3 rounded-lg bg-red-900/10 border border-red-900/20 cursor-pointer hover:border-red-600/50">
+                                <input type="checkbox" class="w-4 h-4 rounded border-red-600 text-red-600 focus:ring-red-600">
+                                <span class="text-white text-sm">Licencias</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-3 rounded-lg bg-red-900/10 border border-red-900/20 cursor-pointer hover:border-red-600/50">
+                                <input type="checkbox" class="w-4 h-4 rounded border-red-600 text-red-600 focus:ring-red-600">
+                                <span class="text-white text-sm">Permisos</span>
+                            </label>
+                        </div>
+                    </div>
+                    <button class="btn-primary w-full py-3 rounded-lg text-white font-bold mt-6">
                         <i class="fas fa-exchange-alt mr-2"></i>Iniciar Migración
                     </button>
                 </div>
             </div>
         </section>
 
-        <div class="section-divider"></div>
-
-        <!-- SECCIÓN 6: ROLES -->
+        <!-- SECCIÓN 6: GESTIÓN DE ROLES -->
         <section id="section-roles" class="section-content fade-in">
-            <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 rounded-lg bg-pink-600 flex items-center justify-center">
-                    <i class="fas fa-user-tag text-white text-xl"></i>
-                </div>
-                <div>
-                    <h2 class="text-2xl font-bold text-white">Gestión de Roles</h2>
-                    <p class="text-gray-400 text-sm">Configura permisos y roles</p>
-                </div>
-            </div>
-
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div class="stat-card rounded-xl p-5 border-l-4 border-l-red-600">
+                <div class="stat-card rounded-xl p-5 border-l-4 border-l-red-600 cursor-pointer hover:scale-105 transition-transform">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-gray-400 text-xs uppercase font-bold">ADMINISTRADORES</p>
@@ -487,7 +458,7 @@
                         <div class="w-10 h-10 rounded-full bg-red-900/30 flex items-center justify-center text-red-400"><i class="fas fa-crown"></i></div>
                     </div>
                 </div>
-                <div class="stat-card rounded-xl p-5 border-l-4 border-l-blue-600">
+                <div class="stat-card rounded-xl p-5 border-l-4 border-l-blue-600 cursor-pointer hover:scale-105 transition-transform">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-gray-400 text-xs uppercase font-bold">MODERADORES</p>
@@ -496,7 +467,7 @@
                         <div class="w-10 h-10 rounded-full bg-blue-900/30 flex items-center justify-center text-blue-400"><i class="fas fa-user-shield"></i></div>
                     </div>
                 </div>
-                <div class="stat-card rounded-xl p-5 border-l-4 border-l-purple-600">
+                <div class="stat-card rounded-xl p-5 border-l-4 border-l-purple-600 cursor-pointer hover:scale-105 transition-transform">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-gray-400 text-xs uppercase font-bold">USUARIOS</p>
@@ -506,100 +477,143 @@
                     </div>
                 </div>
             </div>
-        </section>
 
-        <div class="section-divider"></div>
+            <div class="card rounded-xl p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-bold text-white">Configuración de Roles</h3>
+                    <button class="btn-primary px-4 py-2 rounded-lg text-white font-medium">
+                        <i class="fas fa-plus mr-2"></i>Crear Rol
+                    </button>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="user-row p-4 rounded-lg flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-red-600 flex items-center justify-center">
+                                <i class="fas fa-crown text-white"></i>
+                            </div>
+                            <div>
+                                <p class="text-white font-bold">Administrador</p>
+                                <p class="text-xs text-gray-500">Acceso completo al sistema</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <span class="admin-badge">Sistema</span>
+                            <button class="text-blue-400 hover:text-blue-300"><i class="fas fa-edit"></i></button>
+                        </div>
+                    </div>
+                    
+                    <div class="user-row p-4 rounded-lg flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center">
+                                <i class="fas fa-user-shield text-white"></i>
+                            </div>
+                            <div>
+                                <p class="text-white font-bold">Moderador</p>
+                                <p class="text-xs text-gray-500">Gestión de usuarios y contenido</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <span class="px-2 py-1 rounded bg-blue-900/30 text-blue-400 text-xs border border-blue-600/30">Editable</span>
+                            <button class="text-blue-400 hover:text-blue-300"><i class="fas fa-edit"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <!-- SECCIÓN 7: SERVER.LUA -->
         <section id="section-serverlua" class="section-content fade-in">
-            <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 rounded-lg bg-red-600 flex items-center justify-center animate-pulse">
-                    <i class="fas fa-file-code text-white text-xl"></i>
-                </div>
-                <div>
-                    <h2 class="text-2xl font-bold text-white">Server.lua</h2>
-                    <p class="text-gray-400 text-sm">Editor de código del servidor</p>
-                </div>
-            </div>
-
             <div class="card rounded-xl overflow-hidden">
                 <div class="p-4 border-b border-red-900/30 bg-red-900/10 flex justify-between items-center">
                     <div class="flex items-center gap-3">
                         <i class="fas fa-file-code text-red-500 text-xl"></i>
                         <div>
-                            <h3 class="text-white font-bold">Editor Server.lua</h3>
+                            <h3 class="text-white font-bold">Server.lua</h3>
+                            <p class="text-xs text-gray-400">Edición en tiempo real</p>
                         </div>
                     </div>
                     <button class="btn-primary px-4 py-2 rounded-lg text-white text-sm font-bold">
                         <i class="fas fa-save mr-2"></i>Guardar Cambios
                     </button>
                 </div>
-                <textarea class="w-full h-[500px] bg-[#050507] text-gray-300 font-mono text-sm p-6 focus:outline-none resize-none" spellcheck="false">
+                <div class="p-0">
+                    <textarea class="w-full h-[600px] bg-[#050507] text-gray-300 font-mono text-sm p-6 focus:outline-none resize-none" spellcheck="false">
 -- [SYSTEM CORE]
--- Server.lua - Panel de Administración
+-- Autorizado por Admin Panel v2
 
 local function clean(s)
     if not s then return "" end
     return tostring(s):gsub("%s+", ""):upper()
 end
 
+local function tienePermisoACL()
+    local resourceName = getResourceName(getThisResource())
+    local resObj = "resource." .. resourceName
+    if not isObjectInACLGroup(resObj, aclGetGroup("Admin")) then
+        outputDebugString("[Papeleta Progamador] El resource '"..resourceName.."' NO tiene permiso en ACL 'Admin'", 1)
+        return false
+    end
+    return true
+end
+
 local function validarLicencia()
-    outputDebugString("[SISTEMA] Verificando licencia...", 3)
+    if not configLicense or not configLicense["User"] or not configLicense["Key"] then
+        outputDebugString("[Papeleta Progamador] Faltan credenciales en config", 1)
+        stopResource(getThisResource())
+        return
+    end
+    
+    outputDebugString("[Papeleta Progamador] INICIANDO VERIFICACION DE LICENCIA", 3)
 end
 
 addEventHandler("onResourceStart", resourceRoot, function()
+    if not tienePermisoACL() then
+        cancelEvent(true, "[Papeleta] Resource sin permiso en ACL 'Admin'")
+        setTimer(function() stopResource(getThisResource()) end, 50, 1)
+        return
+    end
     validarLicencia()
-end)
-                </textarea>
+end, true, "high")
+                    </textarea>
+                </div>
             </div>
         </section>
-
-        <!-- Footer -->
-        <footer class="mt-12 pb-8 text-center text-gray-500 text-sm">
-            <p>Admin Panel v2.0.4 • Todos los derechos reservados</p>
-        </footer>
 
     </main>
 
     <script>
-        function scrollToSection(sectionName, element) {
+        function showSection(sectionName, element) {
+            // Ocultar TODAS las secciones
+            document.querySelectorAll('.section-content').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Mostrar SOLO la sección seleccionada
+            document.getElementById('section-' + sectionName).classList.add('active');
+            
             // Actualizar nav items
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('active');
             });
             element.classList.add('active');
             
-            // Scroll suave a la sección
-            const section = document.getElementById('section-' + sectionName);
-            if (section) {
-                section.scrollIntoView({ 
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        }
-
-        // Highlight nav item al hacer scroll
-        window.addEventListener('scroll', () => {
-            const sections = document.querySelectorAll('.section-content');
-            const navItems = document.querySelectorAll('.nav-item');
+            // Actualizar título
+            const titles = {
+                'upload': 'Subir Archivo',
+                'users': 'Usuarios',
+                'licenses': 'Licencias Usuario',
+                'encryptor': 'Encriptador Lua',
+                'migrate': 'Pasar a Usuarios',
+                'roles': 'Gestión de Roles',
+                'serverlua': 'Server.lua'
+            };
             
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                const sectionHeight = section.clientHeight;
-                if (scrollY >= (sectionTop - 200)) {
-                    current = section.getAttribute('id');
-                }
-            });
-
-            navItems.forEach(item => {
-                item.classList.remove('active');
-                if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(current.replace('section-', ''))) {
-                    item.classList.add('active');
-                }
-            });
-        });
+            document.getElementById('page-title').innerText = titles[sectionName];
+            
+            // Scroll al top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     </script>
 </body>
 </html>
