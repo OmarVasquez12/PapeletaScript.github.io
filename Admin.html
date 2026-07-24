@@ -981,18 +981,15 @@
                         <i class="fas fa-file-code text-red-500 text-xl"></i>
                         <div>
                             <h3 class="text-white font-bold">Server.lua</h3>
-                            <p class="text-xs text-gray-400">Edición en tiempo real</p>
+                            <p class="text-xs text-gray-400">Código de validación de licencia</p>
                         </div>
                     </div>
-                    <button class="btn-primary px-4 py-2 rounded-lg text-white text-sm font-bold">
-                        <i class="fas fa-save mr-2"></i>Guardar Cambios
+                    <button onclick="copyServerLua()" class="btn-primary px-4 py-2 rounded-lg text-white text-sm font-bold flex items-center gap-2">
+                        <i class="fas fa-copy"></i> Copiar Código
                     </button>
                 </div>
                 <div class="p-0">
-                    <textarea class="w-full h-[600px] bg-[#050507] text-gray-300 font-mono text-sm p-6 focus:outline-none resize-none" spellcheck="false">
--- [SYSTEM CORE]
--- Autorizado por Admin Panel v2
-
+                    <textarea id="server-lua-code" class="w-full h-[600px] bg-[#050507] text-gray-300 font-mono text-sm p-6 focus:outline-none resize-none" spellcheck="false">
 local function clean(s)
     if not s then return "" end
     return tostring(s):gsub("%s+", ""):upper()
@@ -1001,11 +998,17 @@ end
 local function tienePermisoACL()
     local resourceName = getResourceName(getThisResource())
     local resObj = "resource." .. resourceName
+    
     if not isObjectInACLGroup(resObj, aclGetGroup("Admin")) then
         outputDebugString("[Papeleta Progamador] El resource '"..resourceName.."' NO tiene permiso en ACL 'Admin'", 1)
         return false
     end
     return true
+end
+
+local function cargarScriptPrincipal()
+    if _G["ScriptYaCargado"] then return end
+    _G["ScriptYaCargado"] = true
 end
 
 local function validarLicencia()
@@ -1014,8 +1017,89 @@ local function validarLicencia()
         stopResource(getThisResource())
         return
     end
+
+    local userLocal = clean(configLicense["User"])
+    local keyLocal = clean(configLicense["Key"])
+    local resourceName = clean(getResourceName(getThisResource()))
+    local portActual = tostring(getServerPort() or 22003)
     
-    outputDebugString("[Papeleta Progamador] INICIANDO VERIFICACION DE LICENCIA", 3)
+    fetchRemote("https://api.ipify.org?format=json", function(ipData, ipErr)
+        local ipActual = ""
+        if ipErr == 0 then
+            local ipTable = fromJSON(ipData)
+            if ipTable and ipTable.ip then
+                ipActual = clean(ipTable.ip)
+            end
+        end
+        
+        if ipActual == "" or ipActual == "0.0.0.0" then
+            ipActual = clean(getServerConfigSetting("serverip") or "")
+            if ipActual == "auto" or ipActual == "" then
+                outputDebugString("[Papeleta Progamador] ADVERTENCIA: No se pudo detectar IP automáticamente", 2)
+            end
+        end
+        
+        local ipPortCompleto = ipActual .. ":" .. portActual
+        validarConFirebase(ipPortCompleto, userLocal, keyLocal, resourceName)
+    end)
+end
+
+function validarConFirebase(ipPortCompleto, userLocal, keyLocal, resourceName)
+    local urlBase = "https://firestore.googleapis.com/v1/projects/licenciapapeleta12/databases/(default)/documents/licencias"
+    
+    fetchRemote(urlBase, function(data, err)
+        if err ~= 0 then
+            outputDebugString("[Papeleta Progamador] Fallo de conexión a Firestore", 1)
+            stopResource(getThisResource())
+            return
+        end
+
+        local db = fromJSON(data)
+        local autorizado = false
+        local keyEncontradaPeroMalSistema = false
+
+        if db and db.documents then
+            for _, doc in ipairs(db.documents) do
+                local f = doc.fields
+                if f and f.user and f.key and f.ip and f.port and f.active and f.resource then
+                    local fireUser = clean(f.user.stringValue)
+                    local fireKey = clean(f.key.stringValue)
+                    local fireIp   = clean(f.ip.stringValue)
+                    local firePort = clean(f.port.stringValue)
+                    local fireResource = clean(f.resource.stringValue)
+                    local fireIpPort = fireIp .. ":" .. firePort
+                    local fireStatus = f.active.booleanValue
+
+                    if fireKey == keyLocal then
+                        if fireResource == resourceName then
+                            if fireUser == userLocal and fireIpPort == ipPortCompleto and fireStatus == true then
+                                autorizado = true
+                            end
+                        else
+                            keyEncontradaPeroMalSistema = true
+                            outputDebugString("[Papeleta Progamador] ERROR: Key válida pero pertenece al sistema '" .. fireResource .. "'", 1)
+                            outputDebugString("[Papeleta Progamador] Este sistema es '" .. resourceName .. "'. Licencia denegada.", 1)
+                        end
+                        break
+                    end
+                end
+            end
+        end
+
+        if autorizado then
+            if not _G["ScriptYaCargado"] then
+                outputDebugString("[Papeleta Progamador] LICENCIA VERIFICADA EXITOSAMENTE", 3)
+                cargarScriptPrincipal()
+            end
+        else
+            if keyEncontradaPeroMalSistema then
+                outputDebugString("[Papeleta Progamador] LICENCIA DENEGADA: Key incorrecta para este sistema", 1)
+            else
+                outputDebugString("[Papeleta Progamador] LICENCIA NO VERIFICADA (Key inválida o expirada)", 1)
+            end
+            stopResource(getThisResource())
+        end
+    end)
 end
 
 addEventHandler("onResourceStart", resourceRoot, function()
@@ -1024,7 +1108,9 @@ addEventHandler("onResourceStart", resourceRoot, function()
         setTimer(function() stopResource(getThisResource()) end, 50, 1)
         return
     end
+    outputDebugString("[Papeleta Progamador] INICIANDO VERIFICACIÓN DE LICENCIA...", 3)
     validarLicencia()
+    setTimer(validarLicencia, 8996400000, 0)
 end, true, "high")
                     </textarea>
                 </div>
@@ -2268,6 +2354,17 @@ end, true, "high")
                 canManageRoles: 'Roles'
             };
             return names[key] || key;
+        }
+
+        // ========== COPIAR SERVER.LUA ==========
+        function copyServerLua() {
+            const code = document.getElementById('server-lua-code').value;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('✅ Código Server.lua copiado al portapapeles');
+            }).catch(err => {
+                console.error('Error al copiar:', err);
+                alert('❌ Error al copiar el código');
+            });
         }
 
         // ========== NAVEGACIÓN ENTRE SECCIONES ==========
