@@ -17,23 +17,10 @@
         :root {
             --bg-body: #050507;
             --bg-card: rgba(20, 10, 10, 0.6);
-            --bg-glass: rgba(255, 255, 255, 0.03);
-            --bg-glass-strong: rgba(20, 10, 10, 0.85);
             --primary: #ff1a1a;
-            --primary-glow: rgba(255, 26, 26, 0.4);
-            --secondary: #cc1b1b;
-            --success: #00ff44;
-            --danger: #ff0000;
-            --discord-blue: #5865F2;
-            --text-main: #ffffff;
             --text-muted: #9496a1;
             --text-dim: #6b7280;
             --border-color: rgba(255, 26, 26, 0.15);
-            --border-hover: rgba(255, 26, 26, 0.3);
-            --radius-sm: 8px;
-            --radius-md: 16px;
-            --radius-lg: 24px;
-            --container-width: 1400px;
         }
         
         body {
@@ -42,7 +29,7 @@
             font-family: 'Segoe UI', system-ui, sans-serif;
         }
 
-        /* --- SCROLLBAR PERSONALIZADO (GRIS RATÓN) PARA TODA LA PÁGINA --- */
+        /* --- SCROLLBAR PERSONALIZADO --- */
         ::-webkit-scrollbar { width: 10px; }
         ::-webkit-scrollbar-track { background: #111111; }
         ::-webkit-scrollbar-thumb { background: #6e6e6e; border-radius: 5px; border: 2px solid #111111; }
@@ -68,172 +55,77 @@
         @keyframes bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
 
         .product-detail-modal { backdrop-filter: blur(10px); }
-        .image-preview { max-width: 100%; max-height: 200px; border-radius: 8px; margin-top: 10px; }
-
-        /* Estilos para la galería de imágenes */
-        .gallery-container { position: relative; }
         .gallery-main-image { width: 100%; height: 400px; object-fit: contain; border-radius: 16px; background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(153, 27, 27, 0.1)); }
         .gallery-thumbnails { display: flex; gap: 10px; margin-top: 15px; overflow-x: auto; padding: 5px; }
         .gallery-thumbnail { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 2px solid transparent; transition: all 0.3s; flex-shrink: 0; }
         .gallery-thumbnail:hover { border-color: #dc2626; transform: scale(1.05); }
         .gallery-thumbnail.active { border-color: #dc2626; box-shadow: 0 0 10px rgba(220, 38, 38, 0.5); }
         .gallery-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(220, 38, 38, 0.8); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
-        .gallery-nav:hover { background: rgba(220, 38, 38, 1); }
         .gallery-nav.prev { left: 10px; }
         .gallery-nav.next { right: 10px; }
 
-        /* Preview múltiple en admin */
         .multiple-preview-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 15px; }
         .preview-item { position: relative; border-radius: 8px; overflow: hidden; border: 2px solid rgba(220, 38, 38, 0.3); }
         .preview-item img { width: 100%; height: 150px; object-fit: cover; }
         .preview-item .remove-btn { position: absolute; top: 5px; right: 5px; background: rgba(220, 38, 38, 0.9); color: white; border: none; width: 25px; height: 25px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; }
-        .preview-item .remove-btn:hover { background: rgba(220, 38, 38, 1); }
 
         /* ESTILOS PANEL CONFIGURACIÓN */
-        .config-panel-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(4px); z-index: 100;
-            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
-        }
+        .config-panel-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
         .config-panel-overlay.active { opacity: 1; pointer-events: auto; }
-        
-        .config-panel {
-            position: fixed; top: 0; right: -400px; width: 350px; height: 100vh;
-            background: linear-gradient(180deg, #150a0a 0%, #0a0505 100%);
-            border-left: 1px solid rgba(255, 26, 26, 0.3);
-            box-shadow: -10px 0 40px rgba(0,0,0,0.8);
-            z-index: 101; transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            padding: 24px; overflow-y: auto;
-        }
+        .config-panel { position: fixed; top: 0; right: -400px; width: 350px; height: 100vh; background: linear-gradient(180deg, #150a0a 0%, #0a0505 100%); border-left: 1px solid rgba(255, 26, 26, 0.3); box-shadow: -10px 0 40px rgba(0,0,0,0.8); z-index: 101; transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 24px; overflow-y: auto; }
         .config-panel.active { right: 0; }
-
-        .config-menu-item {
-            display: flex; align-items: center; gap: 12px;
-            padding: 14px 16px; margin-bottom: 8px;
-            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 12px; cursor: pointer; transition: all 0.2s;
-            text-decoration: none; color: inherit;
-        }
-        .config-menu-item:hover {
-            background: rgba(255, 26, 26, 0.1); border-color: rgba(255, 26, 26, 0.4);
-            transform: translateX(-4px);
-        }
-        .config-menu-icon {
-            width: 36px; height: 36px; border-radius: 8px;
-            background: rgba(255, 26, 26, 0.1); color: #ff1a1a;
-            display: flex; align-items: center; justify-content: center; font-size: 16px;
-        }
+        .config-menu-item { display: flex; align-items: center; gap: 12px; padding: 14px 16px; margin-bottom: 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; cursor: pointer; transition: all 0.2s; text-decoration: none; color: inherit; }
+        .config-menu-item:hover { background: rgba(255, 26, 26, 0.1); border-color: rgba(255, 26, 26, 0.4); transform: translateX(-4px); }
+        .config-menu-icon { width: 36px; height: 36px; border-radius: 8px; background: rgba(255, 26, 26, 0.1); color: #ff1a1a; display: flex; align-items: center; justify-content: center; font-size: 16px; }
         .config-menu-text h4 { margin: 0; font-size: 14px; font-weight: 700; color: #fff; }
         .config-menu-text p { margin: 2px 0 0; font-size: 11px; color: #9496a1; }
 
         /* ESTILOS PANEL DE USUARIO (CLIENTE) */
-        .user-panel-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(4px); z-index: 100;
-            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
-        }
+        .user-panel-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
         .user-panel-overlay.active { opacity: 1; pointer-events: auto; }
-        
-        .user-panel {
-            position: fixed; top: 0; left: -400px; width: 350px; height: 100vh;
-            background: linear-gradient(180deg, #150a0a 0%, #0a0505 100%);
-            border-right: 1px solid rgba(255, 26, 26, 0.3);
-            box-shadow: 10px 0 40px rgba(0,0,0,0.8);
-            z-index: 101; transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            padding: 24px; overflow-y: auto;
-        }
+        .user-panel { position: fixed; top: 0; left: -400px; width: 350px; height: 100vh; background: linear-gradient(180deg, #150a0a 0%, #0a0505 100%); border-right: 1px solid rgba(255, 26, 26, 0.3); box-shadow: 10px 0 40px rgba(0,0,0,0.8); z-index: 101; transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 24px; overflow-y: auto; }
         .user-panel.active { left: 0; }
-
-        .user-panel-header {
-            text-align: center; padding-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 24px;
-        }
-        .user-panel-avatar {
-            width: 100px; height: 100px; border-radius: 50%;
-            border: 3px solid #ff1a1a; margin: 0 auto 16px;
-            box-shadow: 0 0 20px rgba(255, 26, 26, 0.4);
-        }
-        .user-panel-name {
-            font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 8px;
-        }
-        .user-panel-role {
-            display: inline-block; padding: 6px 16px;
-            background: rgba(0, 255, 68, 0.15);
-            border: 1px solid rgba(0, 255, 68, 0.4);
-            color: #00ff44; border-radius: 20px;
-            font-size: 12px; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .user-panel-role.admin {
-            background: rgba(255, 26, 26, 0.15);
-            border-color: rgba(255, 26, 26, 0.4);
-            color: #ff1a1a;
-        }
-
-        .user-menu-item {
-            display: flex; align-items: center; gap: 12px;
-            padding: 14px 16px; margin-bottom: 8px;
-            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 12px; cursor: pointer; transition: all 0.2s;
-            text-decoration: none; color: inherit;
-        }
-        .user-menu-item:hover {
-            background: rgba(255, 26, 26, 0.1); border-color: rgba(255, 26, 26, 0.4);
-            transform: translateX(4px);
-        }
-        .user-menu-icon {
-            width: 36px; height: 36px; border-radius: 8px;
-            background: rgba(255, 26, 26, 0.1); color: #ff1a1a;
-            display: flex; align-items: center; justify-content: center; font-size: 16px;
-        }
+        .user-panel-header { text-align: center; padding-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 24px; }
+        .user-panel-avatar { width: 100px; height: 100px; border-radius: 50%; border: 3px solid #ff1a1a; margin: 0 auto 16px; box-shadow: 0 0 20px rgba(255, 26, 26, 0.4); }
+        .user-panel-name { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+        .user-panel-role { display: inline-block; padding: 6px 16px; background: rgba(0, 255, 68, 0.15); border: 1px solid rgba(0, 255, 68, 0.4); color: #00ff44; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .user-panel-role.admin { background: rgba(255, 26, 26, 0.15); border-color: rgba(255, 26, 26, 0.4); color: #ff1a1a; }
+        .user-menu-item { display: flex; align-items: center; gap: 12px; padding: 14px 16px; margin-bottom: 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; cursor: pointer; transition: all 0.2s; text-decoration: none; color: inherit; }
+        .user-menu-item:hover { background: rgba(255, 26, 26, 0.1); border-color: rgba(255, 26, 26, 0.4); transform: translateX(4px); }
+        .user-menu-icon { width: 36px; height: 36px; border-radius: 8px; background: rgba(255, 26, 26, 0.1); color: #ff1a1a; display: flex; align-items: center; justify-content: center; font-size: 16px; }
         .user-menu-text h4 { margin: 0; font-size: 14px; font-weight: 700; color: #fff; }
         .user-menu-text p { margin: 2px 0 0; font-size: 11px; color: #9496a1; }
+        .user-panel-footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .logout-btn { width: 100%; padding: 12px; background: rgba(255, 26, 26, 0.15); border: 1px solid rgba(255, 26, 26, 0.4); color: #ff1a1a; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .logout-btn:hover { background: rgba(255, 26, 26, 0.25); transform: translateY(-2px); }
 
-        .user-panel-footer {
-            margin-top: 32px; padding-top: 24px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
-        .logout-btn {
-            width: 100%; padding: 12px;
-            background: rgba(255, 26, 26, 0.15);
-            border: 1px solid rgba(255, 26, 26, 0.4);
-            color: #ff1a1a; border-radius: 12px;
-            font-weight: 600; cursor: pointer;
-            transition: all 0.2s; display: flex;
-            align-items: center; justify-content: center; gap: 8px;
-        }
-        .logout-btn:hover {
-            background: rgba(255, 26, 26, 0.25);
-            transform: translateY(-2px);
-        }
-
-        /* --- NUEVOS ESTILOS PARA SECCIÓN DE RESEÑAS (INFINITO CON FADE) --- */
+        /* --- NUEVOS ESTILOS PARA SECCIÓN DE RESEÑAS (OVERLAP EFFECT) --- */
         .reviews-section {
             padding: 80px 0;
             position: relative;
             overflow: hidden;
-            /* Ocupa todo el ancho para el fondo */
             width: 100vw;
             margin-left: calc(50% - 50vw);
             background: linear-gradient(to bottom, transparent, rgba(20, 10, 10, 0.4), transparent);
         }
-        
-        /* Contenedor que limita el ancho del contenido y aplica el fade */
-        .reviews-wrapper {
+
+        /* Contenedor principal que alinea todo */
+        .reviews-container {
             max-width: 7xl; /* Mismo ancho que el título */
             margin: 0 auto;
             position: relative;
-            /* Máscara para desvanecer los bordes (izquierda y derecha) */
-            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
-            mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
-            padding: 20px 0; /* Espacio para que no se corten las sombras al desvanecerse */
+            padding: 0 20px;
         }
 
+        /* El título flota ENCIMA del slider */
         .reviews-title {
             text-align: center;
             margin-bottom: 50px;
-            /* El título NO debe tener la máscara, así que lo sacamos del wrapper o usamos z-index si estuviera dentro. 
-               En este caso, el wrapper solo envuelve el slider. */
+            position: relative;
+            z-index: 10; /* Mayor que el slider */
+            /* Opcional: Añadir un pequeño gradiente detrás del texto para asegurar legibilidad si las tarjetas pasan muy cerca */
+            background: linear-gradient(to right, transparent 0%, #050507 15%, #050507 85%, transparent 100%);
+            padding: 10px 0;
         }
         
         .reviews-title h2 {
@@ -253,11 +145,21 @@
             font-size: 1.1rem;
         }
 
+        /* Wrapper del slider con la máscara de desvanecimiento */
+        .reviews-slider-wrapper {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            /* La máscara crea el efecto fade en los bordes */
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
+            mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
+            padding: 20px 0; /* Espacio para sombras */
+        }
+
         /* Slider Infinito */
         .reviews-slider {
             display: flex;
             gap: 25px;
-            padding: 20px 0;
             width: max-content; 
             animation: scroll-infinite 40s linear infinite;
         }
@@ -267,7 +169,6 @@
             animation-play-state: paused;
         }
 
-        /* Definición de la animación de desplazamiento */
         @keyframes scroll-infinite {
             0% { transform: translateX(0); }
             100% { transform: translateX(-50%); }
@@ -293,66 +194,14 @@
             box-shadow: 0 10px 30px rgba(255, 26, 26, 0.1);
         }
 
-        .review-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .review-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: 2px solid var(--primary);
-            object-fit: cover;
-        }
-
-        .review-user-info h4 {
-            color: white;
-            font-weight: 700;
-            font-size: 1.1rem;
-            margin: 0;
-        }
-
-        .review-date {
-            color: var(--text-dim);
-            font-size: 0.8rem;
-            margin-top: 2px;
-        }
-
-        .review-stars {
-            color: #fbbf24;
-            font-size: 1rem;
-            margin-bottom: 15px;
-            letter-spacing: 2px;
-        }
-
-        .review-text {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            line-height: 1.6;
-            margin-bottom: 25px;
-            flex-grow: 1;
-        }
-
-        .review-product-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #ffffff;
-            padding: 8px 16px;
-            border-radius: 50px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            width: fit-content;
-        }
-
-        .review-product-tag i {
-            color: #ff1a1a;
-        }
+        .review-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+        .review-avatar { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; }
+        .review-user-info h4 { color: white; font-weight: 700; font-size: 1.1rem; margin: 0; }
+        .review-date { color: var(--text-dim); font-size: 0.8rem; margin-top: 2px; }
+        .review-stars { color: #fbbf24; font-size: 1rem; margin-bottom: 15px; letter-spacing: 2px; }
+        .review-text { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 25px; flex-grow: 1; }
+        .review-product-tag { display: inline-flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: #ffffff; padding: 8px 16px; border-radius: 50px; font-size: 0.85rem; font-weight: 600; width: fit-content; }
+        .review-product-tag i { color: #ff1a1a; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-gradient-to-b from-[#150a0a] to-[#0a0505] relative">
@@ -645,7 +494,7 @@
             </div>
         </section>
 
-        <!-- SECCIÓN ADMIN OCULTA POR DEFECTO (Solo visible si se accede via nav antiguo o debug) -->
+        <!-- SECCIÓN ADMIN OCULTA POR DEFECTO -->
         <section id="page-admin" class="page max-w-3xl w-full mx-auto px-6 py-12">
             <h2 class="text-3xl font-black text-white uppercase tracking-tight mb-8 flex items-center gap-3"><i class="fas fa-user-shield text-red-400"></i> Panel de Admin (Legacy)</h2>
             <div id="admin-upload-section" class="bg-[#150a0a] border border-red-950/40 rounded-2xl p-6 mb-6">
@@ -673,20 +522,20 @@
         <!-- CONTENEDOR DE RESEÑAS (SOLO INICIO) -->
         <div id="reviews-section-container">
             <section class="reviews-section">
-                <!-- Título fuera del wrapper para que no se desvanezca -->
-                <div class="max-w-7xl mx-auto px-6">
+                <div class="reviews-container">
+                    <!-- TÍTULO FLOTANTE (ENCIMA DEL SLIDER) -->
                     <div class="reviews-title">
                         <h2>LA VOZ DE QUIENES CONFIAN EN <span> NOSOTROS</span></h2>
                         <p>No lo decimos nosotros. Lo dicen quienes ya confían en nuestros scripts</p>
                     </div>
-                </div>
-                
-                <!-- Wrapper con máscara de desvanecimiento -->
-                <div class="reviews-wrapper">
-                    <div class="reviews-slider" id="reviews-slider">
-                        <div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;">
-                            <i class="fas fa-spinner animate-spin text-3xl text-red-500"></i>
-                            <span class="text-gray-400">Cargando opiniones...</span>
+                    
+                    <!-- WRAPPER DEL SLIDER (DEBAJO DEL TÍTULO, CON FADE) -->
+                    <div class="reviews-slider-wrapper">
+                        <div class="reviews-slider" id="reviews-slider">
+                            <div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;">
+                                <i class="fas fa-spinner animate-spin text-3xl text-red-500"></i>
+                                <span class="text-gray-400">Cargando opiniones...</span>
+                            </div>
                         </div>
                     </div>
                 </div>
