@@ -3,9 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Server Control</title>
+    <title>Papeleta Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap');
         * { font-family: 'Inter', sans-serif; }
@@ -73,16 +79,8 @@
         ::-webkit-scrollbar-thumb:hover { background: #ef4444; }
         .fade-in { animation: fadeIn 0.4s ease forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* SECCIONES - Solo la activa se muestra */
-        .section-content { 
-            display: none; 
-        }
-        .section-content.active { 
-            display: block; 
-            animation: fadeIn 0.4s ease;
-        }
-        
+        .section-content { display: none; }
+        .section-content.active { display: block; animation: fadeIn 0.4s ease; }
         .admin-badge { 
             background: rgba(220, 38, 38, 0.2); 
             border: 1px solid rgba(220, 38, 38, 0.5); 
@@ -106,20 +104,72 @@
             border-color: rgba(255, 26, 26, 0.3);
             transform: translateX(5px);
         }
+        
+        /* Modal Login */
+        .login-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            background: rgba(21, 10, 10, 0.95);
+            border: 1px solid rgba(255, 26, 26, 0.3);
+            border-left: 4px solid #dc2626;
+            border-radius: 12px;
+            padding: 16px 20px;
+            min-width: 320px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            animation: slideInRight 0.4s ease;
+        }
+        .toast.success { border-left-color: #10b981; }
+        .toast.error { border-left-color: #ef4444; }
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
     </style>
 </head>
 <body class="min-h-screen flex">
 
+    <!-- LOGIN MODAL -->
+    <div id="login-modal" class="login-modal hidden">
+        <div class="max-w-md w-full bg-[#150a0a] border border-red-600/30 rounded-2xl p-8 text-center">
+            <div class="mx-auto w-20 h-20 rounded-xl mb-6 bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center text-3xl font-black text-white">P</div>
+            <h1 class="text-3xl font-black text-white mb-2">ADMIN PANEL</h1>
+            <p class="text-gray-400 text-sm mb-8">Inicia sesión para acceder al panel</p>
+            <button onclick="redirectToDiscord()" class="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-3.5 px-6 rounded-xl flex items-center justify-center gap-3 transition-all">
+                <i class="fab fa-discord text-xl"></i> Iniciar Sesión con Discord
+            </button>
+        </div>
+    </div>
+
     <!-- SIDEBAR -->
     <aside class="sidebar w-72 fixed left-0 top-0 h-full z-50 hidden md:flex flex-col justify-between">
         <div class="p-6">
-            <div class="flex items-center gap-3 mb-10 cursor-pointer group">
-                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center font-black text-white shadow-lg shadow-red-900/50 group-hover:scale-110 transition-transform">
+            <div class="flex items-center gap-3 mb-10">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center font-black text-white shadow-lg">
                     <i class="fas fa-shield-alt"></i>
                 </div>
                 <div>
                     <span class="text-white font-bold text-lg tracking-wide block">ADMIN PANEL</span>
-                    <span class="text-xs text-red-500 font-mono">v2.0.4 STABLE</span>
+                    <span id="user-role-badge" class="admin-badge hidden">ADMIN</span>
                 </div>
             </div>
 
@@ -170,12 +220,12 @@
 
         <div class="p-4 border-t border-red-900/20 bg-[#0a0505]/50">
             <div class="flex items-center gap-3 px-2">
-                <div class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-xs">AD</div>
+                <img id="sidebar-avatar" src="" alt="User" class="w-8 h-8 rounded-full border-2 border-red-600 object-cover">
                 <div class="flex-1 min-w-0">
-                    <p class="text-white font-medium text-sm truncate">Administrador</p>
+                    <p id="sidebar-username" class="text-white font-medium text-sm truncate">Usuario</p>
                     <p class="text-green-500 text-xs">● En línea</p>
                 </div>
-                <button class="text-gray-400 hover:text-red-400"><i class="fas fa-sign-out-alt"></i></button>
+                <button onclick="logout()" class="text-gray-400 hover:text-red-400"><i class="fas fa-sign-out-alt"></i></button>
             </div>
         </div>
     </aside>
@@ -202,35 +252,49 @@
                 <div class="stat-card rounded-xl p-5 flex items-center justify-between border-l-4 border-l-red-600">
                     <div>
                         <p class="text-gray-400 text-xs uppercase font-bold">USUARIOS TOTALES</p>
-                        <h3 class="text-2xl font-bold text-white mt-1">1,245</h3>
+                        <h3 id="stat-total-users" class="text-2xl font-bold text-white mt-1">0</h3>
                     </div>
                     <div class="w-10 h-10 rounded-full bg-red-900/30 flex items-center justify-center text-red-400"><i class="fas fa-users"></i></div>
                 </div>
                 <div class="stat-card rounded-xl p-5 flex items-center justify-between border-l-4 border-l-blue-600">
                     <div>
                         <p class="text-gray-400 text-xs uppercase font-bold">LICENCIAS ACTIVAS</p>
-                        <h3 class="text-2xl font-bold text-white mt-1">892</h3>
+                        <h3 id="stat-active-licenses" class="text-2xl font-bold text-white mt-1">0</h3>
                     </div>
                     <div class="w-10 h-10 rounded-full bg-blue-900/30 flex items-center justify-center text-blue-400"><i class="fas fa-key"></i></div>
                 </div>
                 <div class="stat-card rounded-xl p-5 flex items-center justify-between border-l-4 border-l-purple-600">
                     <div>
                         <p class="text-gray-400 text-xs uppercase font-bold">SCRIPTS PROTEGIDOS</p>
-                        <h3 class="text-2xl font-bold text-white mt-1">45</h3>
+                        <h3 id="stat-protected-scripts" class="text-2xl font-bold text-white mt-1">0</h3>
                     </div>
                     <div class="w-10 h-10 rounded-full bg-purple-900/30 flex items-center justify-center text-purple-400"><i class="fas fa-shield-alt"></i></div>
                 </div>
             </div>
 
-            <div class="card rounded-xl p-8 min-h-[400px] flex flex-col items-center justify-center border-dashed border-2 border-red-900/30 bg-red-900/5">
-                <div class="w-20 h-20 rounded-full bg-red-900/20 flex items-center justify-center mb-4">
-                    <i class="fas fa-cloud-upload-alt text-4xl text-red-500"></i>
+            <div class="card rounded-xl p-8">
+                <h3 class="text-xl font-bold text-white mb-6">Subir Nuevo Producto/Script</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-400 text-xs uppercase font-semibold mb-2">Nombre del Producto</label>
+                        <input type="text" id="product-name" class="input-field w-full px-4 py-3 rounded-lg text-white" placeholder="Ej: Sistema de Inventario">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 text-xs uppercase font-semibold mb-2">Precio</label>
+                        <input type="text" id="product-price" class="input-field w-full px-4 py-3 rounded-lg text-white" placeholder="Ej: 50.00 o Gratis">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 text-xs uppercase font-semibold mb-2">URL de Imagen</label>
+                        <input type="text" id="product-image" class="input-field w-full px-4 py-3 rounded-lg text-white" placeholder="https://...">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 text-xs uppercase font-semibold mb-2">Archivo (URL de descarga)</label>
+                        <input type="text" id="product-file" class="input-field w-full px-4 py-3 rounded-lg text-white" placeholder="URL del archivo .zip o .lua">
+                    </div>
+                    <button onclick="uploadProduct()" class="btn-primary w-full py-3 rounded-lg text-white font-bold mt-4">
+                        <i class="fas fa-upload mr-2"></i>Subir Producto
+                    </button>
                 </div>
-                <h3 class="text-xl font-bold text-white mb-2">Arrastra tus archivos aquí</h3>
-                <p class="text-gray-400 text-center max-w-md mb-6">Soporta archivos .lua, .zip y configuraciones .conf. El sistema validará la integridad automáticamente.</p>
-                <button class="btn-action px-6 py-3 rounded-lg text-white font-bold flex items-center gap-2">
-                    <i class="fas fa-folder-open"></i> Seleccionar Archivo
-                </button>
             </div>
         </section>
 
@@ -239,13 +303,10 @@
             <div class="card rounded-xl p-6">
                 <div class="flex justify-between items-center mb-6">
                     <div class="flex items-center gap-4">
-                        <input type="text" placeholder="Buscar usuario..." class="input-field px-4 py-2 rounded-lg text-white w-64">
-                        <button class="btn-primary px-4 py-2 rounded-lg text-white font-medium">
-                            <i class="fas fa-search mr-2"></i>Buscar
-                        </button>
+                        <input type="text" id="user-search" oninput="filterUsers()" placeholder="Buscar usuario..." class="input-field px-4 py-2 rounded-lg text-white w-64">
                     </div>
-                    <button class="btn-primary px-4 py-2 rounded-lg text-white font-medium">
-                        <i class="fas fa-user-plus mr-2"></i>Nuevo Usuario
+                    <button onclick="refreshUsers()" class="btn-primary px-4 py-2 rounded-lg text-white font-medium">
+                        <i class="fas fa-sync-alt mr-2"></i>Actualizar
                     </button>
                 </div>
 
@@ -255,48 +316,12 @@
                             <tr class="text-left text-gray-400 text-xs uppercase">
                                 <th class="pb-3 font-semibold">Usuario</th>
                                 <th class="pb-3 font-semibold">Email</th>
-                                <th class="pb-3 font-semibold">Rol</th>
+                                <th class="pb-3 font-semibold">Discord ID</th>
                                 <th class="pb-3 font-semibold">Estado</th>
-                                <th class="pb-3 font-semibold">Acciones</th>
                             </tr>
                         </thead>
-                        <tbody class="space-y-2">
-                            <tr class="user-row rounded-lg">
-                                <td class="p-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-xs font-bold">JD</div>
-                                        <div>
-                                            <p class="text-white font-medium">JohnDoe</p>
-                                            <p class="text-xs text-gray-500">ID: 890526767608127489</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="p-4 text-gray-300">john@example.com</td>
-                                <td class="p-4"><span class="admin-badge">Admin</span></td>
-                                <td class="p-4"><span class="text-green-400 text-sm">● Activo</span></td>
-                                <td class="p-4">
-                                    <button class="text-blue-400 hover:text-blue-300 mr-3"><i class="fas fa-edit"></i></button>
-                                    <button class="text-red-400 hover:text-red-300"><i class="fas fa-trash"></i></button>
-                                </td>
-                            </tr>
-                            <tr class="user-row rounded-lg">
-                                <td class="p-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-xs font-bold">MK</div>
-                                        <div>
-                                            <p class="text-white font-medium">MikeKing</p>
-                                            <p class="text-xs text-gray-500">ID: 123456789012345678</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="p-4 text-gray-300">mike@example.com</td>
-                                <td class="p-4"><span class="px-2 py-1 rounded bg-gray-700 text-xs text-gray-300">Usuario</span></td>
-                                <td class="p-4"><span class="text-green-400 text-sm">● Activo</span></td>
-                                <td class="p-4">
-                                    <button class="text-blue-400 hover:text-blue-300 mr-3"><i class="fas fa-edit"></i></button>
-                                    <button class="text-red-400 hover:text-red-300"><i class="fas fa-trash"></i></button>
-                                </td>
-                            </tr>
+                        <tbody id="users-table-body" class="space-y-2">
+                            <!-- Se llena dinámicamente -->
                         </tbody>
                     </table>
                 </div>
@@ -309,30 +334,10 @@
                 <div class="card rounded-xl p-6">
                     <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
                         <i class="fas fa-key text-red-500"></i>
-                        Licencias Activas
+                        Todas las Licencias
                     </h3>
-                    <div class="space-y-3 max-h-[500px] overflow-y-auto">
-                        <div class="user-row p-4 rounded-lg flex items-center justify-between">
-                            <div>
-                                <p class="text-white font-medium">JohnDoe</p>
-                                <p class="text-xs text-gray-500 font-mono">PapeletaStore(ABC123XYZ789)</p>
-                            </div>
-                            <span class="text-green-400 text-xs">● Activa</span>
-                        </div>
-                        <div class="user-row p-4 rounded-lg flex items-center justify-between">
-                            <div>
-                                <p class="text-white font-medium">MikeKing</p>
-                                <p class="text-xs text-gray-500 font-mono">PapeletaStore(DEF456UVW012)</p>
-                            </div>
-                            <span class="text-green-400 text-xs">● Activa</span>
-                        </div>
-                        <div class="user-row p-4 rounded-lg flex items-center justify-between">
-                            <div>
-                                <p class="text-white font-medium">AlexSmith</p>
-                                <p class="text-xs text-gray-500 font-mono">PapeletaStore(GHI789RST345)</p>
-                            </div>
-                            <span class="text-red-400 text-xs">● Expirada</span>
-                        </div>
+                    <div id="licenses-list" class="space-y-3 max-h-[500px] overflow-y-auto">
+                        <!-- Se llena dinámicamente -->
                     </div>
                 </div>
 
@@ -343,26 +348,18 @@
                     </h3>
                     <div class="space-y-4">
                         <div>
-                            <label class="block text-gray-400 text-xs uppercase font-semibold mb-2">Usuario</label>
-                            <select class="input-field w-full px-4 py-3 rounded-lg text-white">
-                                <option>JohnDoe</option>
-                                <option>MikeKing</option>
-                                <option>AlexSmith</option>
-                            </select>
+                            <label class="block text-gray-400 text-xs uppercase font-semibold mb-2">Usuario (Discord ID)</label>
+                            <input type="text" id="license-user-id" class="input-field w-full px-4 py-3 rounded-lg text-white" placeholder="ID de Discord">
                         </div>
                         <div>
-                            <label class="block text-gray-400 text-xs uppercase font-semibold mb-2">Tipo de Licencia</label>
-                            <select class="input-field w-full px-4 py-3 rounded-lg text-white">
-                                <option>General</option>
-                                <option>Premium</option>
-                                <option>VIP</option>
-                            </select>
+                            <label class="block text-gray-400 text-xs uppercase font-semibold mb-2">Recurso/Script</label>
+                            <input type="text" id="license-resource" class="input-field w-full px-4 py-3 rounded-lg text-white" placeholder="Nombre del resource">
                         </div>
                         <div>
                             <label class="block text-gray-400 text-xs uppercase font-semibold mb-2">Duración (días)</label>
-                            <input type="number" class="input-field w-full px-4 py-3 rounded-lg text-white" value="30">
+                            <input type="number" id="license-duration" class="input-field w-full px-4 py-3 rounded-lg text-white" value="30">
                         </div>
-                        <button class="btn-primary w-full py-3 rounded-lg text-white font-bold mt-4">
+                        <button onclick="generateLicense()" class="btn-primary w-full py-3 rounded-lg text-white font-bold mt-4">
                             <i class="fas fa-magic mr-2"></i>Generar Licencia
                         </button>
                     </div>
@@ -378,19 +375,19 @@
                         <i class="fas fa-code text-red-500"></i>
                         Código Original
                     </h3>
-                    <textarea class="input-field w-full h-[400px] p-4 rounded-lg text-white font-mono text-sm resize-none" placeholder="Pega tu código Lua aquí..."></textarea>
+                    <textarea id="lua-original" class="input-field w-full h-[400px] p-4 rounded-lg text-white font-mono text-sm resize-none" placeholder="-- Pega tu código Lua aquí..."></textarea>
                 </div>
                 <div class="card rounded-xl p-6">
                     <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
                         <i class="fas fa-lock text-red-500"></i>
                         Código Encriptado
                     </h3>
-                    <textarea class="input-field w-full h-[400px] p-4 rounded-lg text-white font-mono text-sm resize-none" placeholder="El código encriptado aparecerá aquí..." readonly></textarea>
+                    <textarea id="lua-encrypted" readonly class="input-field w-full h-[400px] p-4 rounded-lg text-white font-mono text-sm resize-none" placeholder="El código encriptado aparecerá aquí..."></textarea>
                     <div class="flex gap-3 mt-4">
-                        <button class="btn-primary flex-1 py-3 rounded-lg text-white font-bold">
+                        <button onclick="encryptLua()" class="btn-primary flex-1 py-3 rounded-lg text-white font-bold">
                             <i class="fas fa-magic mr-2"></i>Encriptar
                         </button>
-                        <button class="btn-action flex-1 py-3 rounded-lg text-white font-bold">
+                        <button onclick="copyEncryptedCode()" class="btn-action flex-1 py-3 rounded-lg text-white font-bold">
                             <i class="fas fa-copy mr-2"></i>Copiar
                         </button>
                     </div>
@@ -405,41 +402,22 @@
                     <div class="w-20 h-20 rounded-full bg-red-900/20 flex items-center justify-center mx-auto mb-4">
                         <i class="fas fa-exchange-alt text-4xl text-red-500"></i>
                     </div>
-                    <h3 class="text-2xl font-bold text-white mb-2">Migrar Datos a Usuarios</h3>
-                    <p class="text-gray-400">Transfiere licencias y permisos entre usuarios de forma segura</p>
+                    <h3 class="text-2xl font-bold text-white mb-2">Migrar Licencias a Usuarios</h3>
+                    <p class="text-gray-400">Transfiere licencias existentes a nuevos usuarios</p>
                 </div>
 
                 <div class="max-w-2xl mx-auto space-y-6">
                     <div>
-                        <label class="block text-gray-400 text-xs uppercase font-semibold mb-2">Usuario de Origen</label>
-                        <select class="input-field w-full px-4 py-3 rounded-lg text-white">
-                            <option>Seleccionar usuario...</option>
-                            <option>JohnDoe</option>
-                            <option>MikeKing</option>
+                        <label class="block text-gray-400 text-xs uppercase font-semibold mb-2">Licencia de Origen</label>
+                        <select id="migrate-source-license" class="input-field w-full px-4 py-3 rounded-lg text-white">
+                            <option>Seleccionar licencia...</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-gray-400 text-xs uppercase font-semibold mb-2">Usuario de Destino</label>
-                        <select class="input-field w-full px-4 py-3 rounded-lg text-white">
-                            <option>Seleccionar usuario...</option>
-                            <option>AlexSmith</option>
-                            <option>NuevoUsuario</option>
-                        </select>
+                        <label class="block text-gray-400 text-xs uppercase font-semibold mb-2">Usuario de Destino (Discord ID)</label>
+                        <input type="text" id="migrate-dest-user" class="input-field w-full px-4 py-3 rounded-lg text-white" placeholder="ID de Discord">
                     </div>
-                    <div>
-                        <label class="block text-gray-400 text-xs uppercase font-semibold mb-2">Datos a Migrar</label>
-                        <div class="grid grid-cols-2 gap-3 mt-2">
-                            <label class="flex items-center gap-3 p-3 rounded-lg bg-red-900/10 border border-red-900/20 cursor-pointer hover:border-red-600/50">
-                                <input type="checkbox" class="w-4 h-4 rounded border-red-600 text-red-600 focus:ring-red-600">
-                                <span class="text-white text-sm">Licencias</span>
-                            </label>
-                            <label class="flex items-center gap-3 p-3 rounded-lg bg-red-900/10 border border-red-900/20 cursor-pointer hover:border-red-600/50">
-                                <input type="checkbox" class="w-4 h-4 rounded border-red-600 text-red-600 focus:ring-red-600">
-                                <span class="text-white text-sm">Permisos</span>
-                            </label>
-                        </div>
-                    </div>
-                    <button class="btn-primary w-full py-3 rounded-lg text-white font-bold mt-6">
+                    <button onclick="migrateLicense()" class="btn-primary w-full py-3 rounded-lg text-white font-bold mt-6">
                         <i class="fas fa-exchange-alt mr-2"></i>Iniciar Migración
                     </button>
                 </div>
@@ -449,29 +427,29 @@
         <!-- SECCIÓN 6: GESTIÓN DE ROLES -->
         <section id="section-roles" class="section-content fade-in">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div class="stat-card rounded-xl p-5 border-l-4 border-l-red-600 cursor-pointer hover:scale-105 transition-transform">
+                <div class="stat-card rounded-xl p-5 border-l-4 border-l-red-600">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-gray-400 text-xs uppercase font-bold">ADMINISTRADORES</p>
-                            <h3 class="text-2xl font-bold text-white mt-1">5</h3>
+                            <h3 id="count-admins" class="text-2xl font-bold text-white mt-1">0</h3>
                         </div>
                         <div class="w-10 h-10 rounded-full bg-red-900/30 flex items-center justify-center text-red-400"><i class="fas fa-crown"></i></div>
                     </div>
                 </div>
-                <div class="stat-card rounded-xl p-5 border-l-4 border-l-blue-600 cursor-pointer hover:scale-105 transition-transform">
+                <div class="stat-card rounded-xl p-5 border-l-4 border-l-blue-600">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-gray-400 text-xs uppercase font-bold">MODERADORES</p>
-                            <h3 class="text-2xl font-bold text-white mt-1">12</h3>
+                            <h3 id="count-mods" class="text-2xl font-bold text-white mt-1">0</h3>
                         </div>
                         <div class="w-10 h-10 rounded-full bg-blue-900/30 flex items-center justify-center text-blue-400"><i class="fas fa-user-shield"></i></div>
                     </div>
                 </div>
-                <div class="stat-card rounded-xl p-5 border-l-4 border-l-purple-600 cursor-pointer hover:scale-105 transition-transform">
+                <div class="stat-card rounded-xl p-5 border-l-4 border-l-purple-600">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-gray-400 text-xs uppercase font-bold">USUARIOS</p>
-                            <h3 class="text-2xl font-bold text-white mt-1">1,228</h3>
+                            <h3 id="count-users" class="text-2xl font-bold text-white mt-1">0</h3>
                         </div>
                         <div class="w-10 h-10 rounded-full bg-purple-900/30 flex items-center justify-center text-purple-400"><i class="fas fa-users"></i></div>
                     </div>
@@ -480,44 +458,17 @@
 
             <div class="card rounded-xl p-6">
                 <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-lg font-bold text-white">Configuración de Roles</h3>
-                    <button class="btn-primary px-4 py-2 rounded-lg text-white font-medium">
-                        <i class="fas fa-plus mr-2"></i>Crear Rol
-                    </button>
+                    <h3 class="text-lg font-bold text-white">Asignar Rol de Administrador</h3>
                 </div>
                 
                 <div class="space-y-4">
-                    <div class="user-row p-4 rounded-lg flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-lg bg-red-600 flex items-center justify-center">
-                                <i class="fas fa-crown text-white"></i>
-                            </div>
-                            <div>
-                                <p class="text-white font-bold">Administrador</p>
-                                <p class="text-xs text-gray-500">Acceso completo al sistema</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <span class="admin-badge">Sistema</span>
-                            <button class="text-blue-400 hover:text-blue-300"><i class="fas fa-edit"></i></button>
-                        </div>
+                    <div>
+                        <label class="block text-gray-400 text-xs uppercase font-semibold mb-2">Discord ID del Usuario</label>
+                        <input type="text" id="admin-user-id" class="input-field w-full px-4 py-3 rounded-lg text-white" placeholder="Ej: 890526767608127489">
                     </div>
-                    
-                    <div class="user-row p-4 rounded-lg flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center">
-                                <i class="fas fa-user-shield text-white"></i>
-                            </div>
-                            <div>
-                                <p class="text-white font-bold">Moderador</p>
-                                <p class="text-xs text-gray-500">Gestión de usuarios y contenido</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <span class="px-2 py-1 rounded bg-blue-900/30 text-blue-400 text-xs border border-blue-600/30">Editable</span>
-                            <button class="text-blue-400 hover:text-blue-300"><i class="fas fa-edit"></i></button>
-                        </div>
-                    </div>
+                    <button onclick="addAdminRole()" class="btn-primary w-full py-3 rounded-lg text-white font-bold">
+                        <i class="fas fa-user-plus mr-2"></i>Asignar Rol Admin
+                    </button>
                 </div>
             </div>
         </section>
@@ -529,20 +480,47 @@
                     <div class="flex items-center gap-3">
                         <i class="fas fa-file-code text-red-500 text-xl"></i>
                         <div>
-                            <h3 class="text-white font-bold">Server.lua</h3>
-                            <p class="text-xs text-gray-400">Edición en tiempo real</p>
+                            <h3 class="text-white font-bold">Server.lua - Sistema de Licencias</h3>
+                            <p class="text-xs text-gray-400">Código completo de validación</p>
                         </div>
                     </div>
-                    <button class="btn-primary px-4 py-2 rounded-lg text-white text-sm font-bold">
-                        <i class="fas fa-save mr-2"></i>Guardar Cambios
+                    <button onclick="copyServerLua()" class="btn-primary px-4 py-2 rounded-lg text-white text-sm font-bold">
+                        <i class="fas fa-copy mr-2"></i>Copiar Código
                     </button>
                 </div>
-                <div class="p-0">
-                    <textarea class="w-full h-[600px] bg-[#050507] text-gray-300 font-mono text-sm p-6 focus:outline-none resize-none" spellcheck="false">
--- [SYSTEM CORE]
--- Autorizado por Admin Panel v2
+                <textarea id="server-lua-code" readonly class="w-full h-[600px] bg-[#050507] text-gray-300 font-mono text-sm p-6 focus:outline-none resize-none" spellcheck="false"></textarea>
+            </div>
+        </section>
 
-local function clean(s)
+    </main>
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <script>
+        // CONFIGURACIÓN FIREBASE
+        const CLIENT_ID = '1213866547181780992';
+        const REDIRECT_URI = window.location.href.split('#')[0];
+        const ADMIN_DISCORD_IDS = ['890526767608127489']; // Tu Discord ID
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
+            authDomain: "papeletalicencia.firebaseapp.com",
+            projectId: "papeletalicencia",
+            storageBucket: "papeletalicencia.firebasestorage.app",
+            messagingSenderId: "677208314051",
+            appId: "1:677208314051:web:a27c04f31d402e83f29276"
+        };
+
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        let currentUser = null;
+        let allProducts = [];
+        let allLicenses = [];
+
+        // SERVER LUA CODE
+        const SERVER_LUA_CODE = `local function clean(s)
     if not s then return "" end
     return tostring(s):gsub("%s+", ""):upper()
 end
@@ -563,8 +541,64 @@ local function validarLicencia()
         stopResource(getThisResource())
         return
     end
+    local userLocal = clean(configLicense["User"])
+    local keyLocal = clean(configLicense["Key"])
+    local resourceName = clean(getResourceName(getThisResource()))
+    local portActual = tostring(getServerPort() or 22003)
     
-    outputDebugString("[Papeleta Progamador] INICIANDO VERIFICACION DE LICENCIA", 3)
+    fetchRemote("https://api.ipify.org?format=json", function(ipData, ipErr)
+        local ipActual = ""
+        if ipErr == 0 then
+            local ipTable = fromJSON(ipData)
+            if ipTable and ipTable.ip then ipActual = clean(ipTable.ip) end
+        end
+        if ipActual == "" or ipActual == "0.0.0.0" then
+            ipActual = clean(getServerConfigSetting("serverip") or "")
+        end
+        local ipPortCompleto = ipActual .. ":" .. portActual
+        validarConFirebase(ipPortCompleto, userLocal, keyLocal, resourceName)
+    end)
+end
+
+function validarConFirebase(ipPortCompleto, userLocal, keyLocal, resourceName)
+    local urlBase = "https://firestore.googleapis.com/v1/projects/papeletalicencia/databases/(default)/documents/licencias"
+    fetchRemote(urlBase, function(data, err)
+        if err ~= 0 then
+            outputDebugString("[Papeleta Progamador] Fallo de conexión a Firestore", 1)
+            stopResource(getThisResource())
+            return
+        end
+        local db = fromJSON(data)
+        local autorizado = false
+        if db and db.documents then
+            for _, doc in ipairs(db.documents) do
+                local f = doc.fields
+                if f and f.user and f.key and f.ip and f.port and f.active and f.resource then
+                    local fireUser = clean(f.user.stringValue)
+                    local fireKey = clean(f.key.stringValue)
+                    local fireIp = clean(f.ip.stringValue)
+                    local firePort = clean(f.port.stringValue)
+                    local fireResource = clean(f.resource.stringValue)
+                    local fireIpPort = fireIp .. ":" .. firePort
+                    local fireStatus = f.active.booleanValue
+                    if fireKey == keyLocal then
+                        if fireResource == resourceName then
+                            if fireUser == userLocal and fireIpPort == ipPortCompleto and fireStatus == true then 
+                                autorizado = true 
+                            end
+                        end
+                        break
+                    end
+                end
+            end
+        end
+        if autorizado then
+            outputDebugString("[Papeleta Progamador] LICENCIA VERIFICADA EXITOSAMENTE", 3)
+        else
+            outputDebugString("[Papeleta Progamador] LICENCIA NO VERIFICADA", 1)
+            stopResource(getThisResource())
+        end
+    end)
 end
 
 addEventHandler("onResourceStart", resourceRoot, function()
@@ -573,32 +607,92 @@ addEventHandler("onResourceStart", resourceRoot, function()
         setTimer(function() stopResource(getThisResource()) end, 50, 1)
         return
     end
+    outputDebugString("[Papeleta Progamador] INICIANDO VERIFICACION DE LICENCIA", 3)
     validarLicencia()
-end, true, "high")
-                    </textarea>
-                </div>
-            </div>
-        </section>
+end, true, "high")`;
 
-    </main>
+        // TOAST NOTIFICATIONS
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+            toast.innerHTML = `
+                <i class="fas ${icon} text-${type === 'success' ? 'green' : 'red'}-400 mr-3 text-xl"></i>
+                <span class="text-white">${message}</span>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 5000);
+        }
 
-    <script>
+        // DISCORD AUTH
+        function redirectToDiscord() {
+            window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20email`;
+        }
+
+        function checkDiscordAuth() {
+            const fragment = new URLSearchParams(window.location.hash.slice(1));
+            const accessToken = fragment.get('access_token');
+            if (accessToken) {
+                window.location.hash = '';
+                localStorage.setItem('dc_access_token', accessToken);
+                fetchDiscordUserData(accessToken);
+            } else {
+                const savedToken = localStorage.getItem('dc_access_token');
+                if (savedToken) {
+                    fetchDiscordUserData(savedToken);
+                } else {
+                    document.getElementById('login-modal').classList.remove('hidden');
+                }
+            }
+        }
+
+        function fetchDiscordUserData(token) {
+            fetch('https://discord.com/api/users/@me', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Token expirado');
+                return res.json();
+            })
+            .then(user => {
+                currentUser = user;
+                document.getElementById('sidebar-username').innerText = user.username;
+                document.getElementById('sidebar-avatar').src = user.avatar ? 
+                    `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : 
+                    'https://cdn.discordapp.com/embed/avatars/0.png';
+                
+                if (isAdmin()) {
+                    document.getElementById('user-role-badge').classList.remove('hidden');
+                }
+                
+                document.getElementById('login-modal').classList.add('hidden');
+                loadAllData();
+            })
+            .catch(err => {
+                console.error(err);
+                logout();
+            });
+        }
+
+        function isAdmin() {
+            return currentUser && ADMIN_DISCORD_IDS.includes(currentUser.id);
+        }
+
+        function logout() {
+            localStorage.removeItem('dc_access_token');
+            currentUser = null;
+            location.reload();
+        }
+
+        // SHOW SECTION
         function showSection(sectionName, element) {
-            // Ocultar TODAS las secciones
-            document.querySelectorAll('.section-content').forEach(section => {
-                section.classList.remove('active');
-            });
+            document.querySelectorAll('.section-content').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             
-            // Mostrar SOLO la sección seleccionada
             document.getElementById('section-' + sectionName).classList.add('active');
-            
-            // Actualizar nav items
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
             element.classList.add('active');
             
-            // Actualizar título
             const titles = {
                 'upload': 'Subir Archivo',
                 'users': 'Usuarios',
@@ -610,10 +704,302 @@ end, true, "high")
             };
             
             document.getElementById('page-title').innerText = titles[sectionName];
-            
-            // Scroll al top
             window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // Cargar datos específicos según sección
+            if (sectionName === 'serverlua') {
+                document.getElementById('server-lua-code').value = SERVER_LUA_CODE;
+            }
         }
+
+        // CARGAR TODOS LOS DATOS
+        async function loadAllData() {
+            await loadStats();
+            await loadUsers();
+            await loadLicenses();
+        }
+
+        // CARGAR ESTADÍSTICAS
+        async function loadStats() {
+            try {
+                const usersSnap = await db.collection("Clientes").get();
+                const licensesSnap = await db.collection("Licencias").get();
+                const productsSnap = await db.collection("Productos").get();
+                
+                document.getElementById('stat-total-users').innerText = usersSnap.size;
+                
+                let activeLicenses = 0;
+                licensesSnap.forEach(doc => {
+                    if (doc.data().status === 'active') activeLicenses++;
+                });
+                document.getElementById('stat-active-licenses').innerText = activeLicenses;
+                document.getElementById('stat-protected-scripts').innerText = productsSnap.size;
+                
+                // Contar roles
+                document.getElementById('count-admins').innerText = ADMIN_DISCORD_IDS.length;
+                document.getElementById('count-users').innerText = usersSnap.size;
+            } catch (error) {
+                console.error("Error cargando stats:", error);
+            }
+        }
+
+        // CARGAR USUARIOS
+        async function loadUsers() {
+            try {
+                const snapshot = await db.collection("Clientes").get();
+                const tbody = document.getElementById('users-table-body');
+                tbody.innerHTML = '';
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const row = `
+                        <tr class="user-row rounded-lg">
+                            <td class="p-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-xs font-bold">
+                                        ${data.username?.charAt(0).toUpperCase() || 'U'}
+                                    </div>
+                                    <div>
+                                        <p class="text-white font-medium">${data.username || 'Sin nombre'}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="p-4 text-gray-300">${data.email || 'N/A'}</td>
+                            <td class="p-4 text-gray-400 font-mono text-sm">${data.discord_id || 'N/A'}</td>
+                            <td class="p-4"><span class="text-green-400 text-sm">● Activo</span></td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            } catch (error) {
+                console.error("Error cargando usuarios:", error);
+            }
+        }
+
+        // CARGAR LICENCIAS
+        async function loadLicenses() {
+            try {
+                const snapshot = await db.collection("Licencias").get();
+                const container = document.getElementById('licenses-list');
+                const select = document.getElementById('migrate-source-license');
+                container.innerHTML = '';
+                select.innerHTML = '<option>Seleccionar licencia...</option>';
+                
+                allLicenses = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    allLicenses.push({ id: doc.id, ...data });
+                    
+                    const item = `
+                        <div class="user-row p-4 rounded-lg flex items-center justify-between">
+                            <div>
+                                <p class="text-white font-medium">${data.username || 'Sin usuario'}</p>
+                                <p class="text-xs text-gray-500 font-mono">${data.key}</p>
+                                <p class="text-xs text-gray-400 mt-1">Recurso: ${data.resource || 'General'}</p>
+                            </div>
+                            <span class="text-${data.status === 'active' ? 'green' : 'red'}-400 text-xs">
+                                ● ${data.status === 'active' ? 'Activa' : 'Inactiva'}
+                            </span>
+                        </div>
+                    `;
+                    container.innerHTML += item;
+                    
+                    // Agregar al select de migración
+                    const option = `<option value="${doc.id}">${data.key} - ${data.username}</option>`;
+                    select.innerHTML += option;
+                });
+            } catch (error) {
+                console.error("Error cargando licencias:", error);
+            }
+        }
+
+        // SUBIR PRODUCTO
+        async function uploadProduct() {
+            const name = document.getElementById('product-name').value;
+            const price = document.getElementById('product-price').value;
+            const image = document.getElementById('product-image').value;
+            const file = document.getElementById('product-file').value;
+            
+            if (!name || !price) {
+                showToast('Por favor completa los campos obligatorios', 'error');
+                return;
+            }
+            
+            try {
+                await db.collection("Productos").add({
+                    name: name,
+                    price: price,
+                    image_url: image || '',
+                    file_data: file || '',
+                    file_name: name + '.zip',
+                    created_at: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                showToast('Producto subido exitosamente');
+                loadStats();
+                
+                // Limpiar campos
+                document.getElementById('product-name').value = '';
+                document.getElementById('product-price').value = '';
+                document.getElementById('product-image').value = '';
+                document.getElementById('product-file').value = '';
+            } catch (error) {
+                console.error("Error subiendo producto:", error);
+                showToast('Error al subir producto', 'error');
+            }
+        }
+
+        // GENERAR LICENCIA
+        function generateUniqueKey() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let key = '';
+            for (let i = 0; i < 24; i++) {
+                key += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return key;
+        }
+
+        async function generateLicense() {
+            const userId = document.getElementById('license-user-id').value;
+            const resource = document.getElementById('license-resource').value;
+            const duration = parseInt(document.getElementById('license-duration').value);
+            
+            if (!userId) {
+                showToast('Por favor ingresa el Discord ID', 'error');
+                return;
+            }
+            
+            try {
+                const key = generateUniqueKey();
+                await db.collection("Licencias").add({
+                    discord_id: userId,
+                    key: `PapeletaStore(${key})`,
+                    resource: resource || 'general',
+                    status: 'active',
+                    duration_days: duration,
+                    created_at: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                showToast(`Licencia generada: PapeletaStore(${key})`);
+                loadLicenses();
+                loadStats();
+                
+                document.getElementById('license-user-id').value = '';
+                document.getElementById('license-resource').value = '';
+            } catch (error) {
+                console.error("Error generando licencia:", error);
+                showToast('Error al generar licencia', 'error');
+            }
+        }
+
+        // ENCRIPTAR LUA
+        function encryptLua() {
+            const original = document.getElementById('lua-original').value;
+            if (!original.trim()) {
+                showToast('Ingresa código Lua para encriptar', 'error');
+                return;
+            }
+            
+            // Encriptación simple (Base64)
+            const encrypted = btoa(unescape(encodeURIComponent(original)));
+            document.getElementById('lua-encrypted').value = `-- Código Encriptado\nloadstring(game:GetService("HttpService"):UrlDecode("${encrypted}"))()`;
+            
+            showToast('Código encriptado exitosamente');
+        }
+
+        function copyEncryptedCode() {
+            const textarea = document.getElementById('lua-encrypted');
+            textarea.select();
+            document.execCommand('copy');
+            showToast('Código copiado al portapapeles');
+        }
+
+        // MIGRAR LICENCIA
+        async function migrateLicense() {
+            const licenseId = document.getElementById('migrate-source-license').value;
+            const destUser = document.getElementById('migrate-dest-user').value;
+            
+            if (licenseId === 'Seleccionar licencia...' || !destUser) {
+                showToast('Selecciona una licencia y usuario de destino', 'error');
+                return;
+            }
+            
+            try {
+                const license = allLicenses.find(l => l.id === licenseId);
+                if (license) {
+                    await db.collection("Licencias").add({
+                        discord_id: destUser,
+                        key: license.key,
+                        resource: license.resource,
+                        status: 'active',
+                        migrated_from: license.discord_id,
+                        created_at: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    showToast('Licencia migrada exitosamente');
+                    loadLicenses();
+                }
+            } catch (error) {
+                console.error("Error migrando licencia:", error);
+                showToast('Error al migrar licencia', 'error');
+            }
+        }
+
+        // ASIGNAR ROL ADMIN
+        async function addAdminRole() {
+            const userId = document.getElementById('admin-user-id').value;
+            
+            if (!userId) {
+                showToast('Ingresa el Discord ID', 'error');
+                return;
+            }
+            
+            try {
+                // Agregar a la lista de admins (en una colección de config)
+                await db.collection("Config").doc("admins").set({
+                    admin_ids: firebase.firestore.FieldValue.arrayUnion(userId)
+                }, { merge: true });
+                
+                ADMIN_DISCORD_IDS.push(userId);
+                showToast(`Usuario ${userId} ahora es administrador`);
+                document.getElementById('admin-user-id').value = '';
+                loadStats();
+            } catch (error) {
+                console.error("Error asignando rol:", error);
+                showToast('Error al asignar rol', 'error');
+            }
+        }
+
+        // COPIAR SERVER LUA
+        function copyServerLua() {
+            const textarea = document.getElementById('server-lua-code');
+            textarea.select();
+            document.execCommand('copy');
+            showToast('Server.lua copiado al portapapeles');
+        }
+
+        // FILTRAR USUARIOS
+        function filterUsers() {
+            const search = document.getElementById('user-search').value.toLowerCase();
+            const rows = document.querySelectorAll('#users-table-body tr');
+            
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(search) ? '' : 'none';
+            });
+        }
+
+        // REFRESH
+        function refreshUsers() {
+            loadUsers();
+            showToast('Datos actualizados');
+        }
+
+        // INICIALIZAR
+        document.addEventListener('DOMContentLoaded', () => {
+            checkDiscordAuth();
+            document.getElementById('server-lua-code').value = SERVER_LUA_CODE;
+        });
     </script>
 </body>
 </html>
