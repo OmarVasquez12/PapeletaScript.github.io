@@ -585,16 +585,18 @@
     <!-- MAIN CONTENT -->
     <main class="main-content flex-1 md:ml-72 min-h-screen p-8">
         
+        <!-- HEADER ACTUALIZADO CON BOTÓN VOLVER ATRÁS -->
         <header class="flex justify-between items-center mb-10 fade-in">
             <div>
                 <h1 id="page-title" class="text-3xl font-bold text-white mb-1">Subir <span class="gradient-text">Producto</span></h1>
                 <p class="text-gray-400 text-sm">Panel de control y administración del servidor</p>
             </div>
             <div class="flex gap-4">
-                <div class="card px-4 py-2 rounded-lg flex items-center gap-2">
-                    <i class="fas fa-server text-red-500"></i>
-                    <span class="text-sm font-mono text-gray-300">Status: <span class="text-green-400">Online</span></span>
-                </div>
+                <!-- Botón VOLVER ATRÁS personalizado -->
+                <button onclick="goBack()" class="card px-5 py-2.5 rounded-lg flex items-center gap-3 hover:bg-red-900/20 hover:border-red-500/50 transition-all cursor-pointer group">
+                    <i class="fas fa-server text-red-500 group-hover:animate-pulse"></i>
+                    <span class="text-sm font-bold text-gray-300 group-hover:text-white tracking-wide">VOLVER ATRÁS</span>
+                </button>
             </div>
         </header>
 
@@ -1352,6 +1354,16 @@ end, true, "high")
         document.getElementById('custom-confirm-modal').addEventListener('click', function(e) {
             if (e.target === this) handleConfirmCancel();
         });
+
+        // ========== FUNCIÓN VOLVER ATRÁS ==========
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                // Si no hay historial, redirigir a la tienda o index
+                window.location.href = 'index.html'; 
+            }
+        }
 
         // ========== AUTH DISCORD ==========
         function isAdmin() {
