@@ -460,6 +460,12 @@
                 <div class="user-menu-icon"><i class="fas fa-shopping-cart"></i></div>
                 <div class="user-menu-text"><h4>Carrito</h4><p>Ver mi carrito de compras</p></div>
             </a>
+            
+            <!-- BOTÓN CONFIG - SOLO PARA ADMINS -->
+            <div id="user-panel-config-btn" class="user-menu-item hidden" onclick="toggleUserPanel(); toggleConfigPanel();" style="display: none;">
+                <div class="user-menu-icon"><i class="fas fa-cog"></i></div>
+                <div class="user-menu-text"><h4>Config</h4><p>Panel de Administrador</p></div>
+            </div>
         </div>
 
         <div class="user-panel-footer">
@@ -1130,14 +1136,17 @@
                 // LÓGICA DE ROLES PARA EL BOTÓN CONFIG
                 if (isAdmin(user)) {
                     document.getElementById('nav-config').classList.remove('hidden');
+                    document.getElementById('user-panel-config-btn').style.display = 'flex'; // Mostrar botón en panel
                     currentUserRole = 'admin';
                 } else {
                     // Verificar si tiene rol de Mod u otro rol con acceso a config
                     const savedData = JSON.parse(localStorage.getItem('papeleta_user_' + user.id) || '{}');
                     if(savedData.role && ['mod', 'staff', 'developer'].includes(savedData.role.toLowerCase())) {
                          document.getElementById('nav-config').classList.remove('hidden');
+                         document.getElementById('user-panel-config-btn').style.display = 'flex'; // Mostrar botón en panel
                          currentUserRole = savedData.role;
                     } else {
+                        document.getElementById('user-panel-config-btn').style.display = 'none'; // Ocultar botón
                         currentUserRole = 'cliente';
                     }
                 }
@@ -1265,6 +1274,7 @@
             localStorage.removeItem('dc_access_token');
             currentUser = null; currentUserRole = 'user';
             document.getElementById('nav-config').classList.add('hidden');
+            document.getElementById('user-panel-config-btn').style.display = 'none'; // Ocultar botón config
             // Cerrar paneles si están abiertos
             document.getElementById('user-panel').classList.remove('active');
             document.getElementById('user-panel-overlay').classList.remove('active');
