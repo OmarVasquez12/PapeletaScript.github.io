@@ -541,7 +541,6 @@ end, true, "high")`;
             if (!reviewText) { showToast('Por favor escribe tu reseña', 'warning'); return; }
             
             try {
-                // CORREGIDO: "Resenas" sin ñ
                 const existingReview = await db.collection("Resenas")
                     .where("product_id", "==", currentReviewProduct)
                     .where("user_id", "==", currentUser.id)
@@ -549,7 +548,6 @@ end, true, "high")`;
                 
                 if (!existingReview.empty) { showToast('Ya has dejado una reseña para este producto', 'error'); closeReviewModal(); return; }
                 
-                // CORREGIDO: "Resenas" sin ñ
                 await db.collection("Resenas").add({
                     product_id: currentReviewProduct,
                     user_id: currentUser.id,
@@ -583,7 +581,6 @@ end, true, "high")`;
                     });
                 }
                 
-                // CORREGIDO: "Resenas" sin ñ
                 const snapshot = await db.collection("Resenas").where("user_id", "==", currentUser.id).get();
                 
                 if (snapshot.empty) {
@@ -599,7 +596,6 @@ end, true, "high")`;
                 reviews.forEach(review => {
                     const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
                     const date = review.created_at?.toDate ? review.created_at.toDate().toLocaleDateString('es-ES') : 'Fecha desconocida';
-                    // CORREGIDO: Comparación como String para asegurar coincidencia
                     const product = allProducts.find(p => String(p.id) === String(review.product_id) || String(p.docId) === String(review.product_id));
                     const productName = product ? product.name : 'Producto no encontrado';
                     const safeProductName = productName.replace(/'/g, "\\'");
@@ -616,7 +612,6 @@ end, true, "high")`;
         async function deleteReview(reviewId) {
             if (!confirm('¿Estás seguro de eliminar esta reseña?')) return;
             try {
-                // CORREGIDO: "Resenas" sin ñ
                 await db.collection("Resenas").doc(reviewId).delete();
                 showToast('Reseña eliminada', 'success');
                 loadMyReviews();
@@ -676,7 +671,6 @@ end, true, "high")`;
                     if (String(purchase.discord_id) === String(currentUser.id)) {
                         if (purchase.products && Array.isArray(purchase.products)) {
                             purchase.products.forEach(prod => {
-                                // CORREGIDO: Comparación como String para asegurar que encuentre el producto
                                 const productData = allProducts.find(p => String(p.id) === String(prod.id) || String(p.docId) === String(prod.id));
                                 if (productData) {
                                     purchasedProducts.push({ ...productData, purchaseDate: purchase.date?.toDate ? purchase.date.toDate() : new Date(), price: prod.price || 'Gratis' });
@@ -699,7 +693,6 @@ end, true, "high")`;
                 } else {
                     document.getElementById('dashboard-empty-state').classList.add('hidden');
                     
-                    // CORREGIDO: "Resenas" sin ñ
                     const reviewsSnapshot = await db.collection("Resenas").where("user_id", "==", currentUser.id).get();
                     const reviewedProductIds = new Set();
                     reviewsSnapshot.forEach(doc => reviewedProductIds.add(doc.data().product_id));
@@ -708,10 +701,24 @@ end, true, "high")`;
                         const hasReview = reviewedProductIds.has(String(item.id)) || reviewedProductIds.has(String(item.docId));
                         const safeName = item.name.replace(/'/g, "\\'");
                         
+                        // MODIFICACIÓN: Lógica para mostrar REGALADO y color BLANCO
+                        let priceDisplay = '$' + Number(item.price).toFixed(2);
+                        let priceClass = 'text-white font-bold'; // Color blanco por defecto
+                        
+                        const rawPrice = String(item.price).toLowerCase();
+                        if (rawPrice === 'gratis' || rawPrice === 'regalado' || item.price == 0 || isNaN(parseFloat(item.price))) {
+                            priceDisplay = 'REGALADO';
+                            priceClass = 'text-white font-bold'; // Asegurar blanco puro
+                        }
+
                         return `<div class="bg-[#0d0505] border border-red-900/30 rounded-xl p-4 flex items-center justify-between hover:border-red-600/50 transition-all">
                             <div class="flex items-center gap-4">
                                 <div class="w-16 h-16 rounded-lg bg-[#150a0a] border border-red-900/20 overflow-hidden"><img src="${item.image_url || ''}" class="w-full h-full object-cover"></div>
-                                <div><h3 class="text-white font-bold">${item.name}</h3><p class="text-gray-400 text-xs">${String(item.price).toLowerCase() === 'gratis' ? 'GRATIS' : '$' + Number(item.price).toFixed(2)}</p></div>
+                                <div>
+                                    <h3 class="text-white font-bold">${item.name}</h3>
+                                    <!-- Aquí aplicamos la clase text-white forzada -->
+                                    <p class="${priceClass} text-sm">${priceDisplay}</p>
+                                </div>
                             </div>
                             <div class="flex gap-2">
                                 ${item.file_data ? `<button onclick="downloadProduct('${item.id}')" class="btn-primary px-4 py-2 rounded-lg text-white text-sm"><i class="fas fa-download"></i> Descargar</button>` : '<button disabled class="px-4 py-2 rounded-lg bg-gray-800 text-gray-500 text-sm">No disponible</button>'}
@@ -734,7 +741,6 @@ end, true, "high")`;
         }
 
         function downloadProduct(productId) {
-            // CORREGIDO: Comparación como String
             const product = allProducts.find(p => String(p.id) === String(productId) || String(p.docId) === String(productId));
             if (product && product.file_data) {
                 const link = document.createElement('a');
