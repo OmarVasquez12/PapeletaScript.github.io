@@ -403,6 +403,84 @@
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(100%); } }
         @keyframes timerShrink { from { width: 100%; } to { width: 0%; } }
+
+        /* MODAL DE CONFIRMACIÓN PERSONALIZADO */
+        #custom-confirm-modal {
+            display: none;
+            position: fixed; inset: 0; z-index: 100000;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            align-items: center; justify-content: center;
+        }
+        #custom-confirm-modal.active { display: flex; }
+        
+        .confirm-modal-box {
+            background: #0d0505;
+            border: 1px solid rgba(220, 38, 38, 0.4);
+            border-radius: 16px;
+            padding: 32px;
+            width: 90%; max-width: 480px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(220, 38, 38, 0.15);
+            animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: center;
+        }
+        
+        .confirm-title {
+            color: #dc2626;
+            font-size: 20px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        
+        .confirm-body {
+            color: #e5e7eb;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        
+        .confirm-body strong { color: white; font-weight: 600; }
+        .confirm-body .highlight { color: #ff6b6b; font-weight: 700; }
+        
+        .confirm-actions {
+            display: flex; gap: 12px; justify-content: center;
+        }
+        
+        .btn-confirm-cancel {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #9ca3af;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+        }
+        .btn-confirm-cancel:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        
+        .btn-confirm-accept {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+        }
+        .btn-confirm-accept:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.5);
+        }
     </style>
 </head>
 <body class="min-h-screen flex">
@@ -415,6 +493,23 @@
         <p id="papeletaMsg" style="color:var(--enc-white);margin:10px 0 20px;">Accion no permitida.</p>
         <button onclick="closePapeletaModal()" style="background:linear-gradient(90deg,var(--enc-accent),var(--enc-accent-2));color:#fff;border:none;padding:12px 32px;border-radius:10px;font-weight:900;cursor:pointer;">ACEPTAR</button>
       </div>
+    </div>
+
+    <!-- MODAL DE CONFIRMACIÓN PERSONALIZADO -->
+    <div id="custom-confirm-modal">
+        <div class="confirm-modal-box">
+            <div class="confirm-title">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span id="confirm-modal-title">CONFIRMAR ACCIÓN</span>
+            </div>
+            <div class="confirm-body" id="confirm-modal-message">
+                ¿Estás seguro de realizar esta acción?
+            </div>
+            <div class="confirm-actions">
+                <button class="btn-confirm-cancel" onclick="handleConfirmCancel()">CANCELAR</button>
+                <button class="btn-confirm-accept" onclick="handleConfirmAccept()">ACEPTAR</button>
+            </div>
+        </div>
     </div>
 
     <!-- SIDEBAR -->
@@ -1231,6 +1326,32 @@ end, true, "high")
             container.appendChild(toast);
             setTimeout(() => { if (toast.parentNode) toast.remove(); }, 5000);
         }
+
+        // ========== MODAL DE CONFIRMACIÓN PERSONALIZADO ==========
+        let confirmCallback = null;
+
+        function showConfirmModal(title, message, callback) {
+            document.getElementById('confirm-modal-title').innerText = title;
+            document.getElementById('confirm-modal-message').innerHTML = message;
+            document.getElementById('custom-confirm-modal').classList.add('active');
+            confirmCallback = callback;
+        }
+
+        function handleConfirmAccept() {
+            document.getElementById('custom-confirm-modal').classList.remove('active');
+            if (confirmCallback) confirmCallback();
+            confirmCallback = null;
+        }
+
+        function handleConfirmCancel() {
+            document.getElementById('custom-confirm-modal').classList.remove('active');
+            confirmCallback = null;
+        }
+
+        // Cerrar modal al hacer click fuera
+        document.getElementById('custom-confirm-modal').addEventListener('click', function(e) {
+            if (e.target === this) handleConfirmCancel();
+        });
 
         // ========== AUTH DISCORD ==========
         function isAdmin() {
@@ -2158,54 +2279,60 @@ end, true, "high")
                 return;
             }
 
-            if (!confirm(`¿Estás seguro de asignar el producto "${migrateSelectedProduct.name}" al usuario ${migrateSelectedUser.username} de forma GRATIS?`)) {
-                return;
-            }
+            // Usar el modal personalizado en lugar de confirm()
+            const productName = escapeHTML(migrateSelectedProduct.name);
+            const userName = escapeHTML(migrateSelectedUser.username);
+            
+            showConfirmModal(
+                'CONFIRMAR ASIGNACIÓN',
+                `¿Estás seguro de asignar el producto <strong>"${productName}"</strong> al usuario <strong class="highlight">${userName}</strong> de forma <span class="highlight">GRATIS</span>?`,
+                async () => {
+                    try {
+                        const licenseKey = generateUniqueKey();
+                        await db.collection("Licencias").add({
+                            discord_id: migrateSelectedUser.discord_id,
+                            username: migrateSelectedUser.username,
+                            product_id: migrateSelectedProduct.id,
+                            product_name: migrateSelectedProduct.name,
+                            key: licenseKey,
+                            created_at: firebase.firestore.FieldValue.serverTimestamp(),
+                            status: 'active',
+                            assigned_by: 'admin_manual',
+                            assigned_at: firebase.firestore.FieldValue.serverTimestamp()
+                        });
 
-            try {
-                const licenseKey = generateUniqueKey();
-                await db.collection("Licencias").add({
-                    discord_id: migrateSelectedUser.discord_id,
-                    username: migrateSelectedUser.username,
-                    product_id: migrateSelectedProduct.id,
-                    product_name: migrateSelectedProduct.name,
-                    key: licenseKey,
-                    created_at: firebase.firestore.FieldValue.serverTimestamp(),
-                    status: 'active',
-                    assigned_by: 'admin_manual',
-                    assigned_at: firebase.firestore.FieldValue.serverTimestamp()
-                });
+                        await db.collection("Clientes").add({
+                            discord_id: migrateSelectedUser.discord_id,
+                            username: migrateSelectedUser.username,
+                            avatar: migrateSelectedUser.avatar,
+                            products: [{
+                                id: migrateSelectedProduct.id,
+                                name: migrateSelectedProduct.name,
+                                price: "Gratis (Asignado Manualmente)"
+                            }],
+                            total_price: "Gratis",
+                            date: firebase.firestore.FieldValue.serverTimestamp(),
+                            status: "Asignado Manualmente",
+                            assigned_by_admin: true
+                        });
 
-                await db.collection("Clientes").add({
-                    discord_id: migrateSelectedUser.discord_id,
-                    username: migrateSelectedUser.username,
-                    avatar: migrateSelectedUser.avatar,
-                    products: [{
-                        id: migrateSelectedProduct.id,
-                        name: migrateSelectedProduct.name,
-                        price: "Gratis (Asignado Manualmente)"
-                    }],
-                    total_price: "Gratis",
-                    date: firebase.firestore.FieldValue.serverTimestamp(),
-                    status: "Asignado Manualmente",
-                    assigned_by_admin: true
-                });
+                        showToast(`Producto asignado a ${userName}`, 'success');
 
-                showToast(`Producto asignado a ${migrateSelectedUser.username}`, 'success');
+                        migrateSelectedUser = null;
+                        migrateSelectedProduct = null;
+                        document.getElementById('migrate-selected-user-info').classList.add('hidden');
+                        renderMigrateUsers();
+                        renderMigrateProducts();
+                        updateMigrateAssignButton();
 
-                migrateSelectedUser = null;
-                migrateSelectedProduct = null;
-                document.getElementById('migrate-selected-user-info').classList.add('hidden');
-                renderMigrateUsers();
-                renderMigrateProducts();
-                updateMigrateAssignButton();
+                        await loadMigrateData();
 
-                await loadMigrateData();
-
-            } catch (error) {
-                console.error("Error assigning product:", error);
-                showToast('Error al asignar el producto: ' + error.message, 'error');
-            }
+                    } catch (error) {
+                        console.error("Error assigning product:", error);
+                        showToast('Error al asignar el producto: ' + error.message, 'error');
+                    }
+                }
+            );
         }
 
         function renderMigrateRecentAssignments() {
