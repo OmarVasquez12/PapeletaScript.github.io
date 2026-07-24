@@ -207,19 +207,33 @@
             transform: translateY(-2px);
         }
 
-        /* --- NUEVOS ESTILOS PARA SECCIÓN DE RESEÑAS (INFINITO) --- */
+        /* --- NUEVOS ESTILOS PARA SECCIÓN DE RESEÑAS (INFINITO CON FADE) --- */
         .reviews-section {
             padding: 80px 0;
             position: relative;
             overflow: hidden;
+            /* Ocupa todo el ancho para el fondo */
             width: 100vw;
             margin-left: calc(50% - 50vw);
             background: linear-gradient(to bottom, transparent, rgba(20, 10, 10, 0.4), transparent);
         }
         
+        /* Contenedor que limita el ancho del contenido y aplica el fade */
+        .reviews-wrapper {
+            max-width: 7xl; /* Mismo ancho que el título */
+            margin: 0 auto;
+            position: relative;
+            /* Máscara para desvanecer los bordes (izquierda y derecha) */
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
+            mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
+            padding: 20px 0; /* Espacio para que no se corten las sombras al desvanecerse */
+        }
+
         .reviews-title {
             text-align: center;
             margin-bottom: 50px;
+            /* El título NO debe tener la máscara, así que lo sacamos del wrapper o usamos z-index si estuviera dentro. 
+               En este caso, el wrapper solo envuelve el slider. */
         }
         
         .reviews-title h2 {
@@ -239,14 +253,12 @@
             font-size: 1.1rem;
         }
 
-        /* Contenedor del slider infinito */
+        /* Slider Infinito */
         .reviews-slider {
             display: flex;
             gap: 25px;
             padding: 20px 0;
-            /* Ancho dinámico basado en el contenido para permitir el scroll */
             width: max-content; 
-            /* Animación infinita */
             animation: scroll-infinite 40s linear infinite;
         }
 
@@ -257,13 +269,8 @@
 
         /* Definición de la animación de desplazamiento */
         @keyframes scroll-infinite {
-            0% {
-                transform: translateX(0);
-            }
-            100% {
-                /* Se mueve exactamente la mitad del ancho total (porque duplicamos el contenido) */
-                transform: translateX(-50%);
-            }
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
         }
 
         .review-card-slide {
@@ -273,7 +280,6 @@
             border: 1px solid var(--border-color);
             border-radius: 20px;
             padding: 30px;
-            /* Eliminamos scroll-snap ya que ahora es automático */
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -667,13 +673,16 @@
         <!-- CONTENEDOR DE RESEÑAS (SOLO INICIO) -->
         <div id="reviews-section-container">
             <section class="reviews-section">
+                <!-- Título fuera del wrapper para que no se desvanezca -->
                 <div class="max-w-7xl mx-auto px-6">
                     <div class="reviews-title">
                         <h2>LA VOZ DE QUIENES CONFIAN EN <span> NOSOTROS</span></h2>
                         <p>No lo decimos nosotros. Lo dicen quienes ya confían en nuestros scripts</p>
                     </div>
-                    
-                    <!-- Slider Infinito -->
+                </div>
+                
+                <!-- Wrapper con máscara de desvanecimiento -->
+                <div class="reviews-wrapper">
                     <div class="reviews-slider" id="reviews-slider">
                         <div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;">
                             <i class="fas fa-spinner animate-spin text-3xl text-red-500"></i>
@@ -1499,8 +1508,6 @@
 
             if (count > 0) {
                 // DUPLICAMOS EL CONTENIDO PARA CREAR EL EFECTO INFINITO
-                // Al tener dos copias idénticas, cuando la primera termina de pasar,
-                // la segunda ya está visible y la animación se reinicia imperceptiblemente.
                 slider.innerHTML = reviewsHTML + reviewsHTML;
             } else {
                 slider.innerHTML = `
