@@ -701,7 +701,7 @@
                         let priceClass = 'text-white font-bold'; // Color blanco por defecto
                         
                         const rawPrice = String(item.price).toLowerCase();
-                        if (rawPrice === 'gratis' || rawPrice === 'regalado' || item.price == 0 || isNaN(parseFloat(item.price))) {
+                        if (rawPrice === 'gratis' || rawPrice === 'Gratis' || item.price == 0 || isNaN(parseFloat(item.price))) {
                             priceDisplay = 'REGALADO';
                             priceClass = 'text-white font-bold'; // Asegurar blanco puro
                         }
