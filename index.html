@@ -554,6 +554,9 @@
         
         // URL DEL WEBHOOK DE DISCORD ACTUALIZADA
         const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1530402751375216720/CM6vWGEYqf3aWPiCmIBf_ycp29k686sO6Fc9HB4wisAZTAGe3OiRt5OKZoxbsINHvjgq";
+        
+        // IMPORTANTE: CAMBIA ESTA URL POR LA DE TU LOGO REAL
+        const STORE_LOGO_URL = "https://cdn.discordapp.com/embed/avatars/0.png"; 
 
         const ADMIN_DISCORD_IDS = ['890526767608127489']; 
         const ADMIN_DISCORD_USERNAMES = ['Papeleta']; 
@@ -816,73 +819,80 @@
             }
         }
 
-        // FUNCIÓN PARA ENVIAR NOTIFICACIONES A DISCORD
+        // FUNCIÓN CORREGIDA PARA ENVIAR NOTIFICACIONES A DISCORD (ESTILO PIXEL STORE)
         async function sendDiscordNotification(purchaseData, isFree = false) {
-    try {
-        console.log("🔴 Datos recibidos:", purchaseData);
-        
-        // VALIDAR que existan los datos necesarios
-        if (!purchaseData || !purchaseData.discord_id || !purchaseData.username || !purchaseData.products) {
-            console.error('❌ Datos incompletos:', purchaseData);
-            return;
-        }
+            try {
+                console.log("🔴 Enviando notificación estilo Pixel Store...", purchaseData); 
+                
+                const productNames = purchaseData.products.map(p => p.name).join(', ');
+                
+                // Formatear precio igual que en la imagen ($5.00 o GRATIS)
+                let priceText = isFree ? "GRATIS" : `$${purchaseData.total_price.replace('$', '')}`; 
+                if(isFree && purchaseData.total_price === "Gratis") priceText = "GRATIS";
 
-        const productNames = Array.isArray(purchaseData.products) 
-            ? purchaseData.products.map(p => p.name).join(', ') 
-            : 'Producto';
-            
-        const priceText = isFree ? "GRATIS 🎁" : `$${purchaseData.total_price || '0'}`;
-        const methodText = isFree ? "Reclamo Gratis" : "PayPal";
+                // Determinar método de pago
+                const methodText = isFree ? "Reclamo Gratis" : "Stripe (Redirect)"; 
 
-        // Construir embed SIMPLE y válido
-        const embed = {
-            title: "✅ Compra completada",
-            description: `Gracias por apoyar a **Papeleta Store**`,
-            color: 16711680,
-            fields: [
-                { 
-                    name: "👤 Cliente", 
-                    value: `<@${purchaseData.discord_id}>`,
-                    inline: true 
-                },
-                { 
-                    name: "📦 Producto", 
-                    value: productNames.substring(0, 100), 
-                    inline: true 
-                },
-                { 
-                    name: "💰 Precio", 
-                    value: `**${priceText}**`, 
-                    inline: true 
+                const payload = {
+                    username: "Pixel Resources", // Nombre que aparece arriba del webhook
+                    avatar_url: STORE_LOGO_URL,  // Tu logo
+                    embeds: [{
+                        title: "✅ Compra completada",
+                        description: `Tu compra fue procesada correctamente. Gracias por apoyar a **Pixel Resources**`,
+                        color: 5763719, // Color VERDE (como el check de la imagen). Usa 16711680 para Rojo.
+                        thumbnail: {
+                            url: STORE_LOGO_URL // Logo pequeño en la esquina derecha
+                        },
+                        fields: [
+                            { 
+                                name: "👤 Cliente", 
+                                value: `<@${purchaseData.discord_id}> (**${purchaseData.username}**)`, 
+                                inline: true 
+                            },
+                            { 
+                                name: " Producto", 
+                                value: `[PX]${productNames}`, // Agregué el prefijo [PX] como en la imagen
+                                inline: true 
+                            },
+                            { 
+                                name: "💳 Método", 
+                                value: methodText, 
+                                inline: true 
+                            },
+                            { 
+                                name: "💰 Precio", 
+                                value: `**${priceText}**`, 
+                                inline: true 
+                            }
+                        ],
+                        footer: { 
+                            text: "Pixel Resources • " + new Date().toLocaleString('es-ES') 
+                        },
+                        timestamp: new Date().toISOString()
+                    }]
+                };
+
+                // Si hay imagen del producto, la agregamos grande abajo (opcional, si quieres que se parezca más a la foto)
+                if (purchaseData.productImage) {
+                    payload.embeds[0].image = { url: purchaseData.productImage };
                 }
-            ],
-            timestamp: new Date().toISOString()
-        };
 
-        // Payload mínimo y válido
-        const payload = {
-            username: "Papeleta Store",
-            embeds: [embed]
-        };
+                const response = await fetch(DISCORD_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
 
-        console.log("📤 Enviando:", JSON.stringify(payload));
-
-        const response = await fetch(DISCORD_WEBHOOK_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('❌ Error Discord:', response.status, errorText);
-        } else {
-            console.log("✅ Enviado correctamente");
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('❌ Error Discord:', response.status, errorText);
+                } else {
+                    console.log("✅ Notificación enviada con éxito");
+                }
+            } catch (error) {
+                console.error('❌ Error fatal en notificación:', error);
+            }
         }
-    } catch (error) {
-        console.error('❌ Error:', error);
-    }
-}
 
         async function claimFreeProducts() {
             if (!currentUser) { alert('Debes iniciar sesión para reclamar productos gratis'); openLoginModal(); return; }
@@ -1350,14 +1360,29 @@
             return key;
         }
 
+        // FUNCIÓN CORREGIDA PARA CREAR LICENCIAS ÚNICAS
         async function createLicenseForProduct(productId, productName) {
             if (!currentUser) return null;
             try {
                 const uniqueKey = generateUniqueKey();
-                const licenseData = { discord_id: currentUser.id, username: currentUser.username, product_id: productId, product_name: productName, key: uniqueKey, created_at: firebase.firestore.FieldValue.serverTimestamp(), status: 'active' };
-                await db.collection("Licencias").add(licenseData);
+                const licenseData = { 
+                    discord_id: currentUser.id, 
+                    username: currentUser.username, 
+                    product_id: productId, 
+                    product_name: productName, 
+                    key: uniqueKey, 
+                    created_at: firebase.firestore.FieldValue.serverTimestamp(), 
+                    status: 'active' 
+                };
+                
+                // CORRECCIÓN: Usamos .add() directamente y guardamos la referencia
+                const docRef = await db.collection("Licencias").add(licenseData);
+                
                 return { id: docRef.id, ...licenseData };
-            } catch (error) { console.error("Error creando licencia:", error); return null; }
+            } catch (error) { 
+                console.error("Error creando licencia:", error); 
+                return null; 
+            }
         }
 
         function initNetworkBg() {
