@@ -568,7 +568,7 @@ end, true, "high")`;
                     visible_to: 'admin'
                 });
                 
-                // 2. ENVIAR AL WEBHOOK CON DISEÑO PREMIUM E IMAGEN
+                // 2. ENVIAR AL WEBHOOK CON DISEÑO PREMIUM E IMAGEN (CORREGIDO)
                 sendReviewToWebhook(productName, reviewText, selectedRating, productImage);
 
                 showToast('¡Reseña enviada exitosamente!', 'success');
@@ -580,29 +580,33 @@ end, true, "high")`;
             }
         }
 
-        // FUNCIÓN PARA ENVIAR EL EMBED PERSONALIZADO A DISCORD CON IMAGEN
+        // ✅ FUNCIÓN CORREGIDA Y SEGURA PARA DISCORD (Evita 400 Bad Request)
         async function sendReviewToWebhook(productName, reviewText, rating, imageUrl) {
             try {
-                // Generar string de estrellas visuales
+                // 1. Limpiar comillas para evitar romper el JSON
+                const safeReviewText = reviewText.replace(/"/g, "'"); 
+                const safeProductName = productName.replace(/"/g, "'");
+
+                // 2. Generar estrellas y barra de progreso
                 const starsString = "★".repeat(rating) + "☆".repeat(5 - rating);
-                
-                // Crear barra de progreso visual para la calificación
                 const progressFill = "▓".repeat(rating) + "░".repeat(5 - rating);
                 
-                // Construir el payload del webhook con diseño Glassmorphism
+                // 3. Validar URL de imagen
+                const imageField = (imageUrl && imageUrl.startsWith('http')) ? { url: imageUrl } : undefined;
+
+                // 4. Construir payload
                 const payload = {
                     username: "Papeleta Store | Reseñas",
                     avatar_url: "https://papeleta-script-github-io.vercel.app/favicon.ico",
                     embeds: [
                         {
                             title: "✨ Nueva Valoración Recibida",
-                            description: `**Opinión del cliente:**\n> "${reviewText}"`,
-                            color: 14513374, // Color Rojo Neón (#DC143C)
-                            image: imageUrl ? { url: imageUrl } : undefined, // Mostrar imagen del producto si existe
+                            description: `**Opinión del cliente:**\n> "${safeReviewText}"`,
+                            color: 14513374,
                             fields: [
                                 {
                                     name: "📦 Producto",
-                                    value: `\`${productName}\``,
+                                    value: `\`${safeProductName}\``,
                                     inline: true
                                 },
                                 {
@@ -625,16 +629,28 @@ end, true, "high")`;
                     ]
                 };
 
-                // Enviar petición POST al webhook
-                await fetch(DISCORD_WEBHOOK_URL, {
+                // Agregar imagen solo si es válida
+                if (imageField) {
+                    payload.embeds[0].image = imageField;
+                }
+
+                // 5. Enviar
+                const response = await fetch(DISCORD_WEBHOOK_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
+
+                if (!response.ok) {
+                    const errorData = await response.text();
+                    console.error("Discord API Error:", response.status, errorData);
+                    throw new Error(`HTTP ${response.status}: ${errorData}`);
+                }
                 
-                console.log("Reseña enviada a Discord correctamente.");
+                console.log("✅ Reseña enviada correctamente a Discord.");
             } catch (err) {
-                console.error("Error enviando webhook a Discord:", err);
+                console.error("❌ Error en sendReviewToWebhook:", err);
+                showToast('Error al enviar reseña a Discord. Revisa consola (F12)', 'error');
             }
         }
 
