@@ -818,61 +818,71 @@
 
         // FUNCIÓN PARA ENVIAR NOTIFICACIONES A DISCORD
         async function sendDiscordNotification(purchaseData, isFree = false) {
-            try {
-                console.log("🔴 Intentando enviar notificación a Discord...", purchaseData); // DEBUG EN CONSOLA
-                
-                const productNames = purchaseData.products.map(p => p.name).join(', ');
-                const priceText = isFree ? "GRATIS 🎁" : `$${purchaseData.total_price}`;
-                const methodText = isFree ? "Reclamo Gratis" : "PayPal";
-
-                const payload = {
-                    username: "Papeleta Store",
-                    avatar_url: "https://cdn.discordapp.com/embed/avatars/0.png",
-                    embeds: [{
-                        title: "✅ Compra completada",
-                        description: `Tu compra fue procesada correctamente. Gracias por apoyar a **Papeleta Store**`,
-                        color: 16711680, // Rojo #FF0000
-                        fields: [
-                            { name: "👤 Cliente", value: `<@${purchaseData.discord_id}> (**${purchaseData.username}**)`, inline: true },
-                            { name: "📦 Producto", value: productNames.length > 256 ? productNames.substring(0, 253) + "..." : productNames, inline: true },
-                            { name: "💳 Método", value: methodText, inline: true },
-                            { name: "💰 Precio", value: `**${priceText}**`, inline: true }
-                        ],
-                        footer: { text: "Papeleta Store • " + new Date().toLocaleString('es-ES') },
-                        timestamp: new Date().toISOString()
-                    }]
-                };
-
-                // Si hay imagen del primer producto, agrégala al embed
-                if (purchaseData.productImage) {
-                    payload.embeds[0].image = { url: purchaseData.productImage };
-                }
-
-                // Si hay múltiples productos, formatearlos como lista
-                if (purchaseData.products.length > 1) {
-                    let list = purchaseData.products.map((p, i) => `${i + 1}. **${p.name}** - ${p.price}`).join('\n');
-                    payload.embeds[0].fields[1].value = list.length > 1024 ? list.substring(0, 1021) + "..." : list;
-                }
-
-                const response = await fetch(DISCORD_WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json' 
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('❌ Error de Discord:', response.status, errorText);
-                    alert(`Error al enviar notificación a Discord: ${response.status}\n${errorText}`);
-                } else {
-                    console.log("✅ Notificación enviada a Discord exitosamente");
-                }
-            } catch (error) {
-                console.error('❌ Error fatal en sendDiscordNotification:', error);
-            }
+    try {
+        console.log("🔴 Datos recibidos:", purchaseData);
+        
+        // VALIDAR que existan los datos necesarios
+        if (!purchaseData || !purchaseData.discord_id || !purchaseData.username || !purchaseData.products) {
+            console.error('❌ Datos incompletos:', purchaseData);
+            return;
         }
+
+        const productNames = Array.isArray(purchaseData.products) 
+            ? purchaseData.products.map(p => p.name).join(', ') 
+            : 'Producto';
+            
+        const priceText = isFree ? "GRATIS 🎁" : `$${purchaseData.total_price || '0'}`;
+        const methodText = isFree ? "Reclamo Gratis" : "PayPal";
+
+        // Construir embed SIMPLE y válido
+        const embed = {
+            title: "✅ Compra completada",
+            description: `Gracias por apoyar a **Papeleta Store**`,
+            color: 16711680,
+            fields: [
+                { 
+                    name: "👤 Cliente", 
+                    value: `<@${purchaseData.discord_id}>`,
+                    inline: true 
+                },
+                { 
+                    name: "📦 Producto", 
+                    value: productNames.substring(0, 100), 
+                    inline: true 
+                },
+                { 
+                    name: "💰 Precio", 
+                    value: `**${priceText}**`, 
+                    inline: true 
+                }
+            ],
+            timestamp: new Date().toISOString()
+        };
+
+        // Payload mínimo y válido
+        const payload = {
+            username: "Papeleta Store",
+            embeds: [embed]
+        };
+
+        console.log("📤 Enviando:", JSON.stringify(payload));
+
+        const response = await fetch(DISCORD_WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('❌ Error Discord:', response.status, errorText);
+        } else {
+            console.log("✅ Enviado correctamente");
+        }
+    } catch (error) {
+        console.error('❌ Error:', error);
+    }
+}
 
         async function claimFreeProducts() {
             if (!currentUser) { alert('Debes iniciar sesión para reclamar productos gratis'); openLoginModal(); return; }
