@@ -623,10 +623,48 @@
             return key;
         }
 
+        // --- FUNCIÓN MAESTRA ÚNICA PARA LICENCIAS (EVITA DUPLICADOS) ---
+        async function getOrCreateLicense(userId, productId, productName) {
+            try {
+                // 1. Buscar SI YA EXISTE una licencia activa para este usuario y producto
+                const querySnapshot = await db.collection("Licencias")
+                    .where("discord_id", "==", userId)
+                    .where("product_id", "==", productId)
+                    .where("status", "==", "active")
+                    .limit(1)
+                    .get();
+
+                if (!querySnapshot.empty) {
+                    console.log(`✅ Licencia ya existente para ${userId} en ${productId}. No se crea duplicado.`);
+                    return querySnapshot.docs[0].data(); // Retorna la existente sin crear nada
+                }
+
+                // 2. Si NO existe, creamos UNA SOLA licencia nueva
+                const uniqueKey = generateUniqueKey();
+                const licenseData = { 
+                    discord_id: userId, 
+                    username: currentUser ? currentUser.username : 'Unknown', 
+                    product_id: productId, 
+                    product_name: productName, 
+                    key: uniqueKey, 
+                    created_at: firebase.firestore.FieldValue.serverTimestamp(), 
+                    status: 'active' 
+                };
+                
+                const docRef = await db.collection("Licencias").add(licenseData);
+                console.log(`✨ Nueva licencia creada: ${docRef.id}`);
+                return { id: docRef.id, ...licenseData };
+
+            } catch (error) {
+                console.error("❌ Error en getOrCreateLicense:", error);
+                return null;
+            }
+        }
+
         async function ensureFixedLicense() {
             if (!currentUser) return;
             try {
-                // VERIFICAR SI YA EXISTE ANTES DE CREAR
+                // VERIFICAR SI YA EXISTE ANTES DE CREAR (Usando la función única)
                 const snapshot = await db.collection("Licencias").where("discord_id", "==", currentUser.id).where("type", "==", "general").limit(1).get();
                 if (!snapshot.empty) {
                     userFixedLicenseKey = snapshot.docs[0].data().key;
