@@ -10,8 +10,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.paypal.com/sdk/js?client-id=sb&currency=USD"></script>
 
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <!-- IMPORTANTE: Usamos la misma versión de Firebase que AreaCliente para evitar conflictos -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
     <style>
         :root {
@@ -579,15 +580,17 @@
         let localProducts = JSON.parse(localStorage.getItem('papeleta_local_products') || '[]');
         let tempImages = [];
 
+        // =============================================
+        //          FIREBASE CONFIGURACIÓN UNIFICADA
+        // =============================================
         const firebaseConfig = {
-            apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
-            authDomain: "papeletalicencia.firebaseapp.com",
-            databaseURL: "https://papeletalicencia-default-rtdb.firebaseio.com",
-            projectId: "papeletalicencia",
-            storageBucket: "papeletalicencia.firebasestorage.app",
-            messagingSenderId: "677208314051",
-            appId: "1:677208314051:web:a27c04f31d402e83f29276",
-            measurementId: "G-RPJ4KQ6EQ4"
+            apiKey: "AIzaSyBzNb1fj_64JGMKAPkBWXXQxk9RizQUS-E",
+            authDomain: "licenciapapeleta12.firebaseapp.com",
+            projectId: "licenciapapeleta12",
+            storageBucket: "licenciapapeleta12.firebasestorage.app",
+            messagingSenderId: "467063297352",
+            appId: "1:467063297352:web:67767e0cc51f0042fa4f7d",
+            measurementId: "G-6LW8X0B2TH"
         };
 
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
@@ -911,6 +914,51 @@ async function sendDiscordNotification(purchaseData, isFree = false) {
         return false;
     }
 }
+
+// --- FUNCIÓN MAESTRA PARA CREAR LICENCIAS (COMPARTIDA) ---
+function generateUniqueKey() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; let key = '';
+    for (let i = 0; i < 24; i++) key += chars.charAt(Math.floor(Math.random() * chars.length));
+    return key;
+}
+
+async function getOrCreateLicense(userId, productId, productName) {
+    try {
+        // 1. Buscar SI YA EXISTE una licencia activa para este usuario y producto
+        const querySnapshot = await db.collection("Licencias")
+            .where("discord_id", "==", userId)
+            .where("product_id", "==", productId)
+            .where("status", "==", "active")
+            .limit(1)
+            .get();
+
+        if (!querySnapshot.empty) {
+            console.log(`✅ Licencia ya existente para ${userId} en ${productId}. No se crea duplicado.`);
+            return querySnapshot.docs[0].data(); // Retorna la existente sin crear nada
+        }
+
+        // 2. Si NO existe, creamos UNA SOLA licencia nueva
+        const uniqueKey = generateUniqueKey();
+        const licenseData = { 
+            discord_id: userId, 
+            username: currentUser ? currentUser.username : 'Unknown', 
+            product_id: productId, 
+            product_name: productName, 
+            key: uniqueKey, 
+            created_at: firebase.firestore.FieldValue.serverTimestamp(), 
+            status: 'active' 
+        };
+        
+        const docRef = await db.collection("Licencias").add(licenseData);
+        console.log(`✨ Nueva licencia creada: ${docRef.id}`);
+        return { id: docRef.id, ...licenseData };
+
+    } catch (error) {
+        console.error("❌ Error en getOrCreateLicense:", error);
+        return null;
+    }
+}
+
         async function claimFreeProducts() {
             if (!currentUser) { alert('Debes iniciar sesión para reclamar productos gratis'); openLoginModal(); return; }
             if (cart.length === 0) { alert('Tu carrito está vacío'); return; }
@@ -930,8 +978,10 @@ async function sendDiscordNotification(purchaseData, isFree = false) {
                 // Enviar notificación a Discord
                 await sendDiscordNotification(purchaseData, true);
                 
-                // CORRECCIÓN: Se ha eliminado la generación de licencias aquí.
-                // Ahora solo registra la compra en "Clientes".
+                // ✅ CORRECCIÓN: Generar licencias para cada producto reclamado
+                for (const item of cart) {
+                    await getOrCreateLicense(currentUser.id, item.id, item.name);
+                }
                 
                 saveUserDataLocally();
                 alert('¡Productos reclamados exitosamente! Ya están disponibles en tu biblioteca.\n\nGracias por seguir confiando en nuestra tienda.');
@@ -992,8 +1042,10 @@ async function sendDiscordNotification(purchaseData, isFree = false) {
                 // Enviar notificación a Discord
                 await sendDiscordNotification(purchaseData, false);
                 
-                // CORRECCIÓN: Se ha eliminado la generación de licencias aquí.
-                // El bucle anterior que llamaba a getOrCreateLicense ha sido removido.
+                // ✅ CORRECCIÓN: Generar licencias para cada producto comprado
+                for (const item of cart) {
+                    await getOrCreateLicense(currentUser.id, item.id, item.name);
+                }
                 
                 saveUserDataLocally();
                 alert("¡Productos añadidos a tu biblioteca!");
@@ -1400,50 +1452,6 @@ async function sendDiscordNotification(purchaseData, isFree = false) {
         }
 
         function escapeHTML(str) { return String(str).replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)); }
-
-        function generateUniqueKey() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; let key = '';
-            for (let i = 0; i < 20; i++) key += chars.charAt(Math.floor(Math.random() * chars.length));
-            return key;
-        }
-
-        // --- FUNCIÓN MAESTRA ÚNICA PARA LICENCIAS (EVITA DUPLICADOS) ---
-        async function getOrCreateLicense(userId, productId, productName) {
-            try {
-                // 1. Buscar SI YA EXISTE una licencia activa para este usuario y producto
-                const querySnapshot = await db.collection("Licencias")
-                    .where("discord_id", "==", userId)
-                    .where("product_id", "==", productId)
-                    .where("status", "==", "active")
-                    .limit(1)
-                    .get();
-
-                if (!querySnapshot.empty) {
-                    console.log(`✅ Licencia ya existente para ${userId} en ${productId}. No se crea duplicado.`);
-                    return querySnapshot.docs[0].data(); // Retorna la existente sin crear nada
-                }
-
-                // 2. Si NO existe, creamos UNA SOLA licencia nueva
-                const uniqueKey = generateUniqueKey();
-                const licenseData = { 
-                    discord_id: userId, 
-                    username: currentUser ? currentUser.username : 'Unknown', 
-                    product_id: productId, 
-                    product_name: productName, 
-                    key: uniqueKey, 
-                    created_at: firebase.firestore.FieldValue.serverTimestamp(), 
-                    status: 'active' 
-                };
-                
-                const docRef = await db.collection("Licencias").add(licenseData);
-                console.log(`✨ Nueva licencia creada: ${docRef.id}`);
-                return { id: docRef.id, ...licenseData };
-
-            } catch (error) {
-                console.error("❌ Error en getOrCreateLicense:", error);
-                return null;
-            }
-        }
 
         function initNetworkBg() {
             const canvas = document.getElementById('network-bg');
