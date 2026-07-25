@@ -997,28 +997,51 @@
 }
 
     async function claimFreeProducts() {
-        if (!currentUser) { alert('Debes iniciar sesión para reclamar productos gratis'); openLoginModal(); return; }
-        if (cart.length === 0) { alert('Tu carrito está vacío'); return; }
-        const allFree = cart.every(item => Number(item.price) === 0);
-        if (!allFree) { alert('Algunos productos no son gratis'); return; }
+    if (!currentUser) { alert('Debes iniciar sesión para reclamar productos gratis'); openLoginModal(); return; }
+    if (cart.length === 0) { alert('Tu carrito está vacío'); return; }
+    const allFree = cart.every(item => Number(item.price) === 0);
+    if (!allFree) { alert('Algunos productos no son gratis'); return; }
+    
+    try {
+        // Obtener la imagen del primer producto desde Firestore
+        let productImageUrl = null;
+        if (cart.length > 0) {
+            const productDoc = await db.collection("Productos").doc(cart[0].id).get();
+            if (productDoc.exists) {
+                const productData = productDoc.data();
+                productImageUrl = productData.image_url || productData.images?.[0] || null;
+            }
+        }
+
+        const purchaseData = {
+            discord_id: currentUser.id, 
+            username: currentUser.username, 
+            avatar: currentUser.avatar,
+            products: cart.map(item => ({ id: item.id, name: item.name, price: "Gratis" })),
+            total_price: "Gratis", 
+            date: firebase.firestore.FieldValue.serverTimestamp(), 
+            status: "Reclamado Exitosamente",
+            productImage: productImageUrl // URL real de Cloudinary
+        };
         
-        try {
-            const purchaseData = {
-                discord_id: currentUser.id, username: currentUser.username, avatar: currentUser.avatar,
-                products: cart.map(item => ({ id: item.id, name: item.name, price: "Gratis" })),
-                total_price: "Gratis", date: firebase.firestore.FieldValue.serverTimestamp(), status: "Reclamado Exitosamente",
-                productImage: cart[0]?.image || null
-            };
-            
-            await db.collection("Clientes").add(purchaseData);
-            await sendDiscordNotification(purchaseData, true);
-            
-            for (const item of cart) { await createLicenseForProduct(item.id, item.name); myAssignedProductIds.add(item.id); }
-            saveUserDataLocally();
-            alert('¡Productos reclamados exitosamente! Ya están disponibles en tu biblioteca.\n\nSe han generado tus licencias automáticamente.\n\nGracias por seguir confiando en nuestra tienda.');
-            cart = []; updateCartUI(); closeCartModal();
-        } catch (error) { console.error(error); alert('Error al registrar la reclamación: ' + error.message); }
+        await db.collection("Clientes").add(purchaseData);
+        await sendDiscordNotification(purchaseData, true);
+        
+        for (const item of cart) { 
+            await createLicenseForProduct(item.id, item.name); 
+            myAssignedProductIds.add(item.id); 
+        }
+        saveUserDataLocally();
+        
+        alert('¡Productos reclamados exitosamente! Ya están disponibles en tu biblioteca.\n\nSe han generado tus licencias automáticamente.\n\nGracias por seguir confiando en nuestra tienda.');
+        cart = []; 
+        updateCartUI(); 
+        closeCartModal();
+    } catch (error) { 
+        console.error(error); 
+        alert('Error al registrar la reclamación: ' + error.message); 
     }
+}
 
     function openCartModal() {
         if(cart.length === 0 && !currentUser) { openLoginModal(); return; }
@@ -1056,26 +1079,46 @@
         saveUserDataLocally();
     }
 
-    async function assignProductsToUserAfterPayment(paymentDetails) {
-        if(!currentUser) return;
-        try {
-            const purchaseData = {
-                discord_id: currentUser.id, username: currentUser.username, avatar: currentUser.avatar,
-                products: cart.map(item => ({ id: item.id, name: item.name, price: "$" + Number(item.price).toFixed(2) })),
-                total_price: "$" + cart.reduce((sum, item) => sum + Number(item.price), 0).toFixed(2),
-                payment_id: paymentDetails.id, payer_email: paymentDetails.payer.email_address,
-                date: firebase.firestore.FieldValue.serverTimestamp(), status: "Pagado",
-                productImage: cart[0]?.image || null
-            };
-            
-            await db.collection("Clientes").add(purchaseData);
-            await sendDiscordNotification(purchaseData, false);
-            
-            for (const item of cart) { await createLicenseForProduct(item.id, item.name); myAssignedProductIds.add(item.id); }
-            saveUserDataLocally();
-            alert("¡Productos añadidos a tu biblioteca!\n\nSe han generado tus licencias automáticamente.");
-        } catch (error) { console.error(error); alert('Error al registrar la compra: ' + error.message); }
+   async function assignProductsToUserAfterPayment(paymentDetails) {
+    if(!currentUser) return;
+    try {
+        // Obtener la imagen del primer producto desde Firestore
+        let productImageUrl = null;
+        if (cart.length > 0) {
+            const productDoc = await db.collection("Productos").doc(cart[0].id).get();
+            if (productDoc.exists) {
+                const productData = productDoc.data();
+                productImageUrl = productData.image_url || productData.images?.[0] || null;
+            }
+        }
+
+        const purchaseData = {
+            discord_id: currentUser.id, 
+            username: currentUser.username, 
+            avatar: currentUser.avatar,
+            products: cart.map(item => ({ id: item.id, name: item.name, price: "$" + Number(item.price).toFixed(2) })),
+            total_price: "$" + cart.reduce((sum, item) => sum + Number(item.price), 0).toFixed(2),
+            payment_id: paymentDetails.id, 
+            payer_email: paymentDetails.payer.email_address,
+            date: firebase.firestore.FieldValue.serverTimestamp(), 
+            status: "Pagado",
+            productImage: productImageUrl // URL real de Cloudinary
+        };
+        
+        await db.collection("Clientes").add(purchaseData);
+        await sendDiscordNotification(purchaseData, false);
+        
+        for (const item of cart) { 
+            await createLicenseForProduct(item.id, item.name); 
+            myAssignedProductIds.add(item.id); 
+        }
+        saveUserDataLocally();
+        alert("¡Productos añadidos a tu biblioteca!\n\nSe han generado tus licencias automáticamente.");
+    } catch (error) { 
+        console.error(error); 
+        alert('Error al registrar la compra: ' + error.message); 
     }
+}
 
     function checkoutManual() {
          if (cart.length === 0) { alert('Tu carrito está vacío'); return; }
