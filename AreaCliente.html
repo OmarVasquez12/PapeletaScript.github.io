@@ -326,6 +326,150 @@
         let currentReviewProduct = null;
         let selectedRating = 0;
 
+        // =============================================
+        //          FUNCIONES AUXILIARES (VALIDACIÓN)
+        // =============================================
+
+        function validateIPPort(ipPort) {
+            if (!ipPort || typeof ipPort !== 'string') return false;
+            const parts = ipPort.trim().split(':');
+            if (parts.length !== 2) return false;
+            const ip = parts[0].trim();
+            const port = parts[1].trim();
+            const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
+            if (!ipRegex.test(ip)) return false;
+            const portNum = parseInt(port);
+            if (isNaN(portNum) || portNum < 1 || portNum > 65535) return false;
+            return true;
+        }
+
+        function parseIPPort(ipPort) {
+            const parts = ipPort.trim().split(':');
+            return { ip: parts[0].trim(), port: parts[1].trim(), full: ipPort.trim() };
+        }
+
+        // Función auxiliar para logs visuales en consola o UI si existe
+        const updateLog = (msg, isError = false) => {
+            console.log(msg); // Mantiene registro en consola
+            const logElement = document.getElementById("statusLog");
+            if (logElement) {
+                logElement.innerText = msg;
+                logElement.style.color = isError ? "var(--danger)" : "var(--success)";
+            }
+        };
+
+        // =============================================
+        //          GESTIÓN DE LICENCIAS (CRUD)
+        // =============================================
+
+        // Variables globales necesarias
+        let licensesData = [];
+        let foldersData = [];
+        let currentFolder = '';
+
+        // Escuchar cambios en tiempo real en la colección 'licencias'
+        db.collection("licencias").onSnapshot((snapshot) => {
+            licensesData = [];
+            snapshot.forEach((docSnap) => {
+                licensesData.push({ id: docSnap.id, ...docSnap.data() });
+            });
+            console.log("Licencias actualizadas en tiempo real:", licensesData.length);
+        });
+
+        // Escuchar cambios en carpetas (necesario para filtrar licencias por carpeta)
+        db.collection("carpetas").onSnapshot((snapshot) => {
+            foldersData = [];
+            snapshot.forEach((docSnap) => foldersData.push({ id: docSnap.id, ...docSnap.data() }));
+            
+            // Restaurar carpeta seleccionada si existe
+            const savedFolder = localStorage.getItem("papeleta_currentFolder");
+            if (savedFolder && foldersData.some(f => f.id === savedFolder)) {
+                currentFolder = savedFolder;
+            }
+        });
+
+        // Crear Licencia
+        window.addLicense = async (resource, ipPort, folderId) => {
+            if(!resource || !ipPort) return alert("FALTAN DATOS");
+            if (!validateIPPort(ipPort)) return alert("FORMATO IP:PUERTO INVÁLIDO");
+            
+            const parsed = parseIPPort(ipPort);
+            
+            // Generar datos únicos
+            const id = Date.now().toString();
+            const newUser = "USER_" + Math.random().toString(36).substring(2, 8).toUpperCase();
+            const newKey = Array.from({length: 24}, () => "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[Math.floor(Math.random() * 36)]).join('');
+            
+            const newLic = {
+                id, 
+                resource: resource,
+                ip: parsed.ip, 
+                port: parsed.port, 
+                IDCARPETA: folderId || currentFolder || 'general',
+                user: newUser,
+                key: newKey,
+                active: true
+            };
+            
+            try {
+                await db.collection("licencias").doc(id).set(newLic);
+                updateLog("✅ Licencia Creada");
+                return { user: newUser, key: newKey, resource: resource };
+            } catch (e) { 
+                updateLog("❌ Error: " + e.message, true); 
+                alert("Error al crear: " + e.message);
+                return null;
+            }
+        };
+
+        // Eliminar Licencia
+        window.deleteLicense = (id) => {
+            if(confirm("¿Estás seguro de eliminar esta licencia?")) {
+                db.collection("licencias").doc(id).delete()
+                    .then(() => updateLog("✅ Licencia Eliminada"))
+                    .catch(e => alert("Error: " + e.message));
+            }
+        };
+
+        // Cambiar Estado (Activo/Inactivo)
+        window.toggleStatus = async (id, currentStatus) => {
+            try {
+                await db.collection("licencias").doc(id).update({ active: !currentStatus });
+                updateLog(`Estado cambiado a ${!currentStatus ? 'ACTIVO' : 'INACTIVO'}`);
+            } catch (e) {
+                alert("Error al cambiar estado: " + e.message);
+            }
+        };
+
+        // Editar Campo Individual (IP, User, Key)
+        window.editField = (id, campo, valorActual) => {
+            let nuevoValor = prompt(`MODIFICAR ${campo.toUpperCase()} (Valor actual: ${valorActual}):`, valorActual);
+            
+            if(nuevoValor && nuevoValor !== valorActual) {
+                const valUpper = nuevoValor.trim().toUpperCase();
+                
+                if (campo === 'key') {
+                    // Verificación básica local de duplicados antes de enviar
+                    const keyExists = licensesData.some(l => l.key.toUpperCase() === valUpper && l.id !== id);
+                    if (keyExists) {
+                        return alert("ESTA KEY YA PERTENECE A OTRO SISTEMA.");
+                    }
+                }
+
+                if (campo === 'ip') {
+                    if (!validateIPPort(nuevoValor)) {
+                        return alert("Formato inválido. Debe ser IP:PUERTO");
+                    }
+                    const parsed = parseIPPort(nuevoValor);
+                    db.collection("licencias").doc(id).update({ ip: parsed.ip, port: parsed.port })
+                        .then(() => updateLog("✅ IP actualizada"));
+                } else {
+                    db.collection("licencias").doc(id).update({ [campo]: valUpper })
+                        .then(() => updateLog(`✅ ${campo.toUpperCase()} actualizado`));
+                }
+            }
+        };
+
         // --- Funciones de Utilidad ---
 
         function showToast(message, type = 'success', title = '') {
