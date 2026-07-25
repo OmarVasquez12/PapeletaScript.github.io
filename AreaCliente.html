@@ -679,12 +679,27 @@
             } catch (error) { console.error("Error licencia:", error); }
         }
 
-        function updateLicenseDisplay() {
-            const codeBlock = document.getElementById('license-code');
-            if (userFixedLicenseKey && currentUser) {
-                codeBlock.textContent = `configLicense = {\n    ["User"] = "${currentUser.username}", \n    ["Key"] = "PapeletaStore(${userFixedLicenseKey})"\n}`;
-            }
-        }
+        // REEMPLAZA updateLicenseDisplay EN AreaCliente.html POR ESTA VERSIÓN:
+function updateLicenseDisplay() {
+    const codeBlock = document.getElementById('license-code');
+    if (!currentUser) return;
+
+    // Buscamos la primera licencia activa que tenga este usuario en Firebase
+    db.collection("Licencias")
+      .where("discord_id", "==", currentUser.id)
+      .where("status", "==", "active")
+      .limit(1)
+      .get()
+      .then(snapshot => {
+          if (!snapshot.empty) {
+              const license = snapshot.docs[0].data();
+              // Mostramos la clave real generada para sus productos
+              codeBlock.textContent = `configLicense = {\n    ["User"] = "${currentUser.username}", \n    ["Key"] = "PapeletaStore(${license.key})"\n}`;
+          } else {
+              codeBlock.textContent = "No tienes licencias activas aún.";
+          }
+      });
+}
 
         async function loadDashboardData() {
             if (!currentUser) return;
