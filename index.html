@@ -10,8 +10,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.paypal.com/sdk/js?client-id=sb&currency=USD"></script>
 
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <!-- FIREBASE V10 COMPAT (NUEVA CONFIGURACIÓN) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
     <style>
         :root {
@@ -579,19 +580,118 @@
         let localProducts = JSON.parse(localStorage.getItem('papeleta_local_products') || '[]');
         let tempImages = [];
 
+        // =============================================
+        //          FIREBASE CONFIGURACIÓN Y CONEXIÓN (ACTUALIZADO)
+        // =============================================
         const firebaseConfig = {
-            apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
-            authDomain: "papeletalicencia.firebaseapp.com",
-            databaseURL: "https://papeletalicencia-default-rtdb.firebaseio.com",
-            projectId: "papeletalicencia",
-            storageBucket: "papeletalicencia.firebasestorage.app",
-            messagingSenderId: "677208314051",
-            appId: "1:677208314051:web:a27c04f31d402e83f29276",
-            measurementId: "G-RPJ4KQ6EQ4"
+            apiKey: "AIzaSyBzNb1fj_64JGMKAPkBWXXQxk9RizQUS-E",
+            authDomain: "licenciapapeleta12.firebaseapp.com",
+            projectId: "licenciapapeleta12",
+            storageBucket: "licenciapapeleta12.firebasestorage.app",
+            messagingSenderId: "467063297352",
+            appId: "1:467063297352:web:67767e0cc51f0042fa4f7d",
+            measurementId: "G-6LW8X0B2TH"
         };
 
+        // Inicializar Firebase (Usando Compat para mantener compatibilidad con el código existente)
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+
+        // =============================================
+        //          FUNCIONES AUXILIARES (VALIDACIÓN)
+        // =============================================
+
+        function validateIPPort(ipPort) {
+            if (!ipPort || typeof ipPort !== 'string') return false;
+            const parts = ipPort.trim().split(':');
+            if (parts.length !== 2) return false;
+            const ip = parts[0].trim();
+            const port = parts[1].trim();
+            const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
+            if (!ipRegex.test(ip)) return false;
+            const portNum = parseInt(port);
+            if (isNaN(portNum) || portNum < 1 || portNum > 65535) return false;
+            return true;
+        }
+
+        function parseIPPort(ipPort) {
+            const parts = ipPort.trim().split(':');
+            return { ip: parts[0].trim(), port: parts[1].trim(), full: ipPort.trim() };
+        }
+
+        // Función auxiliar para logs visuales en consola o UI si existe
+        const updateLog = (msg, isError = false) => {
+            console.log(msg); // Mantiene registro en consola
+            const logElement = document.getElementById("statusLog");
+            if (logElement) {
+                logElement.innerText = msg;
+                logElement.style.color = isError ? "var(--danger)" : "var(--success)";
+            }
+        };
+
+        // =============================================
+        //          GESTIÓN DE LICENCIAS (CRUD)
+        // =============================================
+
+        // Escuchar cambios en tiempo real en la colección 'licencias'
+        // Nota: Esto se ejecutará automáticamente cuando Firebase se conecte
+        db.collection("licencias").onSnapshot((snapshot) => {
+            // Aquí podrías actualizar una variable global si la necesitas en otras partes
+            console.log("Licencias actualizadas en tiempo real:", snapshot.size);
+        });
+
+        // Crear Licencia (Función Global para ser usada desde otros archivos si es necesario)
+        window.addLicense = async (resource, ipPort, folderId) => {
+            if(!resource || !ipPort) return alert("FALTAN DATOS");
+            if (!validateIPPort(ipPort)) return alert("FORMATO IP:PUERTO INVÁLIDO");
+            
+            const parsed = parseIPPort(ipPort);
+            
+            // Generar datos únicos
+            const id = Date.now().toString();
+            const newUser = "USER_" + Math.random().toString(36).substring(2, 8).toUpperCase();
+            const newKey = Array.from({length: 24}, () => "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[Math.floor(Math.random() * 36)]).join('');
+            
+            const newLic = {
+                id, 
+                resource: resource,
+                ip: parsed.ip, 
+                port: parsed.port, 
+                IDCARPETA: folderId || 'general',
+                user: newUser,
+                key: newKey,
+                active: true
+            };
+            
+            try {
+                await db.collection("licencias").doc(id).set(newLic);
+                updateLog("✅ Licencia Creada");
+                return { user: newUser, key: newKey, resource: resource };
+            } catch (e) { 
+                updateLog("❌ Error: " + e.message, true); 
+                alert("Error al crear: " + e.message);
+                return null;
+            }
+        };
+
+        // Eliminar Licencia
+        window.deleteLicense = (id) => {
+            if(confirm("¿Estás seguro de eliminar esta licencia?")) {
+                db.collection("licencias").doc(id).delete()
+                    .then(() => updateLog("✅ Licencia Eliminada"))
+                    .catch(e => alert("Error: " + e.message));
+            }
+        };
+
+        // Cambiar Estado (Activo/Inactivo)
+        window.toggleStatus = async (id, currentStatus) => {
+            try {
+                await db.collection("licencias").doc(id).update({ active: !currentStatus });
+                updateLog(`Estado cambiado a ${!currentStatus ? 'ACTIVO' : 'INACTIVO'}`);
+            } catch (e) {
+                alert("Error al cambiar estado: " + e.message);
+            }
+        };
 
         // --- FUNCIONES PANEL DE USUARIO (CLIENTE) ---
         function toggleUserPanel() {
