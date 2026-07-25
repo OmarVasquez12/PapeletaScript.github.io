@@ -551,9 +551,10 @@ end, true, "high")`;
                 
                 if (!existingReview.empty) { showToast('Ya has dejado una reseña para este producto', 'error'); closeReviewModal(); return; }
                 
-                // Obtener nombre del producto para el embed
+                // Obtener datos del producto para el embed
                 const product = allProducts.find(p => String(p.id) === String(currentReviewProduct) || String(p.docId) === String(currentReviewProduct));
                 const productName = product ? product.name : 'Producto General';
+                const productImage = product && product.image_url ? product.image_url : null;
 
                 // 1. Guardar en Firebase
                 await db.collection("Resenas").add({
@@ -567,8 +568,8 @@ end, true, "high")`;
                     visible_to: 'admin'
                 });
                 
-                // 2. ENVIAR AL WEBHOOK DE DISCORD CON DISEÑO PERSONALIZADO
-                sendReviewToWebhook(productName, reviewText, selectedRating);
+                // 2. ENVIAR AL WEBHOOK DE DISCORD CON DISEÑO PERSONALIZADO (IMAGEN GRANDE ABAJO)
+                sendReviewToWebhook(productName, reviewText, selectedRating, productImage);
 
                 showToast('¡Reseña enviada exitosamente!', 'success');
                 closeReviewModal();
@@ -579,16 +580,14 @@ end, true, "high")`;
             }
         }
 
-        // FUNCIÓN PARA ENVIAR EL EMBED PERSONALIZADO A DISCORD
-        async function sendReviewToWebhook(productName, reviewText, rating) {
+        // FUNCIÓN PARA ENVIAR EL EMBED ESTILO PIXEL RESOURCES
+        async function sendReviewToWebhook(productName, reviewText, rating, imageUrl) {
             try {
-                // Generar string de estrellas visuales
                 const starsString = "★".repeat(rating) + "☆".repeat(5 - rating);
                 
-                // Construir el payload del webhook
                 const payload = {
-                    username: "Papeleta Store | Reseñas",
-                    avatar_url: currentUser.avatar ? `https://cdn.discordapp.com/avatars/${currentUser.id}/${currentUser.avatar}.png` : undefined,
+                    username: "Papeleta Store | Reseñas", // Nombre del Bot
+                    avatar_url: "https://cdn-icons-png.flaticon.com/512/2504/2504938.png", // Icono por defecto o logo de tu tienda
                     embeds: [
                         {
                             title: "✨ Nueva Valoración Recibida",
@@ -596,7 +595,7 @@ end, true, "high")`;
                             color: 16711680, // Color Rojo (0xFF1A1A)
                             fields: [
                                 {
-                                    name: "📦 Producto",
+                                    name: " Producto",
                                     value: `\`${productName}\``,
                                     inline: true
                                 },
@@ -613,14 +612,18 @@ end, true, "high")`;
                             ],
                             footer: {
                                 text: "Papeleta Store • Sistema de Reseñas",
-                                icon_url: "https://papeleta-script-github-io.vercel.app/favicon.ico"
+                                icon_url: "https://papeleta-script-github-io.vercel.app/favicon.ico" // Logo pequeño en el footer
                             },
                             timestamp: new Date().toISOString()
                         }
                     ]
                 };
 
-                // Enviar petición POST al webhook
+                // Si hay imagen del producto, la añadimos grande al final del embed
+                if (imageUrl) {
+                    payload.embeds[0].image = { url: imageUrl };
+                }
+
                 await fetch(DISCORD_WEBHOOK_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -766,14 +769,13 @@ end, true, "high")`;
                         const hasReview = reviewedProductIds.has(String(item.id)) || reviewedProductIds.has(String(item.docId));
                         const safeName = item.name.replace(/'/g, "\\'");
                         
-                        // Lógica para mostrar REGALADO y color BLANCO
                         let priceDisplay = '$' + Number(item.price).toFixed(2);
-                        let priceClass = 'text-white font-bold'; // Color blanco por defecto
+                        let priceClass = 'text-white font-bold';
                         
                         const rawPrice = String(item.price).toLowerCase();
                         if (rawPrice === 'gratis' || rawPrice === 'regalado' || item.price == 0 || isNaN(parseFloat(item.price))) {
                             priceDisplay = 'REGALADO';
-                            priceClass = 'text-white font-bold'; // Asegurar blanco puro
+                            priceClass = 'text-white font-bold';
                         }
 
                         return `<div class="bg-[#0d0505] border border-red-900/30 rounded-xl p-4 flex items-center justify-between hover:border-red-600/50 transition-all">
