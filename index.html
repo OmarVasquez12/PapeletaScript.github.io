@@ -22,7 +22,14 @@
             --text-dim: #6b7280;
             --border-color: rgba(255, 26, 26, 0.15);
         }
-        body { background-color: #050507; color: #f3f4f6; font-family: 'Segoe UI', system-ui, sans-serif; }
+        
+        body {
+            background-color: #050507;
+            color: #f3f4f6;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        /* --- SCROLLBAR PERSONALIZADO --- */
         ::-webkit-scrollbar { width: 10px; }
         ::-webkit-scrollbar-track { background: #111111; }
         ::-webkit-scrollbar-thumb { background: #6e6e6e; border-radius: 5px; border: 2px solid #111111; }
@@ -30,14 +37,23 @@
         .custom-scrollbar::-webkit-scrollbar { width: 8px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #1a1a1a; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #6e6e6e; border-radius: 4px; }
+        
         .red-glow { text-shadow: 0 0 18px rgba(255, 26, 26, 0.85), 0 0 36px rgba(204, 27, 27, 0.4); }
         .red-border { border-color: rgba(255, 26, 26, 0.25); }
+        
         #network-bg { position: fixed; inset: 0; z-index: 0; opacity: 0.5; pointer-events: none; }
         .page { display: none; }
         .page.active { display: block; }
         .nav-link.active-page { color: #ff6b6b; }
-        .cart-badge { position: absolute; top: -8px; right: -8px; background: #ff1a1a; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; animation: bounce 0.3s ease; }
+        
+        .cart-badge {
+            position: absolute; top: -8px; right: -8px;
+            background: #ff1a1a; color: white; border-radius: 50%;
+            width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: bold; animation: bounce 0.3s ease;
+        }
         @keyframes bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+
         .product-detail-modal { backdrop-filter: blur(10px); }
         .gallery-main-image { width: 100%; height: 400px; object-fit: contain; border-radius: 16px; background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(153, 27, 27, 0.1)); }
         .gallery-thumbnails { display: flex; gap: 10px; margin-top: 15px; overflow-x: auto; padding: 5px; }
@@ -47,10 +63,13 @@
         .gallery-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(220, 38, 38, 0.8); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
         .gallery-nav.prev { left: 10px; }
         .gallery-nav.next { right: 10px; }
+
         .multiple-preview-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 15px; }
         .preview-item { position: relative; border-radius: 8px; overflow: hidden; border: 2px solid rgba(220, 38, 38, 0.3); }
         .preview-item img { width: 100%; height: 150px; object-fit: cover; }
         .preview-item .remove-btn { position: absolute; top: 5px; right: 5px; background: rgba(220, 38, 38, 0.9); color: white; border: none; width: 25px; height: 25px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+
+        /* ESTILOS PANEL CONFIGURACIÓN */
         .config-panel-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
         .config-panel-overlay.active { opacity: 1; pointer-events: auto; }
         .config-panel { position: fixed; top: 0; right: -400px; width: 350px; height: 100vh; background: linear-gradient(180deg, #150a0a 0%, #0a0505 100%); border-left: 1px solid rgba(255, 26, 26, 0.3); box-shadow: -10px 0 40px rgba(0,0,0,0.8); z-index: 101; transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 24px; overflow-y: auto; }
@@ -60,6 +79,8 @@
         .config-menu-icon { width: 36px; height: 36px; border-radius: 8px; background: rgba(255, 26, 26, 0.1); color: #ff1a1a; display: flex; align-items: center; justify-content: center; font-size: 16px; }
         .config-menu-text h4 { margin: 0; font-size: 14px; font-weight: 700; color: #fff; }
         .config-menu-text p { margin: 2px 0 0; font-size: 11px; color: #9496a1; }
+
+        /* ESTILOS PANEL DE USUARIO (CLIENTE) */
         .user-panel-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
         .user-panel-overlay.active { opacity: 1; pointer-events: auto; }
         .user-panel { position: fixed; top: 0; left: -400px; width: 350px; height: 100vh; background: linear-gradient(180deg, #150a0a 0%, #0a0505 100%); border-right: 1px solid rgba(255, 26, 26, 0.3); box-shadow: 10px 0 40px rgba(0,0,0,0.8); z-index: 101; transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 24px; overflow-y: auto; }
@@ -77,18 +98,102 @@
         .user-panel-footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); }
         .logout-btn { width: 100%; padding: 12px; background: rgba(255, 26, 26, 0.15); border: 1px solid rgba(255, 26, 26, 0.4); color: #ff1a1a; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .logout-btn:hover { background: rgba(255, 26, 26, 0.25); transform: translateY(-2px); }
-        .reviews-section { padding: 80px 0; position: relative; overflow: hidden; width: 100vw; margin-left: calc(50% - 50vw); background: linear-gradient(to bottom, transparent, rgba(20, 10, 10, 0.4), transparent); }
-        .reviews-container { max-width: 7xl; margin: 0 auto; position: relative; padding: 0 20px; }
-        .reviews-title { text-align: center; margin-bottom: 50px; position: relative; z-index: 10; background: linear-gradient(to right, transparent 0%, #050507 15%, #050507 85%, transparent 100%); padding: 10px 0; }
-        .reviews-title h2 { font-size: 2.5rem; font-weight: 900; color: white; margin-bottom: 15px; }
-        .reviews-title h2 span { color: var(--primary); text-shadow: 0 0 20px rgba(255, 26, 26, 0.5); }
-        .reviews-title p { color: var(--text-muted); font-size: 1.1rem; }
-        .reviews-slider-wrapper { position: relative; width: 100%; overflow: hidden; -webkit-mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%); mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%); padding: 20px 0; }
-        .reviews-slider { display: flex; gap: 25px; width: max-content; animation: scroll-infinite 40s linear infinite; }
-        .reviews-slider:hover { animation-play-state: paused; }
-        @keyframes scroll-infinite { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-        .review-card-slide { min-width: 350px; max-width: 350px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 30px; display: flex; flex-direction: column; justify-content: space-between; backdrop-filter: blur(10px); transition: transform 0.3s ease, border-color 0.3s ease; }
-        .review-card-slide:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 30px rgba(255, 26, 26, 0.1); }
+
+        /* --- NUEVOS ESTILOS PARA SECCIÓN DE RESEÑAS (OVERLAP EFFECT) --- */
+        .reviews-section {
+            padding: 80px 0;
+            position: relative;
+            overflow: hidden;
+            width: 100vw;
+            margin-left: calc(50% - 50vw);
+            background: linear-gradient(to bottom, transparent, rgba(20, 10, 10, 0.4), transparent);
+        }
+
+        /* Contenedor principal que alinea todo */
+        .reviews-container {
+            max-width: 7xl; /* Mismo ancho que el título */
+            margin: 0 auto;
+            position: relative;
+            padding: 0 20px;
+        }
+
+        /* El título flota ENCIMA del slider */
+        .reviews-title {
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+            z-index: 10; /* Mayor que el slider */
+            /* Opcional: Añadir un pequeño gradiente detrás del texto para asegurar legibilidad si las tarjetas pasan muy cerca */
+            background: linear-gradient(to right, transparent 0%, #050507 15%, #050507 85%, transparent 100%);
+            padding: 10px 0;
+        }
+        
+        .reviews-title h2 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 15px;
+        }
+        
+        .reviews-title h2 span {
+            color: var(--primary);
+            text-shadow: 0 0 20px rgba(255, 26, 26, 0.5);
+        }
+        
+        .reviews-title p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* Wrapper del slider con la máscara de desvanecimiento */
+        .reviews-slider-wrapper {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            /* La máscara crea el efecto fade en los bordes */
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
+            mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
+            padding: 20px 0; /* Espacio para sombras */
+        }
+
+        /* Slider Infinito */
+        .reviews-slider {
+            display: flex;
+            gap: 25px;
+            width: max-content; 
+            animation: scroll-infinite 40s linear infinite;
+        }
+
+        /* Pausar animación al pasar el mouse */
+        .reviews-slider:hover {
+            animation-play-state: paused;
+        }
+
+        @keyframes scroll-infinite {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .review-card-slide {
+            min-width: 350px;
+            max-width: 350px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .review-card-slide:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(255, 26, 26, 0.1);
+        }
+
         .review-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
         .review-avatar { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; }
         .review-user-info h4 { color: white; font-weight: 700; font-size: 1.1rem; margin: 0; }
@@ -100,6 +205,7 @@
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-gradient-to-b from-[#150a0a] to-[#0a0505] relative">
+
     <canvas id="network-bg"></canvas>
 
     <!-- LOGIN MODAL -->
@@ -112,6 +218,7 @@
             <button onclick="redirectToDiscord()" class="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-3.5 px-6 rounded-xl flex items-center justify-center gap-3 transition-all duration-200 shadow-lg transform hover:scale-[1.02]">
                 <i class="fab fa-discord text-xl"></i> Iniciar Sesión con Discord
             </button>
+            <p class="text-gray-500 text-xs mt-4">Tus datos están seguros. Solo usamos tu ID para asignarte los productos.</p>
         </div>
     </div>
 
@@ -127,6 +234,7 @@
                 <div id="cart-empty" class="hidden text-center py-12">
                     <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-[#0d0505] flex items-center justify-center"><i class="fas fa-shopping-cart text-gray-600 text-3xl"></i></div>
                     <p class="text-gray-400 mb-2">Tu carrito está vacío</p>
+                    <p class="text-gray-500 text-sm">Agrega productos para comenzar</p>
                 </div>
             </div>
             <div class="border-t border-red-900/50 p-4 bg-[#0d0505]/50 rounded-b-2xl shrink-0">
@@ -149,7 +257,9 @@
     <div id="product-detail-modal" class="hidden fixed inset-0 bg-black/90 z-[90] overflow-y-auto product-detail-modal">
         <div class="min-h-screen px-4 py-8">
             <div class="max-w-6xl mx-auto">
-                <button onclick="closeProductDetailModal()" class="mb-6 text-gray-400 hover:text-white flex items-center gap-2 transition-colors"><i class="fas fa-arrow-left"></i> Volver a la Tienda</button>
+                <button onclick="closeProductDetailModal()" class="mb-6 text-gray-400 hover:text-white flex items-center gap-2 transition-colors">
+                    <i class="fas fa-arrow-left"></i> Volver a la Tienda
+                </button>
                 <div class="grid md:grid-cols-2 gap-8 mb-8">
                     <div class="bg-[#150a0a] border border-red-900/50 rounded-2xl p-6 relative overflow-hidden">
                         <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-red-600/20 to-transparent"></div>
@@ -173,7 +283,10 @@
                             <h1 id="detail-title" class="text-4xl md:text-5xl font-black text-white mb-4"></h1>
                             <div class="flex items-baseline gap-4 mb-4">
                                 <span id="detail-price" class="text-5xl font-black text-white"></span>
-                                <div class="text-gray-400 text-sm max-w-xs"><p>Pago único, acceso de por vida</p></div>
+                                <div class="text-gray-400 text-sm max-w-xs">
+                                    <p>Pago único, acceso de por vida</p>
+                                    <p class="text-xs text-gray-500">(+ comisión PayPal calc. en botón de pago)</p>
+                                </div>
                             </div>
                         </div>
                         <div class="space-y-3">
@@ -187,12 +300,16 @@
                 <div class="bg-[#150a0a] border border-red-900/50 rounded-2xl p-6 md:p-8">
                     <div class="flex items-center gap-3 mb-6"><i class="fas fa-list-ul text-red-500 text-2xl"></i><h2 class="text-2xl font-bold text-white">Descripción del Producto</h2></div>
                     <div id="detail-description" class="text-gray-300 space-y-4 leading-relaxed"></div>
+                    <div class="mt-8 pt-8 border-t border-red-900/50">
+                        <h3 class="text-xl font-bold text-white mb-4">Incluye:</h3>
+                        <div id="detail-features" class="grid md:grid-cols-2 gap-3"></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- PANEL DE USUARIO -->
+    <!-- PANEL DE USUARIO (CLIENTE) - LATERAL IZQUIERDO -->
     <div id="user-panel-overlay" class="user-panel-overlay" onclick="toggleUserPanel()"></div>
     <aside id="user-panel" class="user-panel">
         <div class="user-panel-header">
@@ -200,6 +317,7 @@
             <h2 id="panel-user-name" class="user-panel-name">Usuario</h2>
             <span id="panel-user-role" class="user-panel-role">CLIENTE</span>
         </div>
+        
         <div class="space-y-2">
             <a href="AreaCliente.html" class="user-menu-item">
                 <div class="user-menu-icon"><i class="fas fa-box"></i></div>
@@ -213,13 +331,56 @@
                 <div class="user-menu-icon"><i class="fas fa-shopping-cart"></i></div>
                 <div class="user-menu-text"><h4>Carrito</h4><p>Ver mi carrito de compras</p></div>
             </a>
+            
+            <!-- BOTÓN CONFIG - SOLO PARA ADMINS -->
             <a href="Admin.html" id="user-panel-config-btn" class="user-menu-item hidden" style="display: none;">
                 <div class="user-menu-icon"><i class="fas fa-cog"></i></div>
                 <div class="user-menu-text"><h4>Config</h4><p>Panel de Administrador</p></div>
             </a>
         </div>
+
         <div class="user-panel-footer">
-            <button onclick="logout()" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button>
+            <button onclick="logout()" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+            </button>
+        </div>
+    </aside>
+
+    <!-- PANEL DE CONFIGURACIÓN LATERAL (ADMIN) -->
+    <div id="config-overlay" class="config-panel-overlay" onclick="toggleConfigPanel()"></div>
+    <aside id="config-panel" class="config-panel">
+        <div class="flex justify-between items-center mb-6 pb-4 border-b border-white/10">
+            <h2 class="text-xl font-black text-white flex items-center gap-2"><i class="fas fa-cog text-red-500"></i> CONFIGURACIÓN</h2>
+            <button onclick="toggleConfigPanel()" class="text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+        </div>
+        <div class="space-y-2">
+            <a href="SubirProducto.html" class="config-menu-item">
+                <div class="config-menu-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                <div class="config-menu-text"><h4>Subir Producto</h4><p>Agregar nuevos recursos a la tienda</p></div>
+            </a>
+            <a href="LicenciaUsuario.html" class="config-menu-item">
+                <div class="config-menu-icon"><i class="fas fa-key"></i></div>
+                <div class="config-menu-text"><h4>Licencias Usuario</h4><p>Ver historial de compras y reclamos</p></div>
+            </a>
+            <a href="Encriptar.html" class="config-menu-item">
+                <div class="config-menu-icon"><i class="fas fa-lock"></i></div>
+                <div class="config-menu-text"><h4>Encriptar Script</h4><p>Proteger archivos Lua de MTA:SA</p></div>
+            </a>
+            <div class="config-menu-item" onclick="openAssignProductModal()">
+                <div class="config-menu-icon"><i class="fas fa-user-plus"></i></div>
+                <div class="config-menu-text"><h4>Pasar a Usuarios</h4><p>Asignar productos gratis manualmente</p></div>
+            </div>
+            <a href="UsuariosAutorizado.html" class="config-menu-item">
+                <div class="config-menu-icon"><i class="fas fa-users-cog"></i></div>
+                <div class="config-menu-text"><h4>Usuarios Autorizados</h4><p>Gestionar roles Admin y Mod</p></div>
+            </a>
+            <a href="CrearRol.html" class="config-menu-item">
+                <div class="config-menu-icon"><i class="fas fa-id-badge"></i></div>
+                <div class="config-menu-text"><h4>Crear Rol</h4><p>Definir permisos personalizados</p></div>
+            </a>
+        </div>
+        <div class="mt-8 pt-6 border-t border-white/10 text-center">
+            <p class="text-xs text-gray-500">Panel exclusivo para staff</p>
         </div>
     </aside>
 
@@ -230,28 +391,35 @@
                 <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-red-500 to-red-800 flex items-center justify-center font-black">P</div>
                 <span class="text-white font-black tracking-widest text-lg">PAPELETA <span class="text-red-400">STORE</span></span>
             </div>
+
             <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-gray-300">
                 <a href="#" onclick="showPage('inicio')" data-page="inicio" class="nav-link hover:text-red-400 transition-colors">Inicio</a>
                 <a href="#" onclick="showPage('productos')" data-page="productos" class="nav-link hover:text-red-400 transition-colors">Productos</a>
                 <a href="#" onclick="showPage('preguntas')" data-page="preguntas" class="nav-link hover:text-red-400 transition-colors">Preguntas</a>
             </nav>
+
             <div class="flex items-center gap-3">
                 <button onclick="openCartModal()" class="relative bg-[#150a0a] hover:bg-[#1a0a0a] border border-red-900/50 w-10 h-10 rounded-full flex items-center justify-center transition-all group">
                     <i class="fas fa-shopping-cart text-gray-300 group-hover:text-white transition-colors"></i>
                     <span id="cart-count" class="cart-badge hidden">0</span>
                 </button>
+                
                 <button id="logout-btn" onclick="logout()" class="hidden bg-[#150a0a] hover:bg-[#1a0a0a] border border-red-900/50 text-red-400 hover:text-red-300 px-4 py-2 rounded-lg flex items-center gap-2 transition-all text-sm font-semibold">
                     <i class="fas fa-sign-out-alt"></i> <span class="hidden sm:inline">Salir</span>
                 </button>
+                
                 <button id="login-btn" onclick="openLoginModal()" class="bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-2 px-5 rounded-lg flex items-center gap-2 transition-all text-sm shadow-lg shadow-blue-900/20">
                     <i class="fab fa-discord"></i> Acceder
                 </button>
+                
+                <!-- SECCIÓN DE USUARIO - AHORA ABRE EL PANEL LATERAL -->
                 <div id="user-section" class="hidden flex items-center gap-3 bg-[#150a0a] px-3 py-1.5 rounded-full border border-red-900/50 cursor-pointer hover:border-red-600 transition-all group" onclick="toggleUserPanel()">
                     <img id="user-avatar" src="" alt="Avatar" class="w-8 h-8 rounded-full border border-red-500 group-hover:border-red-400 transition-colors">
                     <div class="flex flex-col items-start leading-none">
                         <span id="user-name" class="text-white font-semibold text-sm pr-2 group-hover:text-red-300 transition-colors">...</span>
                         <span id="user-role-badge" class="text-[10px] text-green-400 font-bold uppercase tracking-wider">Cliente</span>
                     </div>
+                    <i class="fas fa-external-link-alt text-gray-500 text-xs group-hover:text-red-400 transition-colors"></i>
                 </div>
             </div>
         </header>
@@ -260,16 +428,36 @@
             <div class="grid md:grid-cols-2 gap-10 items-center">
                 <div>
                     <h2 class="text-4xl md:text-5xl font-black text-white uppercase tracking-tight mb-4">PAPELETA <span class="text-red-400 red-glow">STORE</span></h2>
-                    <p class="text-gray-300 text-sm md:text-base mb-8">LA TIENDA DE SCRIPTS QUE LLEVA TU SERVIDOR AL SIGUIENTE NIVEL</p>
+                    <p class="text-gray-300 text-sm md:text-base mb-8">PAPELETA STORE — LA TIENDA DE SCRIPTS QUE LLEVA TU SERVIDOR AL SIGUIENTE NIVEL</p>
                     <div class="flex flex-col sm:flex-row gap-4">
-                        <button onclick="showPage('productos')" class="bg-red-600 hover:bg-red-700 text-white font-black px-8 py-4 rounded-xl shadow-lg shadow-red-600/20 transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2 uppercase tracking-wider">Ver Recursos <i class="fas fa-arrow-right text-xs"></i></button>
-                        <a href="https://discord.gg/rvxEdWcGkf" target="_blank" class="bg-[#150a0a] border border-red-800/40 hover:border-red-500 text-white font-bold px-8 py-4 rounded-xl transition-all flex items-center justify-center gap-2"><i class="fab fa-discord"></i> Discord</a>
+                        <button onclick="showPage('productos')" class="bg-red-600 hover:bg-red-700 text-white font-black px-8 py-4 rounded-xl shadow-lg shadow-red-600/20 transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2 uppercase tracking-wider">
+                            Ver Recursos <i class="fas fa-arrow-right text-xs"></i>
+                        </button>
+                        <a href="#" id="discord-invite-link" target="_blank" class="bg-[#150a0a] border border-red-800/40 hover:border-red-500 text-white font-bold px-8 py-4 rounded-xl transition-all flex items-center justify-center gap-2">
+                            <i class="fab fa-discord"></i> Discord
+                        </a>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-10">
-                        <div class="bg-[#150a0a] border border-red-950/40 rounded-2xl p-4 text-center"><i class="fas fa-user-check text-red-400 text-xl mb-2"></i><p id="stat-usuarios" class="text-2xl font-black text-white">+1</p><p class="text-xs text-gray-400 uppercase">Usuarios</p></div>
-                        <div class="bg-[#150a0a] border border-red-950/40 rounded-2xl p-4 text-center"><i class="fas fa-users text-red-400 text-xl mb-2"></i><p id="stat-clientes" class="text-2xl font-black text-white">+0</p><p class="text-xs text-gray-400 uppercase">Clientes</p></div>
-                        <div class="bg-[#150a0a] border border-red-950/40 rounded-2xl p-4 text-center"><i class="fas fa-box text-red-400 text-xl mb-2"></i><p id="stat-productos" class="text-2xl font-black text-white">+0</p><p class="text-xs text-gray-400 uppercase">Productos</p></div>
-                        <div class="bg-[#150a0a] border border-red-950/40 rounded-2xl p-4 text-center"><i class="fas fa-shopping-cart text-red-400 text-xl mb-2"></i><p id="stat-ventas" class="text-2xl font-black text-white">+0</p><p class="text-xs text-gray-400 uppercase">Ventas</p></div>
+                        <div class="bg-[#150a0a] border border-red-950/40 rounded-2xl p-4 text-center">
+                            <i class="fas fa-user-check text-red-400 text-xl mb-2"></i>
+                            <p id="stat-usuarios" class="text-2xl font-black text-white">+1</p>
+                            <p class="text-xs text-gray-400 uppercase">Usuarios Registrados</p>
+                        </div>
+                        <div class="bg-[#150a0a] border border-red-950/40 rounded-2xl p-4 text-center">
+                            <i class="fas fa-users text-red-400 text-xl mb-2"></i>
+                            <p id="stat-clientes" class="text-2xl font-black text-white">+0</p>
+                            <p class="text-xs text-gray-400 uppercase">Clientes</p>
+                        </div>
+                        <div class="bg-[#150a0a] border border-red-950/40 rounded-2xl p-4 text-center">
+                            <i class="fas fa-box text-red-400 text-xl mb-2"></i>
+                            <p id="stat-productos" class="text-2xl font-black text-white">+0</p>
+                            <p class="text-xs text-gray-400 uppercase">Productos</p>
+                        </div>
+                        <div class="bg-[#150a0a] border border-red-950/40 rounded-2xl p-4 text-center">
+                            <i class="fas fa-shopping-cart text-red-400 text-xl mb-2"></i>
+                            <p id="stat-ventas" class="text-2xl font-black text-white">+0</p>
+                            <p class="text-xs text-gray-400 uppercase">Ventas</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -277,14 +465,18 @@
 
         <section id="page-productos" class="page max-w-6xl w-full mx-auto px-6 py-12">
             <h2 class="text-3xl md:text-4xl font-black text-white uppercase tracking-tight mb-2 text-center md:text-left">Productos <span class="text-red-400">Premium</span></h2>
+            <p class="text-gray-400 text-sm mb-8 text-center md:text-left">Descubre nuestra selección de productos de alta calidad para tu servidor.</p>
+
             <div class="flex flex-col md:flex-row gap-3 mb-6">
                 <div id="category-filters" class="flex flex-wrap gap-2">
-                    <button onclick="filterCategory('all')" class="cat-btn bg-red-600 text-white text-sm font-semibold px-4 py-2 rounded-full" data-cat="all"><i class="fas fa-th-large mr-1"></i> Todas</button>
+                    <button onclick="filterCategory('all')" class="cat-btn bg-red-600 text-white text-sm font-semibold px-4 py-2 rounded-full" data-cat="all"><i class="fas fa-th-large mr-1"></i> Todas las Categorías</button>
                 </div>
             </div>
-            <input id="search-input" oninput="renderProducts()" type="text" placeholder="Buscar productos..." class="w-full bg-[#150a0a] border border-red-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 mb-8 focus:outline-none focus:border-red-500">
+
+            <input id="search-input" oninput="renderProducts()" type="text" placeholder="Pesquisar productos..." class="w-full bg-[#150a0a] border border-red-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 mb-8 focus:outline-none focus:border-red-500">
+
             <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <p class="text-gray-500 text-sm col-span-full text-center py-10"><i class="fas fa-spinner animate-spin text-red-500 mr-2"></i>Cargando...</p>
+                <p class="text-gray-500 text-sm col-span-full text-center py-10"><i class="fas fa-spinner animate-spin text-red-500 mr-2"></i>Cargando productos...</p>
             </div>
         </section>
 
@@ -293,18 +485,51 @@
             <div class="space-y-4">
                 <div class="bg-[#150a0a] border border-red-950/40 rounded-2xl p-5">
                     <h3 class="text-white font-bold mb-2"><i class="fas fa-circle-question text-red-400 mr-2"></i>¿Cómo compro un producto?</h3>
-                    <p class="text-gray-400 text-sm">Agrega productos al carrito y completa tu pago de forma segura con PayPal. Una vez confirmado, recibirás acceso inmediato.</p>
+                    <p class="text-gray-400 text-sm">Agrega productos al carrito y completa tu pago de forma segura con PayPal. Una vez confirmado, recibirás acceso inmediato y el rol de Cliente.</p>
+                </div>
+                <div class="bg-[#150a0a] border border-red-950/40 rounded-2xl p-5">
+                    <h3 class="text-white font-bold mb-2"><i class="fas fa-circle-question text-red-400 mr-2"></i>¿Recibo soporte tras la compra?</h3>
+                    <p class="text-gray-400 text-sm">Sí, todos los productos incluyen soporte de instalación a través de nuestro Discord.</p>
                 </div>
             </div>
         </section>
 
+        <!-- SECCIÓN ADMIN OCULTA POR DEFECTO -->
+        <section id="page-admin" class="page max-w-3xl w-full mx-auto px-6 py-12">
+            <h2 class="text-3xl font-black text-white uppercase tracking-tight mb-8 flex items-center gap-3"><i class="fas fa-user-shield text-red-400"></i> Panel de Admin (Legacy)</h2>
+            <div id="admin-upload-section" class="bg-[#150a0a] border border-red-950/40 rounded-2xl p-6 mb-6">
+                <h3 class="text-white font-bold mb-4 flex items-center gap-2"><i class="fas fa-plus-circle text-red-400"></i> Agregar Nuevo Producto</h3>
+                <form id="product-form" onsubmit="handleProductSubmit(event)" class="space-y-4">
+                    <div><label class="block text-gray-300 text-sm font-semibold mb-2">Nombre del Producto *</label><input type="text" id="prod-name" required class="w-full bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500" placeholder="Ej: Script de Admin"></div>
+                    <div><label class="block text-gray-300 text-sm font-semibold mb-2">Precio (USD) *</label><input type="number" id="prod-price" required step="0.01" min="0" class="w-full bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500" placeholder="10.00"></div>
+                    <div><label class="block text-gray-300 text-sm font-semibold mb-2">Categoría</label><select id="prod-category" class="w-full bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-500"><option value="Scripts">Scripts</option><option value="Modelajes">Modelajes</option><option value="Mappings">Mappings</option><option value="Webs">Sitios Web</option><option value="Bots">Bots Discord</option><option value="Otros">Otros</option></select></div>
+                    <div><label class="block text-gray-300 text-sm font-semibold mb-2">Descripción/Detalle *</label><textarea id="prod-description" required rows="4" class="w-full bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500" placeholder="Describe las características del producto..."></textarea></div>
+                    <div><label class="block text-gray-300 text-sm font-semibold mb-2">Fotos del Producto (Múltiples) *</label><div class="border-2 border-dashed border-red-900/40 rounded-xl p-4 text-center hover:border-red-500/50 transition-colors"><input type="file" id="prod-images" accept="image/*" multiple required onchange="previewMultipleImages(this)" class="hidden"><label for="prod-images" class="cursor-pointer block"><i class="fas fa-cloud-upload-alt text-3xl text-red-400 mb-2"></i><p class="text-gray-400 text-sm">Haz clic para subir imágenes</p><p class="text-gray-500 text-xs mt-1">Puedes seleccionar varias imágenes a la vez (máx. 800x600)</p></label><div id="multiple-images-preview" class="multiple-preview-container"></div></div></div>
+                    <div><label class="block text-gray-300 text-sm font-semibold mb-2">Archivo del Producto (Zip/Rar/Lua) *</label><div class="border-2 border-dashed border-red-900/40 rounded-xl p-4 text-center hover:border-red-500/50 transition-colors bg-[#0d0505]"><input type="file" id="prod-file" accept=".zip,.rar,.7z,.lua,.txt" required onchange="updateFileName(this)" class="hidden"><label for="prod-file" class="cursor-pointer block"><i class="fas fa-file-archive text-3xl text-red-400 mb-2"></i><p id="file-label-text" class="text-gray-400 text-sm">Haz clic para subir el archivo descargable</p><p class="text-gray-500 text-xs mt-1">El usuario podrá descargar este archivo tras comprarlo</p></label></div></div>
+                    <button type="submit" class="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-red-900/30"><i class="fas fa-plus"></i> Agregar Producto</button>
+                </form>
+                <div class="mt-6 pt-6 border-t border-red-950/40">
+                    <h4 class="text-white font-semibold mb-3 text-sm">Productos Agregados (Firebase):</h4>
+                    <div id="admin-products-list" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar"><p class="text-gray-500 text-sm">Cargando productos...</p></div>
+                </div>
+            </div>
+            <div id="admin-users-section" class="bg-[#150a0a] border border-red-950/40 rounded-2xl p-6">
+                <h3 class="text-white font-bold mb-4"><i class="fas fa-users text-red-400 mr-2"></i>Usuarios Locales</h3>
+                <div id="admin-users-list" class="space-y-2 max-h-96 overflow-y-auto custom-scrollbar"><p class="text-gray-500 text-sm">La lista de usuarios se gestiona localmente en este navegador.</p></div>
+            </div>
+        </section>
+
+        <!-- CONTENEDOR DE RESEÑAS (SOLO INICIO) -->
         <div id="reviews-section-container">
             <section class="reviews-section">
                 <div class="reviews-container">
+                    <!-- TÍTULO FLOTANTE (ENCIMA DEL SLIDER) -->
                     <div class="reviews-title">
                         <h2>LA VOZ DE QUIENES CONFIAN EN <span> NOSOTROS</span></h2>
                         <p>No lo decimos nosotros. Lo dicen quienes ya confían en nuestros scripts</p>
                     </div>
+                    
+                    <!-- WRAPPER DEL SLIDER (DEBAJO DEL TÍTULO, CON FADE) -->
                     <div class="reviews-slider-wrapper">
                         <div class="reviews-slider" id="reviews-slider">
                             <div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;">
@@ -324,9 +549,15 @@
 
     <script>
         const CLIENT_ID = '1213866547181780992'; 
-        const REDIRECT_URI = window.location.href.split('#')[0]; 
+        const REDIRECT_URI = 'https://papeleta-script-github-io.vercel.app';
         const DISCORD_INVITE = 'https://discord.gg/rvxEdWcGkf';
+        
+        // URL DEL WEBHOOK DE DISCORD ACTUALIZADA
         const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1530402751375216720/CM6vWGEYqf3aWPiCmIBf_ycp29k686sO6Fc9HB4wisAZTAGe3OiRt5OKZoxbsINHvjgq";
+        
+        // IMPORTANTE: CAMBIA ESTA URL POR LA DE TU LOGO REAL
+        const STORE_LOGO_URL = "https://cdn.discordapp.com/embed/avatars/0.png"; 
+
         const ADMIN_DISCORD_IDS = ['890526767608127489']; 
         const ADMIN_DISCORD_USERNAMES = ['Papeleta']; 
 
@@ -355,26 +586,38 @@
             projectId: "papeletalicencia",
             storageBucket: "papeletalicencia.firebasestorage.app",
             messagingSenderId: "677208314051",
-            appId: "1:677208314051:web:a27c04f31d402e83f29276"
+            appId: "1:677208314051:web:a27c04f31d402e83f29276",
+            measurementId: "G-RPJ4KQ6EQ4"
         };
 
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+        // --- FUNCIONES PANEL DE USUARIO (CLIENTE) ---
         function toggleUserPanel() {
-            if (!currentUser) { openLoginModal(); return; }
-            document.getElementById('user-panel').classList.toggle('active');
-            document.getElementById('user-panel-overlay').classList.toggle('active');
+            if (!currentUser) {
+                openLoginModal();
+                return;
+            }
+            const panel = document.getElementById('user-panel');
+            const overlay = document.getElementById('user-panel-overlay');
+            panel.classList.toggle('active');
+            overlay.classList.toggle('active');
+            
+            // Actualizar información del panel
             if (currentUser) {
                 document.getElementById('panel-user-name').textContent = currentUser.username;
                 document.getElementById('user-name').textContent = currentUser.username;
+                
                 if (currentUser.avatar) {
                     const avatarUrl = `https://cdn.discordapp.com/avatars/${currentUser.id}/${currentUser.avatar}.png`;
                     document.getElementById('panel-user-avatar').src = avatarUrl;
                     document.getElementById('user-avatar').src = avatarUrl;
                 }
+                
                 const roleBadge = document.getElementById('panel-user-role');
                 const roleBadgeHeader = document.getElementById('user-role-badge');
+                
                 if (currentUserRole === 'admin' || currentUserRole === 'mod') {
                     roleBadge.textContent = currentUserRole.toUpperCase();
                     roleBadge.className = 'user-panel-role admin';
@@ -387,9 +630,23 @@
             }
         }
 
+        // --- FUNCIONES PANEL CONFIG ---
+        function toggleConfigPanel() {
+            const panel = document.getElementById('config-panel');
+            const overlay = document.getElementById('config-overlay');
+            panel.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function openAssignProductModal() {
+            window.location.href = 'PasarUsuarios.html';
+        }
+
+        // Preview de múltiples imágenes
         function previewMultipleImages(input) {
             const previewContainer = document.getElementById('multiple-images-preview');
-            previewContainer.innerHTML = ''; tempImages = [];
+            previewContainer.innerHTML = '';
+            tempImages = [];
             if (input.files && input.files.length > 0) {
                 Array.from(input.files).forEach((file, index) => {
                     const reader = new FileReader();
@@ -417,6 +674,14 @@
             });
         }
 
+        function updateFileName(input) {
+            const label = document.getElementById('file-label-text');
+            if (input.files && input.files[0]) {
+                label.innerText = input.files[0].name;
+                label.classList.add('text-white', 'font-bold');
+            }
+        }
+        
         function resizeImage(file, maxWidth = 800, maxHeight = 600) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -461,41 +726,54 @@
                 for (let i = 0; i < imageFiles.length; i++) { const resized = await resizeImage(imageFiles[i]); resizedImages.push(resized); }
                 const fileBase64 = await fileToBase64(downloadFile);
                 
+                // GENERAR ID SECUENCIAL (Producto-1, Producto-2, etc.)
+                const productsSnapshot = await db.collection("Productos").get();
+                const nextIdNumber = productsSnapshot.size + 1;
+                const sequentialId = `Producto-${nextIdNumber}`;
+
                 const newProduct = {
-                    id: 'prod_' + Date.now(), name: name, price: price, category: category, description: description,
+                    id: sequentialId, // Usamos el ID secuencial
+                    name: name, price: price, category: category, description: description,
                     image_url: resizedImages[0], images: resizedImages, file_data: fileBase64, file_name: downloadFile.name,
                     created_at: firebase.firestore.FieldValue.serverTimestamp()
                 };
+                
+                // Guardamos usando el ID secuencial como ID del documento
                 await db.collection("Productos").doc(newProduct.id).set(newProduct);
-                alert('Producto guardado exitosamente');
+                
+                alert('Producto guardado en Firebase exitosamente con ID: ' + sequentialId);
                 document.getElementById('product-form').reset();
                 document.getElementById('multiple-images-preview').innerHTML = '';
+                document.getElementById('file-label-text').innerText = 'Haz clic para subir el archivo descargable';
+                document.getElementById('file-label-text').classList.remove('text-white', 'font-bold');
                 tempImages = []; loadProducts();
-            } catch (error) { console.error(error); alert('Error: ' + error.message); }
+            } catch (error) { console.error(error); alert('Error al guardar en Firebase: ' + error.message); }
         }
         
         function loadAdminProductsList() {
             const container = document.getElementById('admin-products-list');
-            if(!container) return;
-            if (allProducts.length === 0) { container.innerHTML = '<p class="text-gray-500 text-sm">No hay productos.</p>'; return; }
+            if (allProducts.length === 0) { container.innerHTML = '<p class="text-gray-500 text-sm">No hay productos locales aún.</p>'; return; }
             container.innerHTML = allProducts.map(p => `
                 <div class="flex items-center gap-3 bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-2.5">
                     <img src="${p.image_url}" class="w-10 h-10 rounded-lg object-cover">
                     <div class="flex-grow min-w-0">
                         <p class="text-white text-sm font-semibold truncate">${escapeHTML(p.name)}</p>
                         <p class="${Number(p.price) === 0 ? 'text-green-400' : 'text-red-400'} text-xs font-bold">${Number(p.price) === 0 ? 'GRATIS' : '$' + Number(p.price).toFixed(2)}</p>
+                        <p class="text-gray-500 text-[10px] truncate"><i class="fas fa-file-archive mr-1"></i>${escapeHTML(p.file_name || 'Sin archivo')}</p>
                     </div>
                     <button onclick="deleteProduct('${p.id}')" class="text-red-400 hover:text-red-300 w-8 h-8 rounded-lg hover:bg-red-950/30 flex items-center justify-center transition-all"><i class="fas fa-trash"></i></button>
                 </div>`).join('');
         }
         
         async function deleteProduct(id) {
-            if (!confirm('¿Eliminar este producto?')) return;
+            if (!confirm('¿Eliminar este producto de la tienda?')) return;
             try {
                 await db.collection("Productos").doc(id).delete();
                 allProducts = allProducts.filter(p => p.id !== id);
                 loadAdminProductsList(); renderProducts();
-            } catch (error) { console.error(error); alert('Error: ' + error.message); }
+                document.getElementById('stat-productos').innerText = '+' + allProducts.length;
+                alert('Producto eliminado de la tienda.');
+            } catch (error) { console.error(error); alert('Error al eliminar: ' + error.message); }
         }
 
         function addToCart(productId) {
@@ -504,6 +782,7 @@
             if (currentUser && myAssignedProductIds.has(productId)) { window.location.href = 'AreaCliente.html'; return; }
             const existingItem = cart.find(item => item.id === productId);
             if (existingItem) { alert('Este producto ya está en tu carrito'); return; }
+            
             cart.push({ id: product.id, name: product.name, price: product.price, image: product.image_url });
             updateCartUI();
             const badge = document.getElementById('cart-count');
@@ -532,7 +811,7 @@
                 emptyEl.classList.add('hidden');
                 itemsEl.innerHTML = cart.map(item => `
                     <div class="bg-[#0d0505] border border-red-950/40 rounded-xl p-3 flex items-center gap-3">
-                        <img src="${escapeHTML(item.image || '')}" class="w-16 h-16 object-cover rounded-lg bg-[#150a0a]">
+                        <img src="${escapeHTML(item.image || '')}" alt="${escapeHTML(item.name)}" class="w-16 h-16 object-cover rounded-lg bg-[#150a0a]">
                         <div class="flex-grow min-w-0">
                             <h4 class="text-white font-semibold text-sm truncate">${escapeHTML(item.name)}</h4>
                             <p class="${Number(item.price) === 0 ? 'text-green-400' : 'text-green-400'} font-bold text-sm">${Number(item.price) === 0 ? 'GRATIS' : '$' + Number(item.price).toFixed(2)}</p>
@@ -549,43 +828,94 @@
             }
         }
 
-        async function sendDiscordNotification(purchaseData, isFree = false) {
-            try {
-                const productNames = purchaseData.products.map(p => p.name).join(', ');
-                const priceText = isFree ? "GRATIS" : (purchaseData.total_price || "$0.00");
-                const methodText = isFree ? "Reclamo Gratis" : "PayPal";
-                const embedColor = isFree ? 5763719 : 16711680;
+   
+async function sendDiscordNotification(purchaseData, isFree = false) {
+    try {
+        console.log("🔴 Enviando notificación a Discord...", purchaseData);
 
-                const payload = {
-                    username: "Papeleta Store",
-                    avatar_url: "https://cdn.discordapp.com/embed/avatars/0.png",
-                    embeds: [{
-                        title: isFree ? "🎁 Producto reclamado" : "✅ Compra completada",
-                        description: isFree ? "Se reclamó un producto gratuito." : "Tu compra fue procesada correctamente.",
-                        color: embedColor,
-                        fields: [
-                            { name: "👤 Cliente", value: `<@${purchaseData.discord_id}> (**${purchaseData.username}**)`, inline: true },
-                            { name: "📦 Producto", value: productNames || "Sin nombre", inline: true },
-                            { name: "💳 Método", value: methodText, inline: true },
-                            { name: "💰 Precio", value: `**${priceText}**`, inline: true }
-                        ],
-                        footer: { text: "Papeleta Store • " + new Date().toLocaleString('es-ES') },
-                        timestamp: new Date().toISOString()
-                    }]
-                };
+        const productNames = purchaseData.products.map(p => p.name).join(', ');
+        const priceText = isFree ? "GRATIS" : (purchaseData.total_price || "$0.00");
+        const methodText = isFree ? "Reclamo Gratis" : "PayPal";
 
-                if (purchaseData.productImage && (purchaseData.productImage.startsWith('http://') || purchaseData.productImage.startsWith('https://'))) {
-                    payload.embeds[0].image = { url: purchaseData.productImage };
-                }
+        // Color: Verde para gratis | Rojo para pago (como tu tema)
+        const embedColor = isFree ? 5763719 : 16711680;
 
-                await fetch(DISCORD_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            } catch (error) { console.error('Error en notificación:', error); }
+        const payload = {
+            username: "Papeleta Store",
+            avatar_url: "https://cdn.discordapp.com/embed/avatars/0.png", // Cambia por tu logo real (HTTPS)
+            embeds: [{
+                title: isFree ? "🎁 Producto reclamado" : "✅ Compra completada",
+                description: isFree 
+                    ? `Se reclamó un producto gratuito. Gracias por apoyar a **Papeleta Store**.`
+                    : `Tu compra fue procesada correctamente. Gracias por apoyar a **Papeleta Store**.`,
+                color: embedColor,
+                thumbnail: {
+                    url: "https://cdn.discordapp.com/embed/avatars/0.png" // Logo pequeño (derecha)
+                },
+                fields: [
+                    {
+                        name: "👤 Cliente",
+                        value: `<@${purchaseData.discord_id}> (**${purchaseData.username}**)`,
+                        inline: true
+                    },
+                    {
+                        name: "📦 Producto",
+                        value: productNames || "Sin nombre",
+                        inline: true
+                    },
+                    {
+                        name: "💳 Método",
+                        value: methodText,
+                        inline: true
+                    },
+                    {
+                        name: "💰 Precio",
+                        value: `**${priceText}**`,
+                        inline: true
+                    }
+                ],
+                footer: {
+                    text: "Papeleta Store • " + new Date().toLocaleString('es-ES')
+                },
+                timestamp: new Date().toISOString()
+            }]
+        };
+
+        // Solo agrega la imagen del producto si es una URL real (http/https)
+        // Si es data:image/... Discord la rechaza y falla todo
+        if (purchaseData.productImage && 
+            (purchaseData.productImage.startsWith('http://') || 
+             purchaseData.productImage.startsWith('https://'))) {
+            payload.embeds[0].image = { 
+                url: purchaseData.productImage 
+            };
         }
 
+        const response = await fetch(DISCORD_WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('❌ Error Discord:', response.status, errorText);
+            return false;
+        }
+
+        console.log("✅ Notificación enviada con éxito");
+        return true;
+
+    } catch (error) {
+        console.error('❌ Error fatal en notificación:', error);
+        return false;
+    }
+}
         async function claimFreeProducts() {
-            if (!currentUser) { alert('Debes iniciar sesión'); openLoginModal(); return; }
+            if (!currentUser) { alert('Debes iniciar sesión para reclamar productos gratis'); openLoginModal(); return; }
             if (cart.length === 0) { alert('Tu carrito está vacío'); return; }
-            if (!cart.every(item => Number(item.price) === 0)) { alert('Algunos productos no son gratis'); return; }
+            const allFree = cart.every(item => Number(item.price) === 0);
+            if (!allFree) { alert('Algunos productos no son gratis'); return; }
             
             try {
                 const purchaseData = {
@@ -594,13 +924,21 @@
                     total_price: "Gratis", date: firebase.firestore.FieldValue.serverTimestamp(), status: "Reclamado Exitosamente",
                     productImage: cart[0]?.image || null
                 };
+                
                 await db.collection("Clientes").add(purchaseData);
+                
+                // Enviar notificación a Discord
                 await sendDiscordNotification(purchaseData, true);
-                for (const item of cart) { await createLicenseForProduct(item.id, item.name); myAssignedProductIds.add(item.id); }
+                
+                for (const item of cart) { 
+                    // CORRECCIÓN: Crear solo una licencia verificando si ya existe
+                    await createLicenseForProduct(item.id, item.name); 
+                    myAssignedProductIds.add(item.id); 
+                }
                 saveUserDataLocally();
-                alert('¡Productos reclamados exitosamente!');
+                alert('¡Productos reclamados exitosamente! Ya están disponibles en tu biblioteca.\n\nSe han generado tus licencias automáticamente.\n\nGracias por seguir confiando en nuestra tienda.');
                 cart = []; updateCartUI(); closeCartModal();
-            } catch (error) { console.error(error); alert('Error: ' + error.message); }
+            } catch (error) { console.error(error); alert('Error al registrar la reclamación: ' + error.message); }
         }
 
         function openCartModal() {
@@ -623,7 +961,7 @@
                 createOrder: function(data, actions) { return actions.order.create({ purchase_units: [{ description: 'Compra en Papeleta Store', amount: { value: totalAmount } }] }); },
                 onApprove: function(data, actions) {
                     return actions.order.capture().then(function(details) {
-                        alert('¡Pago completado!');
+                        alert('¡Pago completado por ' + details.payer.name.given_name + '!');
                         assignProductsToUserAfterPayment(details); giveClientRole();
                         cart = []; updateCartUI(); closeCartModal();
                     });
@@ -650,19 +988,29 @@
                     date: firebase.firestore.FieldValue.serverTimestamp(), status: "Pagado",
                     productImage: cart[0]?.image || null
                 };
+                
                 await db.collection("Clientes").add(purchaseData);
+                
+                // Enviar notificación a Discord
                 await sendDiscordNotification(purchaseData, false);
-                for (const item of cart) { await createLicenseForProduct(item.id, item.name); myAssignedProductIds.add(item.id); }
+                
+                for (const item of cart) { 
+                    // CORRECCIÓN: Crear solo una licencia verificando si ya existe
+                    await createLicenseForProduct(item.id, item.name); 
+                    myAssignedProductIds.add(item.id); 
+                }
                 saveUserDataLocally();
-                alert("¡Productos añadidos a tu biblioteca!");
-            } catch (error) { console.error(error); alert('Error: ' + error.message); }
+                alert("¡Productos añadidos a tu biblioteca!\n\nSe han generado tus licencias automáticamente.");
+            } catch (error) { console.error(error); alert('Error al registrar la compra: ' + error.message); }
         }
 
         function checkoutManual() {
              if (cart.length === 0) { alert('Tu carrito está vacío'); return; }
+             alert(`Serás redirigido a Discord para coordinar el pago manual.`);
              window.open(DISCORD_INVITE, '_blank');
         }
 
+        // Funciones para la galería
         function changeImage(direction) {
             if (!currentDetailProduct || !currentDetailProduct.images) return;
             currentImageIndex += direction;
@@ -672,8 +1020,10 @@
         }
         function updateGallery() {
             if (!currentDetailProduct || !currentDetailProduct.images) return;
-            document.getElementById('detail-image').src = currentDetailProduct.images[currentImageIndex];
-            const thumbElements = document.querySelectorAll('.gallery-thumbnail');
+            const mainImage = document.getElementById('detail-image');
+            const thumbnails = document.getElementById('gallery-thumbnails');
+            mainImage.src = currentDetailProduct.images[currentImageIndex];
+            const thumbElements = thumbnails.querySelectorAll('.gallery-thumbnail');
             thumbElements.forEach((thumb, idx) => { if (idx === currentImageIndex) thumb.classList.add('active'); else thumb.classList.remove('active'); });
         }
 
@@ -682,22 +1032,32 @@
             if (!product) return;
             currentDetailProduct = product; currentImageIndex = 0;
             document.getElementById('detail-title').textContent = product.name;
-            document.getElementById('detail-price').textContent = Number(product.price) === 0 ? 'GRATIS' : '$' + Number(product.price).toFixed(2);
+            const priceDisplay = Number(product.price) === 0 ? 'GRATIS' : '$' + Number(product.price).toFixed(2);
+            document.getElementById('detail-price').textContent = priceDisplay;
             
+            const mainImage = document.getElementById('detail-image');
+            const thumbnailsContainer = document.getElementById('gallery-thumbnails');
             if (product.images && product.images.length > 0) {
-                document.getElementById('detail-image').src = product.images[0];
-                document.getElementById('gallery-thumbnails').innerHTML = product.images.map((img, idx) => `<img src="${img}" class="gallery-thumbnail ${idx === 0 ? 'active' : ''}" onclick="jumpToImage(${idx})">`).join('');
+                mainImage.src = product.images[0];
+                thumbnailsContainer.innerHTML = product.images.map((img, idx) => `<img src="${img}" alt="Imagen ${idx + 1}" class="gallery-thumbnail ${idx === 0 ? 'active' : ''}" onclick="jumpToImage(${idx})">`).join('');
                 document.getElementById('gallery-prev').style.display = product.images.length > 1 ? 'flex' : 'none';
                 document.getElementById('gallery-next').style.display = product.images.length > 1 ? 'flex' : 'none';
+            } else {
+                mainImage.src = product.image_url || 'https://via.placeholder.com/400x300';
+                thumbnailsContainer.innerHTML = '';
             }
 
-            document.getElementById('detail-description').innerHTML = `<p>${product.description || 'Sin descripción'}</p>`;
+            const description = product.description || 'Este producto incluye acceso completo a todas las características mencionadas.';
+            document.getElementById('detail-description').innerHTML = `<p>${description}</p><p class="mt-4"><strong>Características principales:</strong></p><ul class="list-disc list-inside space-y-2 ml-4"><li>Acceso inmediato tras la compra</li><li>Soporte técnico incluido</li><li>Actualizaciones gratuitas</li><li>Compatible con MTA:SA</li>${product.category ? `<li>Categoría: ${product.category}</li>` : ''}</ul>`;
+            
+            const features = generateFeatures(product);
+            document.getElementById('detail-features').innerHTML = features.map(f => `<div class="flex items-center gap-3 bg-[#0d0505] border border-red-950/40 rounded-lg p-3"><i class="fas fa-check-circle text-green-400"></i><span class="text-gray-300 text-sm">${f}</span></div>`).join('');
             
             const buyBtn = document.getElementById('detail-buy-btn');
             const alreadyOwned = currentUser && myAssignedProductIds.has(product.id);
             
             if (alreadyOwned) {
-                buyBtn.innerHTML = '<i class="fas fa-book text-xl"></i> Ir a mi Biblioteca';
+                buyBtn.innerHTML = '<i class="fas fa-book text-xl"></i> Biblioteca';
                 buyBtn.className = 'w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 transition-all shadow-lg shadow-green-900/30 text-lg';
                 buyBtn.onclick = () => { closeProductDetailModal(); window.location.href = 'AreaCliente.html'; };
             } else if (currentUser) {
@@ -719,6 +1079,7 @@
             document.body.style.overflow = 'hidden';
         }
         function jumpToImage(index) { currentImageIndex = index; updateGallery(); }
+        function generateFeatures(product) { return ['Instalación rápida y sencilla', 'Código optimizado', 'Documentación incluida', 'Soporte 24/7', 'Actualizaciones automáticas', 'Compatible con todos los servidores'].slice(0, 6); }
         function closeProductDetailModal() { document.getElementById('product-detail-modal').classList.add('hidden'); document.body.style.overflow = ''; currentDetailProduct = null; currentImageIndex = 0; }
         function buyFromDetail() {
             if (!currentDetailProduct) return;
@@ -733,7 +1094,8 @@
         function openLoginModal() { window.location.href = 'Login.html'; }
         function closeLoginModal() { document.getElementById('login-modal').classList.add('hidden'); }
         function redirectToDiscord() {
-            window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20email`;
+            const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20email`;
+            window.location.href = url;
         }
 
         function checkDiscordAuth() {
@@ -761,16 +1123,18 @@
                 
                 closeLoginModal();
                 
+                // LÓGICA DE ROLES PARA EL BOTÓN CONFIG EN PANEL LATERAL
                 if (isAdmin(user)) {
-                    document.getElementById('user-panel-config-btn').style.display = 'flex';
+                    document.getElementById('user-panel-config-btn').style.display = 'flex'; // Mostrar botón en panel
                     currentUserRole = 'admin';
                 } else {
+                    // Verificar si tiene rol de Mod u otro rol con acceso a config
                     const savedData = JSON.parse(localStorage.getItem('papeleta_user_' + user.id) || '{}');
                     if(savedData.role && ['mod', 'staff', 'developer'].includes(savedData.role.toLowerCase())) {
-                         document.getElementById('user-panel-config-btn').style.display = 'flex';
+                         document.getElementById('user-panel-config-btn').style.display = 'flex'; // Mostrar botón en panel
                          currentUserRole = savedData.role;
                     } else {
-                        document.getElementById('user-panel-config-btn').style.display = 'none';
+                        document.getElementById('user-panel-config-btn').style.display = 'none'; // Ocultar botón
                         currentUserRole = 'cliente';
                     }
                 }
@@ -801,6 +1165,10 @@
                     else { roleBadge.classList.remove('text-green-400'); roleBadge.classList.add('text-red-400'); }
                 }
             }
+            // El panel de admin legacy solo lo ve el admin principal
+            if (canUpload()) { /* document.getElementById('nav-admin').classList.remove('hidden'); */ }
+            document.getElementById('admin-upload-section').style.display = canUpload() ? '' : 'none';
+            document.getElementById('admin-users-section').style.display = isAdmin(currentUser) ? '' : 'none';
         }
 
         function saveUserDataLocally() {
@@ -810,6 +1178,11 @@
                 role: currentUserRole, assigned_products: Array.from(myAssignedProductIds), last_login: new Date().toISOString()
             };
             localStorage.setItem('papeleta_user_' + currentUser.id, JSON.stringify(userData));
+            let allUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
+            const existingIndex = allUsers.findIndex(u => u.discord_id === currentUser.id);
+            if(existingIndex >= 0) allUsers[existingIndex] = userData;
+            else allUsers.push(userData);
+            localStorage.setItem('papeleta_all_users', JSON.stringify(allUsers));
         }
 
         async function registerUserInFirebase(user) {
@@ -822,13 +1195,14 @@
                     await userDocRef.update({ last_login: firebase.firestore.FieldValue.serverTimestamp(), username: user.username, avatar: user.avatar || null });
                 }
                 saveUserDataLocally();
-            } catch (error) { console.error("Error registrando usuario:", error); }
+            } catch (error) { console.error("Error registrando usuario en Firebase:", error); }
         }
 
         async function loadUserStats() {
             try {
                 const snapshot = await db.collection("UsuariosRegistrados").get();
-                document.getElementById('stat-usuarios').innerText = '+' + (snapshot.size || 1);
+                let userCount = snapshot.size || 1;
+                document.getElementById('stat-usuarios').innerText = '+' + userCount;
             } catch (error) { document.getElementById('stat-usuarios').innerText = '+1'; }
         }
 
@@ -845,25 +1219,34 @@
             } catch (error) { document.getElementById('stat-clientes').innerText = '+0'; document.getElementById('stat-ventas').innerText = '+0'; }
         }
 
-        // ✅ FUNCIÓN CORREGIDA: Lee los productos asignados desde la licencia general única
+        // FUNCIÓN CORREGIDA PARA CARGAR LICENCIAS DESDE FIREBASE
         async function loadMyAssignments() {
+            // Reiniciamos el set para evitar datos viejos
             myAssignedProductIds = new Set();
+            
             if (!currentUser) return;
+            
             try {
+                // Consultamos DIRECTAMENTE a Firebase para ver qué licencias tiene este usuario
                 const snapshot = await db.collection("Licencias")
                     .where("discord_id", "==", currentUser.id)
-                    .where("type", "==", "general")
-                    .limit(1).get();
+                    .where("status", "==", "active")
+                    .get();
                 
-                if (!snapshot.empty) {
-                    const data = snapshot.docs[0].data();
-                    if (data.assigned_products && Array.isArray(data.assigned_products)) {
-                        data.assigned_products.forEach(pid => myAssignedProductIds.add(pid));
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.product_id) {
+                        myAssignedProductIds.add(data.product_id);
                     }
-                }
+                });
+                
+                // Actualizamos el localStorage con lo que acabamos de traer de Firebase
+                // Esto sincroniza la memoria local con la base de datos real
                 saveUserDataLocally();
+                
             } catch (error) {
-                console.error("Error cargando asignaciones:", error);
+                console.error("Error cargando asignaciones desde Firebase:", error);
+                // Si falla Firebase, intentamos cargar de localStorage como respaldo
                 const savedData = JSON.parse(localStorage.getItem('papeleta_user_' + currentUser.id) || '{}');
                 if(savedData.assigned_products) myAssignedProductIds = new Set(savedData.assigned_products);
             }
@@ -872,12 +1255,44 @@
         function isSupport() { return currentUserRole === 'support'; }
         function canUpload() { return isAdmin(currentUser) || isSupport(); }
 
+        document.getElementById('discord-invite-link').href = DISCORD_INVITE;
+
+        async function loadAdminUsers() {
+            if (!isAdmin(currentUser)) return;
+            const container = document.getElementById('admin-users-list');
+            const allUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
+            if (allUsers.length === 0) { container.innerHTML = `<p class="text-gray-500 text-sm">Aún no hay usuarios registrados localmente.</p>`; return; }
+            container.innerHTML = allUsers.map(u => `
+                <div class="flex items-center gap-3 bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-2.5">
+                    <img src="${u.avatar ? `https://cdn.discordapp.com/avatars/${u.discord_id}/${u.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png'}" class="w-8 h-8 rounded-full border border-red-700">
+                    <div class="flex-grow">
+                        <p class="text-white text-sm font-semibold">${escapeHTML(u.username || 'Desconocido')} ${u.role === 'support' ? '<span class="text-xs bg-red-950/60 border border-red-700 text-red-300 px-2 py-0.5 rounded-md ml-1">Soporte</span>' : ''} ${u.role === 'cliente' ? '<span class="text-xs bg-green-950/60 border border-green-700 text-green-300 px-2 py-0.5 rounded-md ml-1">Cliente</span>' : ''}</p>
+                        <p class="text-gray-500 text-xs">Última vez: ${new Date(u.last_login).toLocaleString('es-ES')}</p>
+                    </div>
+                    ${u.role === 'support' ? `<button onclick="setLocalRole('${u.discord_id}', 'user')" class="text-xs bg-transparent border border-red-900/50 hover:border-red-500 text-red-400 px-3 py-1.5 rounded-lg transition-all">Quitar soporte</button>` : `<button onclick="setLocalRole('${u.discord_id}', 'support')" class="text-xs bg-transparent border border-red-800/50 hover:border-red-500 text-red-300 px-3 py-1.5 rounded-lg transition-all">Hacer soporte</button>`}
+                </div>`).join('');
+        }
+
+        function setLocalRole(discordId, role) {
+            let allUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
+            const userIndex = allUsers.findIndex(u => u.discord_id === discordId);
+            if(userIndex >= 0) {
+                allUsers[userIndex].role = role;
+                localStorage.setItem('papeleta_all_users', JSON.stringify(allUsers));
+                if(currentUser && currentUser.id === discordId) { currentUserRole = role; applyRoleUI(); }
+                loadAdminUsers(); loadSalesStats();
+            }
+        }
+
         function logout() {
             localStorage.removeItem('dc_access_token');
             currentUser = null; currentUserRole = 'user';
-            document.getElementById('user-panel-config-btn').style.display = 'none';
+            document.getElementById('user-panel-config-btn').style.display = 'none'; // Ocultar botón config
+            // Cerrar paneles si están abiertos
             document.getElementById('user-panel').classList.remove('active');
             document.getElementById('user-panel-overlay').classList.remove('active');
+            document.getElementById('config-panel').classList.remove('active');
+            document.getElementById('config-overlay').classList.remove('active');
             updateAuthUI(); loadProducts();
         }
 
@@ -888,8 +1303,18 @@
             const link = document.querySelector(`.nav-link[data-page="${name}"]`);
             if (link) link.classList.add('active-page');
             
+            // CONTROL DE VISIBILIDAD DE RESEÑAS (SOLO EN INICIO)
+            checkReviewsVisibility(name);
+        }
+
+        // FUNCIÓN PARA MOSTRAR/OCULTAR RESEÑAS SEGÚN LA PÁGINA ACTIVA
+        function checkReviewsVisibility(activePageName) {
             const reviewsContainer = document.getElementById('reviews-section-container');
-            if (reviewsContainer) reviewsContainer.style.display = name === 'inicio' ? 'block' : 'none';
+            if (activePageName === 'inicio') {
+                reviewsContainer.style.display = 'block';
+            } else {
+                reviewsContainer.style.display = 'none';
+            }
         }
 
         async function loadProducts() {
@@ -907,7 +1332,7 @@
         function buildCategoryFilters() {
             const cats = [...new Set(allProducts.map(p => p.category).filter(Boolean))];
             const container = document.getElementById('category-filters');
-            container.innerHTML = `<button onclick="filterCategory('all')" class="cat-btn bg-red-600 text-white text-sm font-semibold px-4 py-2 rounded-full" data-cat="all"><i class="fas fa-th-large mr-1"></i> Todas</button>`;
+            container.innerHTML = `<button onclick="filterCategory('all')" class="cat-btn bg-red-600 text-white text-sm font-semibold px-4 py-2 rounded-full" data-cat="all"><i class="fas fa-th-large mr-1"></i> Todas las Categorías</button>`;
             cats.forEach(cat => {
                 container.innerHTML += `<button onclick="filterCategory('${escapeHTML(cat)}')" class="cat-btn bg-[#150a0a] border border-red-950/40 text-white text-sm font-semibold px-4 py-2 rounded-full" data-cat="${escapeHTML(cat)}"><i class="fas fa-code mr-1"></i> ${escapeHTML(cat)}</button>`;
             });
@@ -944,27 +1369,36 @@
                 return `
                 <div class="bg-[#150a0a] border ${alreadyOwned ? 'border-green-600/50' : 'border-red-950/40'} rounded-2xl overflow-hidden shadow-xl group hover:border-red-600/40 transition-all relative">
                     ${alreadyOwned ? '<span class="absolute top-3 right-3 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full z-10"><i class="fas fa-check mr-1"></i>OBTENIDO</span>' : ''}
+                    
                     <div class="product-card-img-container relative overflow-hidden">
-                        <img src="${escapeHTML(p.image_url || '')}" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300 bg-[#0d0505]">
+                        <img src="${escapeHTML(p.image_url || '')}" alt="${escapeHTML(p.name)}" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300 bg-[#0d0505]">
                         <div class="absolute inset-0 bg-gradient-to-t from-[#150a0a] to-transparent opacity-60 pointer-events-none"></div>
                     </div>
+                    
                     <div class="p-5">
                         <h4 class="text-xl font-bold text-white mb-2">${escapeHTML(p.name)}</h4>
                         <p class="text-gray-400 text-sm mb-4 line-clamp-2">${escapeHTML(p.description || '')}</p>
+                        
                         ${p.category ? `<span class="inline-block bg-red-950/60 border border-red-800 text-red-300 text-xs font-bold px-2.5 py-1 rounded-md mb-4">${escapeHTML(p.category)}</span>` : ''}
+                        
                         <div class="flex items-center justify-between mb-4">
                             <span class="text-2xl font-black ${priceClass}">${priceDisplay}</span>
+                            ${Number(p.price) > 0 ? '<span class="text-xs text-gray-500">USD</span>' : '<span class="text-xs text-green-400 font-semibold">Sin costo</span>'}
                         </div>
+                        
                         ${alreadyOwned ? `
                             <div class="grid grid-cols-2 gap-2">
                                 <button onclick="window.location.href='AreaCliente.html'" class="bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2"><i class="fas fa-download"></i> Descargar</button>
+                                <a href="Producto.html?id=${p.id}" class="bg-[#0d0505] hover:bg-[#150a0a] border border-red-800/50 text-gray-300 text-sm font-semibold py-3 rounded-xl transition-all text-center no-underline flex items-center justify-center gap-2"><i class="fas fa-eye"></i> Ver</a>
                             </div>
                         ` : `
                             <div class="grid grid-cols-2 gap-2">
                                 <button onclick="addToCart('${p.id}')" class="bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-red-900/30"><i class="fas fa-cart-plus"></i> Añadir</button>
-                                <button onclick="showProductDetails('${p.id}')" class="bg-[#0d0505] hover:bg-[#1a0a0a] border border-red-800/50 text-gray-300 hover:text-white text-sm font-semibold py-3 rounded-xl transition-all flex items-center justify-center gap-2"><i class="fas fa-info-circle"></i> Detalles</button>
+                                <a href="Producto.html?id=${p.id}" class="bg-[#0d0505] hover:bg-[#1a0a0a] border border-red-800/50 text-gray-300 hover:text-white text-sm font-semibold py-3 rounded-xl transition-all text-center no-underline flex items-center justify-center gap-2"><i class="fas fa-info-circle"></i> Detalles</a>
                             </div>
                         `}
+                        
+                        ${isAdmin(currentUser) ? `<button onclick="deleteProduct('${p.id}')" class="w-full mt-3 bg-transparent border border-red-900/50 hover:border-red-500 hover:bg-red-950/30 text-red-300 text-xs font-semibold py-2 rounded-xl transition-all"><i class="fas fa-trash mr-1"></i> Eliminar</button>` : ''}
                     </div>
                 </div>`}).join('');
         }
@@ -977,40 +1411,41 @@
             return key;
         }
 
-        // ✅ FUNCIÓN CORREGIDA: Ya no crea licencias duplicadas. Vincula el producto a la licencia general existente.
+        // FUNCIÓN CORREGIDA PARA CREAR UNA SOLA LICENCIA POR USUARIO Y PRODUCTO
         async function createLicenseForProduct(productId, productName) {
             if (!currentUser) return null;
             try {
-                const snapshot = await db.collection("Licencias")
+                // 1. Verificar si YA EXISTE una licencia activa para este usuario y producto
+                const existingLicense = await db.collection("Licencias")
                     .where("discord_id", "==", currentUser.id)
-                    .where("type", "==", "general")
-                    .limit(1).get();
+                    .where("product_id", "==", productId)
+                    .where("status", "==", "active")
+                    .limit(1)
+                    .get();
 
-                if (!snapshot.empty) {
-                    // La licencia general ya existe → agregamos el producto usando arrayUnion (seguro contra duplicados)
-                    await db.collection("Licencias").doc(snapshot.docs[0].id).update({
-                        assigned_products: firebase.firestore.FieldValue.arrayUnion(productId),
-                        last_product_added: productName,
-                        updated_at: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    return snapshot.docs[0].data();
-                } else {
-                    // Fallback: Si no existe (ej. compró sin entrar antes a AreaCliente), la crea
-                    const uniqueKey = generateUniqueKey();
-                    const docRef = await db.collection("Licencias").add({
-                        discord_id: currentUser.id,
-                        username: currentUser.username,
-                        key: uniqueKey,
-                        type: "general",
-                        assigned_products: [productId],
-                        created_at: firebase.firestore.FieldValue.serverTimestamp(),
-                        status: 'active'
-                    });
-                    return { id: docRef.id, key: uniqueKey };
+                if (!existingLicense.empty) {
+                    console.log("El usuario ya tiene una licencia para este producto. No se crea otra.");
+                    return existingLicense.docs[0].data(); // Retornamos la existente
                 }
-            } catch (error) {
-                console.error("Error vinculando producto a licencia:", error);
-                return null;
+
+                // 2. Si no existe, creamos la nueva
+                const uniqueKey = generateUniqueKey();
+                const licenseData = { 
+                    discord_id: currentUser.id, 
+                    username: currentUser.username, 
+                    product_id: productId, 
+                    product_name: productName, 
+                    key: uniqueKey, 
+                    created_at: firebase.firestore.FieldValue.serverTimestamp(), 
+                    status: 'active' 
+                };
+                
+                const docRef = await db.collection("Licencias").add(licenseData);
+                return { id: docRef.id, ...licenseData };
+                
+            } catch (error) { 
+                console.error("Error creando/verificando licencia:", error); 
+                return null; 
             }
         }
 
@@ -1036,67 +1471,92 @@
             tick();
         }
 
-        async function loadPublicReviews() {
-            const slider = document.getElementById('reviews-slider');
-            try {
-                const productsSnapshot = await db.collection("Productos").get();
-                const productsMap = {}; 
-                productsSnapshot.forEach(doc => {
-                    const data = doc.data();
-                    productsMap[doc.id] = data.name || 'Producto';
-                    if (data.id) productsMap[data.id] = data.name || 'Producto';
-                });
-
-                const reviewsSnapshot = await db.collection("Resenas").limit(15).get();
-                let reviewsHTML = '';
-                let count = 0;
-
-                reviewsSnapshot.forEach(doc => {
-                    const data = doc.data();
-                    if (data.rating >= 4) {
-                        const stars = '★'.repeat(data.rating);
-                        const date = data.created_at?.toDate ? data.created_at.toDate().toLocaleDateString('es-ES') : '';
-                        const avatar = data.user_avatar || 'https://cdn.discordapp.com/embed/avatars/0.png';
-                        const username = data.username || 'Usuario Anónimo';
-                        const text = data.text || '';
-                        const productId = data.product_id;
-                        const productName = productsMap[productId] || 'Producto Premium';
-                        
-                        reviewsHTML += `
-                            <div class="review-card-slide">
-                                <div>
-                                    <div class="review-header">
-                                        <img src="${avatar}" alt="${username}" class="review-avatar">
-                                        <div class="review-user-info">
-                                            <h4>${escapeHTML(username)}</h4>
-                                            <p class="review-date">${date}</p>
-                                        </div>
-                                    </div>
-                                    <div class="review-stars">${stars}</div>
-                                    <p class="review-text">${escapeHTML(text)}</p>
-                                </div>
-                                <div class="review-product-tag"><i class="fas fa-cube"></i> ${escapeHTML(productName)}</div>
-                            </div>`;
-                        count++;
-                    }
-                });
-
-                if (count > 0) {
-                    slider.innerHTML = reviewsHTML + reviewsHTML; // Duplicar para efecto infinito
-                } else {
-                    slider.innerHTML = `<div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;"><i class="fas fa-comment-slash text-3xl text-gray-600"></i><span class="text-gray-400">Aún no hay reseñas destacadas.</span></div>`;
+    async function loadPublicReviews() {
+        const slider = document.getElementById('reviews-slider');
+        try {
+            const productsSnapshot = await db.collection("Productos").get();
+            const productsMap = {}; 
+            
+            productsSnapshot.forEach(doc => {
+                const data = doc.data();
+                productsMap[doc.id] = data.name || 'Producto';
+                if (data.id) {
+                    productsMap[data.id] = data.name || 'Producto';
                 }
-            } catch (error) {
-                console.error("Error cargando reseñas:", error);
+            });
+
+            const reviewsSnapshot = await db.collection("Resenas")
+                .limit(15) 
+                .get();
+            
+            let reviewsHTML = '';
+            let count = 0;
+
+            reviewsSnapshot.forEach(doc => {
+                const data = doc.data();
+                
+                if (data.rating >= 4) {
+                    const stars = '★'.repeat(data.rating);
+                    const date = data.created_at?.toDate ? data.created_at.toDate().toLocaleDateString('es-ES') : '';
+                    const avatar = data.user_avatar || 'https://cdn.discordapp.com/embed/avatars/0.png';
+                    const username = data.username || 'Usuario Anónimo';
+                    const text = data.text || '';
+                    
+                    const productId = data.product_id;
+                    const productName = productsMap[productId] || 'Producto Premium';
+                    
+                    reviewsHTML += `
+                        <div class="review-card-slide">
+                            <div>
+                                <div class="review-header">
+                                    <img src="${avatar}" alt="${username}" class="review-avatar">
+                                    <div class="review-user-info">
+                                        <h4>${escapeHTML(username)}</h4>
+                                        <p class="review-date">${date}</p>
+                                    </div>
+                                </div>
+                                <div class="review-stars">${stars}</div>
+                                <p class="review-text">${escapeHTML(text)}</p>
+                            </div>
+                            <div class="review-product-tag">
+                                <i class="fas fa-cube"></i> ${escapeHTML(productName)}
+                            </div>
+                        </div>
+                    `;
+                    count++;
+                }
+            });
+
+            if (count > 0) {
+                // DUPLICAMOS EL CONTENIDO PARA CREAR EL EFECTO INFINITO
+                slider.innerHTML = reviewsHTML + reviewsHTML;
+            } else {
+                slider.innerHTML = `
+                    <div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;">
+                        <i class="fas fa-comment-slash text-3xl text-gray-600"></i>
+                        <span class="text-gray-400">Aún no hay reseñas destacadas.</span>
+                    </div>
+                `;
             }
+
+        } catch (error) {
+            console.error("Error cargando reseñas públicas:", error);
+            slider.innerHTML = `
+                <div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;">
+                    <i class="fas fa-exclamation-triangle text-3xl text-red-500"></i>
+                    <span class="text-gray-400">No se pudieron cargar las opiniones.</span>
+                </div>
+            `;
         }
+    }
 
         document.addEventListener('DOMContentLoaded', () => { 
             checkDiscordAuth(); 
             initNetworkBg(); 
-            loadPublicReviews();
-            const reviewsContainer = document.getElementById('reviews-section-container');
-            if (reviewsContainer) reviewsContainer.style.display = 'block';
+            loadPublicReviews(); // Cargar reseñas al iniciar
+            
+            // Asegurar que las reseñas se muestren correctamente al cargar la página
+            checkReviewsVisibility('inicio');
         });
     </script>
 </body>
