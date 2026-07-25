@@ -3,34 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cliente</title>
-    <!-- Favicon SVG -->
+    <title>Cliente - Papeleta Store</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff1a1a'/%3E%3Cstop offset='1' stop-color='%23cc1b1b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Ctext x='50' y='70' font-family='Arial, sans-serif' font-size='58' font-weight='900' fill='white' text-anchor='middle'%3EP%3C/text%3E%3C/svg%3E">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap');
-        
-        /* Estilos Generales */
         * { font-family: 'Inter', sans-serif; }
         body { background: linear-gradient(135deg, #050507 0%, #150a0a 100%); color: #e2e8f0; }
-        
-        /* Sidebar & Cards */
         .sidebar { background: rgba(10, 5, 5, 0.95); backdrop-filter: blur(10px); border-right: 1px solid rgba(255, 26, 26, 0.1); }
         .card { background: rgba(21, 10, 10, 0.6); border: 1px solid rgba(255, 26, 26, 0.15); backdrop-filter: blur(10px); }
-        
-        /* Navegación */
         .nav-item { transition: all 0.3s ease; }
         .nav-item:hover { background: rgba(255, 26, 26, 0.1); color: white; }
         .nav-item.active { background: rgba(255, 26, 26, 0.15); border-left: 3px solid #ff1a1a; color: #ff6b6b; }
-        
-        /* Elementos UI */
         .stat-card { background: linear-gradient(135deg, rgba(21, 10, 10, 0.8) 0%, rgba(13, 5, 5, 0.8) 100%); border: 1px solid rgba(255, 26, 26, 0.15); }
         .btn-primary { background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); transition: all 0.3s ease; }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(220, 38, 38, 0.3); }
@@ -38,34 +27,16 @@
         .input-field:focus { border-color: #ff1a1a; outline: none; }
         .code-block { background: rgba(5, 5, 7, 0.9); border: 1px solid rgba(255, 26, 26, 0.2); }
         .gradient-text { background: linear-gradient(135deg, #ff1a1a 0%, #ff6b6b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        
-        /* Scrollbar Personalizado */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #0a0505; }
         ::-webkit-scrollbar-thumb { background: #7f1d1d; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #ef4444; }
-
-        /* Modales */
         .review-modal { position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.9); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.3s ease; }
         .review-modal.active { display: flex; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        
-        .review-modal-content { 
-            background: linear-gradient(135deg, #150a0a 0%, #0d0505 100%); 
-            border: 2px solid #dc2626; 
-            border-radius: 16px; 
-            padding: 32px; 
-            width: 100%; 
-            max-width: 500px; 
-            box-shadow: 0 0 60px rgba(220, 38, 38, 0.3); 
-            animation: slideUp 0.3s ease; 
-        }
-        
+        .review-modal-content { background: linear-gradient(135deg, #150a0a 0%, #0d0505 100%); border: 2px solid #dc2626; border-radius: 16px; padding: 32px; width: 100%; max-width: 500px; box-shadow: 0 0 60px rgba(220, 38, 38, 0.3); animation: slideUp 0.3s ease; }
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        
         .admin-badge { background: rgba(220, 38, 38, 0.2); border: 1px solid rgba(220, 38, 38, 0.5); color: #ff6b6b; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-left: 8px; }
-
-        /* Toast Notifications */
         .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
         .toast { background: rgba(21, 10, 10, 0.95); border: 1px solid rgba(255, 26, 26, 0.3); border-left: 4px solid #dc2626; border-radius: 12px; padding: 16px 20px; min-width: 320px; max-width: 450px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px); animation: slideInRight 0.4s ease, fadeOut 0.4s ease 4.6s forwards; display: flex; align-items: center; gap: 12px; position: relative; overflow: hidden; }
         .toast.success { border-left-color: #10b981; }
@@ -83,13 +54,9 @@
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(100%); } }
         @keyframes timerShrink { from { width: 100%; } to { width: 0%; } }
-
-        /* Rating Stars */
         .star-rating { display: flex; gap: 8px; justify-content: center; margin: 20px 0; }
         .star { font-size: 32px; color: #374151; cursor: pointer; transition: all 0.2s ease; }
         .star:hover, .star.active { color: #fbbf24; transform: scale(1.1); }
-        
-        /* Secciones y Reseñas */
         .section { display: none; }
         .section.active { display: block; }
         .review-card { background: rgba(13, 5, 5, 0.8); border: 1px solid rgba(255, 26, 26, 0.2); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
@@ -103,21 +70,14 @@
 
     <!-- Sidebar -->
     <aside class="sidebar w-64 fixed left-0 top-0 h-full z-50 hidden md:block">
-    <div class="p-6">
-        <!-- Contenedor del Logo -->
-        <div class="flex items-center gap-3 mb-8 cursor-pointer" onclick="window.location.href='index.html'">
-            
-            <!-- NUEVO CÓDIGO DE IMAGEN -->
-            <img src="/files/999.png" 
-                 alt="Logo Papeleta Store" 
-                 class="w-10 h-10 rounded-lg object-cover shadow-lg shadow-red-900/50 bg-white">
-            
-            <!-- Texto (Se mantiene igual) -->
-            <div>
-               <span class="text-white font-bold text-base tracking-wide block">PAPELETA STORE</span>
-                <span id="admin-badge-sidebar" class="admin-badge hidden">ADMIN</span>
+        <div class="p-6">
+            <div class="flex items-center gap-3 mb-8 cursor-pointer" onclick="window.location.href='index.html'">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff1a1a'/%3E%3Cstop offset='1' stop-color='%23cc1b1b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Ctext x='50' y='70' font-family='Arial, sans-serif' font-size='58' font-weight='900' fill='white' text-anchor='middle'%3EP%3C/text%3E%3C/svg%3E" alt="Logo" class="w-10 h-10 rounded-lg object-cover shadow-lg shadow-red-900/50 bg-white">
+                <div>
+                    <span class="text-white font-bold text-base tracking-wide block">PAPELETA STORE</span>
+                    <span id="admin-badge-sidebar" class="admin-badge hidden">ADMIN</span>
+                </div>
             </div>
-        </div>
             <nav class="space-y-2">
                 <div class="text-xs text-gray-500 uppercase font-semibold mb-4 px-3 tracking-wider">Principal</div>
                 <a href="#" onclick="showSection('dashboard')" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fas fa-home w-5"></i><span>Inicio</span></a>
@@ -147,12 +107,17 @@
                     <h1 class="text-2xl font-bold text-white mb-1">Bienvenido, <span id="header-username" class="gradient-text">usuario</span><span id="header-admin-badge" class="admin-badge hidden ml-2">ADMIN</span></h1>
                     <p class="text-gray-400 text-sm">Gestiona tus productos y licencias desde aquí</p>
                 </div>
-                <a href="index.html" class="btn-primary px-5 py-2.5 rounded-lg text-white font-bold flex items-center gap-2 shadow-lg shadow-red-900/20"><i class="fas fa-shopping-cart"></i> Ir al Catálogo</a>
+                <div class="flex gap-3">
+                    <!-- BOTÓN DE LIMPIEZA SOLO PARA ADMIN -->
+                    <button id="clean-licenses-btn" onclick="cleanDuplicateLicenses()" class="hidden px-4 py-2.5 rounded-lg border border-yellow-600/30 text-yellow-400 hover:bg-yellow-900/20 font-medium flex items-center gap-2 text-sm transition-all">
+                        <i class="fas fa-broom"></i> Limpiar DB
+                    </button>
+                    <a href="index.html" class="btn-primary px-5 py-2.5 rounded-lg text-white font-bold flex items-center gap-2 shadow-lg shadow-red-900/20"><i class="fas fa-shopping-cart"></i> Ir al Catálogo</a>
+                </div>
             </div>
         </header>
 
         <div class="p-6 md:p-8 flex-grow">
-            
             <!-- Dashboard Section -->
             <div id="section-dashboard" class="section active">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -236,7 +201,6 @@
                         <div class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5">
                             <i class="fas fa-comment-slash text-gray-600 text-4xl mb-3"></i>
                             <p class="text-gray-400">Aún no has dejado ninguna reseña.</p>
-                            <p class="text-gray-500 text-sm mt-2">Ve a tus productos activos y deja tu opinión.</p>
                         </div>
                     </div>
                 </div>
@@ -272,11 +236,11 @@
             </div>
             <div class="mb-6">
                 <label class="block text-gray-400 text-sm mb-2">Tu reseña:</label>
-                <textarea id="review-text" class="input-field review-textarea w-full px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none" placeholder="Comparte tu experiencia con este producto..."></textarea>
+                <textarea id="review-text" class="input-field w-full px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none h-32" placeholder="Comparte tu experiencia..."></textarea>
             </div>
             <div class="flex gap-3">
                 <button onclick="closeReviewModal()" class="flex-1 px-4 py-3 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-800 font-medium">Cancelar</button>
-                <button onclick="submitReview()" class="flex-1 btn-primary px-4 py-3 rounded-lg text-white font-bold"><i class="fas fa-paper-plane mr-2"></i> Enviar Reseña</button>
+                <button onclick="submitReview()" class="flex-1 btn-primary px-4 py-3 rounded-lg text-white font-bold"><i class="fas fa-paper-plane mr-2"></i> Enviar</button>
             </div>
         </div>
     </div>
@@ -294,12 +258,9 @@
     <div id="toast-container" class="toast-container"></div>
 
     <script>
-        // Configuración
         const CLIENT_ID = '1213866547181780992'; 
         const REDIRECT_URI = window.location.href.split('#')[0]; 
         const ADMIN_DISCORD_IDS = ['890526767608127489']; 
-        
-        // URL DEL WEBHOOK DE DISCORD
         const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1530350855100956853/mqzdvlTBOx2JZ3wlumx-LdLAus3sZyg610PeoxK9ds4jpqxMK9t0sBT_2Lo-U-TDutRF";
 
         const firebaseConfig = {
@@ -320,8 +281,6 @@
         let userFixedLicenseKey = null;
         let currentReviewProduct = null;
         let selectedRating = 0;
-
-        // --- Funciones de Utilidad ---
 
         function showToast(message, type = 'success', title = '') {
             const container = document.getElementById('toast-container');
@@ -365,6 +324,7 @@
                     document.getElementById('header-admin-badge').classList.remove('hidden');
                     document.getElementById('sidebar-role').textContent = 'Administrador';
                     document.getElementById('sidebar-role').classList.add('text-red-500');
+                    document.getElementById('clean-licenses-btn').classList.remove('hidden'); // Mostrar botón de limpieza
                 } else {
                     currentUserRole = 'client';
                     document.getElementById('sidebar-role').textContent = 'Cliente';
@@ -434,8 +394,6 @@
             if (saved.port) document.getElementById('server-port').value = saved.port;
         });
 
-        // --- Lógica Principal de Reseñas ---
-
         async function submitReview() {
             if (!currentReviewProduct) return;
             if (selectedRating === 0) { showToast('Por favor selecciona una calificación', 'warning'); return; }
@@ -443,7 +401,6 @@
             if (!reviewText) { showToast('Por favor escribe tu reseña', 'warning'); return; }
             
             try {
-                // Verificar si ya reseñó
                 const existingReview = await db.collection("Resenas")
                     .where("product_id", "==", currentReviewProduct)
                     .where("user_id", "==", currentUser.id)
@@ -451,12 +408,10 @@
                 
                 if (!existingReview.empty) { showToast('Ya has dejado una reseña para este producto', 'error'); closeReviewModal(); return; }
                 
-                // Obtener datos del producto (Nombre e Imagen)
                 const product = allProducts.find(p => String(p.id) === String(currentReviewProduct) || String(p.docId) === String(currentReviewProduct));
                 const productName = product ? product.name : 'Producto General';
                 const productImage = product && product.image_url ? product.image_url : null;
 
-                // 1. Guardar en Firebase
                 await db.collection("Resenas").add({
                     product_id: currentReviewProduct,
                     user_id: currentUser.id,
@@ -468,24 +423,16 @@
                     visible_to: 'admin'
                 });
                 
-                // 2. ENVIAR AL WEBHOOK CON DISEÑO ROJO NEÓN E IMAGEN GRANDE
                 await sendReviewToWebhook(productName, reviewText, selectedRating, productImage);
 
-                // ✅ ACTUALIZACIÓN INSTANTÁNEA DE LA INTERFAZ (SIN RECARGAR)
-                // Buscamos el botón específico en la lista de productos y lo cambiamos por el verde
                 const reviewBtn = document.querySelector(`button[onclick*="openReviewModal"][onclick*="'${currentReviewProduct}'"]`);
                 if (reviewBtn) {
-                    // Reemplazamos el HTML del botón por el estado "Reseñado"
                     reviewBtn.outerHTML = `<button disabled class="px-4 py-2 rounded-lg bg-green-900/30 border border-green-600/30 text-green-400 text-sm cursor-not-allowed"><i class="fas fa-check mr-1"></i> Reseñado</button>`;
                 }
 
                 showToast('¡Reseña enviada exitosamente!', 'success');
                 closeReviewModal();
-                
-                // Si estamos en la pestaña de reseñas, actualizamos esa lista también
-                if (document.getElementById('section-reviews').classList.contains('active')) {
-                    loadMyReviews();
-                }
+                if (document.getElementById('section-reviews').classList.contains('active')) loadMyReviews();
 
             } catch (error) {
                 console.error("Error al enviar reseña:", error);
@@ -493,74 +440,36 @@
             }
         }
 
-        // ✅ FUNCIÓN DE WEBHOOK MEJORADA (ROJO NEÓN + IMAGEN PRODUCTO)
         async function sendReviewToWebhook(productName, reviewText, rating, imageUrl) {
             try {
-                // Limpiar texto para evitar errores JSON
                 const safeReviewText = reviewText.replace(/"/g, "'").replace(/\\/g, "");
                 const safeProductName = productName.replace(/"/g, "'").replace(/\\/g, "");
-
-                // Generar estrellas visuales
                 const starsString = "★".repeat(rating) + "☆".repeat(5 - rating);
                 
-                // Construir payload
                 const payload = {
                     username: "Papeleta Store",
-                     avatar_url: "https://papeleta-script-github-io.vercel.app/files/999.png",
-                    embeds: [
-                        {
-                            title: "✨ Nueva Valoración Recibida",
-                            description: `**Opinión del cliente:**\n> "${safeReviewText}"`,
-                            color: 16711680, // ROJO PURO (0xFF0000) para efecto neón en Discord
-                            fields: [
-                                {
-                                    name: " Producto",
-                                    value: `\`${safeProductName}\``,
-                                    inline: true
-                                },
-                                {
-                                    name: "⭐ Calificación",
-                                    value: `${starsString} (${rating}/5)`,
-                                    inline: true
-                                },
-                                {
-                                    name: "👤 Cliente",
-                                    value: `<@${currentUser.id}> (${currentUser.username})`,
-                                    inline: false
-                                }
-                            ],
-                            footer: {
-                                text: "Papeleta Store",
-                                icon_url: "https://papeleta-script-github-io.vercel.app/favicon.ico"
-                            },
-                            timestamp: new Date().toISOString()
-                        }
-                    ]
+                    avatar_url: "https://papeleta-script-github-io.vercel.app/files/999.png",
+                    embeds: [{
+                        title: "✨ Nueva Valoración Recibida",
+                        description: `**Opinión del cliente:**\n> "${safeReviewText}"`,
+                        color: 16711680,
+                        fields: [
+                            { name: "📦 Producto", value: `\`${safeProductName}\``, inline: true },
+                            { name: "⭐ Calificación", value: `${starsString} (${rating}/5)`, inline: true },
+                            { name: "👤 Cliente", value: `<@${currentUser.id}> (${currentUser.username})`, inline: false }
+                        ],
+                        footer: { text: "Papeleta Store", icon_url: "https://papeleta-script-github-io.vercel.app/favicon.ico" },
+                        timestamp: new Date().toISOString()
+                    }]
                 };
 
-                // Agregar imagen grande al final si existe y es válida
                 if (imageUrl && typeof imageUrl === 'string' && imageUrl.startsWith('http')) {
                     payload.embeds[0].image = { url: imageUrl };
                 }
 
-                // Enviar petición
-                const response = await fetch(DISCORD_WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error("❌ Discord API Error:", response.status, errorText);
-                    throw new Error(`HTTP ${response.status}: ${errorText}`);
-                }
-
-                console.log("✅ Reseña enviada a Discord correctamente.");
-            } catch (err) {
-                console.error(" Error crítico en sendReviewToWebhook:", err);
-                showToast('Error al enviar a Discord. Revisa la consola (F12).', 'error');
-            }
+                const response = await fetch(DISCORD_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            } catch (err) { console.error("Error en webhook:", err); }
         }
 
         async function loadMyReviews() {
@@ -577,9 +486,8 @@
                 }
                 
                 const snapshot = await db.collection("Resenas").where("user_id", "==", currentUser.id).get();
-                
                 if (snapshot.empty) {
-                    container.innerHTML = `<div class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5"><i class="fas fa-comment-slash text-gray-600 text-4xl mb-3"></i><p class="text-gray-400">Aún no has dejado ninguna reseña.</p><p class="text-gray-500 text-sm mt-2">Ve a tus productos activos y deja tu opinión.</p></div>`;
+                    container.innerHTML = `<div class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5"><i class="fas fa-comment-slash text-gray-600 text-4xl mb-3"></i><p class="text-gray-400">Aún no has dejado ninguna reseña.</p></div>`;
                     return;
                 }
                 
@@ -599,8 +507,7 @@
                 });
                 container.innerHTML = reviewsHTML;
             } catch (error) {
-                console.error("Error detallado al cargar reseñas:", error);
-                container.innerHTML = `<div class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5"><i class="fas fa-exclamation-triangle text-red-500 text-4xl mb-3"></i><p class="text-red-400 font-semibold">Error al cargar las reseñas</p><p class="text-gray-500 text-sm mt-2">${error.message}</p></div>`;
+                console.error("Error al cargar reseñas:", error);
             }
         }
 
@@ -610,10 +517,7 @@
                 await db.collection("Resenas").doc(reviewId).delete();
                 showToast('Reseña eliminada', 'success');
                 loadMyReviews();
-            } catch (error) {
-                console.error("Error al eliminar reseña:", error);
-                showToast('Error al eliminar la reseña', 'error');
-            }
+            } catch (error) { showToast('Error al eliminar', 'error'); }
         }
 
         function generateUniqueKey() {
@@ -623,17 +527,27 @@
             return key;
         }
 
+        // ✅ FUNCIÓN CORREGIDA: Inicializa el array assigned_products
         async function ensureFixedLicense() {
             if (!currentUser) return;
             try {
-                const snapshot = await db.collection("Licencias").where("discord_id", "==", currentUser.id).where("type", "==", "general").limit(1).get();
+                const snapshot = await db.collection("Licencias")
+                    .where("discord_id", "==", currentUser.id)
+                    .where("type", "==", "general")
+                    .limit(1).get();
+                
                 if (!snapshot.empty) {
                     userFixedLicenseKey = snapshot.docs[0].data().key;
                 } else {
                     const newKey = generateUniqueKey();
                     await db.collection("Licencias").add({
-                        discord_id: currentUser.id, username: currentUser.username, key: newKey, type: "general",
-                        created_at: firebase.firestore.FieldValue.serverTimestamp(), status: 'active'
+                        discord_id: currentUser.id,
+                        username: currentUser.username,
+                        key: newKey,
+                        type: "general",
+                        assigned_products: [], // ← Array vacío para que index.html pueda agregar productos
+                        created_at: firebase.firestore.FieldValue.serverTimestamp(),
+                        status: 'active'
                     });
                     userFixedLicenseKey = newKey;
                 }
@@ -696,21 +610,17 @@
                         const hasReview = reviewedProductIds.has(String(item.id)) || reviewedProductIds.has(String(item.docId));
                         const safeName = item.name.replace(/'/g, "\\'");
                         
-                        // Lógica para mostrar Listo/Gratis
                         let priceDisplay = '';
                         let priceClass = 'text-white font-bold';
-                        
                         const rawPrice = String(item.price).toLowerCase();
                         const numericPrice = parseFloat(rawPrice.replace('$', '').replace(',', ''));
                         
-                        // Si es un número mayor a 0 = COMPRADO → "Listo"
-                        // Si es 0, "gratis", "regalado" o no es número → "Gratis"
                         if (!isNaN(numericPrice) && numericPrice > 0) {
                             priceDisplay = 'Listo';
-                            priceClass = 'text-green-400 font-bold'; // Verde para comprado
+                            priceClass = 'text-green-400 font-bold';
                         } else {
                             priceDisplay = 'Gratis';
-                            priceClass = 'text-white font-bold'; // Blanco para gratis/regalado
+                            priceClass = 'text-white font-bold';
                         }
 
                         return `<div class="bg-[#0d0505] border border-red-900/30 rounded-xl p-4 flex items-center justify-between hover:border-red-600/50 transition-all">
@@ -770,6 +680,31 @@
             const original = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-check"></i> Guardado';
             setTimeout(() => btn.innerHTML = original, 2000);
+        }
+
+        // ✅ FUNCIÓN DE LIMPIEZA PARA EL ADMINISTRADOR
+        async function cleanDuplicateLicenses() {
+            if (!isAdmin()) { alert('Solo administradores'); return; }
+            if (!confirm('¿Estás seguro de eliminar todas las licencias que NO sean de tipo "general"? Esto no se puede deshacer.')) return;
+            
+            try {
+                showToast('Limpiando base de datos...', 'warning');
+                const allLicenses = await db.collection("Licencias").get();
+                let deletedCount = 0;
+                
+                for (const doc of allLicenses.docs) {
+                    const data = doc.data();
+                    // Borrar licencias que NO sean tipo "general" (las viejas por producto)
+                    if (data.type !== "general") {
+                        await db.collection("Licencias").doc(doc.id).delete();
+                        deletedCount++;
+                    }
+                }
+                showToast(`Se eliminaron ${deletedCount} licencias duplicadas correctamente`, 'success');
+            } catch (error) {
+                console.error("Error limpiando licencias:", error);
+                showToast('Error al limpiar: ' + error.message, 'error');
+            }
         }
     </script>
 </body>
