@@ -116,7 +116,6 @@
                 <a href="#" onclick="showSection('dashboard')" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fas fa-home w-5"></i><span>Inicio</span></a>
                 <a href="index.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fas fa-store w-5"></i><span>Tienda</span></a>
                 <a href="#" onclick="showSection('reviews')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fas fa-star w-5"></i><span>Mis Reseñas</span></a>
-                <!-- SE ELIMINÓ EL BOTÓN DE SERVER.LUA AQUÍ -->
                 <a href="#" onclick="showSection('support')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fas fa-headset w-5"></i><span>Soporte</span></a>
                 <a href="https://discord.gg/rvxEdWcGkf" target="_blank" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fab fa-discord w-5"></i><span>Discord</span></a>
             </nav>
@@ -249,8 +248,6 @@
         </div>
     </main>
 
-    <!-- SE ELIMINÓ EL MODAL DE LUA COMPLETAMENTE -->
-
     <!-- Review Modal -->
     <div id="review-modal" class="review-modal">
         <div class="review-modal-content">
@@ -317,8 +314,6 @@
         let currentReviewProduct = null;
         let selectedRating = 0;
 
-        // SE ELIMINÓ LA VARIABLE SERVER_LUA_CODE
-
         // --- Funciones de Utilidad ---
 
         function showToast(message, type = 'success', title = '') {
@@ -359,7 +354,6 @@
                 currentUser = user;
                 if (isAdmin()) {
                     currentUserRole = 'admin';
-                    // SE ELIMINÓ LA LÓGICA DE MOSTRAR EL BOTÓN DE LUA
                     document.getElementById('admin-badge-sidebar').classList.remove('hidden');
                     document.getElementById('header-admin-badge').classList.remove('hidden');
                     document.getElementById('sidebar-role').textContent = 'Administrador';
@@ -391,8 +385,6 @@
             event.currentTarget.classList.add('active');
             if (section === 'reviews') loadMyReviews();
         }
-
-        // SE ELIMINARON LAS FUNCIONES openLuaModal, closeLuaModal, copyLuaCode
 
         function openReviewModal(productId, productName) {
             currentReviewProduct = productId;
@@ -472,9 +464,22 @@
                 // 2. ENVIAR AL WEBHOOK CON DISEÑO ROJO NEÓN E IMAGEN GRANDE
                 await sendReviewToWebhook(productName, reviewText, selectedRating, productImage);
 
+                // ✅ ACTUALIZACIÓN INSTANTÁNEA DE LA INTERFAZ (SIN RECARGAR)
+                // Buscamos el botón específico en la lista de productos y lo cambiamos por el verde
+                const reviewBtn = document.querySelector(`button[onclick*="openReviewModal"][onclick*="'${currentReviewProduct}'"]`);
+                if (reviewBtn) {
+                    // Reemplazamos el HTML del botón por el estado "Reseñado"
+                    reviewBtn.outerHTML = `<button disabled class="px-4 py-2 rounded-lg bg-green-900/30 border border-green-600/30 text-green-400 text-sm cursor-not-allowed"><i class="fas fa-check mr-1"></i> Reseñado</button>`;
+                }
+
                 showToast('¡Reseña enviada exitosamente!', 'success');
                 closeReviewModal();
-                if (document.getElementById('section-reviews').classList.contains('active')) loadMyReviews();
+                
+                // Si estamos en la pestaña de reseñas, actualizamos esa lista también
+                if (document.getElementById('section-reviews').classList.contains('active')) {
+                    loadMyReviews();
+                }
+
             } catch (error) {
                 console.error("Error al enviar reseña:", error);
                 showToast('Error al enviar la reseña', 'error');
