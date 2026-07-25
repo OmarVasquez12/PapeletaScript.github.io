@@ -915,60 +915,86 @@
     }
 
     async function sendDiscordNotification(purchaseData, isFree = false) {
-        try {
-            console.log("🔴 Enviando notificación a Discord...", purchaseData);
+    try {
+        console.log("🔴 Enviando notificación a Discord...", purchaseData);
 
-            const productNames = purchaseData.products.map(p => p.name).join(', ');
-            const priceText = isFree ? "GRATIS" : (purchaseData.total_price || "$0.00");
-            const methodText = isFree ? "Reclamo Gratis" : "PayPal";
+        const productNames = purchaseData.products.map(p => p.name).join(', ');
+        const priceText = isFree ? "GRATIS" : (purchaseData.total_price || "$0.00");
+        const methodText = isFree ? "Reclamo Gratis" : "PayPal";
 
-            const embedColor = isFree ? 5763719 : 16711680;
+        const embedColor = isFree ? 5763719 : 16711680;
 
-            const payload = {
-                username: "Papeleta Store",
-                avatar_url: "https://cdn.discordapp.com/embed/avatars/0.png",
-                embeds: [{
-                    title: isFree ? "🎁 Producto reclamado" : "✅ Compra completada",
-                    description: isFree 
-                        ? `Se reclamó un producto gratuito. Gracias por apoyar a **Papeleta Store**.`
-                        : `Tu compra fue procesada correctamente. Gracias por apoyar a **Papeleta Store**.`,
-                    color: embedColor,
-                    thumbnail: { url: "https://cdn.discordapp.com/embed/avatars/0.png" },
-                    fields: [
-                        { name: "👤 Cliente", value: `<@${purchaseData.discord_id}> (**${purchaseData.username}**)`, inline: true },
-                        { name: "📦 Producto", value: productNames || "Sin nombre", inline: true },
-                        { name: "💳 Método", value: methodText, inline: true },
-                        { name: "💰 Precio", value: `**${priceText}**`, inline: true }
-                    ],
-                    footer: { text: "Papeleta Store • " + new Date().toLocaleString('es-ES') },
-                    timestamp: new Date().toISOString()
-                }]
-            };
-
-            if (purchaseData.productImage && (purchaseData.productImage.startsWith('http://') || purchaseData.productImage.startsWith('https://'))) {
-                payload.embeds[0].image = { url: purchaseData.productImage };
+        // Obtener la primera imagen del producto (si existe)
+        let productImageUrl = null;
+        if (purchaseData.productImage) {
+            // Si es URL de Cloudinary, usarla directamente
+            if (purchaseData.productImage.includes('cloudinary.com') || 
+                purchaseData.productImage.startsWith('http://') || 
+                purchaseData.productImage.startsWith('https://')) {
+                productImageUrl = purchaseData.productImage;
             }
+        }
 
-            const response = await fetch(DISCORD_WEBHOOK_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+        const payload = {
+            username: "Papeleta Store",
+            avatar_url: "https://cdn.discordapp.com/embed/avatars/0.png",
+            embeds: [{
+                title: isFree ? "🎁 Producto reclamado" : "✅ Compra completada",
+                description: isFree 
+                    ? `Se reclamó un producto gratuito. Gracias por apoyar a **Papeleta Store**.`
+                    : `Tu compra fue procesada correctamente. Gracias por apoyar a **Papeleta Store**.`,
+                color: embedColor,
+                // Thumbnail (imagen pequeña a la derecha)
+                thumbnail: productImageUrl ? { url: productImageUrl } : { url: "https://cdn.discordapp.com/embed/avatars/0.png" },
+                fields: [
+                    { 
+                        name: "👤 Cliente", 
+                        value: `<@${purchaseData.discord_id}> (**${purchaseData.username}**)`, 
+                        inline: true 
+                    },
+                    { 
+                        name: "📦 Producto", 
+                        value: productNames || "Sin nombre", 
+                        inline: true 
+                    },
+                    { 
+                        name: "💳 Método", 
+                        value: methodText, 
+                        inline: true 
+                    },
+                    { 
+                        name: "💰 Precio", 
+                        value: `**${priceText}**`, 
+                        inline: true 
+                    }
+                ],
+                footer: {
+                    text: "Papeleta Store • " + new Date().toLocaleString('es-ES')
+                },
+                timestamp: new Date().toISOString()
+            }]
+        };
 
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('❌ Error Discord:', response.status, errorText);
-                return false;
-            }
+        const response = await fetch(DISCORD_WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
 
-            console.log("✅ Notificación enviada con éxito");
-            return true;
-
-        } catch (error) {
-            console.error('❌ Error fatal en notificación:', error);
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('❌ Error Discord:', response.status, errorText);
             return false;
         }
+
+        console.log("✅ Notificación enviada con éxito");
+        return true;
+
+    } catch (error) {
+        console.error('❌ Error fatal en notificación:', error);
+        return false;
     }
+}
 
     async function claimFreeProducts() {
         if (!currentUser) { alert('Debes iniciar sesión para reclamar productos gratis'); openLoginModal(); return; }
