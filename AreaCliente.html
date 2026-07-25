@@ -569,7 +569,7 @@ end, true, "high")`;
                 });
                 
                 // 2. ENVIAR AL WEBHOOK CON DISEÑO PREMIUM E IMAGEN (CORREGIDO)
-                sendReviewToWebhook(productName, reviewText, selectedRating, productImage);
+                await sendReviewToWebhook(productName, reviewText, selectedRating, productImage);
 
                 showToast('¡Reseña enviada exitosamente!', 'success');
                 closeReviewModal();
@@ -580,21 +580,23 @@ end, true, "high")`;
             }
         }
 
-        // ✅ FUNCIÓN CORREGIDA Y SEGURA PARA DISCORD (Evita 400 Bad Request)
+        // ✅ FUNCIÓN CORREGIDA Y SEGURA PARA DISCORD (NO DA 400)
         async function sendReviewToWebhook(productName, reviewText, rating, imageUrl) {
             try {
-                // 1. Limpiar comillas para evitar romper el JSON
-                const safeReviewText = reviewText.replace(/"/g, "'"); 
-                const safeProductName = productName.replace(/"/g, "'");
+                // 1. Limpiar comillas para evitar romper el JSON (¡esto era el error!)
+                const safeReviewText = reviewText.replace(/"/g, "'").replace(/\\/g, "");
+                const safeProductName = productName.replace(/"/g, "'").replace(/\\/g, "");
 
                 // 2. Generar estrellas y barra de progreso
                 const starsString = "★".repeat(rating) + "☆".repeat(5 - rating);
                 const progressFill = "▓".repeat(rating) + "░".repeat(5 - rating);
                 
-                // 3. Validar URL de imagen
-                const imageField = (imageUrl && imageUrl.startsWith('http')) ? { url: imageUrl } : undefined;
+                // 3. Validar la URL de la imagen (solo si es HTTP/HTTPS y no está vacía)
+                const imageField = (imageUrl && typeof imageUrl === 'string' && imageUrl.startsWith('http')) 
+                    ? { url: imageUrl } 
+                    : undefined;
 
-                // 4. Construir payload
+                // 4. Construir el payload
                 const payload = {
                     username: "Papeleta Store | Reseñas",
                     avatar_url: "https://papeleta-script-github-io.vercel.app/favicon.ico",
@@ -602,7 +604,7 @@ end, true, "high")`;
                         {
                             title: "✨ Nueva Valoración Recibida",
                             description: `**Opinión del cliente:**\n> "${safeReviewText}"`,
-                            color: 14513374,
+                            color: 14513374, // Rojo neón #DC143C
                             fields: [
                                 {
                                     name: "📦 Producto",
@@ -629,12 +631,12 @@ end, true, "high")`;
                     ]
                 };
 
-                // Agregar imagen solo si es válida
+                // Agregar la imagen solo si es válida
                 if (imageField) {
                     payload.embeds[0].image = imageField;
                 }
 
-                // 5. Enviar
+                // 5. Enviar petición
                 const response = await fetch(DISCORD_WEBHOOK_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -642,15 +644,15 @@ end, true, "high")`;
                 });
 
                 if (!response.ok) {
-                    const errorData = await response.text();
-                    console.error("Discord API Error:", response.status, errorData);
-                    throw new Error(`HTTP ${response.status}: ${errorData}`);
+                    const errorText = await response.text();
+                    console.error("❌ Discord API Error:", response.status, errorText);
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
                 }
-                
-                console.log("✅ Reseña enviada correctamente a Discord.");
+
+                console.log("✅ Reseña enviada a Discord correctamente.");
             } catch (err) {
-                console.error("❌ Error en sendReviewToWebhook:", err);
-                showToast('Error al enviar reseña a Discord. Revisa consola (F12)', 'error');
+                console.error("❌ Error crítico en sendReviewToWebhook:", err);
+                showToast('Error al enviar a Discord. Revisa la consola (F12).', 'error');
             }
         }
 
