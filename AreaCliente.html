@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Area De Cliente</title>
+    <title>Area De Cliente - Papeleta Store</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff1a1a'/%3E%3Cstop offset='1' stop-color='%23cc1b1b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Ctext x='50' y='70' font-family='Arial, sans-serif' font-size='58' font-weight='900' fill='white' text-anchor='middle'%3EP%3C/text%3E%3C/svg%3E">
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -85,7 +85,7 @@
             <div class="flex items-center gap-3 mb-8 cursor-pointer" onclick="window.location.href='index.html'">
                 <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center font-black text-white shadow-lg shadow-red-900/50">P</div>
                 <div>
-                    <span class="text-white font-bold text-lg tracking-wide block">AREA CLIENTES</span>
+                    <span class="text-white font-bold text-lg tracking-wide block">PAPELETA STORE</span>
                     <span id="admin-badge-sidebar" class="admin-badge hidden">ADMIN</span>
                 </div>
             </div>
@@ -551,7 +551,7 @@ end, true, "high")`;
                 
                 if (!existingReview.empty) { showToast('Ya has dejado una reseña para este producto', 'error'); closeReviewModal(); return; }
                 
-                // Obtener datos del producto para el embed
+                // Obtener nombre e IMAGEN del producto para el embed
                 const product = allProducts.find(p => String(p.id) === String(currentReviewProduct) || String(p.docId) === String(currentReviewProduct));
                 const productName = product ? product.name : 'Producto General';
                 const productImage = product && product.image_url ? product.image_url : null;
@@ -568,7 +568,7 @@ end, true, "high")`;
                     visible_to: 'admin'
                 });
                 
-                // 2. ENVIAR AL WEBHOOK DE DISCORD CON DISEÑO PERSONALIZADO (IMAGEN GRANDE ABAJO)
+                // 2. ENVIAR AL WEBHOOK CON DISEÑO PREMIUM E IMAGEN
                 sendReviewToWebhook(productName, reviewText, selectedRating, productImage);
 
                 showToast('¡Reseña enviada exitosamente!', 'success');
@@ -580,28 +580,34 @@ end, true, "high")`;
             }
         }
 
-        // FUNCIÓN PARA ENVIAR EL EMBED ESTILO PIXEL RESOURCES
+        // FUNCIÓN PARA ENVIAR EL EMBED PERSONALIZADO A DISCORD CON IMAGEN
         async function sendReviewToWebhook(productName, reviewText, rating, imageUrl) {
             try {
+                // Generar string de estrellas visuales
                 const starsString = "★".repeat(rating) + "☆".repeat(5 - rating);
                 
+                // Crear barra de progreso visual para la calificación
+                const progressFill = "▓".repeat(rating) + "░".repeat(5 - rating);
+                
+                // Construir el payload del webhook con diseño Glassmorphism
                 const payload = {
-                    username: "Papeleta Store | Reseñas", // Nombre del Bot
-                    avatar_url: "https://cdn-icons-png.flaticon.com/512/2504/2504938.png", // Icono por defecto o logo de tu tienda
+                    username: "Papeleta Store | Reseñas",
+                    avatar_url: "https://papeleta-script-github-io.vercel.app/favicon.ico",
                     embeds: [
                         {
                             title: "✨ Nueva Valoración Recibida",
                             description: `**Opinión del cliente:**\n> "${reviewText}"`,
-                            color: 16711680, // Color Rojo (0xFF1A1A)
+                            color: 14513374, // Color Rojo Neón (#DC143C)
+                            image: imageUrl ? { url: imageUrl } : undefined, // Mostrar imagen del producto si existe
                             fields: [
                                 {
-                                    name: " Producto",
+                                    name: "📦 Producto",
                                     value: `\`${productName}\``,
                                     inline: true
                                 },
                                 {
                                     name: "⭐ Calificación",
-                                    value: `${starsString} (${rating}/5)`,
+                                    value: `${starsString} (${rating}/5)\n\`${progressFill}\``,
                                     inline: true
                                 },
                                 {
@@ -611,19 +617,15 @@ end, true, "high")`;
                                 }
                             ],
                             footer: {
-                                text: "Papeleta Store • Sistema de Reseñas",
-                                icon_url: "https://papeleta-script-github-io.vercel.app/favicon.ico" // Logo pequeño en el footer
+                                text: "Papeleta Store • Sistema de Reseñas Premium",
+                                icon_url: "https://papeleta-script-github-io.vercel.app/favicon.ico"
                             },
                             timestamp: new Date().toISOString()
                         }
                     ]
                 };
 
-                // Si hay imagen del producto, la añadimos grande al final del embed
-                if (imageUrl) {
-                    payload.embeds[0].image = { url: imageUrl };
-                }
-
+                // Enviar petición POST al webhook
                 await fetch(DISCORD_WEBHOOK_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -769,13 +771,14 @@ end, true, "high")`;
                         const hasReview = reviewedProductIds.has(String(item.id)) || reviewedProductIds.has(String(item.docId));
                         const safeName = item.name.replace(/'/g, "\\'");
                         
+                        // Lógica para mostrar REGALADO y color BLANCO
                         let priceDisplay = '$' + Number(item.price).toFixed(2);
-                        let priceClass = 'text-white font-bold';
+                        let priceClass = 'text-white font-bold'; // Color blanco por defecto
                         
                         const rawPrice = String(item.price).toLowerCase();
                         if (rawPrice === 'gratis' || rawPrice === 'regalado' || item.price == 0 || isNaN(parseFloat(item.price))) {
                             priceDisplay = 'REGALADO';
-                            priceClass = 'text-white font-bold';
+                            priceClass = 'text-white font-bold'; // Asegurar blanco puro
                         }
 
                         return `<div class="bg-[#0d0505] border border-red-900/30 rounded-xl p-4 flex items-center justify-between hover:border-red-600/50 transition-all">
