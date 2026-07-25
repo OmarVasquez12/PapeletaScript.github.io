@@ -1427,14 +1427,17 @@ async function sendDiscordNotification(purchaseData, isFree = false) {
                     return querySnapshot.docs[0].data(); // Retorna la existente sin crear nada
                 }
 
-                // 2. Si NO existe, creamos UNA SOLA licencia nueva
-                const uniqueKey = generateUniqueKey();
+                // 2. Generar User y Key únicos
+                const newUser = "USER_" + Math.random().toString(36).substring(2, 8).toUpperCase();
+                const newKey = Array.from({length: 24}, () => "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[Math.floor(Math.random() * 36)]).join('');
+
                 const licenseData = { 
                     discord_id: userId, 
                     username: currentUser ? currentUser.username : 'Unknown', 
                     product_id: productId, 
                     product_name: productName, 
-                    key: uniqueKey, 
+                    user_code: newUser, // Este es el dato ["User"]
+                    key: newKey,        // Este es el dato ["Key"]
                     created_at: firebase.firestore.FieldValue.serverTimestamp(), 
                     status: 'active' 
                 };
