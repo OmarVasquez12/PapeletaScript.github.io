@@ -819,66 +819,58 @@
         // FUNCIÓN PARA ENVIAR NOTIFICACIONES A DISCORD
         async function sendDiscordNotification(purchaseData, isFree = false) {
             try {
-                const embed = {
-                    title: "✅ Compra completada",
-                    description: `Tu compra fue procesada correctamente. Gracias por apoyar a **Papeleta Store**`,
-                    color: 16711680, // Color rojo (#FF0000)
-                    fields: [
-                        {
-                            name: " Cliente",
-                            value: `**${purchaseData.username}**\n<@${purchaseData.discord_id}>`,
-                            inline: true
-                        },
-                        {
-                            name: "📦 Producto",
-                            value: purchaseData.products.map(p => p.name).join(', '),
-                            inline: true
-                        },
-                        {
-                            name: " Método",
-                            value: isFree ? "Gratis" : "PayPal (Redirect)",
-                            inline: true
-                        },
-                        {
-                            name: "💰 Precio",
-                            value: isFree ? "**GRATIS** 🎁" : `**$${purchaseData.total_price}**`,
-                            inline: true
-                        }
-                    ],
-                    footer: {
-                        text: "Papeleta Store",
-                        icon_url: "https://cdn.discordapp.com/embed/avatars/0.png"
-                    },
-                    timestamp: new Date().toISOString()
+                console.log("🔴 Intentando enviar notificación a Discord...", purchaseData); // DEBUG EN CONSOLA
+                
+                const productNames = purchaseData.products.map(p => p.name).join(', ');
+                const priceText = isFree ? "GRATIS 🎁" : `$${purchaseData.total_price}`;
+                const methodText = isFree ? "Reclamo Gratis" : "PayPal";
+
+                const payload = {
+                    username: "Papeleta Store",
+                    avatar_url: "https://cdn.discordapp.com/embed/avatars/0.png",
+                    embeds: [{
+                        title: "✅ Compra completada",
+                        description: `Tu compra fue procesada correctamente. Gracias por apoyar a **Papeleta Store**`,
+                        color: 16711680, // Rojo #FF0000
+                        fields: [
+                            { name: "👤 Cliente", value: `<@${purchaseData.discord_id}> (**${purchaseData.username}**)`, inline: true },
+                            { name: "📦 Producto", value: productNames.length > 256 ? productNames.substring(0, 253) + "..." : productNames, inline: true },
+                            { name: "💳 Método", value: methodText, inline: true },
+                            { name: "💰 Precio", value: `**${priceText}**`, inline: true }
+                        ],
+                        footer: { text: "Papeleta Store • " + new Date().toLocaleString('es-ES') },
+                        timestamp: new Date().toISOString()
+                    }]
                 };
 
-                // Si hay imagen del primer producto, agrégala
+                // Si hay imagen del primer producto, agrégala al embed
                 if (purchaseData.productImage) {
-                    embed.image = { url: purchaseData.productImage };
+                    payload.embeds[0].image = { url: purchaseData.productImage };
                 }
 
-                // Si hay múltiples productos, muestra cada uno en lista
+                // Si hay múltiples productos, formatearlos como lista
                 if (purchaseData.products.length > 1) {
-                    embed.fields[1].value = purchaseData.products.map((p, i) => 
-                        `${i + 1}. **${p.name}** - ${p.price}`
-                    ).join('\n');
+                    let list = purchaseData.products.map((p, i) => `${i + 1}. **${p.name}** - ${p.price}`).join('\n');
+                    payload.embeds[0].fields[1].value = list.length > 1024 ? list.substring(0, 1021) + "..." : list;
                 }
 
                 const response = await fetch(DISCORD_WEBHOOK_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        username: "Papeleta Store",
-                        avatar_url: "https://cdn.discordapp.com/embed/avatars/0.png",
-                        embeds: [embed]
-                    })
+                    headers: { 
+                        'Content-Type': 'application/json' 
+                    },
+                    body: JSON.stringify(payload)
                 });
 
                 if (!response.ok) {
-                    console.error('Error enviando notificación a Discord:', response.status);
+                    const errorText = await response.text();
+                    console.error('❌ Error de Discord:', response.status, errorText);
+                    alert(`Error al enviar notificación a Discord: ${response.status}\n${errorText}`);
+                } else {
+                    console.log("✅ Notificación enviada a Discord exitosamente");
                 }
             } catch (error) {
-                console.error('Error en sendDiscordNotification:', error);
+                console.error('❌ Error fatal en sendDiscordNotification:', error);
             }
         }
 
