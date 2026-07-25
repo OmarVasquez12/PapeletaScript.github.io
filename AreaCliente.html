@@ -696,14 +696,21 @@
                         const hasReview = reviewedProductIds.has(String(item.id)) || reviewedProductIds.has(String(item.docId));
                         const safeName = item.name.replace(/'/g, "\\'");
                         
-                        // Lógica para mostrar REGALADO y color BLANCO
-                        let priceDisplay = '$' + Number(item.price).toFixed(2);
-                        let priceClass = 'text-white font-bold'; // Color blanco por defecto
+                        // Lógica para mostrar Listo/Gratis
+                        let priceDisplay = '';
+                        let priceClass = 'text-white font-bold';
                         
                         const rawPrice = String(item.price).toLowerCase();
-                        if (rawPrice === 'gratis' || rawPrice === 'Gratis' || item.price == 0 || isNaN(parseFloat(item.price))) {
-                            priceDisplay = 'REGALADO';
-                            priceClass = 'text-white font-bold'; // Asegurar blanco puro
+                        const numericPrice = parseFloat(rawPrice.replace('$', '').replace(',', ''));
+                        
+                        // Si es un número mayor a 0 = COMPRADO → "Listo"
+                        // Si es 0, "gratis", "regalado" o no es número → "Gratis"
+                        if (!isNaN(numericPrice) && numericPrice > 0) {
+                            priceDisplay = 'Listo';
+                            priceClass = 'text-green-400 font-bold'; // Verde para comprado
+                        } else {
+                            priceDisplay = 'Gratis';
+                            priceClass = 'text-white font-bold'; // Blanco para gratis/regalado
                         }
 
                         return `<div class="bg-[#0d0505] border border-red-900/30 rounded-xl p-4 flex items-center justify-between hover:border-red-600/50 transition-all">
