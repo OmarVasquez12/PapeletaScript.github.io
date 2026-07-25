@@ -820,79 +820,95 @@
         }
 
         // FUNCIÓN CORREGIDA PARA ENVIAR NOTIFICACIONES A DISCORD (ESTILO PIXEL STORE)
-        async function sendDiscordNotification(purchaseData, isFree = false) {
-            try {
-                console.log("🔴 Enviando notificación estilo Pixel Store...", purchaseData); 
-                
-                const productNames = purchaseData.products.map(p => p.name).join(', ');
-                
-                // Formatear precio igual que en la imagen ($5.00 o GRATIS)
-                let priceText = isFree ? "GRATIS" : `$${purchaseData.total_price.replace('$', '')}`; 
-                if(isFree && purchaseData.total_price === "Gratis") priceText = "GRATIS";
+        // FUNCIÓN CORREGIDA PARA ENVIAR NOTIFICACIONES A DISCORD
+async function sendDiscordNotification(purchaseData, isFree = false) {
+    try {
+        console.log("🔴 Enviando notificación a Discord...", purchaseData);
 
-                // Determinar método de pago
-                const methodText = isFree ? "Reclamo Gratis" : "Stripe (Redirect)"; 
-
-                const payload = {
-                    username: "Pixel Resources", // Nombre que aparece arriba del webhook
-                    avatar_url: STORE_LOGO_URL,  // Tu logo
-                    embeds: [{
-                        title: "✅ Compra completada",
-                        description: `Tu compra fue procesada correctamente. Gracias por apoyar a **Pixel Resources**`,
-                        color: 5763719, // Color VERDE (como el check de la imagen). Usa 16711680 para Rojo.
-                        thumbnail: {
-                            url: STORE_LOGO_URL // Logo pequeño en la esquina derecha
-                        },
-                        fields: [
-                            { 
-                                name: "👤 Cliente", 
-                                value: `<@${purchaseData.discord_id}> (**${purchaseData.username}**)`, 
-                                inline: true 
-                            },
-                            { 
-                                name: " Producto", 
-                                value: `[PX]${productNames}`, // Agregué el prefijo [PX] como en la imagen
-                                inline: true 
-                            },
-                            { 
-                                name: "💳 Método", 
-                                value: methodText, 
-                                inline: true 
-                            },
-                            { 
-                                name: "💰 Precio", 
-                                value: `**${priceText}**`, 
-                                inline: true 
-                            }
-                        ],
-                        footer: { 
-                            text: "Pixel Resources • " + new Date().toLocaleString('es-ES') 
-                        },
-                        timestamp: new Date().toISOString()
-                    }]
-                };
-
-                // Si hay imagen del producto, la agregamos grande abajo (opcional, si quieres que se parezca más a la foto)
-                if (purchaseData.productImage) {
-                    payload.embeds[0].image = { url: purchaseData.productImage };
-                }
-
-                const response = await fetch(DISCORD_WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('❌ Error Discord:', response.status, errorText);
-                } else {
-                    console.log("✅ Notificación enviada con éxito");
-                }
-            } catch (error) {
-                console.error('❌ Error fatal en notificación:', error);
-            }
+        const productNames = purchaseData.products.map(p => p.name).join(', ');
+        
+        // Precio limpio
+        let priceText = isFree ? "GRATIS" : (purchaseData.total_price || "$0.00");
+        if (typeof priceText === 'string' && priceText.startsWith('$')) {
+            priceText = priceText; // ya viene con $
+        } else if (!isFree) {
+            priceText = `$${priceText}`;
         }
+
+        // Método correcto
+        const methodText = isFree ? "Reclamo Gratis" : "PayPal";
+
+        const payload = {
+            username: "Papeleta Store",
+            avatar_url: STORE_LOGO_URL,
+            embeds: [{
+                title: isFree ? "🎁 Producto reclamado gratis" : "✅ Compra completada",
+                description: isFree 
+                    ? `Se reclamó un producto gratuito en **Papeleta Store**.`
+                    : `Tu compra fue procesada correctamente. Gracias por apoyar a **Papeleta Store**.`,
+                color: isFree ? 5763719 : 16711680, // Verde para gratis, Rojo para pago
+                thumbnail: {
+                    url: STORE_LOGO_URL
+                },
+                fields: [
+                    { 
+                        name: "👤 Cliente", 
+                        value: `<@${purchaseData.discord_id}> (**${purchaseData.username}**)`, 
+                        inline: true 
+                    },
+                    { 
+                        name: "📦 Producto", 
+                        value: productNames || "Sin nombre", 
+                        inline: true 
+                    },
+                    { 
+                        name: "💳 Método", 
+                        value: methodText, 
+                        inline: true 
+                    },
+                    { 
+                        name: "💰 Precio", 
+                        value: `**${priceText}**`, 
+                        inline: true 
+                    }
+                ],
+                footer: { 
+                    text: "Papeleta Store • " + new Date().toLocaleString('es-ES') 
+                },
+                timestamp: new Date().toISOString()
+            }]
+        };
+
+        // Imagen del producto (opcional)
+        if (purchaseData.productImage) {
+            payload.embeds[0].image = { url: purchaseData.productImage };
+        }
+
+        const response = await fetch(DISCORD_WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('❌ Error Discord:', response.status, errorText);
+            // Ahora sí mostramos el error al usuario
+            alert(`Error al enviar notificación a Discord (${response.status}).\nRevisa la consola (F12) para más detalles.`);
+            return false;
+        }
+
+        console.log("✅ Notificación enviada con éxito a Discord");
+        return true;
+
+    } catch (error) {
+        console.error('❌ Error fatal en notificación Discord:', error);
+        alert('Error de red al enviar notificación a Discord. Revisa la consola (F12).');
+        return false;
+    }
+}
 
         async function claimFreeProducts() {
             if (!currentUser) { alert('Debes iniciar sesión para reclamar productos gratis'); openLoginModal(); return; }
