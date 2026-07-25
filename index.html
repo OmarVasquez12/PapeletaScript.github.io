@@ -819,27 +819,29 @@
             }
         }
 
-        // FUNCIÓN CORREGIDA - Discord no acepta data: URLs
+   
 async function sendDiscordNotification(purchaseData, isFree = false) {
     try {
         console.log("🔴 Enviando notificación a Discord...", purchaseData);
 
         const productNames = purchaseData.products.map(p => p.name).join(', ');
-
-        let priceText = isFree ? "GRATIS" : (purchaseData.total_price || "$0.00");
+        const priceText = isFree ? "GRATIS" : (purchaseData.total_price || "$0.00");
         const methodText = isFree ? "Reclamo Gratis" : "PayPal";
+
+        // Color: Verde para gratis | Rojo para pago (como tu tema)
+        const embedColor = isFree ? 5763719 : 16711680;
 
         const payload = {
             username: "Papeleta Store",
-            avatar_url: "https://cdn.discordapp.com/embed/avatars/0.png", // URL pública HTTPS
+            avatar_url: "https://cdn.discordapp.com/embed/avatars/0.png", // Cambia por tu logo real (HTTPS)
             embeds: [{
-                title: isFree ? "🎁 Producto reclamado gratis" : "✅ Compra completada",
-                description: isFree
-                    ? `Se reclamó un producto gratuito en **Papeleta Store**.`
+                title: isFree ? "🎁 Producto reclamado" : "✅ Compra completada",
+                description: isFree 
+                    ? `Se reclamó un producto gratuito. Gracias por apoyar a **Papeleta Store**.`
                     : `Tu compra fue procesada correctamente. Gracias por apoyar a **Papeleta Store**.`,
-                color: isFree ? 5763719 : 16711680, // Verde = gratis | Rojo = pago
+                color: embedColor,
                 thumbnail: {
-                    url: "https://cdn.discordapp.com/embed/avatars/0.png" // Solo HTTPS
+                    url: "https://cdn.discordapp.com/embed/avatars/0.png" // Logo pequeño (derecha)
                 },
                 fields: [
                     {
@@ -870,12 +872,14 @@ async function sendDiscordNotification(purchaseData, isFree = false) {
             }]
         };
 
-        // SOLO agregar imagen del producto si es una URL real (http/https)
-        // Nunca mandar data:image/... porque Discord lo rechaza
+        // Solo agrega la imagen del producto si es una URL real (http/https)
+        // Si es data:image/... Discord la rechaza y falla todo
         if (purchaseData.productImage && 
             (purchaseData.productImage.startsWith('http://') || 
              purchaseData.productImage.startsWith('https://'))) {
-            payload.embeds[0].image = { url: purchaseData.productImage };
+            payload.embeds[0].image = { 
+                url: purchaseData.productImage 
+            };
         }
 
         const response = await fetch(DISCORD_WEBHOOK_URL, {
@@ -887,7 +891,6 @@ async function sendDiscordNotification(purchaseData, isFree = false) {
         if (!response.ok) {
             const errorText = await response.text();
             console.error('❌ Error Discord:', response.status, errorText);
-            alert(`Error al enviar a Discord (${response.status}). Mira la consola (F12).`);
             return false;
         }
 
@@ -896,11 +899,9 @@ async function sendDiscordNotification(purchaseData, isFree = false) {
 
     } catch (error) {
         console.error('❌ Error fatal en notificación:', error);
-        alert('Error de red al enviar notificación a Discord.');
         return false;
     }
 }
-
         async function claimFreeProducts() {
             if (!currentUser) { alert('Debes iniciar sesión para reclamar productos gratis'); openLoginModal(); return; }
             if (cart.length === 0) { alert('Tu carrito está vacío'); return; }
