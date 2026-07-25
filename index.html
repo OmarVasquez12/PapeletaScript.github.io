@@ -932,7 +932,7 @@ async function sendDiscordNotification(purchaseData, isFree = false) {
                 
                 for (const item of cart) { 
                     // CORRECCIÓN: Crear solo una licencia verificando si ya existe
-                    await createLicenseForProduct(item.id, item.name); 
+                    await ensureSingleLicense(currentUser.id, item.id, item.name); 
                     myAssignedProductIds.add(item.id); 
                 }
                 saveUserDataLocally();
@@ -996,7 +996,7 @@ async function sendDiscordNotification(purchaseData, isFree = false) {
                 
                 for (const item of cart) { 
                     // CORRECCIÓN: Crear solo una licencia verificando si ya existe
-                    await createLicenseForProduct(item.id, item.name); 
+                    await ensureSingleLicense(currentUser.id, item.id, item.name); 
                     myAssignedProductIds.add(item.id); 
                 }
                 saveUserDataLocally();
@@ -1411,28 +1411,27 @@ async function sendDiscordNotification(purchaseData, isFree = false) {
             return key;
         }
 
-        // FUNCIÓN CORREGIDA PARA CREAR UNA SOLA LICENCIA POR USUARIO Y PRODUCTO
-        async function createLicenseForProduct(productId, productName) {
-            if (!currentUser) return null;
+        // --- FUNCIÓN MAESTRA PARA EVITAR DUPLICADOS ---
+        async function ensureSingleLicense(userId, productId, productName) {
             try {
-                // 1. Verificar si YA EXISTE una licencia activa para este usuario y producto
-                const existingLicense = await db.collection("Licencias")
-                    .where("discord_id", "==", currentUser.id)
+                // 1. Buscar si YA EXISTE una licencia activa para este usuario y producto
+                const querySnapshot = await db.collection("Licencias")
+                    .where("discord_id", "==", userId)
                     .where("product_id", "==", productId)
                     .where("status", "==", "active")
                     .limit(1)
                     .get();
 
-                if (!existingLicense.empty) {
-                    console.log("El usuario ya tiene una licencia para este producto. No se crea otra.");
-                    return existingLicense.docs[0].data(); // Retornamos la existente
+                if (!querySnapshot.empty) {
+                    console.log(`✅ Licencia ya existente para ${userId} en ${productId}. No se crea duplicado.`);
+                    return querySnapshot.docs[0].data(); // Retorna la existente
                 }
 
-                // 2. Si no existe, creamos la nueva
+                // 2. Si NO existe, creamos una nueva
                 const uniqueKey = generateUniqueKey();
                 const licenseData = { 
-                    discord_id: currentUser.id, 
-                    username: currentUser.username, 
+                    discord_id: userId, 
+                    username: currentUser ? currentUser.username : 'Unknown', 
                     product_id: productId, 
                     product_name: productName, 
                     key: uniqueKey, 
@@ -1441,11 +1440,12 @@ async function sendDiscordNotification(purchaseData, isFree = false) {
                 };
                 
                 const docRef = await db.collection("Licencias").add(licenseData);
+                console.log(`✨ Nueva licencia creada: ${docRef.id}`);
                 return { id: docRef.id, ...licenseData };
-                
-            } catch (error) { 
-                console.error("Error creando/verificando licencia:", error); 
-                return null; 
+
+            } catch (error) {
+                console.error("❌ Error en ensureSingleLicense:", error);
+                return null;
             }
         }
 
