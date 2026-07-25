@@ -46,31 +46,22 @@
         ::-webkit-scrollbar-thumb:hover { background: #ef4444; }
 
         /* Modales */
-        .lua-modal, .review-modal { position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.9); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.3s ease; }
-        .lua-modal.active, .review-modal.active { display: flex; }
+        .review-modal { position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.9); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.3s ease; }
+        .review-modal.active { display: flex; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
-        .lua-code-container, .review-modal-content { 
+        .review-modal-content { 
             background: linear-gradient(135deg, #150a0a 0%, #0d0505 100%); 
             border: 2px solid #dc2626; 
             border-radius: 16px; 
-            padding: 0; 
+            padding: 32px; 
             width: 100%; 
-            max-width: 1000px; 
-            max-height: 85vh; 
-            display: flex; 
-            flex-direction: column; 
+            max-width: 500px; 
             box-shadow: 0 0 60px rgba(220, 38, 38, 0.3); 
             animation: slideUp 0.3s ease; 
         }
-        .review-modal-content { max-width: 500px; padding: 32px; }
         
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        
-        .lua-header { background: linear-gradient(135deg, #150a0a 0%, #0d0505 100%); border-bottom: 2px solid #dc2626; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; }
-        .lua-body { flex: 1; overflow: auto; padding: 24px; background: #050507; }
-        .lua-pre { font-family: 'Fira Code', monospace; color: #ffffff; font-size: 13px; line-height: 1.7; white-space: pre-wrap; word-break: break-all; margin: 0; }
-        .lua-footer { background: #0d0505; border-top: 1px solid rgba(220, 38, 38, 0.3); padding: 16px 24px; display: flex; justify-content: flex-end; gap: 12px; }
         
         .admin-badge { background: rgba(220, 38, 38, 0.2); border: 1px solid rgba(220, 38, 38, 0.5); color: #ff6b6b; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-left: 8px; }
 
@@ -125,7 +116,7 @@
                 <a href="#" onclick="showSection('dashboard')" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fas fa-home w-5"></i><span>Inicio</span></a>
                 <a href="index.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fas fa-store w-5"></i><span>Tienda</span></a>
                 <a href="#" onclick="showSection('reviews')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fas fa-star w-5"></i><span>Mis Reseñas</span></a>
-                <a href="#" id="nav-server-lua" onclick="openLuaModal()" class="nav-item hidden flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:text-red-400 border border-transparent hover:border-red-600/30"><i class="fas fa-file-code w-5 text-red-400"></i><span>Server.Lua</span><i class="fas fa-shield-alt ml-auto text-xs text-red-500/50"></i></a>
+                <!-- SE ELIMINÓ EL BOTÓN DE SERVER.LUA AQUÍ -->
                 <a href="#" onclick="showSection('support')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fas fa-headset w-5"></i><span>Soporte</span></a>
                 <a href="https://discord.gg/rvxEdWcGkf" target="_blank" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fab fa-discord w-5"></i><span>Discord</span></a>
             </nav>
@@ -258,23 +249,7 @@
         </div>
     </main>
 
-    <!-- Lua Modal -->
-    <div id="lua-modal" class="lua-modal">
-        <div class="lua-code-container">
-            <div class="lua-header">
-                <div class="flex items-center gap-3">
-                    <i class="fas fa-file-code text-red-500 text-2xl"></i>
-                    <div><h3 class="text-xl font-bold text-white">Server.Lua</h3><p class="text-gray-400 text-xs">Sistema de Validación de Licencias</p></div>
-                </div>
-                <button onclick="closeLuaModal()" class="text-gray-400 hover:text-white text-2xl transition-colors"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="lua-body"><pre id="lua-code-content" class="lua-pre"></pre></div>
-            <div class="lua-footer">
-                <button onclick="closeLuaModal()" class="px-4 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-800 font-medium text-sm">Cerrar</button>
-                <button onclick="copyLuaCode()" class="btn-primary px-6 py-2 rounded-lg text-white font-bold flex items-center gap-2 text-sm"><i class="fas fa-copy"></i> Copiar Código</button>
-            </div>
-        </div>
-    </div>
+    <!-- SE ELIMINÓ EL MODAL DE LUA COMPLETAMENTE -->
 
     <!-- Review Modal -->
     <div id="review-modal" class="review-modal">
@@ -342,106 +317,7 @@
         let currentReviewProduct = null;
         let selectedRating = 0;
 
-        // Código Lua (sin cambios)
-        const SERVER_LUA_CODE = `local function clean(s)
-    if not s then return "" end
-    return tostring(s):gsub("%s+", ""):upper()
-end
-
-local function tienePermisoACL()
-    local resourceName = getResourceName(getThisResource())
-    local resObj = "resource." .. resourceName
-    if not isObjectInACLGroup(resObj, aclGetGroup("Admin")) then
-        outputDebugString("[Papeleta Progamador] El resource '"..resourceName.."' NO tiene permiso en ACL 'Admin'", 1)
-        return false
-    end
-    return true
-end
-
-local function cargarScriptPrincipal()
-    if _G["ScriptYaCargado"] then return end
-    _G["ScriptYaCargado"] = true
-end
-
-local function validarLicencia()
-    if not configLicense or not configLicense["User"] or not configLicense["Key"] then
-        outputDebugString("[Papeleta Progamador] Faltan credenciales en config", 1)
-        stopResource(getThisResource())
-        return
-    end
-    local userLocal = clean(configLicense["User"])
-    local keyLocal = clean(configLicense["Key"])
-    local resourceName = clean(getResourceName(getThisResource()))
-    local portActual = tostring(getServerPort() or 22003)
-    
-    fetchRemote("https://api.ipify.org?format=json", function(ipData, ipErr)
-        local ipActual = ""
-        if ipErr == 0 then
-            local ipTable = fromJSON(ipData)
-            if ipTable and ipTable.ip then ipActual = clean(ipTable.ip) end
-        end
-        if ipActual == "" or ipActual == "0.0.0.0" then
-            ipActual = clean(getServerConfigSetting("serverip") or "")
-            if ipActual == "auto" or ipActual == "" then outputDebugString("[Papeleta Progamador] ADVERTENCIA: No se pudo detectar IP automáticamente", 2) end
-        end
-        local ipPortCompleto = ipActual .. ":" .. portActual
-        validarConFirebase(ipPortCompleto, userLocal, keyLocal, resourceName)
-    end)
-end
-
-function validarConFirebase(ipPortCompleto, userLocal, keyLocal, resourceName)
-    local urlBase = "https://firestore.googleapis.com/v1/projects/licenciapapeleta12/databases/(default)/documents/licencias"
-    fetchRemote(urlBase, function(data, err)
-        if err ~= 0 then
-            outputDebugString("[Papeleta Progamador] Fallo de conexión a Firestore", 1)
-            stopResource(getThisResource())
-            return
-        end
-        local db = fromJSON(data)
-        local autorizado = false
-        local keyEncontradaPeroMalSistema = false
-        if db and db.documents then
-            for _, doc in ipairs(db.documents) do
-                local f = doc.fields
-                if f and f.user and f.key and f.ip and f.port and f.active and f.resource then
-                    local fireUser = clean(f.user.stringValue)
-                    local fireKey = clean(f.key.stringValue)
-                    local fireIp = clean(f.ip.stringValue)
-                    local firePort = clean(f.port.stringValue)
-                    local fireResource = clean(f.resource.stringValue)
-                    local fireIpPort = fireIp .. ":" .. firePort
-                    local fireStatus = f.active.booleanValue
-                    if fireKey == keyLocal then
-                        if fireResource == resourceName then
-                            if fireUser == userLocal and fireIpPort == ipPortCompleto and fireStatus == true then autorizado = true end
-                        else
-                            keyEncontradaPeroMalSistema = true
-                            outputDebugString("[Papeleta Progamador] ERROR: Key válida pero pertenece al sistema '" .. fireResource .. "'", 1)
-                        end
-                        break
-                    end
-                end
-            end
-        end
-        if autorizado then
-            if not _G["ScriptYaCargado"] then outputDebugString("[Papeleta Progamador] LICENCIA VERIFICADA EXITOSAMENTE", 3); cargarScriptPrincipal() end
-        else
-            outputDebugString("[Papeleta Progamador] LICENCIA NO VERIFICADA", 1)
-            stopResource(getThisResource())
-        end
-    end)
-end
-
-addEventHandler("onResourceStart", resourceRoot, function()
-    if not tienePermisoACL() then
-        cancelEvent(true, "[Papeleta] Resource sin permiso en ACL 'Admin'")
-        setTimer(function() stopResource(getThisResource()) end, 50, 1)
-        return
-    end
-    outputDebugString("[Papeleta Progamador] INICIANDO VERIFICACION DE LICENCIA", 3)
-    validarLicencia()
-    setTimer(validarLicencia, 8996400000, 0)
-end, true, "high")`;
+        // SE ELIMINÓ LA VARIABLE SERVER_LUA_CODE
 
         // --- Funciones de Utilidad ---
 
@@ -483,7 +359,7 @@ end, true, "high")`;
                 currentUser = user;
                 if (isAdmin()) {
                     currentUserRole = 'admin';
-                    document.getElementById('nav-server-lua').classList.remove('hidden');
+                    // SE ELIMINÓ LA LÓGICA DE MOSTRAR EL BOTÓN DE LUA
                     document.getElementById('admin-badge-sidebar').classList.remove('hidden');
                     document.getElementById('header-admin-badge').classList.remove('hidden');
                     document.getElementById('sidebar-role').textContent = 'Administrador';
@@ -516,28 +392,7 @@ end, true, "high")`;
             if (section === 'reviews') loadMyReviews();
         }
 
-        function openLuaModal() {
-            if (!isAdmin()) { showToast('Acceso denegado. Solo administradores.', 'error'); return; }
-            document.getElementById('lua-code-content').textContent = SERVER_LUA_CODE;
-            document.getElementById('lua-modal').classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeLuaModal() {
-            document.getElementById('lua-modal').classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        function copyLuaCode() {
-            navigator.clipboard.writeText(SERVER_LUA_CODE).then(() => {
-                const btn = event.currentTarget;
-                const originalHTML = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check"></i> ¡Copiado!';
-                setTimeout(() => { btn.innerHTML = originalHTML; }, 2000);
-            });
-        }
-
-        document.getElementById('lua-modal').addEventListener('click', function(e) { if (e.target === this) closeLuaModal(); });
+        // SE ELIMINARON LAS FUNCIONES openLuaModal, closeLuaModal, copyLuaCode
 
         function openReviewModal(productId, productName) {
             currentReviewProduct = productId;
