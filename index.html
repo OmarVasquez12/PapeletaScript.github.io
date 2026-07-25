@@ -552,8 +552,8 @@
         const REDIRECT_URI = 'https://papeleta-script-github-io.vercel.app';
         const DISCORD_INVITE = 'https://discord.gg/rvxEdWcGkf';
         
-        // URL DEL WEBHOOK DE DISCORD
-        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1530350855100956853/mqzdvlTBOx2JZ3wlumx-LdLAus3sZyg610PeoxK9ds4jpqxMK9t0sBT_2Lo-U-TDutRF";
+        // URL DEL WEBHOOK DE DISCORD ACTUALIZADA
+        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1530402751375216720/CM6vWGEYqf3aWPiCmIBf_ycp29k686sO6Fc9HB4wisAZTAGe3OiRt5OKZoxbsINHvjgq";
 
         const ADMIN_DISCORD_IDS = ['890526767608127489']; 
         const ADMIN_DISCORD_USERNAMES = ['Papeleta']; 
@@ -816,6 +816,72 @@
             }
         }
 
+        // FUNCIÓN PARA ENVIAR NOTIFICACIONES A DISCORD
+        async function sendDiscordNotification(purchaseData, isFree = false) {
+            try {
+                const embed = {
+                    title: "✅ Compra completada",
+                    description: `Tu compra fue procesada correctamente. Gracias por apoyar a **Papeleta Store**`,
+                    color: 16711680, // Color rojo (#FF0000)
+                    fields: [
+                        {
+                            name: " Cliente",
+                            value: `**${purchaseData.username}**\n<@${purchaseData.discord_id}>`,
+                            inline: true
+                        },
+                        {
+                            name: "📦 Producto",
+                            value: purchaseData.products.map(p => p.name).join(', '),
+                            inline: true
+                        },
+                        {
+                            name: " Método",
+                            value: isFree ? "Gratis" : "PayPal (Redirect)",
+                            inline: true
+                        },
+                        {
+                            name: "💰 Precio",
+                            value: isFree ? "**GRATIS** 🎁" : `**$${purchaseData.total_price}**`,
+                            inline: true
+                        }
+                    ],
+                    footer: {
+                        text: "Papeleta Store",
+                        icon_url: "https://cdn.discordapp.com/embed/avatars/0.png"
+                    },
+                    timestamp: new Date().toISOString()
+                };
+
+                // Si hay imagen del primer producto, agrégala
+                if (purchaseData.productImage) {
+                    embed.image = { url: purchaseData.productImage };
+                }
+
+                // Si hay múltiples productos, muestra cada uno en lista
+                if (purchaseData.products.length > 1) {
+                    embed.fields[1].value = purchaseData.products.map((p, i) => 
+                        `${i + 1}. **${p.name}** - ${p.price}`
+                    ).join('\n');
+                }
+
+                const response = await fetch(DISCORD_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: "Papeleta Store",
+                        avatar_url: "https://cdn.discordapp.com/embed/avatars/0.png",
+                        embeds: [embed]
+                    })
+                });
+
+                if (!response.ok) {
+                    console.error('Error enviando notificación a Discord:', response.status);
+                }
+            } catch (error) {
+                console.error('Error en sendDiscordNotification:', error);
+            }
+        }
+
         async function claimFreeProducts() {
             if (!currentUser) { alert('Debes iniciar sesión para reclamar productos gratis'); openLoginModal(); return; }
             if (cart.length === 0) { alert('Tu carrito está vacío'); return; }
@@ -826,9 +892,15 @@
                 const purchaseData = {
                     discord_id: currentUser.id, username: currentUser.username, avatar: currentUser.avatar,
                     products: cart.map(item => ({ id: item.id, name: item.name, price: "Gratis" })),
-                    total_price: "Gratis", date: firebase.firestore.FieldValue.serverTimestamp(), status: "Reclamado Exitosamente"
+                    total_price: "Gratis", date: firebase.firestore.FieldValue.serverTimestamp(), status: "Reclamado Exitosamente",
+                    productImage: cart[0]?.image || null
                 };
+                
                 await db.collection("Clientes").add(purchaseData);
+                
+                // Enviar notificación a Discord
+                await sendDiscordNotification(purchaseData, true);
+                
                 for (const item of cart) { await createLicenseForProduct(item.id, item.name); myAssignedProductIds.add(item.id); }
                 saveUserDataLocally();
                 alert('¡Productos reclamados exitosamente! Ya están disponibles en tu biblioteca.\n\nSe han generado tus licencias automáticamente.\n\nGracias por seguir confiando en nuestra tienda.');
@@ -880,9 +952,15 @@
                     products: cart.map(item => ({ id: item.id, name: item.name, price: "$" + Number(item.price).toFixed(2) })),
                     total_price: "$" + cart.reduce((sum, item) => sum + Number(item.price), 0).toFixed(2),
                     payment_id: paymentDetails.id, payer_email: paymentDetails.payer.email_address,
-                    date: firebase.firestore.FieldValue.serverTimestamp(), status: "Pagado"
+                    date: firebase.firestore.FieldValue.serverTimestamp(), status: "Pagado",
+                    productImage: cart[0]?.image || null
                 };
+                
                 await db.collection("Clientes").add(purchaseData);
+                
+                // Enviar notificación a Discord
+                await sendDiscordNotification(purchaseData, false);
+                
                 for (const item of cart) { await createLicenseForProduct(item.id, item.name); myAssignedProductIds.add(item.id); }
                 saveUserDataLocally();
                 alert("¡Productos añadidos a tu biblioteca!\n\nSe han generado tus licencias automáticamente.");
