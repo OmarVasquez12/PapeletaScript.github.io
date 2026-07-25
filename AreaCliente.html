@@ -662,22 +662,42 @@
         }
 
         async function ensureFixedLicense() {
-            if (!currentUser) return;
-            try {
-                // VERIFICAR SI YA EXISTE ANTES DE CREAR (Usando la función única)
-                const snapshot = await db.collection("Licencias").where("discord_id", "==", currentUser.id).where("type", "==", "general").limit(1).get();
-                if (!snapshot.empty) {
-                    userFixedLicenseKey = snapshot.docs[0].data().key;
-                } else {
-                    const newKey = generateUniqueKey();
-                    await db.collection("Licencias").add({
-                        discord_id: currentUser.id, username: currentUser.username, key: newKey, type: "general",
-                        created_at: firebase.firestore.FieldValue.serverTimestamp(), status: 'active'
-                    });
-                    userFixedLicenseKey = newKey;
-                }
-            } catch (error) { console.error("Error licencia:", error); }
+    if (!currentUser) return;
+    
+    try {
+        // 1. Buscamos si el usuario YA tiene una licencia "general" creada
+        const snapshot = await db.collection("Licencias")
+            .where("discord_id", "==", currentUser.id)
+            .where("type", "==", "general") // Buscamos SOLO la licencia maestra
+            .limit(1)
+            .get();
+
+        if (!snapshot.empty) {
+            // Si ya existe, usamos esa misma clave (no creamos otra)
+            userFixedLicenseKey = snapshot.docs[0].data().key;
+            console.log("✅ Licencia fija encontrada:", userFixedLicenseKey);
+        } else {
+            // 2. Si NO existe, creamos UNA SOLA vez la licencia maestra
+            const newKey = generateUniqueKey();
+            await db.collection("Licencias").add({
+                discord_id: currentUser.id, 
+                username: currentUser.username, 
+                key: newKey, 
+                type: "general", // Etiqueta para identificarla como la única
+                created_at: firebase.firestore.FieldValue.serverTimestamp(), 
+                status: 'active'
+            });
+            userFixedLicenseKey = newKey;
+            console.log("✨ Nueva licencia maestra creada:", userFixedLicenseKey);
         }
+        
+        // Actualizamos la visualización en el panel lateral
+        updateLicenseDisplay();
+
+    } catch (error) { 
+        console.error("Error gestionando licencia fija:", error); 
+    }
+}
 
         // REEMPLAZA updateLicenseDisplay EN AreaCliente.html POR ESTA VERSIÓN:
 function updateLicenseDisplay() {
