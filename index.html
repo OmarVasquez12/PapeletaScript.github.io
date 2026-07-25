@@ -4,16 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Papeleta Store</title>
-    <!-- Favicon SVG -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff1a1a'/%3E%3Cstop offset='1' stop-color='%23cc1b1b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Ctext x='50' y='70' font-family='Arial, sans-serif' font-size='58' font-weight='900' fill='white' text-anchor='middle'%3EP%3C/text%3E%3C/svg%3E">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.paypal.com/sdk/js?client-id=sb&currency=USD"></script>
 
-    <!-- FIREBASE V10 COMPAT (UNIFICADO CON AREACLIENTE) -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     
     <style>
         :root {
@@ -125,6 +123,7 @@
             margin-bottom: 50px;
             position: relative;
             z-index: 10; /* Mayor que el slider */
+            /* Opcional: Añadir un pequeño gradiente detrás del texto para asegurar legibilidad si las tarjetas pasan muy cerca */
             background: linear-gradient(to right, transparent 0%, #050507 15%, #050507 85%, transparent 100%);
             padding: 10px 0;
         }
@@ -151,9 +150,10 @@
             position: relative;
             width: 100%;
             overflow: hidden;
+            /* La máscara crea el efecto fade en los bordes */
             -webkit-mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
             mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
-            padding: 20px 0;
+            padding: 20px 0; /* Espacio para sombras */
         }
 
         /* Slider Infinito */
@@ -164,6 +164,7 @@
             animation: scroll-infinite 40s linear infinite;
         }
 
+        /* Pausar animación al pasar el mouse */
         .reviews-slider:hover {
             animation-play-state: paused;
         }
@@ -522,11 +523,13 @@
         <div id="reviews-section-container">
             <section class="reviews-section">
                 <div class="reviews-container">
+                    <!-- TÍTULO FLOTANTE (ENCIMA DEL SLIDER) -->
                     <div class="reviews-title">
                         <h2>LA VOZ DE QUIENES CONFIAN EN <span> NOSOTROS</span></h2>
                         <p>No lo decimos nosotros. Lo dicen quienes ya confían en nuestros scripts</p>
                     </div>
                     
+                    <!-- WRAPPER DEL SLIDER (DEBAJO DEL TÍTULO, CON FADE) -->
                     <div class="reviews-slider-wrapper">
                         <div class="reviews-slider" id="reviews-slider">
                             <div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;">
@@ -546,10 +549,13 @@
 
     <script>
         const CLIENT_ID = '1213866547181780992'; 
-        const REDIRECT_URI = window.location.href.split('#')[0]; // URL dinámica
+        const REDIRECT_URI = 'https://papeleta-script-github-io.vercel.app';
         const DISCORD_INVITE = 'https://discord.gg/rvxEdWcGkf';
         
+        // URL DEL WEBHOOK DE DISCORD ACTUALIZADA
         const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1530402751375216720/CM6vWGEYqf3aWPiCmIBf_ycp29k686sO6Fc9HB4wisAZTAGe3OiRt5OKZoxbsINHvjgq";
+        
+        // IMPORTANTE: CAMBIA ESTA URL POR LA DE TU LOGO REAL
         const STORE_LOGO_URL = "https://cdn.discordapp.com/embed/avatars/0.png"; 
 
         const ADMIN_DISCORD_IDS = ['890526767608127489']; 
@@ -573,15 +579,15 @@
         let localProducts = JSON.parse(localStorage.getItem('papeleta_local_products') || '[]');
         let tempImages = [];
 
-        // CONFIGURACIÓN FIREBASE UNIFICADA
         const firebaseConfig = {
-            apiKey: "AIzaSyBzNb1fj_64JGMKAPkBWXXQxk9RizQUS-E",
-            authDomain: "licenciapapeleta12.firebaseapp.com",
-            projectId: "licenciapapeleta12",
-            storageBucket: "licenciapapeleta12.firebasestorage.app",
-            messagingSenderId: "467063297352",
-            appId: "1:467063297352:web:67767e0cc51f0042fa4f7d",
-            measurementId: "G-6LW8X0B2TH"
+            apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
+            authDomain: "papeletalicencia.firebaseapp.com",
+            databaseURL: "https://papeletalicencia-default-rtdb.firebaseio.com",
+            projectId: "papeletalicencia",
+            storageBucket: "papeletalicencia.firebasestorage.app",
+            messagingSenderId: "677208314051",
+            appId: "1:677208314051:web:a27c04f31d402e83f29276",
+            measurementId: "G-RPJ4KQ6EQ4"
         };
 
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
@@ -589,12 +595,16 @@
 
         // --- FUNCIONES PANEL DE USUARIO (CLIENTE) ---
         function toggleUserPanel() {
-            if (!currentUser) { openLoginModal(); return; }
+            if (!currentUser) {
+                openLoginModal();
+                return;
+            }
             const panel = document.getElementById('user-panel');
             const overlay = document.getElementById('user-panel-overlay');
             panel.classList.toggle('active');
             overlay.classList.toggle('active');
             
+            // Actualizar información del panel
             if (currentUser) {
                 document.getElementById('panel-user-name').textContent = currentUser.username;
                 document.getElementById('user-name').textContent = currentUser.username;
@@ -620,13 +630,19 @@
             }
         }
 
+        // --- FUNCIONES PANEL CONFIG ---
         function toggleConfigPanel() {
-            document.getElementById('config-panel').classList.toggle('active');
-            document.getElementById('config-overlay').classList.toggle('active');
+            const panel = document.getElementById('config-panel');
+            const overlay = document.getElementById('config-overlay');
+            panel.classList.toggle('active');
+            overlay.classList.toggle('active');
         }
 
-        function openAssignProductModal() { window.location.href = 'PasarUsuarios.html'; }
+        function openAssignProductModal() {
+            window.location.href = 'PasarUsuarios.html';
+        }
 
+        // Preview de múltiples imágenes
         function previewMultipleImages(input) {
             const previewContainer = document.getElementById('multiple-images-preview');
             previewContainer.innerHTML = '';
@@ -710,56 +726,62 @@
                 for (let i = 0; i < imageFiles.length; i++) { const resized = await resizeImage(imageFiles[i]); resizedImages.push(resized); }
                 const fileBase64 = await fileToBase64(downloadFile);
                 
+                // GENERAR ID SECUENCIAL (Producto-1, Producto-2, etc.)
                 const productsSnapshot = await db.collection("Productos").get();
                 const nextIdNumber = productsSnapshot.size + 1;
                 const sequentialId = `Producto-${nextIdNumber}`;
 
                 const newProduct = {
-                    id: sequentialId,
+                    id: sequentialId, // Usamos el ID secuencial
                     name: name, price: price, category: category, description: description,
                     image_url: resizedImages[0], images: resizedImages, file_data: fileBase64, file_name: downloadFile.name,
                     created_at: firebase.firestore.FieldValue.serverTimestamp()
                 };
                 
+                // Guardamos usando el ID secuencial como ID del documento
                 await db.collection("Productos").doc(newProduct.id).set(newProduct);
-                alert('Producto guardado exitosamente.');
+                
+                alert('Producto guardado en Firebase exitosamente con ID: ' + sequentialId);
                 document.getElementById('product-form').reset();
                 document.getElementById('multiple-images-preview').innerHTML = '';
                 document.getElementById('file-label-text').innerText = 'Haz clic para subir el archivo descargable';
                 document.getElementById('file-label-text').classList.remove('text-white', 'font-bold');
                 tempImages = []; loadProducts();
-            } catch (error) { console.error(error); alert('Error al guardar: ' + error.message); }
+            } catch (error) { console.error(error); alert('Error al guardar en Firebase: ' + error.message); }
         }
         
         function loadAdminProductsList() {
             const container = document.getElementById('admin-products-list');
-            if (allProducts.length === 0) { container.innerHTML = '<p class="text-gray-500 text-sm">No hay productos aún.</p>'; return; }
+            if (allProducts.length === 0) { container.innerHTML = '<p class="text-gray-500 text-sm">No hay productos locales aún.</p>'; return; }
             container.innerHTML = allProducts.map(p => `
                 <div class="flex items-center gap-3 bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-2.5">
                     <img src="${p.image_url}" class="w-10 h-10 rounded-lg object-cover">
                     <div class="flex-grow min-w-0">
                         <p class="text-white text-sm font-semibold truncate">${escapeHTML(p.name)}</p>
                         <p class="${Number(p.price) === 0 ? 'text-green-400' : 'text-red-400'} text-xs font-bold">${Number(p.price) === 0 ? 'GRATIS' : '$' + Number(p.price).toFixed(2)}</p>
+                        <p class="text-gray-500 text-[10px] truncate"><i class="fas fa-file-archive mr-1"></i>${escapeHTML(p.file_name || 'Sin archivo')}</p>
                     </div>
                     <button onclick="deleteProduct('${p.id}')" class="text-red-400 hover:text-red-300 w-8 h-8 rounded-lg hover:bg-red-950/30 flex items-center justify-center transition-all"><i class="fas fa-trash"></i></button>
                 </div>`).join('');
         }
         
         async function deleteProduct(id) {
-            if (!confirm('¿Eliminar este producto?')) return;
+            if (!confirm('¿Eliminar este producto de la tienda?')) return;
             try {
                 await db.collection("Productos").doc(id).delete();
                 allProducts = allProducts.filter(p => p.id !== id);
                 loadAdminProductsList(); renderProducts();
                 document.getElementById('stat-productos').innerText = '+' + allProducts.length;
-            } catch (error) { alert('Error: ' + error.message); }
+                alert('Producto eliminado de la tienda.');
+            } catch (error) { console.error(error); alert('Error al eliminar: ' + error.message); }
         }
 
         function addToCart(productId) {
             const product = allProducts.find(p => p.id === productId);
             if (!product) return;
             if (currentUser && myAssignedProductIds.has(productId)) { window.location.href = 'AreaCliente.html'; return; }
-            if (cart.find(item => item.id === productId)) { alert('Ya está en el carrito'); return; }
+            const existingItem = cart.find(item => item.id === productId);
+            if (existingItem) { alert('Este producto ya está en tu carrito'); return; }
             
             cart.push({ id: product.id, name: product.name, price: product.price, image: product.image_url });
             updateCartUI();
@@ -789,12 +811,12 @@
                 emptyEl.classList.add('hidden');
                 itemsEl.innerHTML = cart.map(item => `
                     <div class="bg-[#0d0505] border border-red-950/40 rounded-xl p-3 flex items-center gap-3">
-                        <img src="${escapeHTML(item.image || '')}" class="w-16 h-16 object-cover rounded-lg bg-[#150a0a]">
+                        <img src="${escapeHTML(item.image || '')}" alt="${escapeHTML(item.name)}" class="w-16 h-16 object-cover rounded-lg bg-[#150a0a]">
                         <div class="flex-grow min-w-0">
                             <h4 class="text-white font-semibold text-sm truncate">${escapeHTML(item.name)}</h4>
-                            <p class="text-green-400 font-bold text-sm">${Number(item.price) === 0 ? 'GRATIS' : '$' + Number(item.price).toFixed(2)}</p>
+                            <p class="${Number(item.price) === 0 ? 'text-green-400' : 'text-green-400'} font-bold text-sm">${Number(item.price) === 0 ? 'GRATIS' : '$' + Number(item.price).toFixed(2)}</p>
                         </div>
-                        <button onclick="removeFromCart('${item.id}')" class="text-red-400 hover:text-red-300 w-8 h-8 rounded-lg hover:bg-red-950/30 flex items-center justify-center"><i class="fas fa-trash"></i></button>
+                        <button onclick="removeFromCart('${item.id}')" class="text-red-400 hover:text-red-300 w-8 h-8 rounded-lg hover:bg-red-950/30 flex items-center justify-center transition-all"><i class="fas fa-trash"></i></button>
                     </div>`).join('');
                 
                 const total = cart.reduce((sum, item) => sum + Number(item.price), 0);
@@ -806,90 +828,117 @@
             }
         }
 
-        async function sendDiscordNotification(purchaseData, isFree = false) {
-            try {
-                const productNames = purchaseData.products.map(p => p.name).join(', ');
-                const priceText = isFree ? "GRATIS" : (purchaseData.total_price || "$0.00");
-                const methodText = isFree ? "Reclamo Gratis" : "PayPal";
-                const embedColor = isFree ? 5763719 : 16711680;
+   
+async function sendDiscordNotification(purchaseData, isFree = false) {
+    try {
+        console.log("🔴 Enviando notificación a Discord...", purchaseData);
 
-                const payload = {
-                    username: "Papeleta Store",
-                    avatar_url: STORE_LOGO_URL,
-                    embeds: [{
-                        title: isFree ? "🎁 Producto reclamado" : "✅ Compra completada",
-                        description: isFree ? "Se reclamó un producto gratuito." : "Compra procesada correctamente.",
-                        color: embedColor,
-                        fields: [
-                            { name: "👤 Cliente", value: `<@${purchaseData.discord_id}> (${purchaseData.username})`, inline: true },
-                            { name: "📦 Producto", value: productNames, inline: true },
-                            { name: "💰 Precio", value: `**${priceText}**`, inline: true }
-                        ],
-                        footer: { text: "Papeleta Store • " + new Date().toLocaleString('es-ES') },
-                        timestamp: new Date().toISOString()
-                    }]
-                };
+        const productNames = purchaseData.products.map(p => p.name).join(', ');
+        const priceText = isFree ? "GRATIS" : (purchaseData.total_price || "$0.00");
+        const methodText = isFree ? "Reclamo Gratis" : "PayPal";
 
-                if (purchaseData.productImage && purchaseData.productImage.startsWith('http')) {
-                    payload.embeds[0].image = { url: purchaseData.productImage };
-                }
+        // Color: Verde para gratis | Rojo para pago (como tu tema)
+        const embedColor = isFree ? 5763719 : 16711680;
 
-                await fetch(DISCORD_WEBHOOK_URL, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
-                });
-            } catch (error) { console.error('Error en webhook:', error); }
+        const payload = {
+            username: "Papeleta Store",
+            avatar_url: "https://cdn.discordapp.com/embed/avatars/0.png", // Cambia por tu logo real (HTTPS)
+            embeds: [{
+                title: isFree ? "🎁 Producto reclamado" : "✅ Compra completada",
+                description: isFree 
+                    ? `Se reclamó un producto gratuito. Gracias por apoyar a **Papeleta Store**.`
+                    : `Tu compra fue procesada correctamente. Gracias por apoyar a **Papeleta Store**.`,
+                color: embedColor,
+                thumbnail: {
+                    url: "https://cdn.discordapp.com/embed/avatars/0.png" // Logo pequeño (derecha)
+                },
+                fields: [
+                    {
+                        name: "👤 Cliente",
+                        value: `<@${purchaseData.discord_id}> (**${purchaseData.username}**)`,
+                        inline: true
+                    },
+                    {
+                        name: "📦 Producto",
+                        value: productNames || "Sin nombre",
+                        inline: true
+                    },
+                    {
+                        name: " Método",
+                        value: methodText,
+                        inline: true
+                    },
+                    {
+                        name: "💰 Precio",
+                        value: `**${priceText}**`,
+                        inline: true
+                    }
+                ],
+                footer: {
+                    text: "Papeleta Store • " + new Date().toLocaleString('es-ES')
+                },
+                timestamp: new Date().toISOString()
+            }]
+        };
+
+        // Solo agrega la imagen del producto si es una URL real (http/https)
+        // Si es data:image/... Discord la rechaza y falla todo
+        if (purchaseData.productImage && 
+            (purchaseData.productImage.startsWith('http://') || 
+             purchaseData.productImage.startsWith('https://'))) {
+            payload.embeds[0].image = { 
+                url: purchaseData.productImage 
+            };
         }
 
-        function generateUniqueKey() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; let key = '';
-            for (let i = 0; i < 24; i++) key += chars.charAt(Math.floor(Math.random() * chars.length));
-            return key;
+        const response = await fetch(DISCORD_WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('❌ Error Discord:', response.status, errorText);
+            return false;
         }
 
-        async function getOrCreateLicense(userId, productId, productName) {
-            try {
-                const querySnapshot = await db.collection("Licencias")
-                    .where("discord_id", "==", userId)
-                    .where("product_id", "==", productId)
-                    .where("status", "==", "active")
-                    .limit(1).get();
+        console.log("✅ Notificación enviada con éxito");
+        return true;
 
-                if (!querySnapshot.empty) return querySnapshot.docs[0].data();
-
-                const uniqueKey = generateUniqueKey();
-                const licenseData = { 
-                    discord_id: userId, username: currentUser ? currentUser.username : 'Unknown', 
-                    product_id: productId, product_name: productName, key: uniqueKey, 
-                    created_at: firebase.firestore.FieldValue.serverTimestamp(), status: 'active' 
-                };
-                await db.collection("Licencias").add(licenseData);
-                return { id: 'new', ...licenseData };
-            } catch (error) { console.error("Error licencia:", error); return null; }
-        }
-
+    } catch (error) {
+        console.error('❌ Error fatal en notificación:', error);
+        return false;
+    }
+}
         async function claimFreeProducts() {
-            if (!currentUser) { openLoginModal(); return; }
-            if (cart.length === 0) return;
-            if (!cart.every(item => Number(item.price) === 0)) { alert('Hay productos de pago'); return; }
+            if (!currentUser) { alert('Debes iniciar sesión para reclamar productos gratis'); openLoginModal(); return; }
+            if (cart.length === 0) { alert('Tu carrito está vacío'); return; }
+            const allFree = cart.every(item => Number(item.price) === 0);
+            if (!allFree) { alert('Algunos productos no son gratis'); return; }
             
             try {
                 const purchaseData = {
                     discord_id: currentUser.id, username: currentUser.username, avatar: currentUser.avatar,
                     products: cart.map(item => ({ id: item.id, name: item.name, price: "Gratis" })),
-                    total_price: "Gratis", date: firebase.firestore.FieldValue.serverTimestamp(), status: "Reclamado",
+                    total_price: "Gratis", date: firebase.firestore.FieldValue.serverTimestamp(), status: "Reclamado Exitosamente",
                     productImage: cart[0]?.image || null
                 };
                 
                 await db.collection("Clientes").add(purchaseData);
+                
+                // Enviar notificación a Discord
                 await sendDiscordNotification(purchaseData, true);
                 
-                // CREAR LICENCIAS AUTOMÁTICAMENTE
-                for (const item of cart) await getOrCreateLicense(currentUser.id, item.id, item.name);
-                
+                for (const item of cart) { 
+                    // CORRECCIÓN: Usar la función única para evitar duplicados
+                    await getOrCreateLicense(currentUser.id, item.id, item.name); 
+                    myAssignedProductIds.add(item.id); 
+                }
                 saveUserDataLocally();
-                alert('¡Productos reclamados!');
+                alert('¡Productos reclamados exitosamente! Ya están disponibles en tu biblioteca.\n\nSe han generado tus licencias automáticamente.\n\nGracias por seguir confiando en nuestra tienda.');
                 cart = []; updateCartUI(); closeCartModal();
-            } catch (error) { alert('Error: ' + error.message); }
+            } catch (error) { console.error(error); alert('Error al registrar la reclamación: ' + error.message); }
         }
 
         function openCartModal() {
@@ -909,11 +958,14 @@
 
             paypal.Buttons({
                 style: { shape: 'rect', color: 'gold', layout: 'vertical', label: 'pay' },
-                createOrder: (data, actions) => actions.order.create({ purchase_units: [{ amount: { value: totalAmount } }] }),
-                onApprove: (data, actions) => actions.order.capture().then((details) => {
-                    assignProductsToUserAfterPayment(details); giveClientRole();
-                    cart = []; updateCartUI(); closeCartModal();
-                })
+                createOrder: function(data, actions) { return actions.order.create({ purchase_units: [{ description: 'Compra en Papeleta Store', amount: { value: totalAmount } }] }); },
+                onApprove: function(data, actions) {
+                    return actions.order.capture().then(function(details) {
+                        alert('¡Pago completado por ' + details.payer.name.given_name + '!');
+                        assignProductsToUserAfterPayment(details); giveClientRole();
+                        cart = []; updateCartUI(); closeCartModal();
+                    });
+                }
             }).render('#paypal-button-container');
         }
 
@@ -921,7 +973,7 @@
             if(!currentUser) return;
             currentUserRole = 'cliente';
             const roleBadge = document.getElementById('user-role-badge');
-            if(roleBadge) { roleBadge.innerText = 'CLIENTE'; roleBadge.classList.add('text-green-400'); }
+            if(roleBadge) { roleBadge.innerText = 'CLIENTE'; roleBadge.classList.add('text-green-400'); roleBadge.classList.remove('text-red-400'); }
             saveUserDataLocally();
         }
 
@@ -938,21 +990,27 @@
                 };
                 
                 await db.collection("Clientes").add(purchaseData);
+                
+                // Enviar notificación a Discord
                 await sendDiscordNotification(purchaseData, false);
                 
-                // CREAR LICENCIAS AUTOMÁTICAMENTE
-                for (const item of cart) await getOrCreateLicense(currentUser.id, item.id, item.name);
-                
+                for (const item of cart) { 
+                    // CORRECCIÓN: Usar la función única para evitar duplicados
+                    await getOrCreateLicense(currentUser.id, item.id, item.name); 
+                    myAssignedProductIds.add(item.id); 
+                }
                 saveUserDataLocally();
-                alert("¡Compra registrada!");
-            } catch (error) { alert('Error: ' + error.message); }
+                alert("¡Productos añadidos a tu biblioteca!\n\nSe han generado tus licencias automáticamente.");
+            } catch (error) { console.error(error); alert('Error al registrar la compra: ' + error.message); }
         }
 
         function checkoutManual() {
-             if (cart.length === 0) return;
+             if (cart.length === 0) { alert('Tu carrito está vacío'); return; }
+             alert(`Serás redirigido a Discord para coordinar el pago manual.`);
              window.open(DISCORD_INVITE, '_blank');
         }
 
+        // Funciones para la galería
         function changeImage(direction) {
             if (!currentDetailProduct || !currentDetailProduct.images) return;
             currentImageIndex += direction;
@@ -962,10 +1020,11 @@
         }
         function updateGallery() {
             if (!currentDetailProduct || !currentDetailProduct.images) return;
-            document.getElementById('detail-image').src = currentDetailProduct.images[currentImageIndex];
-            document.querySelectorAll('.gallery-thumbnail').forEach((thumb, idx) => { 
-                thumb.classList.toggle('active', idx === currentImageIndex); 
-            });
+            const mainImage = document.getElementById('detail-image');
+            const thumbnails = document.getElementById('gallery-thumbnails');
+            mainImage.src = currentDetailProduct.images[currentImageIndex];
+            const thumbElements = thumbnails.querySelectorAll('.gallery-thumbnail');
+            thumbElements.forEach((thumb, idx) => { if (idx === currentImageIndex) thumb.classList.add('active'); else thumb.classList.remove('active'); });
         }
 
         function showProductDetails(productId) {
@@ -973,13 +1032,14 @@
             if (!product) return;
             currentDetailProduct = product; currentImageIndex = 0;
             document.getElementById('detail-title').textContent = product.name;
-            document.getElementById('detail-price').textContent = Number(product.price) === 0 ? 'GRATIS' : '$' + Number(product.price).toFixed(2);
+            const priceDisplay = Number(product.price) === 0 ? 'GRATIS' : '$' + Number(product.price).toFixed(2);
+            document.getElementById('detail-price').textContent = priceDisplay;
             
             const mainImage = document.getElementById('detail-image');
             const thumbnailsContainer = document.getElementById('gallery-thumbnails');
             if (product.images && product.images.length > 0) {
                 mainImage.src = product.images[0];
-                thumbnailsContainer.innerHTML = product.images.map((img, idx) => `<img src="${img}" class="gallery-thumbnail ${idx === 0 ? 'active' : ''}" onclick="jumpToImage(${idx})">`).join('');
+                thumbnailsContainer.innerHTML = product.images.map((img, idx) => `<img src="${img}" alt="Imagen ${idx + 1}" class="gallery-thumbnail ${idx === 0 ? 'active' : ''}" onclick="jumpToImage(${idx})">`).join('');
                 document.getElementById('gallery-prev').style.display = product.images.length > 1 ? 'flex' : 'none';
                 document.getElementById('gallery-next').style.display = product.images.length > 1 ? 'flex' : 'none';
             } else {
@@ -987,7 +1047,11 @@
                 thumbnailsContainer.innerHTML = '';
             }
 
-            document.getElementById('detail-description').innerHTML = `<p>${product.description || 'Sin descripción.'}</p>`;
+            const description = product.description || 'Este producto incluye acceso completo a todas las características mencionadas.';
+            document.getElementById('detail-description').innerHTML = `<p>${description}</p><p class="mt-4"><strong>Características principales:</strong></p><ul class="list-disc list-inside space-y-2 ml-4"><li>Acceso inmediato tras la compra</li><li>Soporte técnico incluido</li><li>Actualizaciones gratuitas</li><li>Compatible con MTA:SA</li>${product.category ? `<li>Categoría: ${product.category}</li>` : ''}</ul>`;
+            
+            const features = generateFeatures(product);
+            document.getElementById('detail-features').innerHTML = features.map(f => `<div class="flex items-center gap-3 bg-[#0d0505] border border-red-950/40 rounded-lg p-3"><i class="fas fa-check-circle text-green-400"></i><span class="text-gray-300 text-sm">${f}</span></div>`).join('');
             
             const buyBtn = document.getElementById('detail-buy-btn');
             const alreadyOwned = currentUser && myAssignedProductIds.has(product.id);
@@ -1015,7 +1079,8 @@
             document.body.style.overflow = 'hidden';
         }
         function jumpToImage(index) { currentImageIndex = index; updateGallery(); }
-        function closeProductDetailModal() { document.getElementById('product-detail-modal').classList.add('hidden'); document.body.style.overflow = ''; currentDetailProduct = null; }
+        function generateFeatures(product) { return ['Instalación rápida y sencilla', 'Código optimizado', 'Documentación incluida', 'Soporte 24/7', 'Actualizaciones automáticas', 'Compatible con todos los servidores'].slice(0, 6); }
+        function closeProductDetailModal() { document.getElementById('product-detail-modal').classList.add('hidden'); document.body.style.overflow = ''; currentDetailProduct = null; currentImageIndex = 0; }
         function buyFromDetail() {
             if (!currentDetailProduct) return;
             if (currentUser && myAssignedProductIds.has(currentDetailProduct.id)) { window.location.href = 'AreaCliente.html'; return; }
@@ -1029,7 +1094,8 @@
         function openLoginModal() { window.location.href = 'Login.html'; }
         function closeLoginModal() { document.getElementById('login-modal').classList.add('hidden'); }
         function redirectToDiscord() {
-            window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20email`;
+            const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20email`;
+            window.location.href = url;
         }
 
         function checkDiscordAuth() {
@@ -1051,18 +1117,26 @@
             .then(res => { if (!res.ok) throw new Error('Token expirado'); return res.json(); })
             .then(user => {
                 currentUser = user;
-                document.getElementById('user-name').innerText = user.username;
+                document.getElementById('user-name').innerText = `${user.username}`;
                 if (user.avatar) document.getElementById('user-avatar').src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
                 else document.getElementById('user-avatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
                 
                 closeLoginModal();
                 
+                // LÓGICA DE ROLES PARA EL BOTÓN CONFIG EN PANEL LATERAL
                 if (isAdmin(user)) {
-                    document.getElementById('user-panel-config-btn').style.display = 'flex';
+                    document.getElementById('user-panel-config-btn').style.display = 'flex'; // Mostrar botón en panel
                     currentUserRole = 'admin';
                 } else {
-                    document.getElementById('user-panel-config-btn').style.display = 'none';
-                    currentUserRole = 'cliente';
+                    // Verificar si tiene rol de Mod u otro rol con acceso a config
+                    const savedData = JSON.parse(localStorage.getItem('papeleta_user_' + user.id) || '{}');
+                    if(savedData.role && ['mod', 'staff', 'developer'].includes(savedData.role.toLowerCase())) {
+                         document.getElementById('user-panel-config-btn').style.display = 'flex'; // Mostrar botón en panel
+                         currentUserRole = savedData.role;
+                    } else {
+                        document.getElementById('user-panel-config-btn').style.display = 'none'; // Ocultar botón
+                        currentUserRole = 'cliente';
+                    }
                 }
                 
                 updateAuthUI(); applyRoleUI(); registerUserInFirebase(user);
@@ -1083,11 +1157,17 @@
         function applyRoleUI() {
             const roleBadge = document.getElementById('user-role-badge');
             if(currentUser) {
-                roleBadge.innerText = currentUserRole.toUpperCase();
-                if(currentUserRole === 'cliente') { roleBadge.classList.add('text-green-400'); roleBadge.classList.remove('text-red-400'); }
-                else { roleBadge.classList.remove('text-green-400'); roleBadge.classList.add('text-red-400'); }
+                const savedData = JSON.parse(localStorage.getItem('papeleta_user_' + currentUser.id) || '{}');
+                if(savedData.role) {
+                    currentUserRole = savedData.role;
+                    roleBadge.innerText = savedData.role.toUpperCase();
+                    if(savedData.role === 'cliente') { roleBadge.classList.add('text-green-400'); roleBadge.classList.remove('text-red-400'); }
+                    else { roleBadge.classList.remove('text-green-400'); roleBadge.classList.add('text-red-400'); }
+                }
             }
-            document.getElementById('admin-upload-section').style.display = isAdmin(currentUser) ? '' : 'none';
+            // El panel de admin legacy solo lo ve el admin principal
+            if (canUpload()) { /* document.getElementById('nav-admin').classList.remove('hidden'); */ }
+            document.getElementById('admin-upload-section').style.display = canUpload() ? '' : 'none';
             document.getElementById('admin-users-section').style.display = isAdmin(currentUser) ? '' : 'none';
         }
 
@@ -1098,6 +1178,11 @@
                 role: currentUserRole, assigned_products: Array.from(myAssignedProductIds), last_login: new Date().toISOString()
             };
             localStorage.setItem('papeleta_user_' + currentUser.id, JSON.stringify(userData));
+            let allUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
+            const existingIndex = allUsers.findIndex(u => u.discord_id === currentUser.id);
+            if(existingIndex >= 0) allUsers[existingIndex] = userData;
+            else allUsers.push(userData);
+            localStorage.setItem('papeleta_all_users', JSON.stringify(allUsers));
         }
 
         async function registerUserInFirebase(user) {
@@ -1105,48 +1190,109 @@
                 const userDocRef = db.collection("UsuariosRegistrados").doc(user.id);
                 const docSnap = await userDocRef.get();
                 if (!docSnap.exists) {
-                    await userDocRef.set({ discord_id: user.id, username: user.username, avatar: user.avatar || null, registered_at: firebase.firestore.FieldValue.serverTimestamp() });
+                    await userDocRef.set({ discord_id: user.id, username: user.username, avatar: user.avatar || null, registered_at: firebase.firestore.FieldValue.serverTimestamp(), last_login: firebase.firestore.FieldValue.serverTimestamp() });
+                } else {
+                    await userDocRef.update({ last_login: firebase.firestore.FieldValue.serverTimestamp(), username: user.username, avatar: user.avatar || null });
                 }
-            } catch (error) { console.error(error); }
+                saveUserDataLocally();
+            } catch (error) { console.error("Error registrando usuario en Firebase:", error); }
         }
 
         async function loadUserStats() {
             try {
                 const snapshot = await db.collection("UsuariosRegistrados").get();
-                document.getElementById('stat-usuarios').innerText = '+' + snapshot.size;
-            } catch (error) {}
+                let userCount = snapshot.size || 1;
+                document.getElementById('stat-usuarios').innerText = '+' + userCount;
+            } catch (error) { document.getElementById('stat-usuarios').innerText = '+1'; }
         }
 
         async function loadSalesStats() {
             try {
                 const snapshot = await db.collection("Clientes").get();
-                let clientes = new Set(); let ventas = 0;
-                snapshot.forEach(doc => {
-                    ventas++;
-                    const d = doc.data();
-                    if (d.status === "Pagado" || (d.total_price && d.total_price !== "Gratis")) clientes.add(d.discord_id);
+                let clientesQueCompraron = new Set(); let totalVentas = 0;
+                snapshot.forEach((doc) => {
+                    const data = doc.data(); totalVentas++;
+                    if (data.status === "Pagado" || (data.total_price && data.total_price !== "Gratis" && data.total_price !== "GRATIS")) clientesQueCompraron.add(data.discord_id);
                 });
-                document.getElementById('stat-clientes').innerText = '+' + clientes.size;
-                document.getElementById('stat-ventas').innerText = '+' + ventas;
-            } catch (error) {}
+                document.getElementById('stat-clientes').innerText = '+' + clientesQueCompraron.size;
+                document.getElementById('stat-ventas').innerText = '+' + totalVentas;
+            } catch (error) { document.getElementById('stat-clientes').innerText = '+0'; document.getElementById('stat-ventas').innerText = '+0'; }
         }
 
+        // FUNCIÓN CORREGIDA PARA CARGAR LICENCIAS DESDE FIREBASE
         async function loadMyAssignments() {
+            // Reiniciamos el set para evitar datos viejos
             myAssignedProductIds = new Set();
+            
             if (!currentUser) return;
+            
             try {
-                const snapshot = await db.collection("Licencias").where("discord_id", "==", currentUser.id).where("status", "==", "active").get();
-                snapshot.forEach(doc => { if (doc.data().product_id) myAssignedProductIds.add(doc.data().product_id); });
+                // Consultamos DIRECTAMENTE a Firebase para ver qué licencias tiene este usuario
+                const snapshot = await db.collection("Licencias")
+                    .where("discord_id", "==", currentUser.id)
+                    .where("status", "==", "active")
+                    .get();
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.product_id) {
+                        myAssignedProductIds.add(data.product_id);
+                    }
+                });
+                
+                // Actualizamos el localStorage con lo que acabamos de traer de Firebase
+                // Esto sincroniza la memoria local con la base de datos real
                 saveUserDataLocally();
-            } catch (error) { console.error(error); }
+                
+            } catch (error) {
+                console.error("Error cargando asignaciones desde Firebase:", error);
+                // Si falla Firebase, intentamos cargar de localStorage como respaldo
+                const savedData = JSON.parse(localStorage.getItem('papeleta_user_' + currentUser.id) || '{}');
+                if(savedData.assigned_products) myAssignedProductIds = new Set(savedData.assigned_products);
+            }
+        }
+
+        function isSupport() { return currentUserRole === 'support'; }
+        function canUpload() { return isAdmin(currentUser) || isSupport(); }
+
+        document.getElementById('discord-invite-link').href = DISCORD_INVITE;
+
+        async function loadAdminUsers() {
+            if (!isAdmin(currentUser)) return;
+            const container = document.getElementById('admin-users-list');
+            const allUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
+            if (allUsers.length === 0) { container.innerHTML = `<p class="text-gray-500 text-sm">Aún no hay usuarios registrados localmente.</p>`; return; }
+            container.innerHTML = allUsers.map(u => `
+                <div class="flex items-center gap-3 bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-2.5">
+                    <img src="${u.avatar ? `https://cdn.discordapp.com/avatars/${u.discord_id}/${u.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png'}" class="w-8 h-8 rounded-full border border-red-700">
+                    <div class="flex-grow">
+                        <p class="text-white text-sm font-semibold">${escapeHTML(u.username || 'Desconocido')} ${u.role === 'support' ? '<span class="text-xs bg-red-950/60 border border-red-700 text-red-300 px-2 py-0.5 rounded-md ml-1">Soporte</span>' : ''} ${u.role === 'cliente' ? '<span class="text-xs bg-green-950/60 border border-green-700 text-green-300 px-2 py-0.5 rounded-md ml-1">Cliente</span>' : ''}</p>
+                        <p class="text-gray-500 text-xs">Última vez: ${new Date(u.last_login).toLocaleString('es-ES')}</p>
+                    </div>
+                    ${u.role === 'support' ? `<button onclick="setLocalRole('${u.discord_id}', 'user')" class="text-xs bg-transparent border border-red-900/50 hover:border-red-500 text-red-400 px-3 py-1.5 rounded-lg transition-all">Quitar soporte</button>` : `<button onclick="setLocalRole('${u.discord_id}', 'support')" class="text-xs bg-transparent border border-red-800/50 hover:border-red-500 text-red-300 px-3 py-1.5 rounded-lg transition-all">Hacer soporte</button>`}
+                </div>`).join('');
+        }
+
+        function setLocalRole(discordId, role) {
+            let allUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
+            const userIndex = allUsers.findIndex(u => u.discord_id === discordId);
+            if(userIndex >= 0) {
+                allUsers[userIndex].role = role;
+                localStorage.setItem('papeleta_all_users', JSON.stringify(allUsers));
+                if(currentUser && currentUser.id === discordId) { currentUserRole = role; applyRoleUI(); }
+                loadAdminUsers(); loadSalesStats();
+            }
         }
 
         function logout() {
             localStorage.removeItem('dc_access_token');
             currentUser = null; currentUserRole = 'user';
-            document.getElementById('user-panel-config-btn').style.display = 'none';
+            document.getElementById('user-panel-config-btn').style.display = 'none'; // Ocultar botón config
+            // Cerrar paneles si están abiertos
             document.getElementById('user-panel').classList.remove('active');
             document.getElementById('user-panel-overlay').classList.remove('active');
+            document.getElementById('config-panel').classList.remove('active');
+            document.getElementById('config-overlay').classList.remove('active');
             updateAuthUI(); loadProducts();
         }
 
@@ -1156,13 +1302,19 @@
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active-page'));
             const link = document.querySelector(`.nav-link[data-page="${name}"]`);
             if (link) link.classList.add('active-page');
+            
+            // CONTROL DE VISIBILIDAD DE RESEÑAS (SOLO EN INICIO)
             checkReviewsVisibility(name);
         }
 
+        // FUNCIÓN PARA MOSTRAR/OCULTAR RESEÑAS SEGÚN LA PÁGINA ACTIVA
         function checkReviewsVisibility(activePageName) {
             const reviewsContainer = document.getElementById('reviews-section-container');
-            if (activePageName === 'inicio') reviewsContainer.style.display = 'block';
-            else reviewsContainer.style.display = 'none';
+            if (activePageName === 'inicio') {
+                reviewsContainer.style.display = 'block';
+            } else {
+                reviewsContainer.style.display = 'none';
+            }
         }
 
         async function loadProducts() {
@@ -1171,17 +1323,10 @@
                 const jsonProducts = [];
                 snapshot.forEach((doc) => jsonProducts.push(doc.data()));
                 allProducts = [...jsonProducts, ...localProducts];
-                
-                // Debug: Verificar si cargaron productos
-                console.log("Productos cargados:", allProducts.length);
-                
                 buildCategoryFilters(); renderProducts();
                 document.getElementById('stat-productos').innerText = '+' + allProducts.length;
                 loadAdminProductsList();
-            } catch (e) { 
-                console.error("Error cargando productos:", e); 
-                document.getElementById('products-grid').innerHTML = '<p class="text-red-500 text-center col-span-full">Error conectando a la base de datos.</p>';
-            }
+            } catch (e) { console.error(e); }
         }
 
         function buildCategoryFilters() {
@@ -1238,6 +1383,7 @@
                         
                         <div class="flex items-center justify-between mb-4">
                             <span class="text-2xl font-black ${priceClass}">${priceDisplay}</span>
+                            ${Number(p.price) > 0 ? '<span class="text-xs text-gray-500">USD</span>' : '<span class="text-xs text-green-400 font-semibold">Sin costo</span>'}
                         </div>
                         
                         ${alreadyOwned ? `
@@ -1258,6 +1404,50 @@
         }
 
         function escapeHTML(str) { return String(str).replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)); }
+
+        function generateUniqueKey() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; let key = '';
+            for (let i = 0; i < 20; i++) key += chars.charAt(Math.floor(Math.random() * chars.length));
+            return key;
+        }
+
+        // --- FUNCIÓN MAESTRA ÚNICA PARA LICENCIAS (EVITA DUPLICADOS) ---
+        async function getOrCreateLicense(userId, productId, productName) {
+            try {
+                // 1. Buscar SI YA EXISTE una licencia activa para este usuario y producto
+                const querySnapshot = await db.collection("Licencias")
+                    .where("discord_id", "==", userId)
+                    .where("product_id", "==", productId)
+                    .where("status", "==", "active")
+                    .limit(1)
+                    .get();
+
+                if (!querySnapshot.empty) {
+                    console.log(`✅ Licencia ya existente para ${userId} en ${productId}. No se crea duplicado.`);
+                    return querySnapshot.docs[0].data(); // Retorna la existente sin crear nada
+                }
+
+                // 2. Si NO existe, creamos UNA SOLA licencia nueva
+                const uniqueKey = generateUniqueKey();
+                const licenseData = { 
+                    discord_id: userId, 
+                    username: currentUser ? currentUser.username : 'Unknown', 
+                    product_id: productId, 
+                    product_name: productName, 
+                    key: uniqueKey, 
+                    created_at: firebase.firestore.FieldValue.serverTimestamp(), 
+                    status: 'active' 
+                };
+                
+                const docRef = await db.collection("Licencias").add(licenseData);
+                console.log(`✨ Nueva licencia creada: ${docRef.id}`);
+                return { id: docRef.id, ...licenseData };
+
+            } catch (error) {
+                console.error("❌ Error en getOrCreateLicense:", error);
+                return null;
+            }
+        }
 
         function initNetworkBg() {
             const canvas = document.getElementById('network-bg');
@@ -1281,52 +1471,91 @@
             tick();
         }
 
-        async function loadPublicReviews() {
-            const slider = document.getElementById('reviews-slider');
-            try {
-                const productsSnapshot = await db.collection("Productos").get();
-                const productsMap = {}; 
-                productsSnapshot.forEach(doc => { const d = doc.data(); productsMap[doc.id] = d.name || 'Producto'; if(d.id) productsMap[d.id] = d.name; });
+    async function loadPublicReviews() {
+        const slider = document.getElementById('reviews-slider');
+        try {
+            const productsSnapshot = await db.collection("Productos").get();
+            const productsMap = {}; 
+            
+            productsSnapshot.forEach(doc => {
+                const data = doc.data();
+                productsMap[doc.id] = data.name || 'Producto';
+                if (data.id) {
+                    productsMap[data.id] = data.name || 'Producto';
+                }
+            });
 
-                const reviewsSnapshot = await db.collection("Resenas").limit(15).get();
-                let reviewsHTML = ''; let count = 0;
+            const reviewsSnapshot = await db.collection("Resenas")
+                .limit(15) 
+                .get();
+            
+            let reviewsHTML = '';
+            let count = 0;
 
-                reviewsSnapshot.forEach(doc => {
-                    const data = doc.data();
-                    if (data.rating >= 4) {
-                        const stars = '★'.repeat(data.rating);
-                        const date = data.created_at?.toDate ? data.created_at.toDate().toLocaleDateString('es-ES') : '';
-                        const avatar = data.user_avatar || 'https://cdn.discordapp.com/embed/avatars/0.png';
-                        const username = data.username || 'Usuario Anónimo';
-                        const text = data.text || '';
-                        const productId = data.product_id;
-                        const productName = productsMap[productId] || 'Producto Premium';
-                        
-                        reviewsHTML += `
-                            <div class="review-card-slide">
-                                <div>
-                                    <div class="review-header">
-                                        <img src="${avatar}" alt="${username}" class="review-avatar">
-                                        <div class="review-user-info"><h4>${escapeHTML(username)}</h4><p class="review-date">${date}</p></div>
+            reviewsSnapshot.forEach(doc => {
+                const data = doc.data();
+                
+                if (data.rating >= 4) {
+                    const stars = '★'.repeat(data.rating);
+                    const date = data.created_at?.toDate ? data.created_at.toDate().toLocaleDateString('es-ES') : '';
+                    const avatar = data.user_avatar || 'https://cdn.discordapp.com/embed/avatars/0.png';
+                    const username = data.username || 'Usuario Anónimo';
+                    const text = data.text || '';
+                    
+                    const productId = data.product_id;
+                    const productName = productsMap[productId] || 'Producto Premium';
+                    
+                    reviewsHTML += `
+                        <div class="review-card-slide">
+                            <div>
+                                <div class="review-header">
+                                    <img src="${avatar}" alt="${username}" class="review-avatar">
+                                    <div class="review-user-info">
+                                        <h4>${escapeHTML(username)}</h4>
+                                        <p class="review-date">${date}</p>
                                     </div>
-                                    <div class="review-stars">${stars}</div>
-                                    <p class="review-text">${escapeHTML(text)}</p>
                                 </div>
-                                <div class="review-product-tag"><i class="fas fa-cube"></i> ${escapeHTML(productName)}</div>
-                            </div>`;
-                        count++;
-                    }
-                });
+                                <div class="review-stars">${stars}</div>
+                                <p class="review-text">${escapeHTML(text)}</p>
+                            </div>
+                            <div class="review-product-tag">
+                                <i class="fas fa-cube"></i> ${escapeHTML(productName)}
+                            </div>
+                        </div>
+                    `;
+                    count++;
+                }
+            });
 
-                if (count > 0) slider.innerHTML = reviewsHTML + reviewsHTML;
-                else slider.innerHTML = `<div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;"><i class="fas fa-comment-slash text-3xl text-gray-600"></i><span class="text-gray-400">Aún no hay reseñas destacadas.</span></div>`;
-            } catch (error) { console.error(error); }
+            if (count > 0) {
+                // DUPLICAMOS EL CONTENIDO PARA CREAR EL EFECTO INFINITO
+                slider.innerHTML = reviewsHTML + reviewsHTML;
+            } else {
+                slider.innerHTML = `
+                    <div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;">
+                        <i class="fas fa-comment-slash text-3xl text-gray-600"></i>
+                        <span class="text-gray-400">Aún no hay reseñas destacadas.</span>
+                    </div>
+                `;
+            }
+
+        } catch (error) {
+            console.error("Error cargando reseñas públicas:", error);
+            slider.innerHTML = `
+                <div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;">
+                    <i class="fas fa-exclamation-triangle text-3xl text-red-500"></i>
+                    <span class="text-gray-400">No se pudieron cargar las opiniones.</span>
+                </div>
+            `;
         }
+    }
 
         document.addEventListener('DOMContentLoaded', () => { 
             checkDiscordAuth(); 
             initNetworkBg(); 
-            loadPublicReviews();
+            loadPublicReviews(); // Cargar reseñas al iniciar
+            
+            // Asegurar que las reseñas se muestren correctamente al cargar la página
             checkReviewsVisibility('inicio');
         });
     </script>
