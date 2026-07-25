@@ -693,6 +693,19 @@
         }
 
         async function createLicenseForProduct(productId, productName, user) {
+            // VERIFICAR SI YA EXISTE UNA LICENCIA PARA EVITAR DUPLICADOS
+            const existingLicense = await db.collection("Licencias")
+                .where("discord_id", "==", user.id)
+                .where("product_id", "==", productId)
+                .where("status", "==", "active")
+                .limit(1)
+                .get();
+
+            if (!existingLicense.empty) {
+                console.log("El usuario ya tiene una licencia para este producto. No se crea otra.");
+                return existingLicense.docs[0].data();
+            }
+
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             let key = '';
             for (let i = 0; i < 20; i++) {
