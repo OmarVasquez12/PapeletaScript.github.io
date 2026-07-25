@@ -864,7 +864,7 @@ async function sendDiscordNotification(purchaseData, isFree = false) {
                         inline: true
                     },
                     {
-                        name: "💳 Método",
+                        name: " Método",
                         value: methodText,
                         inline: true
                     },
@@ -931,8 +931,8 @@ async function sendDiscordNotification(purchaseData, isFree = false) {
                 await sendDiscordNotification(purchaseData, true);
                 
                 for (const item of cart) { 
-                    // CORRECCIÓN: Crear solo una licencia verificando si ya existe
-                    await ensureSingleLicense(currentUser.id, item.id, item.name); 
+                    // CORRECCIÓN: Usar la función única para evitar duplicados
+                    await getOrCreateLicense(currentUser.id, item.id, item.name); 
                     myAssignedProductIds.add(item.id); 
                 }
                 saveUserDataLocally();
@@ -995,8 +995,8 @@ async function sendDiscordNotification(purchaseData, isFree = false) {
                 await sendDiscordNotification(purchaseData, false);
                 
                 for (const item of cart) { 
-                    // CORRECCIÓN: Crear solo una licencia verificando si ya existe
-                    await ensureSingleLicense(currentUser.id, item.id, item.name); 
+                    // CORRECCIÓN: Usar la función única para evitar duplicados
+                    await getOrCreateLicense(currentUser.id, item.id, item.name); 
                     myAssignedProductIds.add(item.id); 
                 }
                 saveUserDataLocally();
@@ -1411,10 +1411,10 @@ async function sendDiscordNotification(purchaseData, isFree = false) {
             return key;
         }
 
-        // --- FUNCIÓN MAESTRA PARA EVITAR DUPLICADOS ---
-        async function ensureSingleLicense(userId, productId, productName) {
+        // --- FUNCIÓN MAESTRA ÚNICA PARA LICENCIAS (EVITA DUPLICADOS) ---
+        async function getOrCreateLicense(userId, productId, productName) {
             try {
-                // 1. Buscar si YA EXISTE una licencia activa para este usuario y producto
+                // 1. Buscar SI YA EXISTE una licencia activa para este usuario y producto
                 const querySnapshot = await db.collection("Licencias")
                     .where("discord_id", "==", userId)
                     .where("product_id", "==", productId)
@@ -1424,10 +1424,10 @@ async function sendDiscordNotification(purchaseData, isFree = false) {
 
                 if (!querySnapshot.empty) {
                     console.log(`✅ Licencia ya existente para ${userId} en ${productId}. No se crea duplicado.`);
-                    return querySnapshot.docs[0].data(); // Retorna la existente
+                    return querySnapshot.docs[0].data(); // Retorna la existente sin crear nada
                 }
 
-                // 2. Si NO existe, creamos una nueva
+                // 2. Si NO existe, creamos UNA SOLA licencia nueva
                 const uniqueKey = generateUniqueKey();
                 const licenseData = { 
                     discord_id: userId, 
@@ -1444,7 +1444,7 @@ async function sendDiscordNotification(purchaseData, isFree = false) {
                 return { id: docRef.id, ...licenseData };
 
             } catch (error) {
-                console.error("❌ Error en ensureSingleLicense:", error);
+                console.error("❌ Error en getOrCreateLicense:", error);
                 return null;
             }
         }
