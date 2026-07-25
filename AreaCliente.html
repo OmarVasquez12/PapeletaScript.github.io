@@ -293,15 +293,11 @@
 
     <div id="toast-container" class="toast-container"></div>
 
+    <!-- SCRIPT LIMPIO INTEGRADO -->
     <script>
-        // Configuración
-        const CLIENT_ID = '1213866547181780992'; 
-        const REDIRECT_URI = window.location.href.split('#')[0]; 
-        const ADMIN_DISCORD_IDS = ['890526767608127489']; 
-        
-        // URL DEL WEBHOOK DE DISCORD
-        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1530350855100956853/mqzdvlTBOx2JZ3wlumx-LdLAus3sZyg610PeoxK9ds4jpqxMK9t0sBT_2Lo-U-TDutRF";
-
+        // =============================================
+        //          FIREBASE CONFIGURACIÓN (COMPAT)
+        // =============================================
         const firebaseConfig = {
             apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
             authDomain: "papeletalicencia.firebaseapp.com",
@@ -311,8 +307,207 @@
             appId: "1:677208314051:web:a27c04f31d402e83f29276"
         };
 
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        // Inicializar Firebase si no está iniciado
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
         const db = firebase.firestore();
+
+        // Variables globales
+        let licensesData = [];
+        
+        // =============================================
+        //          FUNCIONES AUXILIARES (VALIDACIÓN)
+        // =============================================
+
+        function validateIPPort(ipPort) {
+            if (!ipPort || typeof ipPort !== 'string') return false;
+            const parts = ipPort.trim().split(':');
+            if (parts.length !== 2) return false;
+            const ip = parts[0].trim();
+            const port = parts[1].trim();
+            // Regex simple para IP
+            const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
+            if (!ipRegex.test(ip)) return false;
+            const portNum = parseInt(port);
+            if (isNaN(portNum) || portNum < 1 || portNum > 65535) return false;
+            return true;
+        }
+
+        function parseIPPort(ipPort) {
+            const parts = ipPort.trim().split(':');
+            return { ip: parts[0].trim(), port: parts[1].trim(), full: ipPort.trim() };
+        }
+
+        // Función para mostrar logs visuales (Toast)
+        const updateLog = (msg, isError = false) => {
+            console.log(msg);
+            // Usamos tu función showToast existente si está disponible, sino console
+            if (typeof showToast === 'function') {
+                showToast(msg, isError ? 'error' : 'success');
+            }
+        };
+
+        // =============================================
+        //          GESTIÓN DE LICENCIAS (CRUD)
+        // =============================================
+
+        // Escuchar cambios en tiempo real en la colección 'Licencias' (Mayúscula inicial como en tu DB)
+        db.collection("Licencias").onSnapshot((snapshot) => {
+            licensesData = [];
+            snapshot.forEach((docSnap) => {
+                licensesData.push({ id: docSnap.id, ...docSnap.data() });
+            });
+            
+            // Actualizar la vista si estamos en el panel de cliente
+            if (currentUser && document.getElementById('license-code')) {
+                updateLicenseDisplay(); 
+            }
+            
+            console.log("Licencias sincronizadas:", licensesData.length);
+        });
+
+        // Crear Licencia (Manual o Automática)
+        window.addLicense = async (resourceName = "Recurso General") => {
+            // Intenta obtener valores del DOM si existen (para uso manual), sino usa prompts
+            let resource = resourceName;
+            let ipPort = "";
+            
+            const resInput = document.getElementById("resourceName");
+            const ipInput = document.getElementById("ipAddr");
+            
+            if(resInput && ipInput) {
+                resource = resInput.value.trim().toUpperCase() || resource;
+                ipPort = ipInput.value.trim();
+            } else {
+                // Fallback manual si no hay inputs en pantalla
+                ipPort = prompt("IP:PUERTO del Servidor MTA (Ej: 127.0.0.1:22005):");
+            }
+
+            if(!currentUser) return alert("Debes iniciar sesión primero.");
+            if (!ipPort) return alert("Falta la IP:PUERTO");
+            if (!validateIPPort(ipPort)) return alert("FORMATO IP:PUERTO INVÁLIDO");
+            
+            const parsed = parseIPPort(ipPort);
+            
+            // Generar datos únicos
+            const newUser = "USER_" + Math.random().toString(36).substring(2, 8).toUpperCase();
+            const newKey = Array.from({length: 24}, () => "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[Math.floor(Math.random() * 36)]).join('');
+            
+            const newLic = {
+                discord_id: currentUser.id,
+                username: currentUser.username,
+                product_id: "manual_" + Date.now(), // ID temporal para licencias manuales
+                product_name: resource,
+                user_code: newUser,
+                key: newKey,
+                ip: parsed.ip,
+                port: parsed.port,
+                created_at: firebase.firestore.FieldValue.serverTimestamp(),
+                status: 'active'
+            };
+            
+            try {
+                await db.collection("Licencias").add(newLic);
+                updateLog("✅ Licencia Creada Correctamente");
+                
+                // Limpiar inputs si existen
+                if(resInput) resInput.value = "";
+                if(ipInput) ipInput.value = "";
+                
+            } catch (e) { 
+                updateLog("❌ Error: " + e.message, true); 
+            }
+        };
+
+        // Eliminar Licencia
+        window.deleteLicense = (id) => {
+            if(confirm("¿Estás seguro de eliminar esta licencia permanentemente?")) {
+                db.collection("Licencias").doc(id).delete()
+                    .then(() => updateLog("✅ Licencia Eliminada"))
+                    .catch(e => alert("Error: " + e.message));
+            }
+        };
+
+        // Cambiar Estado (Activo/Inactivo)
+        window.toggleStatus = async (id, currentStatus) => {
+            try {
+                await db.collection("Licencias").doc(id).update({ active: !currentStatus });
+                updateLog(`Estado cambiado a ${!currentStatus ? 'ACTIVO' : 'INACTIVO'}`);
+            } catch (e) {
+                alert("Error al cambiar estado: " + e.message);
+            }
+        };
+
+        // Editar Campo Individual (IP, User, Key)
+        window.editField = async (id, campo, valorActual) => {
+            let nuevoValor = prompt(`MODIFICAR ${campo.toUpperCase()} (Valor actual: ${valorActual}):`, valorActual);
+            
+            if(nuevoValor && nuevoValor !== valorActual) {
+                const valUpper = nuevoValor.trim().toUpperCase();
+                
+                if (campo === 'key') {
+                    // Verificación local rápida
+                    const keyExists = licensesData.some(l => l.key.toUpperCase() === valUpper && l.id !== id);
+                    if (keyExists) return alert("ESTA KEY YA ESTÁ EN USO POR OTRO SISTEMA.");
+                    await db.collection("Licencias").doc(id).update({ key: valUpper });
+                } 
+                else if (campo === 'ip' || campo === 'port') {
+                     // Para editar IP y Puerto juntos o por separado
+                     if(campo === 'ip') {
+                         // Asumimos que el usuario podría escribir IP:PORT de nuevo
+                         if(validateIPPort(nuevoValor)) {
+                             const parsed = parseIPPort(nuevoValor);
+                             await db.collection("Licencias").doc(id).update({ ip: parsed.ip, port: parsed.port });
+                         } else {
+                             return alert("Formato inválido. Usa IP:PUERTO");
+                         }
+                     }
+                } 
+                else {
+                    // Para User u otros campos
+                    await db.collection("Licencias").doc(id).update({ [campo]: valUpper });
+                }
+                updateLog(`✅ ${campo.toUpperCase()} actualizado correctamente`);
+            }
+        };
+
+        // =============================================
+        //          UTILIDADES DE INTERFAZ
+        // =============================================
+
+        // Mostrar código Lua exacto solicitado
+        window.showLua = (user, key) => {
+            const code = `configLicense = {
+    ["User"] = "${user}", 
+    ["Key"] = "${key}"
+}`;
+            
+            const luaEl = document.getElementById("luaCode");
+            if (luaEl) {
+                luaEl.innerText = code;
+            }
+            return code;
+        };
+
+        // Copiar texto al portapapeles
+        window.copyText = (elementId) => {
+            const text = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                if(typeof showToast === 'function') showToast("¡Código copiado!", "success");
+                else alert("¡Copiado!");
+            });
+        };
+    </script>
+
+    <script>
+        // Configuración
+        const CLIENT_ID = '1213866547181780992'; 
+        const REDIRECT_URI = window.location.href.split('#')[0]; 
+        const ADMIN_DISCORD_IDS = ['890526767608127489']; 
+        
+        // URL DEL WEBHOOK DE DISCORD
+        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1530350855100956853/mqzdvlTBOx2JZ3wlumx-LdLAus3sZyg610PeoxK9ds4jpqxMK9t0sBT_2Lo-U-TDutRF";
 
         let currentUser = null;
         let currentUserRole = 'client';
@@ -714,7 +909,10 @@ function updateLicenseDisplay() {
           if (!snapshot.empty) {
               const license = snapshot.docs[0].data();
               // Mostramos la clave real generada para sus productos
-              codeBlock.textContent = `configLicense = {\n    ["User"] = "${currentUser.username}", \n    ["Key"] = "PapeletaStore(${license.key})"\n}`;
+              codeBlock.textContent = `configLicense = {
+    ["User"] = "${license.user_code || 'PENDIENTE'}", 
+    ["Key"] = "${license.key}"
+}`;
           } else {
               codeBlock.textContent = "No tienes licencias activas aún.";
           }
