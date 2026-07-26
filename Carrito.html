@@ -351,7 +351,7 @@
             showToast('Código de descuento eliminado', 'success');
         }
 
-        // ========== INTEGRACIÓN CON STRIPE ==========
+        // ========== INTEGRACIÓN CON STRIPE CHECKOUT (DINÁMICO) ==========
         async function initiateStripeCheckout() {
             if (!currentUser) {
                 showToast('Debes iniciar sesión para continuar', 'error');
@@ -364,36 +364,54 @@
             btn.disabled = true;
 
             try {
-                // Calcular total final
+                // 1. Calcular totales locales
                 const subtotal = cart.reduce((sum, item) => sum + Number(item.price), 0);
                 let total = subtotal;
+                let discountInfo = '';
+                
                 if (activeDiscount && discountPercentage > 0) {
                     total = subtotal - (subtotal * (discountPercentage / 100));
+                    discountInfo = `Código: ${activeDiscount} (-${discountPercentage}%)`;
                 }
 
-                // Convertir a centavos (Stripe usa enteros)
-                const amountInCents = Math.round(total * 100);
+                // 2. Guardar orden pendiente en Firebase (opcional pero recomendado)
+                const orderRef = await db.collection("Orders").add({
+                    discord_id: currentUser.id,
+                    username: currentUser.username,
+                    products: cart,
+                    total_amount: total,
+                    discount_info: discountInfo,
+                    status: "pending_payment",
+                    created_at: firebase.firestore.FieldValue.serverTimestamp()
+                });
 
-                // ⚠️ NOTA: En un entorno real, deberías llamar a TU backend aquí para crear la sesión.
-                // Por ejemplo: const response = await fetch('/api/create-checkout-session', { ... });
-                // Como estamos en modo prueba frontend-only, simulamos la redirección o usamos Payment Links.
-                
-                // OPCIÓN A: Si tienes Payment Links creados en Stripe Dashboard, redirige ahí:
-                // window.location.href = 'https://buy.stripe.com/test_TU_ENLACE';
-                
-                // OPCIÓN B: Simulación para demostración (NO USAR EN PRODUCCIÓN REAL SIN BACKEND)
-                // En producción real, necesitas un endpoint en tu servidor que use sk_test_...
-                
-                showToast('Redirigiendo a Stripe Checkout...', 'success');
-                
-                // Simular delay y luego redirigir (en real sería la URL de la sesión)
-                setTimeout(() => {
-                    // Aquí iría: window.location.href = session.url;
-                    alert('⚠️ MODO PRUEBA: En producción, esto redirigiría a Stripe Checkout seguro.\n\nPara hacerlo funcionar realmente, necesitas:\n1. Un backend (Node.js/PHP) que cree la sesión con tu sk_test_\n2. O usar "Payment Links" desde el dashboard de Stripe.');
-                    
+                // 3. Llamar a TU BACKEND para crear la sesión de Stripe
+                // ⚠️ REEMPLAZA ESTA URL CON LA DE TU SERVIDOR REAL
+                const response = await fetch('https://tu-servidor.com/api/create-checkout-session', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        orderId: orderRef.id,
+                        items: cart,
+                        total: total,
+                        discount: activeDiscount
+                    })
+                });
+
+                if (!response.ok) throw new Error('Error al crear la sesión de pago');
+
+                const session = await response.json();
+
+                // 4. Redirigir a Stripe Checkout
+                const result = await stripe.redirectToCheckout({
+                    sessionId: session.id
+                });
+
+                if (result.error) {
+                    showToast(result.error.message, 'error');
                     btn.innerHTML = originalText;
                     btn.disabled = false;
-                }, 1500);
+                }
 
             } catch (error) {
                 console.error(error);
