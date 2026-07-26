@@ -202,6 +202,29 @@
         .review-text { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 25px; flex-grow: 1; }
         .review-product-tag { display: inline-flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: #ffffff; padding: 8px 16px; border-radius: 50px; font-size: 0.85rem; font-weight: 600; width: fit-content; }
         .review-product-tag i { color: #ff1a1a; }
+
+        /* ESTILOS PARA MODAL DE CÓDIGO DE DESCUENTO */
+        .discount-modal {
+            backdrop-filter: blur(10px);
+        }
+        .discount-input {
+            background: rgba(13, 5, 5, 0.8);
+            border: 2px solid rgba(255, 26, 26, 0.3);
+            transition: all 0.3s ease;
+        }
+        .discount-input:focus {
+            border-color: #ff1a1a;
+            box-shadow: 0 0 20px rgba(255, 26, 26, 0.3);
+            outline: none;
+        }
+        .discount-badge {
+            background: linear-gradient(135deg, #10b981, #059669);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-gradient-to-b from-[#150a0a] to-[#0a0505] relative">
@@ -238,10 +261,41 @@
                 </div>
             </div>
             <div class="border-t border-red-900/50 p-4 bg-[#0d0505]/50 rounded-b-2xl shrink-0">
-                <div class="flex justify-between items-center mb-4">
-                    <span class="text-gray-400 text-sm">Total a pagar:</span>
-                    <span id="cart-total" class="text-2xl font-black text-white">$0.00</span>
+                <!-- SECCIÓN DE CÓDIGO DE DESCUENTO -->
+                <div id="discount-section" class="mb-4">
+                    <div id="discount-input-container" class="flex gap-2">
+                        <input type="text" id="discount-code-input" placeholder="Código de descuento" 
+                            class="flex-1 bg-[#0d0505] border border-red-900/40 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500">
+                        <button onclick="applyDiscountCode()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all">
+                            Aplicar
+                        </button>
+                    </div>
+                    <div id="discount-applied" class="hidden mt-2 p-3 bg-green-900/20 border border-green-600/30 rounded-lg flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-tag text-green-400"></i>
+                            <span class="text-green-400 text-sm font-semibold" id="discount-code-text"></span>
+                        </div>
+                        <button onclick="removeDiscountCode()" class="text-gray-400 hover:text-red-400 text-sm">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
                 </div>
+                
+                <div class="space-y-2 mb-4">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-400">Subtotal:</span>
+                        <span id="cart-subtotal" class="text-white">$0.00</span>
+                    </div>
+                    <div id="discount-line" class="hidden flex justify-between text-sm">
+                        <span class="text-green-400">Descuento:</span>
+                        <span id="discount-amount" class="text-green-400">-$0.00</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-2 border-t border-red-900/30">
+                        <span class="text-gray-400 text-sm">Total a pagar:</span>
+                        <span id="cart-total" class="text-2xl font-black text-white">$0.00</span>
+                    </div>
+                </div>
+                
                 <button id="claim-free-btn" onclick="claimFreeProducts()" class="hidden w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-green-900/30 mb-3">
                     <i class="fas fa-gift"></i> Reclamar Productos Gratis
                 </button>
@@ -249,6 +303,47 @@
                 <button id="manual-checkout-btn" onclick="checkoutManual()" class="w-full hidden bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-red-900/30">
                     <i class="fas fa-credit-card"></i> Pagar Manualmente (Discord)
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CÓDIGO DE DESCUENTO -->
+    <div id="discount-code-modal" class="hidden fixed inset-0 bg-black/90 z-[95] flex items-center justify-center p-4 discount-modal">
+        <div class="bg-[#150a0a] border border-red-900/50 rounded-2xl p-8 max-w-md w-full shadow-2xl">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center">
+                    <i class="fas fa-tag text-white text-2xl"></i>
+                </div>
+                <h2 class="text-2xl font-black text-white mb-2">CÓDIGO DE DESCUENTO</h2>
+                <p class="text-gray-400 text-sm">Ingresa tu código para obtener descuento en toda la tienda</p>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-gray-300 text-sm font-semibold mb-2">Código Promocional</label>
+                    <input type="text" id="modal-discount-input" 
+                        class="w-full bg-[#0d0505] border border-red-900/40 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-red-500 text-center text-lg uppercase tracking-wider"
+                        placeholder="Ej: PAPELETA25">
+                </div>
+                
+                <div id="discount-result" class="hidden p-4 rounded-xl border">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-check-circle text-2xl"></i>
+                        <div>
+                            <p class="text-white font-bold">¡Código Aplicado!</p>
+                            <p class="text-green-400 text-sm" id="discount-percent-text"></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex gap-3">
+                    <button onclick="closeDiscountModal()" class="flex-1 px-4 py-3 rounded-xl border border-red-900/40 text-red-400 hover:bg-red-900/20 transition-all font-semibold">
+                        Cancelar
+                    </button>
+                    <button onclick="validateAndApplyDiscount()" class="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-red-900/30">
+                        Aplicar Código
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -323,6 +418,13 @@
                 <div class="user-menu-icon"><i class="fas fa-box"></i></div>
                 <div class="user-menu-text"><h4>Mis Productos</h4><p>Ver y descargar mis compras</p></div>
             </a>
+            
+            <!-- NUEVO BOTÓN DE CÓDIGO DE DESCUENTO -->
+            <div class="user-menu-item" onclick="openDiscountModal()">
+                <div class="user-menu-icon"><i class="fas fa-tag"></i></div>
+                <div class="user-menu-text"><h4>Código</h4><p>Aplicar descuento</p></div>
+            </div>
+            
             <a href="#" onclick="toggleUserPanel(); showPage('productos')" class="user-menu-item">
                 <div class="user-menu-icon"><i class="fas fa-store"></i></div>
                 <div class="user-menu-text"><h4>Tienda</h4><p>Explorar más productos</p></div>
@@ -578,6 +680,10 @@
         let cart = [];
         let localProducts = JSON.parse(localStorage.getItem('papeleta_local_products') || '[]');
         let tempImages = [];
+        
+        // Variables para descuento
+        let activeDiscount = null;
+        let discountPercentage = 0;
 
         const firebaseConfig = {
             apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
@@ -592,6 +698,72 @@
 
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+
+        // --- FUNCIONES DE CÓDIGO DE DESCUENTO ---
+        function openDiscountModal() {
+            toggleUserPanel();
+            document.getElementById('discount-code-modal').classList.remove('hidden');
+            document.getElementById('modal-discount-input').value = '';
+            document.getElementById('discount-result').classList.add('hidden');
+        }
+
+        function closeDiscountModal() {
+            document.getElementById('discount-code-modal').classList.add('hidden');
+        }
+
+        async function validateAndApplyDiscount() {
+            const code = document.getElementById('modal-discount-input').value.trim().toUpperCase();
+            
+            if (!code) {
+                showToast('Ingresa un código', 'warning');
+                return;
+            }
+
+            try {
+                const discountDoc = await db.collection("DiscountCodes").doc(code).get();
+                
+                if (!discountDoc.exists) {
+                    showToast('Código inválido', 'error');
+                    return;
+                }
+
+                const discountData = discountDoc.data();
+                
+                if (!discountData.active) {
+                    showToast('Este código ha expirado', 'error');
+                    return;
+                }
+
+                // Aplicar descuento
+                activeDiscount = code;
+                discountPercentage = discountData.percentage || 0;
+                
+                document.getElementById('discount-result').classList.remove('hidden');
+                document.getElementById('discount-percent-text').textContent = `Descuento del ${discountPercentage}% aplicado`;
+                document.getElementById('discount-result').className = 'p-4 rounded-xl border border-green-600/30 bg-green-900/20';
+                
+                setTimeout(() => {
+                    closeDiscountModal();
+                    updateCartUI();
+                    showToast(`¡Código ${code} aplicado! ${discountPercentage}% de descuento`, 'success');
+                }, 1500);
+                
+            } catch (error) {
+                console.error(error);
+                showToast('Error al validar el código', 'error');
+            }
+        }
+
+        function applyDiscountCode() {
+            openDiscountModal();
+        }
+
+        function removeDiscountCode() {
+            activeDiscount = null;
+            discountPercentage = 0;
+            updateCartUI();
+            showToast('Código de descuento eliminado', 'success');
+        }
 
         // --- FUNCIONES PANEL DE USUARIO (CLIENTE) ---
         function toggleUserPanel() {
@@ -830,9 +1002,14 @@
             const itemsEl = document.getElementById('cart-items');
             const emptyEl = document.getElementById('cart-empty');
             const totalEl = document.getElementById('cart-total');
+            const subtotalEl = document.getElementById('cart-subtotal');
             const claimBtn = document.getElementById('claim-free-btn');
             const paypalContainer = document.getElementById('paypal-button-container');
             const manualBtn = document.getElementById('manual-checkout-btn');
+            const discountLine = document.getElementById('discount-line');
+            const discountAmountEl = document.getElementById('discount-amount');
+            const discountApplied = document.getElementById('discount-applied');
+            const discountCodeText = document.getElementById('discount-code-text');
             
             const count = cart.length;
             if (count > 0) { countEl.textContent = count; countEl.classList.remove('hidden'); } else { countEl.classList.add('hidden'); }
@@ -840,6 +1017,8 @@
             if (cart.length === 0) {
                 itemsEl.innerHTML = ''; emptyEl.classList.remove('hidden');
                 claimBtn.classList.add('hidden'); paypalContainer.innerHTML = ''; manualBtn.classList.add('hidden');
+                discountLine.classList.add('hidden');
+                discountApplied.classList.add('hidden');
             } else {
                 emptyEl.classList.add('hidden');
                 itemsEl.innerHTML = cart.map(item => `
@@ -852,12 +1031,39 @@
                         <button onclick="removeFromCart('${item.id}')" class="text-red-400 hover:text-red-300 w-8 h-8 rounded-lg hover:bg-red-950/30 flex items-center justify-center transition-all"><i class="fas fa-trash"></i></button>
                     </div>`).join('');
                 
-                const total = cart.reduce((sum, item) => sum + Number(item.price), 0);
-                totalEl.textContent = total === 0 ? 'GRATIS' : '$' + total.toFixed(2);
+                // Calcular subtotal
+                const subtotal = cart.reduce((sum, item) => sum + Number(item.price), 0);
+                
+                // Mostrar/ocultar sección de descuento
+                if (activeDiscount && discountPercentage > 0) {
+                    const discountAmount = subtotal * (discountPercentage / 100);
+                    const total = subtotal - discountAmount;
+                    
+                    subtotalEl.textContent = '$' + subtotal.toFixed(2);
+                    discountLine.classList.remove('hidden');
+                    discountAmountEl.textContent = '-$' + discountAmount.toFixed(2);
+                    totalEl.textContent = '$' + total.toFixed(2);
+                    
+                    discountApplied.classList.remove('hidden');
+                    discountCodeText.textContent = `${activeDiscount} (-${discountPercentage}%)`;
+                } else {
+                    subtotalEl.textContent = '$' + subtotal.toFixed(2);
+                    discountLine.classList.add('hidden');
+                    totalEl.textContent = subtotal === 0 ? 'GRATIS' : '$' + subtotal.toFixed(2);
+                    discountApplied.classList.add('hidden');
+                }
+                
                 const allFree = cart.every(item => Number(item.price) === 0);
                 
-                if (allFree && total === 0) { claimBtn.classList.remove('hidden'); paypalContainer.innerHTML = ''; manualBtn.classList.add('hidden'); } 
-                else { claimBtn.classList.add('hidden'); renderPayPalButtons(); manualBtn.classList.remove('hidden'); }
+                if (allFree && subtotal === 0) { 
+                    claimBtn.classList.remove('hidden'); 
+                    paypalContainer.innerHTML = ''; 
+                    manualBtn.classList.add('hidden'); 
+                } else { 
+                    claimBtn.classList.add('hidden'); 
+                    renderPayPalButtons(); 
+                    manualBtn.classList.remove('hidden'); 
+                }
             }
         }
 
@@ -987,7 +1193,17 @@ async function sendDiscordNotification(purchaseData, isFree = false) {
             if (cart.length === 0) return;
             const hasPaidProducts = cart.some(item => Number(item.price) > 0);
             if (!hasPaidProducts) return;
-            const totalAmount = cart.reduce((sum, item) => sum + Number(item.price), 0).toFixed(2);
+            
+            // Calcular total con descuento
+            const subtotal = cart.reduce((sum, item) => sum + Number(item.price), 0);
+            let totalAmount = subtotal;
+            
+            if (activeDiscount && discountPercentage > 0) {
+                const discountAmount = subtotal * (discountPercentage / 100);
+                totalAmount = subtotal - discountAmount;
+            }
+            
+            totalAmount = totalAmount.toFixed(2);
 
             paypal.Buttons({
                 style: { shape: 'rect', color: 'gold', layout: 'vertical', label: 'pay' },
@@ -1013,13 +1229,26 @@ async function sendDiscordNotification(purchaseData, isFree = false) {
         async function assignProductsToUserAfterPayment(paymentDetails) {
             if(!currentUser) return;
             try {
+                // Calcular total con descuento
+                const subtotal = cart.reduce((sum, item) => sum + Number(item.price), 0);
+                let total = subtotal;
+                let discountInfo = '';
+                
+                if (activeDiscount && discountPercentage > 0) {
+                    const discountAmount = subtotal * (discountPercentage / 100);
+                    total = subtotal - discountAmount;
+                    discountInfo = ` (Código: ${activeDiscount}, -${discountPercentage}%)`;
+                }
+                
                 const purchaseData = {
                     discord_id: currentUser.id, username: currentUser.username, avatar: currentUser.avatar,
                     products: cart.map(item => ({ id: item.id, name: item.name, price: "$" + Number(item.price).toFixed(2) })),
-                    total_price: "$" + cart.reduce((sum, item) => sum + Number(item.price), 0).toFixed(2),
+                    total_price: "$" + total.toFixed(2) + discountInfo,
                     payment_id: paymentDetails.id, payer_email: paymentDetails.payer.email_address,
                     date: firebase.firestore.FieldValue.serverTimestamp(), status: "Pagado",
-                    productImage: cart[0]?.image || null
+                    productImage: cart[0]?.image || null,
+                    discount_code: activeDiscount,
+                    discount_percentage: discountPercentage
                 };
                 
                 await db.collection("Clientes").add(purchaseData);
