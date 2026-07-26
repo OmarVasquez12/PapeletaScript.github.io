@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito de Compras - Papeleta Store</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff1a1a'/%3E%3Cstop offset='1' stop-color='%23cc1b1b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Ctext x='50' y='70' font-family='Arial, sans-serif' font-size='58' font-weight='900' fill='white' text-anchor='middle'%3EP%3C/text%3E%3C/svg%3E">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.paypal.com/sdk/js?client-id=sb&currency=USD"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        :root { --bg-body: #050507; --primary: #ff1a1a; --border-color: rgba(255, 26, 26, 0.15); }
+        body { background-color: #050507; color: #f3f4f6; font-family: 'Segoe UI', system-ui, sans-serif; }
+        .red-glow { text-shadow: 0 0 18px rgba(255, 26, 26, 0.85); }
+        .cart-item { background: rgba(21, 10, 10, 0.6); border: 1px solid rgba(255, 26, 26, 0.15); transition: all 0.3s ease; }
+        .cart-item:hover { border-color: rgba(255, 26, 26, 0.4); }
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { background: rgba(21, 10, 10, 0.95); border: 1px solid rgba(255, 26, 26, 0.3); border-left: 4px solid #dc2626; border-radius: 12px; padding: 16px 20px; min-width: 320px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); animation: slideInRight 0.4s ease, fadeOut 0.4s ease 4.6s forwards; display: flex; align-items: center; gap: 12px; pointer-events: auto; }
+        .toast.success { border-left-color: #10b981; }
+        .toast.error { border-left-color: #ef4444; }
+        .toast.warning { border-left-color: #f59e0b; }
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; transform: translateX(100%); } }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- HEADER SIMPLIFICADO -->
+    <header class="bg-[#0d0505]/90 backdrop-blur border-b border-red-900/30 sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
+        <a href="index.html" class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
+            <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-red-500 to-red-800 flex items-center justify-center font-black text-white">P</div>
+            <span class="text-white font-black tracking-widest text-lg">PAPELETA <span class="text-red-400">STORE</span></span>
+        </a>
+        <a href="index.html" class="text-gray-400 hover:text-white flex items-center gap-2 transition-colors text-sm font-semibold">
+            <i class="fas fa-arrow-left"></i> Volver a la Tienda
+        </a>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL DEL CARRITO -->
+    <main class="flex-grow max-w-6xl w-full mx-auto px-6 py-12">
+        <h1 class="text-3xl md:text-4xl font-black text-white uppercase tracking-tight mb-8 flex items-center gap-3">
+            <i class="fas fa-shopping-cart text-red-500"></i> Mi Carrito
+        </h1>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- LISTA DE PRODUCTOS -->
+            <div class="lg:col-span-2 space-y-4" id="cart-items-container">
+                <!-- Se llena con JS -->
+            </div>
+
+            <!-- RESUMEN DEL PEDIDO -->
+            <div class="lg:col-span-1">
+                <div class="bg-[#150a0a] border border-red-900/30 rounded-2xl p-6 sticky top-24">
+                    <h2 class="text-xl font-bold text-white mb-6">Resumen del Pedido</h2>
+                    
+                    <!-- Input de Descuento -->
+                    <div class="mb-6">
+                        <div id="discount-input-container" class="flex gap-2">
+                            <input type="text" id="discount-code-input" placeholder="Código de descuento" 
+                                class="flex-1 bg-[#0d0505] border border-red-900/40 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500 uppercase">
+                            <button onclick="validateAndApplyDiscount()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all">
+                                Aplicar
+                            </button>
+                        </div>
+                        <div id="discount-applied" class="hidden mt-3 p-3 bg-green-900/20 border border-green-600/30 rounded-lg flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-tag text-green-400"></i>
+                                <span class="text-green-400 text-sm font-semibold" id="discount-code-text"></span>
+                            </div>
+                            <button onclick="removeDiscountCode()" class="text-gray-400 hover:text-red-400 text-sm"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Totales -->
+                    <div class="space-y-3 mb-6 border-t border-red-900/30 pt-4">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-400">Subtotal:</span>
+                            <span id="cart-subtotal" class="text-white">$0.00</span>
+                        </div>
+                        <div id="discount-line" class="hidden flex justify-between text-sm">
+                            <span class="text-green-400">Descuento:</span>
+                            <span id="discount-amount" class="text-green-400">-$0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center pt-3 border-t border-red-900/30">
+                            <span class="text-gray-300 font-semibold">Total a pagar:</span>
+                            <span id="cart-total" class="text-3xl font-black text-white">$0.00</span>
+                        </div>
+                    </div>
+
+                    <!-- Botones de Acción -->
+                    <button id="claim-free-btn" onclick="claimFreeProducts()" class="hidden w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-green-900/30 mb-3">
+                        <i class="fas fa-gift"></i> Reclamar Productos Gratis
+                    </button>
+                    <div id="paypal-button-container" class="mb-3"></div>
+                    <button id="manual-checkout-btn" onclick="checkoutManual()" class="hidden w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-red-900/30">
+                        <i class="fas fa-credit-card"></i> Pagar Manualmente (Discord)
+                    </button>
+                    
+                    <p class="text-gray-500 text-xs text-center mt-4">
+                        <i class="fas fa-shield-alt mr-1"></i> Pago seguro y entrega instantánea
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script>
+        // ========== CONFIGURACIÓN ==========
+        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1530402751375216720/CM6vWGEYqf3aWPiCmIBf_ycp29k686sO6Fc9HB4wisAZTAGe3OiRt5OKZoxbsINHvjgq";
+        const firebaseConfig = {
+            apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
+            authDomain: "papeletalicencia.firebaseapp.com",
+            databaseURL: "https://papeletalicencia-default-rtdb.firebaseio.com",
+            projectId: "papeletalicencia",
+            storageBucket: "papeletalicencia.firebasestorage.app",
+            messagingSenderId: "677208314051",
+            appId: "1:677208314051:web:a27c04f31d402e83f29276",
+            measurementId: "G-RPJ4KQ6EQ4"
+        };
+
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let cart = JSON.parse(localStorage.getItem('papeleta_cart') || '[]');
+        let currentUser = null;
+        let activeDiscount = null;
+        let discountPercentage = 0;
+
+        // ========== UTILIDADES ==========
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', warning: 'fa-exclamation-triangle' };
+            const titles = { success: '¡Éxito!', error: 'Error', warning: 'Advertencia' };
+            toast.innerHTML = `
+                <i class="fas ${icons[type]} text-xl" style="color: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#f59e0b'}"></i>
+                <div class="flex-1">
+                    <div class="font-semibold text-sm text-white">${titles[type]}</div>
+                    <div class="text-xs text-gray-400">${message}</div>
+                </div>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => { if (toast.parentNode) toast.remove(); }, 5000);
+        }
+
+        function escapeHTML(str) {
+            return String(str).replace(/[&<>'"]/g, tag => ({ '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;' }[tag] || tag));
+        }
+
+        // ========== LÓGICA DEL CARRITO ==========
+        function renderCart() {
+            const container = document.getElementById('cart-items-container');
+            
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-16 bg-[#150a0a] border border-red-900/30 rounded-2xl">
+                        <i class="fas fa-shopping-cart text-gray-600 text-5xl mb-4"></i>
+                        <h3 class="text-white text-xl font-bold mb-2">Tu carrito está vacío</h3>
+                        <p class="text-gray-400 mb-6">Agrega productos para comenzar</p>
+                        <a href="index.html" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-xl transition-all inline-flex items-center gap-2">
+                            <i class="fas fa-arrow-left"></i> Volver a la Tienda
+                        </a>
+                    </div>
+                `;
+                updateTotals();
+                return;
+            }
+
+            container.innerHTML = cart.map(item => `
+                <div class="cart-item rounded-xl p-4 flex items-center gap-4">
+                    <img src="${escapeHTML(item.image || '')}" alt="${escapeHTML(item.name)}" class="w-20 h-20 object-cover rounded-lg bg-[#0d0505]">
+                    <div class="flex-grow min-w-0">
+                        <h4 class="text-white font-bold text-lg truncate">${escapeHTML(item.name)}</h4>
+                        <p class="${Number(item.price) === 0 ? 'text-green-400' : 'text-red-400'} font-bold text-xl">
+                            ${Number(item.price) === 0 ? 'GRATIS' : '$' + Number(item.price).toFixed(2)}
+                        </p>
+                    </div>
+                    <button onclick="removeFromCart('${item.id}')" class="text-gray-500 hover:text-red-400 w-10 h-10 rounded-lg hover:bg-red-950/30 flex items-center justify-center transition-all">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `).join('');
+
+            updateTotals();
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            localStorage.setItem('papeleta_cart', JSON.stringify(cart));
+            renderCart();
+            showToast('Producto eliminado del carrito', 'success');
+            
+            // Actualizar badge en index.html si existe
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'papeleta_cart') {
+                    // El badge se actualiza en index.html automáticamente por el evento storage
+                }
+            });
+        }
+
+        function updateTotals() {
+            const subtotal = cart.reduce((sum, item) => sum + Number(item.price), 0);
+            const subtotalEl = document.getElementById('cart-subtotal');
+            const totalEl = document.getElementById('cart-total');
+            const discountLine = document.getElementById('discount-line');
+            const discountAmountEl = document.getElementById('discount-amount');
+            const discountApplied = document.getElementById('discount-applied');
+            const discountCodeText = document.getElementById('discount-code-text');
+            const claimBtn = document.getElementById('claim-free-btn');
+            const paypalContainer = document.getElementById('paypal-button-container');
+            const manualBtn = document.getElementById('manual-checkout-btn');
+
+            subtotalEl.textContent = '$' + subtotal.toFixed(2);
+
+            if (activeDiscount && discountPercentage > 0 && subtotal > 0) {
+                const discountAmount = subtotal * (discountPercentage / 100);
+                const total = subtotal - discountAmount;
+                
+                discountLine.classList.remove('hidden');
+                discountAmountEl.textContent = '-$' + discountAmount.toFixed(2);
+                totalEl.textContent = '$' + total.toFixed(2);
+                
+                discountApplied.classList.remove('hidden');
+                discountCodeText.textContent = `${activeDiscount} (-${discountPercentage}%)`;
+            } else {
+                discountLine.classList.add('hidden');
+                totalEl.textContent = subtotal === 0 ? 'GRATIS' : '$' + subtotal.toFixed(2);
+                discountApplied.classList.add('hidden');
+            }
+
+            const allFree = cart.every(item => Number(item.price) === 0);
+            if (allFree && subtotal === 0) { 
+                claimBtn.classList.remove('hidden'); 
+                paypalContainer.innerHTML = ''; 
+                manualBtn.classList.add('hidden'); 
+            } else { 
+                claimBtn.classList.add('hidden'); 
+                renderPayPalButtons(); 
+                manualBtn.classList.remove('hidden'); 
+            }
+        }
+
+        // ========== CÓDIGOS DE DESCUENTO ==========
+        async function validateAndApplyDiscount() {
+            const code = document.getElementById('discount-code-input').value.trim().toUpperCase();
+            if (!code) { showToast('Ingresa un código', 'warning'); return; }
+
+            try {
+                const discountDoc = await db.collection("DiscountCodes").doc(code).get();
+                if (!discountDoc.exists) { showToast('Código inválido', 'error'); return; }
+
+                const discountData = discountDoc.data();
+                if (!discountData.active) { showToast('Este código ha expirado', 'error'); return; }
+
+                activeDiscount = code;
+                discountPercentage = discountData.percentage || 0;
+                
+                showToast(`¡Código ${code} aplicado! ${discountPercentage}% de descuento`, 'success');
+                updateTotals();
+            } catch (error) {
+                console.error(error);
+                showToast('Error al validar el código', 'error');
+            }
+        }
+
+        function removeDiscountCode() {
+            activeDiscount = null;
+            discountPercentage = 0;
+            document.getElementById('discount-code-input').value = '';
+            updateTotals();
+            showToast('Código de descuento eliminado', 'success');
+        }
+
+        // ========== PROCESO DE PAGO ==========
+        function renderPayPalButtons() {
+            const container = document.getElementById('paypal-button-container');
+            container.innerHTML = ''; 
+            if (cart.length === 0) return;
+            
+            const subtotal = cart.reduce((sum, item) => sum + Number(item.price), 0);
+            let totalAmount = subtotal;
+            
+            if (activeDiscount && discountPercentage > 0) {
+                totalAmount = subtotal - (subtotal * (discountPercentage / 100));
+            }
+            
+            totalAmount = totalAmount.toFixed(2);
+
+            paypal.Buttons({
+                style: { shape: 'rect', color: 'gold', layout: 'vertical', label: 'pay' },
+                createOrder: function(data, actions) { 
+                    return actions.order.create({ 
+                        purchase_units: [{ 
+                            description: 'Compra en Papeleta Store', 
+                            amount: { value: totalAmount } 
+                        }] 
+                    }); 
+                },
+                onApprove: function(data, actions) {
+                    return actions.order.capture().then(function(details) {
+                        showToast('¡Pago completado!', 'success');
+                        assignProductsToUserAfterPayment(details);
+                        cart = [];
+                        localStorage.setItem('papeleta_cart', JSON.stringify(cart));
+                        renderCart();
+                    });
+                }
+            }).render('#paypal-button-container');
+        }
+
+        async function claimFreeProducts() {
+            if (cart.length === 0) return;
+            const allFree = cart.every(item => Number(item.price) === 0);
+            if (!allFree) { showToast('Algunos productos no son gratis', 'error'); return; }
+            
+            try {
+                const purchaseData = {
+                    discord_id: currentUser.id, username: currentUser.username, avatar: currentUser.avatar,
+                    products: cart.map(item => ({ id: item.id, name: item.name, price: "Gratis" })),
+                    total_price: "Gratis", date: firebase.firestore.FieldValue.serverTimestamp(), status: "Reclamado Exitosamente",
+                    productImage: cart[0]?.image || null
+                };
+                
+                await db.collection("Clientes").add(purchaseData);
+                await sendDiscordNotification(purchaseData, true);
+                
+                for (const item of cart) { 
+                    await getOrCreateLicense(currentUser.id, item.id, item.name); 
+                }
+                
+                showToast('¡Productos reclamados exitosamente!', 'success');
+                cart = [];
+                localStorage.setItem('papeleta_cart', JSON.stringify(cart));
+                renderCart();
+            } catch (error) { 
+                console.error(error); 
+                showToast('Error al registrar la reclamación: ' + error.message, 'error'); 
+            }
+        }
+
+        async function assignProductsToUserAfterPayment(paymentDetails) {
+            try {
+                const subtotal = cart.reduce((sum, item) => sum + Number(item.price), 0);
+                let total = subtotal;
+                let discountInfo = '';
+                
+                if (activeDiscount && discountPercentage > 0) {
+                    total = subtotal - (subtotal * (discountPercentage / 100));
+                    discountInfo = ` (Código: ${activeDiscount}, -${discountPercentage}%)`;
+                }
+                
+                const purchaseData = {
+                    discord_id: currentUser.id, username: currentUser.username, avatar: currentUser.avatar,
+                    products: cart.map(item => ({ id: item.id, name: item.name, price: "$" + Number(item.price).toFixed(2) })),
+                    total_price: "$" + total.toFixed(2) + discountInfo,
+                    payment_id: paymentDetails.id, payer_email: paymentDetails.payer.email_address,
+                    date: firebase.firestore.FieldValue.serverTimestamp(), status: "Pagado",
+                    productImage: cart[0]?.image || null,
+                    discount_code: activeDiscount,
+                    discount_percentage: discountPercentage
+                };
+                
+                await db.collection("Clientes").add(purchaseData);
+                await sendDiscordNotification(purchaseData, false);
+                
+                for (const item of cart) { 
+                    await getOrCreateLicense(currentUser.id, item.id, item.name); 
+                }
+                
+                showToast("¡Productos añadidos a tu biblioteca!", 'success');
+            } catch (error) { 
+                console.error(error); 
+                showToast('Error al registrar la compra: ' + error.message, 'error'); 
+            }
+        }
+
+        function checkoutManual() {
+            if (cart.length === 0) return;
+            showToast('Serás redirigido a Discord para coordinar el pago manual.', 'warning');
+            setTimeout(() => { window.open('https://discord.gg/rvxEdWcGkf', '_blank'); }, 1500);
+        }
+
+        // ========== LICENCIAS Y NOTIFICACIONES ==========
+        async function getOrCreateLicense(userId, productId, productName) {
+            try {
+                const querySnapshot = await db.collection("Licencias")
+                    .where("discord_id", "==", userId)
+                    .where("product_id", "==", productId)
+                    .where("status", "==", "active")
+                    .limit(1).get();
+
+                if (!querySnapshot.empty) return querySnapshot.docs[0].data();
+
+                const newUser = "USER_" + Math.random().toString(36).substring(2, 8).toUpperCase();
+                const newKey = Array.from({length: 24}, () => "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[Math.floor(Math.random() * 36)]).join('');
+
+                const licenseData = { 
+                    discord_id: userId, username: currentUser.username, product_id: productId, product_name: productName, 
+                    user_code: newUser, key: newKey, created_at: firebase.firestore.FieldValue.serverTimestamp(), status: 'active' 
+                };
+                
+                await db.collection("Licencias").add(licenseData);
+                return { id: docRef.id, ...licenseData };
+            } catch (error) {
+                console.error("Error en getOrCreateLicense:", error);
+                return null;
+            }
+        }
+
+        async function sendDiscordNotification(purchaseData, isFree = false) {
+            try {
+                const productNames = purchaseData.products.map(p => p.name).join(', ');
+                const priceText = isFree ? "GRATIS" : (purchaseData.total_price || "$0.00");
+                const methodText = isFree ? "Reclamo Gratis" : "PayPal";
+                const embedColor = isFree ? 5763719 : 16711680;
+
+                const payload = {
+                    username: "Papeleta Store",
+                    avatar_url: "https://cdn.discordapp.com/embed/avatars/0.png",
+                    embeds: [{
+                        title: isFree ? "🎁 Producto reclamado" : "✅ Compra completada",
+                        description: isFree ? `Se reclamó un producto gratuito.` : `Tu compra fue procesada correctamente.`,
+                        color: embedColor,
+                        fields: [
+                            { name: "👤 Cliente", value: `<@${purchaseData.discord_id}> (**${purchaseData.username}**)`, inline: true },
+                            { name: "📦 Producto", value: productNames || "Sin nombre", inline: true },
+                            { name: "💳 Método", value: methodText, inline: true },
+                            { name: "💰 Precio", value: `**${priceText}**`, inline: true }
+                        ],
+                        footer: { text: "Papeleta Store • " + new Date().toLocaleString('es-ES') },
+                        timestamp: new Date().toISOString()
+                    }]
+                };
+
+                if (purchaseData.productImage && (purchaseData.productImage.startsWith('http://') || purchaseData.productImage.startsWith('https://'))) {
+                    payload.embeds[0].image = { url: purchaseData.productImage };
+                }
+
+                await fetch(DISCORD_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            } catch (error) {
+                console.error('❌ Error en notificación:', error);
+            }
+        }
+
+        // ========== INICIALIZACIÓN ==========
+        document.addEventListener('DOMContentLoaded', () => {
+            // Verificar si hay usuario (simulado o real, ajusta según tu lógica de login)
+            const savedToken = localStorage.getItem('dc_access_token');
+            if (savedToken) {
+                fetch('https://discord.com/api/users/@me', { headers: { 'Authorization': `Bearer ${savedToken}` }})
+                .then(res => res.json())
+                .then(user => {
+                    currentUser = user;
+                    renderCart();
+                })
+                .catch(() => {
+                    showToast('Debes iniciar sesión para ver el carrito', 'error');
+                    setTimeout(() => { window.location.href = 'index.html'; }, 2000);
+                });
+            } else {
+                showToast('Debes iniciar sesión para ver el carrito', 'warning');
+                setTimeout(() => { window.location.href = 'index.html'; }, 2000);
+            }
+        });
+    </script>
+</body>
+</html>
