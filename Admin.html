@@ -1678,6 +1678,34 @@ end, true, "high")
     }
 }
 
+        async function updateProductPrice(id, newPrice) {
+    const price = parseFloat(newPrice);
+    if (isNaN(price) || price < 0) {
+        showToast('Precio inválido', 'error');
+        loadProducts(); // Recargar para revertir el cambio inválido
+        return;
+    }
+    
+    try {
+        const product = allProducts.find(p => p.id === id);
+        if (!product) return;
+        
+        const updateData = { price: price };
+        
+        // Si no tiene un 'original_price' guardado, usamos el precio actual como base
+        if (!product.original_price && product.price > 0) {
+            updateData.original_price = product.price;
+        }
+        
+        await db.collection("Productos").doc(id).update(updateData);
+        showToast('Precio actualizado exitosamente', 'success');
+        loadProducts(); // Recargar para mostrar el descuento calculado
+    } catch (error) {
+        console.error(error);
+        showToast('Error al actualizar: ' + error.message, 'error');
+    }
+}
+
         async function deleteProduct(id) {
             if (!confirm('¿Eliminar este producto?')) return;
             try {
