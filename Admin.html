@@ -3167,6 +3167,75 @@ end, true, "high")
             if (section) observer.observe(section, { attributes: true, attributeFilter: ['class'] });
         });
 
+        // --- MANEJO DEL CREADOR DE CÓDIGOS ---
+document.getElementById('btn-create-discount').addEventListener('click', function() {
+    const panel = document.getElementById('discount-creator-panel');
+    panel.classList.toggle('hidden');
+});
+
+document.getElementById('btn-preview-discount').addEventListener('click', function() {
+    const code = document.getElementById('discount-code-input').value.trim().toUpperCase();
+    const perc = parseInt(document.getElementById('discount-percentage-input').value) || 25;
+    
+    if (!code) {
+        showToast('Ingresa un código válido', 'warning');
+        return;
+    }
+    
+    const preview = document.getElementById('discount-preview');
+    preview.classList.remove('hidden');
+    
+    // Actualizar vista previa con los valores reales
+    const previews = preview.querySelectorAll('.text-white.text-sm.font-bold');
+    previews.forEach(el => {
+        const match = el.textContent.match(/\$(\d+\.?\d*)/);
+        if (match) {
+            const original = parseFloat(match[1]);
+            const discounted = original * (1 - perc / 100);
+            el.innerHTML = `$${original.toFixed(2)} → <span class="text-green-400">$${discounted.toFixed(2)}</span>`;
+        }
+    });
+    
+    // Actualizar etiquetas de descuento
+    const tags = preview.querySelectorAll('.text-green-400.text-xs.font-bold');
+    tags.forEach(tag => tag.textContent = `-${perc}%`);
+});
+
+document.getElementById('btn-cancel-discount').addEventListener('click', function() {
+    document.getElementById('discount-creator-panel').classList.add('hidden');
+    document.getElementById('discount-preview').classList.add('hidden');
+});
+
+document.getElementById('btn-confirm-create-discount').addEventListener('click', async function() {
+    const code = document.getElementById('discount-code-input').value.trim().toUpperCase();
+    const perc = parseInt(document.getElementById('discount-percentage-input').value) || 25;
+    
+    if (!code) {
+        showToast('Código requerido', 'error');
+        return;
+    }
+
+    try {
+        await db.collection("DiscountCodes").doc(code).set({
+            percentage: perc,
+            active: true,
+            created_at: firebase.firestore.FieldValue.serverTimestamp(),
+            created_by: currentUser ? currentUser.id : 'system'
+        });
+
+        showToast(`Código "${code}" creado con ${perc}% de descuento`, 'success');
+        document.getElementById('discount-creator-panel').classList.add('hidden');
+        document.getElementById('discount-preview').classList.add('hidden');
+        
+        // Limpiar inputs
+        document.getElementById('discount-code-input').value = '';
+        document.getElementById('discount-percentage-input').value = '25';
+    } catch (e) {
+        console.error(e);
+        showToast('Error al crear el código', 'error');
+    }
+});
+
     </script>
 </body>
 </html>
