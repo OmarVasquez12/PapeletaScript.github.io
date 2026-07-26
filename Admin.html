@@ -1586,17 +1586,17 @@ end, true, "high")
                 const fileBase64 = await fileToBase64(downloadFile);
                 
                 const newProduct = {
-                    id: 'prod_' + Date.now(),
-                    name, price, category, description,
-                    original_price: price,
-                    image_url: resizedImages[0],
-                    images: resizedImages,
-                    youtube_url: youtubeUrl || null,
-                    youtube_id: youtubeVideoId || null,
-                    file_data: fileBase64,
-                    file_name: downloadFile.name,
-                    created_at: firebase.firestore.FieldValue.serverTimestamp()
-                };
+    id: 'prod_' + Date.now(),
+    name, price, category, description,
+    original_price: price, // AGREGAR ESTA LÍNEA
+    image_url: resizedImages[0],
+    images: resizedImages,
+    youtube_url: youtubeUrl || null,
+    youtube_id: youtubeVideoId || null,
+    file_data: fileBase64,
+    file_name: downloadFile.name,
+    created_at: firebase.firestore.FieldValue.serverTimestamp()
+};
                 
                 await db.collection("Productos").doc(newProduct.id).set(newProduct);
                 showToast('Producto guardado exitosamente', 'success');
@@ -1635,36 +1635,35 @@ end, true, "high")
         container.innerHTML = allProducts.map(p => {
             const originalPrice = p.original_price || p.price;
             const currentPrice = p.price;
-            let discountHtml = '';
             let priceHtml = '';
+            let discountHtml = '';
             
-            // Calcular descuento si aplica
+            // Si hay descuento (precio original mayor al actual y mayor a 0)
             if (originalPrice > 0 && currentPrice < originalPrice) {
                 const discountPercent = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
                 priceHtml = `
-                    <p class="text-gray-500 text-xs line-through">$${Number(originalPrice).toFixed(2)}</p>
-                    <p class="text-green-400 text-sm font-bold">$${Number(currentPrice).toFixed(2)}</p>
+                    <div class="flex flex-col">
+                        <p class="text-gray-500 text-xs line-through">$${Number(originalPrice).toFixed(2)}</p>
+                        <p class="text-green-400 text-sm font-bold">$${Number(currentPrice).toFixed(2)}</p>
+                    </div>
                 `;
                 discountHtml = `<span class="bg-red-500/20 text-red-400 text-xs font-bold px-2 py-1 rounded-full border border-red-500/30 ml-2">-${discountPercent}%</span>`;
             } else {
+                // Sin descuento
                 priceHtml = `<p class="${Number(currentPrice)===0?'text-green-400':'text-red-400'} text-sm font-bold">${Number(currentPrice)===0?'GRATIS':'$'+Number(currentPrice).toFixed(2)}</p>`;
             }
 
             return `
-            <div class="flex items-center gap-4 bg-[#0d0505] border border-red-950/40 rounded-xl p-4" id="product-row-${p.id}">
+            <div class="flex items-center gap-4 bg-[#0d0505] border border-red-950/40 rounded-xl p-4">
                 <img src="${p.image_url}" class="w-16 h-16 rounded-lg object-cover">
                 <div class="flex-grow">
                     <p class="text-white font-semibold">${escapeHTML(p.name)}</p>
                     <div class="flex items-center gap-3 mt-1">
-                        <div>
-                            ${priceHtml}
-                        </div>
+                        ${priceHtml}
                         ${discountHtml}
-                        <!-- Input para editar el precio -->
                         <input type="number" step="0.01" min="0" value="${currentPrice}" 
                             id="price-input-${p.id}"
                             class="bg-[#1a0a0a] border border-red-900/40 rounded px-2 py-1 text-xs text-white w-20 focus:outline-none focus:border-red-500 transition-colors">
-                        <!-- BOTÓN DE EDITAR PRECIO -->
                         <button onclick="updateProductPrice('${p.id}')" 
                             class="bg-red-600 hover:bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded transition-all flex items-center gap-1.5 shadow-lg shadow-red-900/30">
                             <i class="fas fa-save"></i> Editar
@@ -1683,7 +1682,6 @@ end, true, "high")
 }
 
         async function updateProductPrice(id) {
-    // Leer el valor directamente del input
     const inputElement = document.getElementById(`price-input-${id}`);
     if (!inputElement) return;
     
@@ -1691,7 +1689,7 @@ end, true, "high")
     
     if (isNaN(newPrice) || newPrice < 0) {
         showToast('Precio inválido', 'error');
-        loadProducts(); // Recargar para revertir el cambio inválido
+        loadProducts();
         return;
     }
     
@@ -1701,20 +1699,19 @@ end, true, "high")
         
         const updateData = { price: newPrice };
         
-        // Si no tiene un 'original_price' guardado, usamos el precio actual como base
+        // Si no tiene original_price guardado, usar el precio actual como base
         if (!product.original_price && product.price > 0) {
             updateData.original_price = product.price;
         }
         
         await db.collection("Productos").doc(id).update(updateData);
         showToast('Precio actualizado exitosamente', 'success');
-        loadProducts(); // Recargar para mostrar el descuento calculado
+        loadProducts();
     } catch (error) {
         console.error(error);
         showToast('Error al actualizar: ' + error.message, 'error');
     }
 }
-
         async function deleteProduct(id) {
             if (!confirm('¿Eliminar este producto?')) return;
             try {
