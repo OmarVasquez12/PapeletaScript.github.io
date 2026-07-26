@@ -1447,6 +1447,43 @@ end, true, "high")
             });
         }
 
+        async function getUserPermissions(discordId, userRole) {
+    const user = allUsers.find(u => u.discord_id === discordId);
+    if (!user) return {};
+    
+    if (isAdminHardcoded(user)) {
+        return {
+            canAccessConfig: true,
+            canUploadProducts: true,
+            canDeleteProducts: true,
+            canAssignProducts: true,
+            canViewLicenses: true,
+            canManageRoles: true,
+            canAccessSupport: true
+        };
+    }
+    
+    if (!userRole || ['user', 'cliente'].includes(userRole.toLowerCase())) {
+        return {};
+    }
+    
+    try {
+        const snapshot = await db.collection("RolesUsuarios")
+            .where("name", "==", userRole)
+            .limit(1)
+            .get();
+        
+        if (snapshot.empty) return {};
+        
+        const roleData = snapshot.docs[0].data();
+        return roleData.permissions || {};
+        
+    } catch (error) {
+        console.error("Error getting user permissions:", error);
+        return {};
+    }
+}
+
         function logout() {
             localStorage.removeItem('dc_access_token');
             currentUser = null;
