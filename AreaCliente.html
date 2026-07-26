@@ -669,7 +669,8 @@
         let currentTicketId = null; // ID del ticket activo en Firebase
         let currentTicketData = null; // Datos completos del ticket actual
 
-        // --- Funciones de Utilidad ---
+       let userPermissions = {};
+       let userRole = 'client';
 
         function showToast(message, type = 'success', title = '') {
             const container = document.getElementById('toast-container');
