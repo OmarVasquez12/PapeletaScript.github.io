@@ -353,69 +353,234 @@
 
         // ========== INTEGRACIÓN CON STRIPE CHECKOUT (DINÁMICO) ==========
         async function initiateStripeCheckout() {
+
+    // Verificar usuario
     if (!currentUser) {
-        showToast('Debes iniciar sesión', 'error');
+        showToast(
+            'Debes iniciar sesión',
+            'error'
+        );
         return;
     }
 
-    const btn = document.getElementById('stripe-checkout-btn');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+    // Verificar carrito
+    if (!cart || cart.length === 0) {
+        showToast(
+            'El carrito está vacío',
+            'error'
+        );
+        return;
+    }
+
+    // Verificar términos
+    const termsCheckbox =
+        document.getElementById('terms-checkbox');
+
+    if (!termsCheckbox.checked) {
+        showToast(
+            'Debes aceptar los términos de uso',
+            'warning'
+        );
+        return;
+    }
+
+    const btn =
+        document.getElementById(
+            'stripe-checkout-btn'
+        );
+
+    const originalText =
+        btn.innerHTML;
+
+    // Desactivar botón
+    btn.innerHTML = `
+        <i class="fas fa-spinner fa-spin"></i>
+        Procesando...
+    `;
+
     btn.disabled = true;
 
     try {
-        const subtotal = cart.reduce((sum, item) => sum + Number(item.price), 0);
+
+        // ==============================
+        // CALCULAR TOTAL
+        // ==============================
+
+        const subtotal =
+            cart.reduce(
+                (sum, item) =>
+                    sum + Number(item.price),
+                0
+            );
+
         let total = subtotal;
-        if (activeDiscount && discountPercentage > 0) {
-            total = subtotal - (subtotal * (discountPercentage / 100));
+
+        // Aplicar descuento
+        if (
+            activeDiscount &&
+            discountPercentage > 0
+        ) {
+
+            total =
+                subtotal -
+                (
+                    subtotal *
+                    (
+                        discountPercentage /
+                        100
+                    )
+                );
         }
 
-        //  GUARDAR ORDEN EN FIREBASE (Opcional pero recomendado)
-        await db.collection("Compra").add({
-            discord_id: currentUser.id,
-            username: currentUser.username,
-            products: cart,
-            total_amount: total,
-            status: "pending",
-            date: firebase.firestore.FieldValue.serverTimestamp()
-        });
+        // Redondear
+        total =
+            Math.round(
+                total * 100
+            ) / 100;
 
-        //  LLAMAR A TU API DE VERCEL
-        const response = await fetch('/api/create-checkout-session', { // Ruta relativa funciona perfecto en Vercel
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                items: cart,
-                total: total,
-                discount: activeDiscount
-            })
-        });
+        // Verificar total
+        if (total <= 0) {
+
+            showToast(
+                'El total debe ser mayor a $0.00',
+                'error'
+            );
+
+            btn.innerHTML =
+                originalText;
+
+            btn.disabled = false;
+
+            return;
+        }
+
+        // ==============================
+        // GUARDAR ORDEN EN FIREBASE
+        // ==============================
+
+        await db
+            .collection('Compra')
+            .add({
+
+                discord_id:
+                    currentUser.id,
+
+                username:
+                    currentUser.username,
+
+                products:
+                    cart,
+
+                total_amount:
+                    total,
+
+                status:
+                    'pending',
+
+                date:
+                    firebase.firestore
+                        .FieldValue
+                        .serverTimestamp()
+            });
+
+
+        // ==============================
+        // LLAMAR A VERCEL
+        // ==============================
+
+        const response =
+            await fetch(
+                '/api/create-checkout-session',
+                {
+                    method: 'POST',
+
+                    headers: {
+                        'Content-Type':
+                            'application/json'
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            items:
+                                cart,
+
+                            total:
+                                total,
+
+                            discount:
+                                activeDiscount
+
+                        })
+                }
+            );
+
+
+        // ==============================
+        // LEER RESPUESTA
+        // ==============================
+
+        const session =
+            await response.json();
+
+        console.log(
+            'Respuesta de Stripe:',
+            session
+        );
+
+
+        // ==============================
+        // VERIFICAR ERROR DE API
+        // ==============================
 
         if (!response.ok) {
-    const errorText = await response.text();
-    console.error('❌ Error de la API:', response.status, errorText);
 
-    throw new Error(
-        `Error del servidor (${response.status}): ${errorText}`
-    );
-}
-
-const session = await response.json();
-
-        // REDIRIGIR A STRIPE
-        const result = await stripe.redirectToCheckout({ sessionId: session.id });
-        
-        if (result.error) {
-            showToast(result.error.message, 'error');
-            btn.innerHTML = originalText;
-            btn.disabled = false;
+            throw new Error(
+                session.error ||
+                'Error creando el pago'
+            );
         }
 
+
+        // ==============================
+        // VERIFICAR URL
+        // ==============================
+
+        if (!session.url) {
+
+            throw new Error(
+                'Stripe no devolvió la URL de pago'
+            );
+        }
+
+
+        // ==============================
+        // REDIRIGIR A STRIPE
+        // ==============================
+
+        window.location.href =
+            session.url;
+
+
     } catch (error) {
-        console.error(error);
-        showToast('Error: ' + error.message, 'error');
-        btn.innerHTML = originalText;
-        btn.disabled = false;
+
+        console.error(
+            '❌ Error en Checkout:',
+            error
+        );
+
+        showToast(
+            'Error: ' +
+            error.message,
+            'error'
+        );
+
+        // Restaurar botón
+        btn.innerHTML =
+            originalText;
+
+        btn.disabled =
+            false;
     }
 }
 
