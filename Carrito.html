@@ -371,7 +371,7 @@
         }
 
         //  GUARDAR ORDEN EN FIREBASE (Opcional pero recomendado)
-        await db.collection("Orders").add({
+        await db.collection("Compra").add({
             discord_id: currentUser.id,
             username: currentUser.username,
             products: cart,
