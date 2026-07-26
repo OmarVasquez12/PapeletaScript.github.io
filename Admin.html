@@ -1638,21 +1638,20 @@ end, true, "high")
             let discountHtml = '';
             let priceHtml = '';
             
-            // Si hay descuento (precio original es mayor al actual y es mayor a 0)
+            // Calcular descuento si aplica
             if (originalPrice > 0 && currentPrice < originalPrice) {
                 const discountPercent = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
                 priceHtml = `
                     <p class="text-gray-500 text-xs line-through">$${Number(originalPrice).toFixed(2)}</p>
                     <p class="text-green-400 text-sm font-bold">$${Number(currentPrice).toFixed(2)}</p>
                 `;
-                discountHtml = `<span class="bg-red-500/20 text-red-400 text-xs font-bold px-2 py-1 rounded-full border border-red-500/30">-${discountPercent}%</span>`;
+                discountHtml = `<span class="bg-red-500/20 text-red-400 text-xs font-bold px-2 py-1 rounded-full border border-red-500/30 ml-2">-${discountPercent}%</span>`;
             } else {
-                // Sin descuento
                 priceHtml = `<p class="${Number(currentPrice)===0?'text-green-400':'text-red-400'} text-sm font-bold">${Number(currentPrice)===0?'GRATIS':'$'+Number(currentPrice).toFixed(2)}</p>`;
             }
 
             return `
-            <div class="flex items-center gap-4 bg-[#0d0505] border border-red-950/40 rounded-xl p-4">
+            <div class="flex items-center gap-4 bg-[#0d0505] border border-red-950/40 rounded-xl p-4" id="product-row-${p.id}">
                 <img src="${p.image_url}" class="w-16 h-16 rounded-lg object-cover">
                 <div class="flex-grow">
                     <p class="text-white font-semibold">${escapeHTML(p.name)}</p>
@@ -1663,8 +1662,13 @@ end, true, "high")
                         ${discountHtml}
                         <!-- Input para editar el precio -->
                         <input type="number" step="0.01" min="0" value="${currentPrice}" 
-                            onchange="updateProductPrice('${p.id}', this.value)"
+                            id="price-input-${p.id}"
                             class="bg-[#1a0a0a] border border-red-900/40 rounded px-2 py-1 text-xs text-white w-20 focus:outline-none focus:border-red-500 transition-colors">
+                        <!-- BOTÓN DE EDITAR PRECIO -->
+                        <button onclick="updateProductPrice('${p.id}')" 
+                            class="bg-red-600 hover:bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded transition-all flex items-center gap-1.5 shadow-lg shadow-red-900/30">
+                            <i class="fas fa-save"></i> Editar
+                        </button>
                     </div>
                 </div>
                 <button onclick="deleteProduct('${p.id}')" class="text-red-400 hover:text-red-300 w-10 h-10 rounded-lg hover:bg-red-950/30">
@@ -1678,9 +1682,14 @@ end, true, "high")
     }
 }
 
-        async function updateProductPrice(id, newPrice) {
-    const price = parseFloat(newPrice);
-    if (isNaN(price) || price < 0) {
+        async function updateProductPrice(id) {
+    // Leer el valor directamente del input
+    const inputElement = document.getElementById(`price-input-${id}`);
+    if (!inputElement) return;
+    
+    const newPrice = parseFloat(inputElement.value);
+    
+    if (isNaN(newPrice) || newPrice < 0) {
         showToast('Precio inválido', 'error');
         loadProducts(); // Recargar para revertir el cambio inválido
         return;
@@ -1690,7 +1699,7 @@ end, true, "high")
         const product = allProducts.find(p => p.id === id);
         if (!product) return;
         
-        const updateData = { price: price };
+        const updateData = { price: newPrice };
         
         // Si no tiene un 'original_price' guardado, usamos el precio actual como base
         if (!product.original_price && product.price > 0) {
