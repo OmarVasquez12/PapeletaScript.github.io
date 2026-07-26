@@ -2459,69 +2459,70 @@ end, true, "high")
         }
 
         async function handleCreateRole(e) {
-            e.preventDefault();
+    e.preventDefault();
+    const name = document.getElementById('role-name').value.trim();
+    const color = document.getElementById('role-color').value;
+    const description = document.getElementById('role-desc').value.trim();
+    
+    if (!name) {
+        showToast('El nombre del rol es obligatorio', 'warning');
+        return;
+    }
+    
+    // Verificar si ya existe en Firebase
+    const existingSnapshot = await db.collection("RolesUsuarios")
+        .where("name", "==", name)
+        .limit(1)
+        .get();
+    
+    if (!existingSnapshot.empty) {
+        showToast('Ya existe un rol con ese nombre', 'warning');
+        return;
+    }
+    
+    try {
+        const newRole = {
+            name: name,
+            color: color,
+            description: description || 'Sin descripción',
+            permissions: { ...currentPermissions },
+            created_at: firebase.firestore.FieldValue.serverTimestamp(),
+            created_by: currentUser ? currentUser.id : 'admin'
+        };
+        
+        // Guardar en Firebase
+        const docRef = await db.collection("RolesUsuarios").add(newRole);
+        
+        showToast(`Rol "${name}" creado exitosamente en Firebase`, 'success');
+        
+        document.getElementById('create-role-form').reset();
+        updateColorPreview('#ff1a1a');
+        initPermissions();
+        await loadRoles(); // Recargar desde Firebase
+        
+    } catch (error) {
+        console.error("Error creating role:", error);
+        showToast('Error al crear el rol: ' + error.message, 'error');
+    }
+}
 
-            const name = document.getElementById('role-name').value.trim();
-            const color = document.getElementById('role-color').value;
-            const description = document.getElementById('role-desc').value.trim();
-
-            if (!name) {
-                showToast('El nombre del rol es obligatorio', 'warning');
-                return;
-            }
-
-            const exists = existingRoles.some(r => r.name.toLowerCase() === name.toLowerCase());
-            if (exists) {
-                showToast('Ya existe un rol con ese nombre', 'warning');
-                return;
-            }
-
-            try {
-                const newRole = {
-                    id: 'role_' + Date.now(),
-                    name: name,
-                    color: color,
-                    description: description || 'Sin descripción',
-                    permissions: { ...currentPermissions },
-                    created_at: new Date().toISOString(),
-                    created_by: 'admin'
-                };
-
-                existingRoles.push(newRole);
-                localStorage.setItem('papeleta_custom_roles', JSON.stringify(existingRoles));
-
-                showToast(`Rol "${name}" creado exitosamente`, 'success');
-
-                document.getElementById('create-role-form').reset();
-                updateColorPreview('#ff1a1a');
-                initPermissions();
-
-                renderRoles();
-                if(document.getElementById('section-users').classList.contains('active')) {
-                    loadUsers();
-                }
-
-            } catch (error) {
-                console.error("Error creating role:", error);
-                showToast('Error al crear el rol: ' + error.message, 'error');
-            }
-        }
-
-        function loadRoles() {
-            try {
-                const saved = localStorage.getItem('papeleta_custom_roles');
-                if (saved) {
-                    existingRoles = JSON.parse(saved);
-                } else {
-                    existingRoles = [];
-                }
-                renderRoles();
-            } catch (error) {
-                console.error("Error loading roles:", error);
-                existingRoles = [];
-                renderRoles();
-            }
-        }
+        async function loadRoles() {
+    try {
+        const snapshot = await db.collection("RolesUsuarios").get();
+        existingRoles = [];
+        
+        snapshot.forEach((doc) => {
+            existingRoles.push({ id: doc.id, ...doc.data() });
+        });
+        
+        renderRoles();
+    } catch (error) {
+        console.error("Error loading roles:", error);
+        existingRoles = [];
+        renderRoles();
+        showToast('Error al cargar roles desde Firebase', 'error');
+    }
+}
 
         function renderRoles() {
             const container = document.getElementById('roles-list');
