@@ -767,17 +767,24 @@
         let priceHtml = '';
         
         if (hasDiscount) {
-            const discountPercent = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
-            priceHtml = `
-                <div class="flex items-center gap-2">
-                    <span class="text-gray-500 text-xs line-through">$${Number(originalPrice).toFixed(2)}</span>
-                    <span class="text-green-400 text-xs font-bold">$${Number(currentPrice).toFixed(2)}</span>
-                    <span class="bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">-${discountPercent}%</span>
-                </div>
-            `;
-        } else {
-            priceHtml = `<p class="${Number(currentPrice) === 0 ? 'text-green-400' : 'text-red-400'} text-xs font-bold">${Number(currentPrice) === 0 ? 'GRATIS' : '$' + Number(currentPrice).toFixed(2)}</p>`;
-        }
+    const discountPercent = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
+    
+    // Si el precio actual es 0, mostrar GRATIS
+    const currentPriceDisplay = currentPrice === 0 ? 'GRATIS' : '$' + Number(currentPrice).toFixed(2);
+    
+    priceHtml = `
+        <div class="flex items-baseline gap-2">
+            <span class="text-gray-500 text-sm line-through">$${Number(originalPrice).toFixed(2)}</span>
+            <span class="text-2xl font-black text-green-400">${currentPriceDisplay}</span>
+        </div>
+    `;
+    discountBadge = `<span class="absolute top-3 left-3 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full z-10">-${discountPercent}%</span>`;
+} else {
+    // Sin descuento
+    const priceDisplay = currentPrice === 0 ? 'GRATIS' : '$' + Number(currentPrice).toFixed(2);
+    const priceClass = currentPrice === 0 ? 'text-green-400' : 'text-red-400';
+    priceHtml = `<span class="text-2xl font-black ${priceClass}">${priceDisplay}</span>`;
+}
         
         return `
             <div class="flex items-center gap-3 bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-2.5">
