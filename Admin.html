@@ -2105,13 +2105,16 @@ async function getUserPermissions(discordId, userRole) {
     if (!confirm(confirmMsg)) return;
     
     try {
-        // Actualizar en Firebase (UsuariosRegistrados)
-        await db.collection("UsuariosRegistrados").doc(discordId).update({
+        // 1. Guardar en Firebase Firestore (PERMANENTE)
+        await db.collection("UsuariosRegistrados").doc(discordId).set({
+            discord_id: discordId,
+            username: user.username,
+            avatar: user.avatar,
             role: newRole,
             updated_at: firebase.firestore.FieldValue.serverTimestamp()
-        });
+        }, { merge: true }); // merge: true para no sobrescribir otros campos
         
-        // Actualizar localmente (respaldo)
+        // 2. Actualizar localStorage (respaldo local)
         let localUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
         const userIndex = localUsers.findIndex(u => u.discord_id === discordId);
         if (userIndex >= 0) {
@@ -2127,6 +2130,7 @@ async function getUserPermissions(discordId, userRole) {
         }
         localStorage.setItem('papeleta_all_users', JSON.stringify(localUsers));
         
+        // 3. Actualizar variables locales
         user.role = newRole;
         
         // Cerrar dropdown si está abierto
