@@ -391,9 +391,16 @@
             })
         });
 
-        if (!response.ok) throw new Error('Error en el servidor');
+        if (!response.ok) {
+    const errorText = await response.text();
+    console.error('❌ Error de la API:', response.status, errorText);
 
-        const session = await response.json();
+    throw new Error(
+        `Error del servidor (${response.status}): ${errorText}`
+    );
+}
+
+const session = await response.json();
 
         // REDIRIGIR A STRIPE
         const result = await stripe.redirectToCheckout({ sessionId: session.id });
