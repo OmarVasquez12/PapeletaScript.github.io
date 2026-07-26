@@ -543,12 +543,6 @@
                     <span>Licencias Usuario</span>
                 </a>
 
-                <!-- ENLACE TICKETS (Visible solo para Admin/Soporte) -->
-                <a id="nav-tickets" onclick="showSection('tickets', this)" class="nav-item hidden flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
-                    <i class="fas fa-ticket-alt w-5 text-center"></i>
-                    <span>Tickets de Soporte</span>
-                </a>
-
                 <div class="text-xs text-gray-500 uppercase font-semibold mt-8 mb-4 px-3 tracking-wider">Herramientas Lua</div>
 
                 <a onclick="showSection('encryptor', this)" class="nav-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:text-white">
@@ -1121,54 +1115,7 @@
             </div>
         </section>
 
-        <!-- SECCIÓN 7: TICKETS DE SOPORTE (NUEVA) -->
-        <section id="section-tickets" class="section-content fade-in">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-140px)]">
-                <!-- Lista de Tickets -->
-                <div class="glass-panel p-4 flex flex-col">
-                    <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                        <i class="fas fa-ticket-alt text-red-500"></i> Tickets Activos
-                    </h3>
-                    <div id="admin-tickets-list" class="flex-1 overflow-y-auto space-y-2 custom-scrollbar pr-2">
-                        <p class="text-gray-400 text-center py-4 text-sm">Cargando tickets...</p>
-                    </div>
-                </div>
-                
-                <!-- Vista del Chat del Ticket -->
-                <div class="lg:col-span-2 glass-panel p-4 flex flex-col">
-                    <div id="admin-ticket-header" class="hidden flex justify-between items-center mb-4 pb-4 border-b border-red-900/30">
-                        <div>
-                            <h3 id="admin-ticket-subject" class="text-lg font-bold text-white">Asunto del Ticket</h3>
-                            <p id="admin-ticket-user" class="text-sm text-gray-400">Usuario</p>
-                        </div>
-                        <button onclick="closeCurrentAdminTicket()" class="px-4 py-2 rounded-lg bg-red-900/20 border border-red-600/50 text-red-400 hover:bg-red-900/40 font-bold text-sm">
-                            <i class="fas fa-times-circle mr-2"></i> Cerrar Ticket
-                        </button>
-                    </div>
-                    
-                    <div id="admin-no-ticket-selected" class="flex-1 flex items-center justify-center text-gray-500">
-                        <div class="text-center">
-                            <i class="fas fa-comments text-4xl mb-3"></i>
-                            <p>Selecciona un ticket para ver la conversación</p>
-                        </div>
-                    </div>
-
-                    <div id="admin-chat-interface" class="hidden flex-1 flex flex-col">
-                        <div id="admin-chat-messages" class="flex-1 overflow-y-auto p-4 bg-[#050507]/50 rounded-xl border border-red-900/20 mb-4 space-y-3 custom-scrollbar">
-                            <!-- Mensajes -->
-                        </div>
-                        <div class="flex gap-3">
-                            <input type="text" id="admin-support-message-input" class="input-field flex-1 px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none" placeholder="Escribe tu respuesta...">
-                            <button onclick="sendAdminSupportMessage()" class="btn-primary px-6 py-3 rounded-lg text-white font-bold">
-                                <i class="fas fa-paper-plane"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECCIÓN 8: SERVER.LUA -->
+        <!-- SECCIÓN 7: SERVER.LUA -->
         <section id="section-serverlua" class="section-content fade-in">
             <div class="card rounded-xl overflow-hidden">
                 <div class="p-4 border-b border-red-900/30 bg-red-900/10 flex justify-between items-center">
@@ -1376,10 +1323,6 @@ end, true, "high")
         let currentPermissions = {};
         let existingRoles = [];
 
-        // Variables para Tickets de Soporte
-        let currentAdminTicketId = null;
-        let adminTicketsData = [];
-
         // ========== SISTEMA DE NOTIFICACIONES (TOASTS) ==========
         function showToast(message, type = 'success', title = '') {
             const container = document.getElementById('toast-container');
@@ -1420,6 +1363,7 @@ end, true, "high")
             confirmCallback = null;
         }
 
+        // Cerrar modal al hacer click fuera
         document.getElementById('custom-confirm-modal').addEventListener('click', function(e) {
             if (e.target === this) handleConfirmCancel();
         });
@@ -1429,6 +1373,7 @@ end, true, "high")
             if (window.history.length > 1) {
                 window.history.back();
             } else {
+                // Si no hay historial, redirigir a la tienda o index
                 window.location.href = 'index.html'; 
             }
         }
@@ -1437,17 +1382,6 @@ end, true, "high")
         function isAdmin() {
             if (!currentUser) return false;
             return ADMIN_DISCORD_IDS.includes(currentUser.id);
-        }
-
-        function isSupport() {
-            if (!currentUser) return false;
-            if (ADMIN_DISCORD_IDS.includes(currentUser.id)) return true;
-            const user = allUsers.find(u => u.discord_id === currentUser.id);
-            if (user && user.role) {
-                const r = user.role.toLowerCase();
-                return r === 'soporte' || r === 'support' || r === 'mod' || r === 'moderador';
-            }
-            return false;
         }
 
         function redirectToDiscord() {
@@ -1473,14 +1407,15 @@ end, true, "high")
             }
         }
 
-        async function fetchDiscordUserData(token) {
-            try {
-                const res = await fetch('https://discord.com/api/users/@me', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+        function fetchDiscordUserData(token) {
+            fetch('https://discord.com/api/users/@me', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => {
                 if (!res.ok) throw new Error('Token expirado');
-                const user = await res.json();
-                
+                return res.json();
+            })
+            .then(user => {
                 currentUser = user;
                 
                 if (isAdmin()) {
@@ -1499,23 +1434,17 @@ end, true, "high")
                 }
                 
                 document.getElementById('login-modal').classList.add('hidden');
-                
-                // Cargar usuarios primero para verificar roles
-                await loadUsers();
-                
-                if (isSupport()) {
-                    document.getElementById('nav-tickets').classList.remove('hidden');
-                }
-                
                 loadProducts();
                 loadLicenciasData();
+                loadUsers();
                 loadMigrateData();
                 loadRoles();
                 showToast('Bienvenido, ' + user.username, 'success');
-            } catch (err) {
+            })
+            .catch(err => {
                 console.error(err);
                 logout();
-            }
+            });
         }
 
         function logout() {
@@ -2375,6 +2304,7 @@ end, true, "high")
                 return;
             }
 
+            // Usar el modal personalizado en lugar de confirm()
             const productName = escapeHTML(migrateSelectedProduct.name);
             const userName = escapeHTML(migrateSelectedUser.username);
             
@@ -2645,145 +2575,6 @@ end, true, "high")
             });
         }
 
-        // ========== GESTIÓN DE TICKETS DE SOPORTE ==========
-        async function loadAdminTickets() {
-            const container = document.getElementById('admin-tickets-list');
-            try {
-                const snapshot = await db.collection("Tickets")
-                    .where("status", "==", "open")
-                    .orderBy("created_at", "desc")
-                    .get();
-                
-                adminTicketsData = [];
-                snapshot.forEach(doc => {
-                    adminTicketsData.push({ id: doc.id, ...doc.data() });
-                });
-
-                if (adminTicketsData.length === 0) {
-                    container.innerHTML = '<p class="text-gray-400 text-center py-4 text-sm">No hay tickets activos.</p>';
-                    return;
-                }
-
-                container.innerHTML = adminTicketsData.map(ticket => {
-                    const date = ticket.created_at?.toDate ? ticket.created_at.toDate().toLocaleDateString('es-ES') : 'Reciente';
-                    const isSelected = currentAdminTicketId === ticket.id ? 'bg-red-900/20 border-red-500/50' : 'bg-[#0d0505] border-red-900/30 hover:border-red-500/30';
-                    return `
-                        <div onclick="openAdminTicket('${ticket.id}')" class="cursor-pointer p-3 rounded-lg border ${isSelected} transition-all">
-                            <div class="flex justify-between items-start mb-1">
-                                <span class="text-white font-semibold text-sm truncate flex-1">${escapeHTML(ticket.subject)}</span>
-                                <span class="text-[10px] text-gray-500 whitespace-nowrap ml-2">${date}</span>
-                            </div>
-                            <p class="text-gray-400 text-xs truncate">${escapeHTML(ticket.username)}</p>
-                            ${ticket.assigned_to_name ? `<span class="text-[10px] text-blue-400 mt-1 block">Asignado: ${escapeHTML(ticket.assigned_to_name)}</span>` : '<span class="text-[10px] text-yellow-500 mt-1 block">Sin asignar</span>'}
-                        </div>
-                    `;
-                }).join('');
-            } catch (error) {
-                console.error("Error cargando tickets:", error);
-                container.innerHTML = '<p class="text-red-400 text-center py-4 text-sm">Error al cargar tickets</p>';
-            }
-        }
-
-        function openAdminTicket(ticketId) {
-            currentAdminTicketId = ticketId;
-            const ticket = adminTicketsData.find(t => t.id === ticketId);
-            if (!ticket) return;
-
-            document.getElementById('admin-no-ticket-selected').classList.add('hidden');
-            document.getElementById('admin-chat-interface').classList.remove('hidden');
-            document.getElementById('admin-ticket-header').classList.remove('hidden');
-            
-            document.getElementById('admin-ticket-subject').textContent = ticket.subject;
-            document.getElementById('admin-ticket-user').textContent = `Usuario: ${ticket.username} (${ticket.discord_id})`;
-            
-            renderAdminChatMessages(ticket.messages || []);
-            loadAdminTickets(); // Para actualizar el estilo de selección
-        }
-
-        function renderAdminChatMessages(messages) {
-            const container = document.getElementById('admin-chat-messages');
-            container.innerHTML = '';
-            
-            messages.forEach(msg => {
-                const isSupportMsg = msg.is_support;
-                const adminBubbleClass = isSupportMsg 
-                    ? 'bg-red-900/30 border border-red-500/30 text-white self-end' 
-                    : 'bg-[#1f2937] border border-gray-700 text-gray-200 self-start';
-                
-                const date = new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                
-                const html = `
-                    <div class="max-w-[80%] p-3 rounded-xl ${adminBubbleClass} shadow-sm">
-                        <div class="font-bold text-xs mb-1 opacity-80 flex justify-between gap-4">
-                            <span>${isSupportMsg ? 'Soporte' : escapeHTML(msg.sender)}</span>
-                            <span class="text-[10px] opacity-60">${date}</span>
-                        </div>
-                        <div class="text-sm leading-relaxed">${escapeHTML(msg.text)}</div>
-                    </div>
-                `;
-                container.innerHTML += html;
-            });
-            
-            container.scrollTop = container.scrollHeight;
-        }
-
-        async function sendAdminSupportMessage() {
-            const input = document.getElementById('admin-support-message-input');
-            const text = input.value.trim();
-            if (!text || !currentAdminTicketId) return;
-
-            try {
-                await db.collection("Tickets").doc(currentAdminTicketId).update({
-                    messages: firebase.firestore.FieldValue.arrayUnion({
-                        sender: 'Soporte',
-                        sender_id: currentUser.id,
-                        text: text,
-                        timestamp: new Date().toISOString(),
-                        is_support: true
-                    })
-                });
-                input.value = '';
-                
-                const doc = await db.collection("Tickets").doc(currentAdminTicketId).get();
-                if (doc.exists) {
-                    const ticket = { id: doc.id, ...doc.data() };
-                    renderAdminChatMessages(ticket.messages || []);
-                    
-                    const idx = adminTicketsData.findIndex(t => t.id === currentAdminTicketId);
-                    if (idx !== -1) {
-                        adminTicketsData[idx] = ticket;
-                        loadAdminTickets();
-                    }
-                }
-            } catch (error) {
-                console.error("Error enviando mensaje:", error);
-                showToast('Error al enviar mensaje', 'error');
-            }
-        }
-
-        async function closeCurrentAdminTicket() {
-            if (!currentAdminTicketId) return;
-            if (!confirm('¿Estás seguro de cerrar este ticket?')) return;
-            
-            try {
-                await db.collection("Tickets").doc(currentAdminTicketId).update({
-                    status: 'closed',
-                    closed_at: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-                showToast('Ticket cerrado correctamente', 'success');
-                currentAdminTicketId = null;
-                document.getElementById('admin-no-ticket-selected').classList.remove('hidden');
-                document.getElementById('admin-chat-interface').classList.add('hidden');
-                document.getElementById('admin-ticket-header').classList.add('hidden');
-                
-                loadAdminTickets();
-            } catch (error) {
-                console.error("Error cerrando ticket:", error);
-                showToast('Error al cerrar el ticket', 'error');
-            }
-        }
-
         // ========== NAVEGACIÓN ENTRE SECCIONES ==========
         function showSection(sectionName, element) {
             document.querySelectorAll('.section-content').forEach(section => {
@@ -2804,15 +2595,10 @@ end, true, "high")
                 'encryptor': 'Encriptador Lua',
                 'migrate': 'Pasar a Usuarios',
                 'roles': 'Gestión de Roles',
-                'tickets': 'Tickets de Soporte',
                 'serverlua': 'Server.lua'
             };
             
             document.getElementById('page-title').innerHTML = titles[sectionName];
-            
-            if (sectionName === 'tickets') {
-                loadAdminTickets();
-            }
             
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
