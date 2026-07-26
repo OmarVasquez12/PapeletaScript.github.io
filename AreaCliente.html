@@ -109,6 +109,61 @@
         .ticket-status-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
         .status-open { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
         .status-closed { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .status-assigned { background: rgba(59, 130, 246, 0.2); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); }
+
+        /* MODAL PERSONALIZADO */
+        .custom-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
+        }
+        .custom-modal-overlay.active { display: flex; }
+        .custom-modal {
+            background: linear-gradient(135deg, #150a0a 0%, #0d0505 100%);
+            border: 2px solid #dc2626;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 0 60px rgba(220, 38, 38, 0.4);
+            animation: slideUp 0.3s ease;
+        }
+        .custom-modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        .custom-modal-buttons button {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        .btn-modal-confirm {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+        }
+        .btn-modal-confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 38, 38, 0.4);
+        }
+        .btn-modal-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-modal-cancel:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
     </style>
 </head>
 <body class="min-h-screen flex">
@@ -271,7 +326,7 @@
                         <button id="btn-create-ticket" onclick="openCreateTicketModal()" class="btn-primary px-6 py-2 rounded-lg text-white font-bold shadow-lg shadow-red-900/20">
                             <i class="fas fa-plus-circle mr-2"></i> Crear Ticket
                         </button>
-                        <button id="btn-close-ticket" onclick="closeSupportTicket()" class="hidden px-6 py-2 rounded-lg bg-red-900/20 border border-red-600/50 text-red-400 hover:bg-red-900/40 font-bold">
+                        <button id="btn-close-ticket" onclick="openCloseTicketModal()" class="hidden px-6 py-2 rounded-lg bg-red-900/20 border border-red-600/50 text-red-400 hover:bg-red-900/40 font-bold">
                             <i class="fas fa-times-circle mr-2"></i> Cerrar Ticket
                         </button>
                     </div>
@@ -345,6 +400,28 @@
             <div class="flex gap-3">
                 <button onclick="document.getElementById('create-ticket-modal').classList.remove('active')" class="flex-1 px-4 py-3 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-800 font-medium">Cancelar</button>
                 <button onclick="createNewTicket()" class="flex-1 btn-primary px-4 py-3 rounded-lg text-white font-bold"><i class="fas fa-paper-plane mr-2"></i> Crear Ticket</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Close Ticket Modal -->
+    <div id="close-ticket-modal" class="custom-modal-overlay">
+        <div class="custom-modal">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center">
+                    <i class="fas fa-exclamation-triangle text-red-500 text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-white">Cerrar Ticket</h3>
+                    <p class="text-gray-400 text-sm">¿Estás seguro de cerrar este ticket?</p>
+                </div>
+            </div>
+            <p class="text-gray-300 text-sm mb-6">Se eliminará el acceso al chat y se notificará a Discord.</p>
+            <div class="custom-modal-buttons">
+                <button class="btn-modal-cancel" onclick="closeCloseTicketModal()">Cancelar</button>
+                <button class="btn-modal-confirm" onclick="confirmCloseTicket()">
+                    <i class="fas fa-check mr-2"></i> Sí, cerrar ticket
+                </button>
             </div>
         </div>
     </div>
@@ -575,7 +652,6 @@
         const ADMIN_DISCORD_IDS = ['890526767608127489']; 
         
         // ID DEL ROL DE SOPORTE (DEBES PONER EL ID DEL ROL DE TU DISCORD AQUÍ)
-        // Si no lo sabes, puedes dejarlo vacío y solo los admins podrán responder.
         const SUPPORT_ROLE_ID = ''; 
 
         // URL DEL WEBHOOK DE DISCORD PARA TICKETS
@@ -591,6 +667,7 @@
         let currentReviewProduct = null;
         let selectedRating = 0;
         let currentTicketId = null; // ID del ticket activo en Firebase
+        let currentTicketData = null; // Datos completos del ticket actual
 
         // --- Funciones de Utilidad ---
 
@@ -611,9 +688,6 @@
         function isSupportStaff() {
             if (!currentUser) return false;
             if (isAdmin()) return true;
-            // Aquí podrías añadir lógica para verificar roles si tienes acceso a ellos via API
-            // Por ahora, asumimos que si tiene el ID en SUPPORT_ROLE_ID o es Admin, puede responder.
-            // En una implementación real, necesitarías fetch('/users/@me/guilds/{guild_id}/members')
             return false; 
         }
 
@@ -837,7 +911,7 @@
 
                 if (!response.ok) {
                     const errorText = await response.text();
-                    console.error("❌ Discord API Error:", response.status, errorText);
+                    console.error(" Discord API Error:", response.status, errorText);
                     throw new Error(`HTTP ${response.status}: ${errorText}`);
                 }
 
@@ -1135,7 +1209,7 @@ function updateLicenseDisplay() {
         }
 
         // =============================================
-        //          LÓGICA DE SOPORTE (NUEVA)
+        //          LÓGICA DE SOPORTE (MEJORADA)
         // =============================================
 
         let supportUnsubscribe = null;
@@ -1155,7 +1229,7 @@ function updateLicenseDisplay() {
                     if (!snapshot.empty) {
                         const ticketDoc = snapshot.docs[0];
                         currentTicketId = ticketDoc.id;
-                        const ticketData = ticketDoc.data();
+                        currentTicketData = ticketDoc.data();
                         
                         // Mostrar interfaz de chat
                         document.getElementById('no-ticket-message').classList.add('hidden');
@@ -1163,26 +1237,42 @@ function updateLicenseDisplay() {
                         document.getElementById('btn-create-ticket').classList.add('hidden');
                         document.getElementById('btn-close-ticket').classList.remove('hidden');
                         
-                        // Actualizar estado
+                        // Actualizar estado mostrando quién tiene el ticket
                         const statusEl = document.getElementById('current-ticket-status');
-                        statusEl.innerHTML = `<span class="ticket-status-badge status-open">Ticket Abierto #${ticketDoc.id.substr(-4)}</span>`;
+                        const assignedTo = currentTicketData.assigned_to_name || 'Sin asignar';
+                        const isAssignedToMe = currentTicketData.assigned_to === currentUser.id;
+                        
+                        if (isSupportStaff() && !isAssignedToMe) {
+                            // Si es soporte pero no es su ticket asignado
+                            statusEl.innerHTML = `
+                                <div class="flex flex-col gap-1">
+                                    <span class="ticket-status-badge status-assigned">Asignado</span>
+                                    <span class="text-xs text-blue-400">Ticket abierto por: <strong>${assignedTo}</strong></span>
+                                </div>
+                            `;
+                        } else {
+                            statusEl.innerHTML = `<span class="ticket-status-badge status-open">Ticket Abierto #${ticketDoc.id.substr(-4)}</span>`;
+                        }
                         
                         // Renderizar mensajes
-                        renderChatMessages(ticketData.messages || []);
+                        renderChatMessages(currentTicketData.messages || []);
                         
-                        // Habilitar input si es staff o si es el creador
+                        // Habilitar input solo si es el asignado o admin
                         const input = document.getElementById('support-message-input');
-                        if (isAdmin() || isSupportStaff()) {
-                            input.placeholder = "Responder como Soporte...";
+                        const canRespond = isAdmin() || isAssignedToMe;
+                        
+                        if (canRespond) {
+                            input.placeholder = isSupportStaff() ? "Responder como Soporte..." : "Escribe tu mensaje...";
                             input.disabled = false;
                         } else {
-                            input.placeholder = "Escribe tu mensaje...";
-                            input.disabled = false;
+                            input.placeholder = "Este ticket está siendo atendido por otro soporte";
+                            input.disabled = true;
                         }
 
                     } else {
                         // No hay ticket activo
                         currentTicketId = null;
+                        currentTicketData = null;
                         document.getElementById('no-ticket-message').classList.remove('hidden');
                         document.getElementById('chat-interface').classList.add('hidden');
                         document.getElementById('btn-create-ticket').classList.remove('hidden');
@@ -1195,8 +1285,6 @@ function updateLicenseDisplay() {
         }
 
         function loadSupportInterface() {
-            // La interfaz se carga automáticamente vía el listener initSupportListener
-            // Pero forzamos una comprobación inicial
             if (currentUser) initSupportListener();
         }
 
@@ -1216,12 +1304,17 @@ function updateLicenseDisplay() {
             }
 
             try {
+                // Determinar quién asigna el ticket
+                const isStaff = isSupportStaff();
+                
                 // 1. Crear en Firebase
                 const newTicketRef = await db.collection("Tickets").add({
                     discord_id: currentUser.id,
                     username: currentUser.username,
                     subject: subject,
                     status: 'open',
+                    assigned_to: isStaff ? currentUser.id : null,
+                    assigned_to_name: isStaff ? currentUser.username : null,
                     created_at: firebase.firestore.FieldValue.serverTimestamp(),
                     messages: [
                         {
@@ -1229,18 +1322,16 @@ function updateLicenseDisplay() {
                             sender_id: currentUser.id,
                             text: description,
                             timestamp: new Date().toISOString(),
-                            is_support: false
+                            is_support: isStaff
                         }
                     ]
                 });
 
                 // 2. Enviar Webhook a Discord
-                await sendTicketWebhook(subject, description, newTicketRef.id);
+                await sendTicketWebhook(subject, description, newTicketRef.id, isStaff);
 
                 showToast('Ticket creado correctamente', 'success');
                 document.getElementById('create-ticket-modal').classList.remove('active');
-                
-                // El listener onSnapshot actualizará la UI automáticamente
 
             } catch (error) {
                 console.error("Error creando ticket:", error);
@@ -1248,7 +1339,9 @@ function updateLicenseDisplay() {
             }
         }
 
-        async function sendTicketWebhook(subject, description, ticketId) {
+        async function sendTicketWebhook(subject, description, ticketId, isStaff) {
+            const assignedText = isStaff ? `**Asignado a:** <@${currentUser.id}>` : '**Esperando asignación**';
+            
             const payload = {
                 username: "Sistema de Soporte",
                 avatar_url: "https://papeleta-script-github-io.vercel.app/files/999.png",
@@ -1259,7 +1352,7 @@ function updateLicenseDisplay() {
                         color: 16711680, // Rojo
                         fields: [
                             {
-                                name: "👤 Usuario",
+                                name: " Usuario",
                                 value: `<@${currentUser.id}> (${currentUser.username})`,
                                 inline: true
                             },
@@ -1267,6 +1360,11 @@ function updateLicenseDisplay() {
                                 name: "🆔 ID Ticket",
                                 value: `\`${ticketId}\``,
                                 inline: true
+                            },
+                            {
+                                name: "👨‍💻 Soporte",
+                                value: assignedText,
+                                inline: false
                             }
                         ],
                         footer: {
@@ -1292,8 +1390,6 @@ function updateLicenseDisplay() {
                 const isMe = msg.sender_id === currentUser.id;
                 const isSupport = msg.is_support;
                 
-                // Determinar clase: Si soy yo -> message-user. Si es soporte -> message-support.
-                // Nota: Si soy admin viendo mi propio mensaje, sigue siendo message-user para consistencia visual
                 let bubbleClass = isMe ? 'message-user' : 'message-support';
                 
                 const date = new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
@@ -1308,7 +1404,6 @@ function updateLicenseDisplay() {
                 container.innerHTML += html;
             });
             
-            // Scroll al final
             container.scrollTop = container.scrollHeight;
         }
 
@@ -1320,7 +1415,6 @@ function updateLicenseDisplay() {
             const isStaff = isAdmin() || isSupportStaff();
 
             try {
-                // Añadir mensaje a Firebase
                 await db.collection("Tickets").doc(currentTicketId).update({
                     messages: firebase.firestore.FieldValue.arrayUnion({
                         sender: isStaff ? 'Soporte' : currentUser.username,
@@ -1332,12 +1426,6 @@ function updateLicenseDisplay() {
                 });
 
                 input.value = '';
-                // El listener onSnapshot actualizará el chat automáticamente
-                
-                // Opcional: Enviar notificación a Discord si responde el staff
-                if (isStaff) {
-                    // Podrías añadir otro webhook aquí si quieres notificar al usuario en Discord
-                }
 
             } catch (error) {
                 console.error("Error enviando mensaje:", error);
@@ -1345,8 +1433,19 @@ function updateLicenseDisplay() {
             }
         }
 
-        async function closeSupportTicket() {
-            if (!confirm('¿Estás seguro de cerrar este ticket? Se eliminará el acceso al chat.')) return;
+        // Funciones para el modal personalizado de cerrar ticket
+        function openCloseTicketModal() {
+            document.getElementById('close-ticket-modal').classList.add('active');
+        }
+
+        function closeCloseTicketModal() {
+            document.getElementById('close-ticket-modal').classList.remove('active');
+        }
+
+        async function confirmCloseTicket() {
+            closeCloseTicketModal();
+            
+            if (!currentTicketId) return;
             
             try {
                 // 1. Actualizar estado en Firebase a 'closed'
@@ -1379,7 +1478,6 @@ function updateLicenseDisplay() {
                 });
 
                 showToast('Ticket cerrado correctamente', 'success');
-                // El listener onSnapshot detectará el cambio de estado y ocultará el chat
 
             } catch (error) {
                 console.error("Error cerrando ticket:", error);
