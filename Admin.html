@@ -1588,6 +1588,7 @@ end, true, "high")
                 const newProduct = {
                     id: 'prod_' + Date.now(),
                     name, price, category, description,
+                    original_price: price,
                     image_url: resizedImages[0],
                     images: resizedImages,
                     youtube_url: youtubeUrl || null,
@@ -1619,36 +1620,63 @@ end, true, "high")
         }
 
         // ========== CARGAR PRODUCTOS ==========
-        async function loadProducts() {
-            const container = document.getElementById('admin-products-list');
-            try {
-                const snapshot = await db.collection("Productos").get();
-                allProducts = [];
-                snapshot.forEach(doc => allProducts.push(doc.data()));
-                
-                if (allProducts.length === 0) {
-                    container.innerHTML = '<p class="text-gray-500 text-sm text-center py-8">No hay productos aún.</p>';
-                    return;
-                }
-                
-                container.innerHTML = allProducts.map(p => `
-                    <div class="flex items-center gap-4 bg-[#0d0505] border border-red-950/40 rounded-xl p-4">
-                        <img src="${p.image_url}" class="w-16 h-16 rounded-lg object-cover">
-                        <div class="flex-grow">
-                            <p class="text-white font-semibold">${escapeHTML(p.name)}</p>
-                            <p class="${Number(p.price)===0?'text-green-400':'text-red-400'} text-sm font-bold">
-                                ${Number(p.price)===0?'GRATIS':'$'+Number(p.price).toFixed(2)}
-                            </p>
-                        </div>
-                        <button onclick="deleteProduct('${p.id}')" class="text-red-400 hover:text-red-300 w-10 h-10 rounded-lg hover:bg-red-950/30">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                `).join('');
-            } catch (error) {
-                container.innerHTML = '<p class="text-red-400 text-sm text-center py-8">Error al cargar</p>';
-            }
+       async function loadProducts() {
+    const container = document.getElementById('admin-products-list');
+    try {
+        const snapshot = await db.collection("Productos").get();
+        allProducts = [];
+        snapshot.forEach(doc => allProducts.push(doc.data()));
+        
+        if (allProducts.length === 0) {
+            container.innerHTML = '<p class="text-gray-500 text-sm text-center py-8">No hay productos aún.</p>';
+            return;
         }
+        
+        container.innerHTML = allProducts.map(p => {
+            const originalPrice = p.original_price || p.price;
+            const currentPrice = p.price;
+            let discountHtml = '';
+            let priceHtml = '';
+            
+            // Si hay descuento (precio original es mayor al actual y es mayor a 0)
+            if (originalPrice > 0 && currentPrice < originalPrice) {
+                const discountPercent = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
+                priceHtml = `
+                    <p class="text-gray-500 text-xs line-through">$${Number(originalPrice).toFixed(2)}</p>
+                    <p class="text-green-400 text-sm font-bold">$${Number(currentPrice).toFixed(2)}</p>
+                `;
+                discountHtml = `<span class="bg-red-500/20 text-red-400 text-xs font-bold px-2 py-1 rounded-full border border-red-500/30">-${discountPercent}%</span>`;
+            } else {
+                // Sin descuento
+                priceHtml = `<p class="${Number(currentPrice)===0?'text-green-400':'text-red-400'} text-sm font-bold">${Number(currentPrice)===0?'GRATIS':'$'+Number(currentPrice).toFixed(2)}</p>`;
+            }
+
+            return `
+            <div class="flex items-center gap-4 bg-[#0d0505] border border-red-950/40 rounded-xl p-4">
+                <img src="${p.image_url}" class="w-16 h-16 rounded-lg object-cover">
+                <div class="flex-grow">
+                    <p class="text-white font-semibold">${escapeHTML(p.name)}</p>
+                    <div class="flex items-center gap-3 mt-1">
+                        <div>
+                            ${priceHtml}
+                        </div>
+                        ${discountHtml}
+                        <!-- Input para editar el precio -->
+                        <input type="number" step="0.01" min="0" value="${currentPrice}" 
+                            onchange="updateProductPrice('${p.id}', this.value)"
+                            class="bg-[#1a0a0a] border border-red-900/40 rounded px-2 py-1 text-xs text-white w-20 focus:outline-none focus:border-red-500 transition-colors">
+                    </div>
+                </div>
+                <button onclick="deleteProduct('${p.id}')" class="text-red-400 hover:text-red-300 w-10 h-10 rounded-lg hover:bg-red-950/30">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+            `;
+        }).join('');
+    } catch (error) {
+        container.innerHTML = '<p class="text-red-400 text-sm text-center py-8">Error al cargar</p>';
+    }
+}
 
         async function deleteProduct(id) {
             if (!confirm('¿Eliminar este producto?')) return;
