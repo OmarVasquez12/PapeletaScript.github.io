@@ -164,116 +164,6 @@
         .btn-modal-cancel:hover {
             background: rgba(255, 255, 255, 0.15);
         }
-
-        /* BOTÓN FLOTANTE DE DISCORD */
-        .discord-fab {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, #5865F2 0%, #4752C4 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 8px 25px rgba(88, 101, 242, 0.4);
-            z-index: 9998;
-            transition: all 0.3s ease;
-            animation: pulse 2s infinite;
-        }
-        
-        .discord-fab:hover {
-            transform: scale(1.1) rotate(5deg);
-            box-shadow: 0 12px 35px rgba(88, 101, 242, 0.6);
-        }
-        
-        .discord-fab i {
-            font-size: 32px;
-            color: white;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 8px 25px rgba(88, 101, 242, 0.4); }
-            50% { box-shadow: 0 8px 35px rgba(88, 101, 242, 0.7); }
-        }
-        
-        .notification-badge {
-            position: absolute;
-            bottom: -10px;
-            right: -10px;
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: bold;
-            border: 3px solid #150a0a;
-            white-space: nowrap;
-            animation: bounce 1s infinite;
-            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
-        }
-        
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-
-        .ticket-info-banner {
-            background: rgba(88, 101, 242, 0.1);
-            border: 1px solid rgba(88, 101, 242, 0.3);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .ticket-opener-avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            border: 2px solid #5865F2;
-            object-fit: cover;
-        }
-
-        .ticket-opener-info h4 {
-            color: white;
-            font-weight: 600;
-            margin-bottom: 2px;
-        }
-
-        .ticket-opener-info p {
-            color: #9ca3af;
-            font-size: 13px;
-        }
-
-        .restricted-access {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            border-radius: 12px;
-            padding: 30px;
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .restricted-access i {
-            font-size: 48px;
-            color: #ef4444;
-            margin-bottom: 15px;
-        }
-
-        .restricted-access h3 {
-            color: white;
-            margin-bottom: 8px;
-        }
-
-        .restricted-access p {
-            color: #9ca3af;
-            font-size: 14px;
-        }
     </style>
 </head>
 <body class="min-h-screen flex">
@@ -441,22 +331,6 @@
                         </button>
                     </div>
 
-                    <!-- Banner de Información del Ticket -->
-                    <div id="ticket-info-banner" class="ticket-info-banner hidden">
-                        <img id="ticket-opener-avatar" src="" alt="Avatar" class="ticket-opener-avatar">
-                        <div class="ticket-opener-info">
-                            <h4 id="ticket-opener-name">Usuario</h4>
-                            <p id="ticket-opener-status">Abrió este ticket</p>
-                        </div>
-                    </div>
-
-                    <!-- Mensaje de Acceso Restringido -->
-                    <div id="restricted-access-message" class="restricted-access hidden">
-                        <i class="fas fa-lock"></i>
-                        <h3>Acceso Restringido</h3>
-                        <p>Este ticket fue abierto por otro miembro del soporte. Solo el creador o el asignado puede ver el contenido.</p>
-                    </div>
-
                     <!-- Área de Chat -->
                     <div id="chat-interface" class="chat-container hidden">
                         <div id="chat-messages" class="chat-messages">
@@ -481,12 +355,6 @@
             </div>
         </div>
     </main>
-
-    <!-- BOTÓN FLOTANTE DE DISCORD -->
-    <div id="discord-fab" class="discord-fab hidden" onclick="openSupportFromFab()">
-        <i class="fab fa-discord"></i>
-        <div id="notification-badge" class="notification-badge hidden">+1 Nuevo Mensaje</div>
-    </div>
 
     <!-- Review Modal -->
     <div id="review-modal" class="review-modal">
@@ -800,7 +668,6 @@
         let selectedRating = 0;
         let currentTicketId = null; // ID del ticket activo en Firebase
         let currentTicketData = null; // Datos completos del ticket actual
-        let hasNewMessages = false; // Para controlar la notificación
 
         // --- Funciones de Utilidad ---
 
@@ -861,10 +728,6 @@
                 document.getElementById('sidebar-username').innerText = user.username;
                 document.getElementById('sidebar-avatar').src = user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png';
                 document.getElementById('login-modal').classList.add('hidden');
-                
-                // Mostrar botón flotante de Discord
-                document.getElementById('discord-fab').classList.remove('hidden');
-                
                 ensureFixedLicense().then(() => { loadDashboardData(); updateLicenseDisplay(); });
                 
                 // Iniciar listener de soporte al loguearse
@@ -905,27 +768,6 @@
             document.body.style.overflow = '';
             currentReviewProduct = null;
             selectedRating = 0;
-        }
-
-        // Abrir soporte desde el botón flotante
-        function openSupportFromFab() {
-            showSection('support');
-            // Remover la clase active del nav item y agregarla a soporte
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.querySelector('a[onclick*="support"]').classList.add('active');
-            // Ocultar notificación
-            hasNewMessages = false;
-            updateNotificationBadge();
-        }
-
-        // Actualizar badge de notificación
-        function updateNotificationBadge() {
-            const badge = document.getElementById('notification-badge');
-            if (hasNewMessages && currentTicketId) {
-                badge.classList.remove('hidden');
-            } else {
-                badge.classList.add('hidden');
-            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -1395,62 +1237,37 @@ function updateLicenseDisplay() {
                         document.getElementById('btn-create-ticket').classList.add('hidden');
                         document.getElementById('btn-close-ticket').classList.remove('hidden');
                         
-                        // Mostrar banner de información del ticket
-                        const banner = document.getElementById('ticket-info-banner');
-                        const avatar = document.getElementById('ticket-opener-avatar');
-                        const name = document.getElementById('ticket-opener-name');
-                        const status = document.getElementById('ticket-opener-status');
-                        
-                        banner.classList.remove('hidden');
-                        avatar.src = currentTicketData.user_avatar || 'https://cdn.discordapp.com/embed/avatars/0.png';
-                        name.textContent = currentTicketData.username;
-                        
-                        // Verificar quién puede ver el contenido
-                        const isOwner = currentTicketData.discord_id === currentUser.id;
+                        // Actualizar estado mostrando quién tiene el ticket
+                        const statusEl = document.getElementById('current-ticket-status');
+                        const assignedTo = currentTicketData.assigned_to_name || 'Sin asignar';
                         const isAssignedToMe = currentTicketData.assigned_to === currentUser.id;
-                        const canAccess = isOwner || isAssignedToMe || isAdmin();
                         
-                        if (!canAccess && isSupportStaff()) {
-                            // Si es soporte pero no es el asignado ni el creador
-                            document.getElementById('restricted-access-message').classList.remove('hidden');
-                            document.getElementById('chat-interface').classList.add('hidden');
-                            document.getElementById('support-message-input').disabled = true;
-                            status.textContent = 'Ticket privado - Sin acceso';
+                        if (isSupportStaff() && !isAssignedToMe) {
+                            // Si es soporte pero no es su ticket asignado
+                            statusEl.innerHTML = `
+                                <div class="flex flex-col gap-1">
+                                    <span class="ticket-status-badge status-assigned">Asignado</span>
+                                    <span class="text-xs text-blue-400">Ticket abierto por: <strong>${assignedTo}</strong></span>
+                                </div>
+                            `;
                         } else {
-                            document.getElementById('restricted-access-message').classList.add('hidden');
-                            document.getElementById('chat-interface').classList.remove('hidden');
-                            status.textContent = 'Abrió este ticket';
-                            
-                            // Actualizar estado mostrando quién tiene el ticket
-                            const statusEl = document.getElementById('current-ticket-status');
-                            const assignedTo = currentTicketData.assigned_to_name || 'Sin asignar';
-                            
-                            if (isSupportStaff() && !isAssignedToMe && !isOwner) {
-                                statusEl.innerHTML = `
-                                    <div class="flex flex-col gap-1">
-                                        <span class="ticket-status-badge status-assigned">Asignado</span>
-                                        <span class="text-xs text-blue-400">Ticket abierto por: <strong>${currentTicketData.username}</strong></span>
-                                    </div>
-                                `;
-                            } else {
-                                statusEl.innerHTML = `<span class="ticket-status-badge status-open">Ticket Abierto #${ticketDoc.id.substr(-4)}</span>`;
-                            }
-                            
-                            // Habilitar input solo si es el asignado, el creador o admin
-                            const input = document.getElementById('support-message-input');
-                            const canRespond = canAccess;
-                            
-                            if (canRespond) {
-                                input.placeholder = isSupportStaff() ? "Responder como Soporte..." : "Escribe tu mensaje...";
-                                input.disabled = false;
-                            } else {
-                                input.placeholder = "Este ticket está siendo atendido por otro soporte";
-                                input.disabled = true;
-                            }
+                            statusEl.innerHTML = `<span class="ticket-status-badge status-open">Ticket Abierto #${ticketDoc.id.substr(-4)}</span>`;
                         }
                         
                         // Renderizar mensajes
                         renderChatMessages(currentTicketData.messages || []);
+                        
+                        // Habilitar input solo si es el asignado o admin
+                        const input = document.getElementById('support-message-input');
+                        const canRespond = isAdmin() || isAssignedToMe;
+                        
+                        if (canRespond) {
+                            input.placeholder = isSupportStaff() ? "Responder como Soporte..." : "Escribe tu mensaje...";
+                            input.disabled = false;
+                        } else {
+                            input.placeholder = "Este ticket está siendo atendido por otro soporte";
+                            input.disabled = true;
+                        }
 
                     } else {
                         // No hay ticket activo
@@ -1458,8 +1275,6 @@ function updateLicenseDisplay() {
                         currentTicketData = null;
                         document.getElementById('no-ticket-message').classList.remove('hidden');
                         document.getElementById('chat-interface').classList.add('hidden');
-                        document.getElementById('ticket-info-banner').classList.add('hidden');
-                        document.getElementById('restricted-access-message').classList.add('hidden');
                         document.getElementById('btn-create-ticket').classList.remove('hidden');
                         document.getElementById('btn-close-ticket').classList.add('hidden');
                         document.getElementById('current-ticket-status').textContent = "Sin ticket activo";
@@ -1491,13 +1306,11 @@ function updateLicenseDisplay() {
             try {
                 // Determinar quién asigna el ticket
                 const isStaff = isSupportStaff();
-                const userAvatar = currentUser.avatar ? `https://cdn.discordapp.com/avatars/${currentUser.id}/${currentUser.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png';
                 
                 // 1. Crear en Firebase
                 const newTicketRef = await db.collection("Tickets").add({
                     discord_id: currentUser.id,
                     username: currentUser.username,
-                    user_avatar: userAvatar,
                     subject: subject,
                     status: 'open',
                     assigned_to: isStaff ? currentUser.id : null,
@@ -1544,7 +1357,7 @@ function updateLicenseDisplay() {
                                 inline: true
                             },
                             {
-                                name: " ID Ticket",
+                                name: "🆔 ID Ticket",
                                 value: `\`${ticketId}\``,
                                 inline: true
                             },
@@ -1613,11 +1426,6 @@ function updateLicenseDisplay() {
                 });
 
                 input.value = '';
-                // Marcar que hay nuevos mensajes si no estamos en la sección de soporte
-                if (!document.getElementById('section-support').classList.contains('active')) {
-                    hasNewMessages = true;
-                    updateNotificationBadge();
-                }
 
             } catch (error) {
                 console.error("Error enviando mensaje:", error);
@@ -1652,7 +1460,7 @@ function updateLicenseDisplay() {
                     avatar_url: "https://papeleta-script-github-io.vercel.app/files/999.png",
                     embeds: [
                         {
-                            title: " Ticket Cerrado",
+                            title: "🔒 Ticket Cerrado",
                             description: `El ticket \`${currentTicketId}\` ha sido cerrado.`,
                             color: 65280, // Verde
                             footer: {
