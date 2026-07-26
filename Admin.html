@@ -1447,47 +1447,6 @@ end, true, "high")
             });
         }
 
-       // Función para obtener los permisos de un usuario basado en su rol
-async function getUserPermissions(discordId, userRole) {
-    const user = allUsers.find(u => u.discord_id === discordId);
-    if (!user) return {};
-    
-    // Admins hardcodeados tienen todos los permisos
-    if (isAdminHardcoded(user)) {
-        return {
-            canAccessConfig: true,
-            canUploadProducts: true,
-            canDeleteProducts: true,
-            canAssignProducts: true,
-            canViewLicenses: true,
-            canManageRoles: true,
-            canAccessSupport: true
-        };
-    }
-    
-    // Si es rol básico
-    if (!userRole || ['user', 'cliente'].includes(userRole.toLowerCase())) {
-        return {};
-    }
-    
-    // Buscar el rol en Firebase
-    try {
-        const snapshot = await db.collection("RolesUsuarios")
-            .where("name", "==", userRole)
-            .limit(1)
-            .get();
-        
-        if (snapshot.empty) return {};
-        
-        const roleData = snapshot.docs[0].data();
-        return roleData.permissions || {};
-        
-    } catch (error) {
-        console.error("Error getting user permissions:", error);
-        return {};
-    }
-}
-
         function logout() {
             localStorage.removeItem('dc_access_token');
             currentUser = null;
@@ -2093,63 +2052,53 @@ async function getUserPermissions(discordId, userRole) {
         });
 
         async function setRole(discordId, newRole) {
-    const user = allUsers.find(u => u.discord_id === discordId);
-    if (!user) return;
-    
-    if (isAdminHardcoded(user)) {
-        showToast('No se puede cambiar el rol de un administrador principal', 'warning');
-        return;
-    }
-    
-    const confirmMsg = `¿Estás seguro de cambiar el rol de ${user.username} a "${newRole}"?`;
-    if (!confirm(confirmMsg)) return;
-    
-    try {
-        // 1. Guardar en Firebase Firestore (PERMANENTE)
-        await db.collection("UsuariosRegistrados").doc(discordId).set({
-            discord_id: discordId,
-            username: user.username,
-            avatar: user.avatar,
-            role: newRole,
-            updated_at: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true }); // merge: true para no sobrescribir otros campos
-        
-        // 2. Actualizar localStorage (respaldo local)
-        let localUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
-        const userIndex = localUsers.findIndex(u => u.discord_id === discordId);
-        if (userIndex >= 0) {
-            localUsers[userIndex].role = newRole;
-        } else {
-            localUsers.push({
-                discord_id: discordId,
-                username: user.username,
-                avatar: user.avatar,
-                role: newRole,
-                last_login: new Date().toISOString()
-            });
+            const user = allUsers.find(u => u.discord_id === discordId);
+            if (!user) return;
+
+            if (isAdminHardcoded(user)) {
+                showToast('No se puede cambiar el rol de un administrador principal', 'warning');
+                return;
+            }
+
+            const confirmMsg = `¿Estás seguro de cambiar el rol de ${user.username} a "${newRole}"?`;
+            if (!confirm(confirmMsg)) return;
+
+            try {
+                let localUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
+                const userIndex = localUsers.findIndex(u => u.discord_id === discordId);
+                
+                if (userIndex >= 0) {
+                    localUsers[userIndex].role = newRole;
+                } else {
+                    localUsers.push({
+                        discord_id: discordId,
+                        username: user.username,
+                        avatar: user.avatar,
+                        role: newRole,
+                        last_login: new Date().toISOString()
+                    });
+                }
+                
+                localStorage.setItem('papeleta_all_users', JSON.stringify(localUsers));
+
+                user.role = newRole;
+
+                if (activeDropdownId === discordId) {
+                    const dropdown = document.getElementById(`dropdown-${discordId}`);
+                    if (dropdown) dropdown.classList.remove('active');
+                    activeDropdownId = null;
+                }
+
+                updateUsersStats();
+                renderUsers();
+
+                showToast(`Rol de ${user.username} actualizado a "${newRole}"`, 'success');
+
+            } catch (error) {
+                console.error("Error setting role:", error);
+                showToast('Error al actualizar el rol: ' + error.message, 'error');
+            }
         }
-        localStorage.setItem('papeleta_all_users', JSON.stringify(localUsers));
-        
-        // 3. Actualizar variables locales
-        user.role = newRole;
-        
-        // Cerrar dropdown si está abierto
-        if (activeDropdownId === discordId) {
-            const dropdown = document.getElementById(`dropdown-${discordId}`);
-            if (dropdown) dropdown.classList.remove('active');
-            activeDropdownId = null;
-        }
-        
-        updateUsersStats();
-        renderUsers();
-        showToast(`Rol de ${user.username} actualizado a "${newRole}" en Firebase`, 'success');
-        
-    } catch (error) {
-        console.error("Error setting role:", error);
-        showToast('Error al actualizar el rol: ' + error.message, 'error');
-    }
-}
-        
 
         // ========== FUNCIONES PARA PASAR A USUARIOS (MIGRATE) ==========
         async function loadMigrateData() {
@@ -2473,70 +2422,69 @@ async function getUserPermissions(discordId, userRole) {
         }
 
         async function handleCreateRole(e) {
-    e.preventDefault();
-    const name = document.getElementById('role-name').value.trim();
-    const color = document.getElementById('role-color').value;
-    const description = document.getElementById('role-desc').value.trim();
-    
-    if (!name) {
-        showToast('El nombre del rol es obligatorio', 'warning');
-        return;
-    }
-    
-    // Verificar si ya existe en Firebase
-    const existingSnapshot = await db.collection("RolesUsuarios")
-        .where("name", "==", name)
-        .limit(1)
-        .get();
-    
-    if (!existingSnapshot.empty) {
-        showToast('Ya existe un rol con ese nombre', 'warning');
-        return;
-    }
-    
-    try {
-        const newRole = {
-            name: name,
-            color: color,
-            description: description || 'Sin descripción',
-            permissions: { ...currentPermissions },
-            created_at: firebase.firestore.FieldValue.serverTimestamp(),
-            created_by: currentUser ? currentUser.id : 'admin'
-        };
-        
-        // Guardar en Firebase
-        const docRef = await db.collection("RolesUsuarios").add(newRole);
-        
-        showToast(`Rol "${name}" creado exitosamente en Firebase`, 'success');
-        
-        document.getElementById('create-role-form').reset();
-        updateColorPreview('#ff1a1a');
-        initPermissions();
-        await loadRoles(); // Recargar desde Firebase
-        
-    } catch (error) {
-        console.error("Error creating role:", error);
-        showToast('Error al crear el rol: ' + error.message, 'error');
-    }
-}
+            e.preventDefault();
 
-        async function loadRoles() {
-    try {
-        const snapshot = await db.collection("RolesUsuarios").get();
-        existingRoles = [];
-        
-        snapshot.forEach((doc) => {
-            existingRoles.push({ id: doc.id, ...doc.data() });
-        });
-        
-        renderRoles();
-    } catch (error) {
-        console.error("Error loading roles:", error);
-        existingRoles = [];
-        renderRoles();
-        showToast('Error al cargar roles desde Firebase', 'error');
-    }
-}
+            const name = document.getElementById('role-name').value.trim();
+            const color = document.getElementById('role-color').value;
+            const description = document.getElementById('role-desc').value.trim();
+
+            if (!name) {
+                showToast('El nombre del rol es obligatorio', 'warning');
+                return;
+            }
+
+            const exists = existingRoles.some(r => r.name.toLowerCase() === name.toLowerCase());
+            if (exists) {
+                showToast('Ya existe un rol con ese nombre', 'warning');
+                return;
+            }
+
+            try {
+                const newRole = {
+                    id: 'role_' + Date.now(),
+                    name: name,
+                    color: color,
+                    description: description || 'Sin descripción',
+                    permissions: { ...currentPermissions },
+                    created_at: new Date().toISOString(),
+                    created_by: 'admin'
+                };
+
+                existingRoles.push(newRole);
+                localStorage.setItem('papeleta_custom_roles', JSON.stringify(existingRoles));
+
+                showToast(`Rol "${name}" creado exitosamente`, 'success');
+
+                document.getElementById('create-role-form').reset();
+                updateColorPreview('#ff1a1a');
+                initPermissions();
+
+                renderRoles();
+                if(document.getElementById('section-users').classList.contains('active')) {
+                    loadUsers();
+                }
+
+            } catch (error) {
+                console.error("Error creating role:", error);
+                showToast('Error al crear el rol: ' + error.message, 'error');
+            }
+        }
+
+        function loadRoles() {
+            try {
+                const saved = localStorage.getItem('papeleta_custom_roles');
+                if (saved) {
+                    existingRoles = JSON.parse(saved);
+                } else {
+                    existingRoles = [];
+                }
+                renderRoles();
+            } catch (error) {
+                console.error("Error loading roles:", error);
+                existingRoles = [];
+                renderRoles();
+            }
+        }
 
         function renderRoles() {
             const container = document.getElementById('roles-list');
@@ -2592,20 +2540,16 @@ async function getUserPermissions(discordId, userRole) {
             }).join('');
         }
 
-        async function deleteRole(roleId) {
-    if (!confirm('¿Estás seguro de eliminar este rol? Los usuarios que lo tengan perderán sus permisos.')) {
-        return;
-    }
-    
-    try {
-        await db.collection("RolesUsuarios").doc(roleId).delete();
-        await loadRoles();
-        showToast('Rol eliminado correctamente de Firebase', 'success');
-    } catch (error) {
-        console.error("Error deleting role:", error);
-        showToast('Error al eliminar el rol: ' + error.message, 'error');
-    }
-}
+        function deleteRole(roleId) {
+            if (!confirm('¿Estás seguro de eliminar este rol? Los usuarios que lo tengan perderán sus permisos.')) {
+                return;
+            }
+
+            existingRoles = existingRoles.filter(r => r.id !== roleId);
+            localStorage.setItem('papeleta_custom_roles', JSON.stringify(existingRoles));
+            renderRoles();
+            showToast('Rol eliminado correctamente', 'success');
+        }
 
         function formatPermName(key) {
             const names = {
