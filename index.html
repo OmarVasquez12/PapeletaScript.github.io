@@ -816,52 +816,81 @@
         }
 
         // --- ACTUALIZADO: LÓGICA DE ROLES Y PERMISOS DESDE FIREBASE ---
-        async function fetchDiscordUserData(token) {
+       // --- ACTUALIZADO: LÓGICA DE ROLES Y PERMISOS DESDE FIREBASE ---
+async function fetchDiscordUserData(token) {
+    try {
+        const res = await fetch('https://discord.com/api/users/@me', { 
+            headers: { 'Authorization': `Bearer ${token}` } 
+        });
+        
+        if (!res.ok) throw new Error('Token expirado');
+        const user = await res.json();
+        
+        currentUser = user;
+        document.getElementById('user-name').innerText = `${user.username}`;
+        
+        if (user.avatar) {
+            document.getElementById('user-avatar').src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
+        } else {
+            document.getElementById('user-avatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
+        }
+        
+        closeLoginModal();
+        
+        // 1. Verificar si es Admin Hardcodeado
+        let hasConfigAccess = false;
+        
+        if (isAdmin(user)) {
+            hasConfigAccess = true;
+            currentUserRole = 'admin';
+        } else {
+            // 2. Si no es admin hardcodeado, buscar rol en Firebase
             try {
-                const res = await fetch('https://discord.com/api/users/@me', { headers: { 'Authorization': `Bearer ${token}` }});
-                if (!res.ok) throw new Error('Token expirado');
-                const user = await res.json();
-                currentUser = user;
-                document.getElementById('user-name').innerText = `${user.username}`;
-                if (user.avatar) document.getElementById('user-avatar').src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
-                else document.getElementById('user-avatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
+                const userDoc = await db.collection("UsuariosRegistrados").doc(user.id).get();
                 
-                closeLoginModal();
-                
-                let hasConfigAccess = false;
-                if (isAdmin(user)) {
-                    hasConfigAccess = true;
-                    currentUserRole = 'admin';
-                } else {
-                    try {
-                        const userDoc = await db.collection("UsuariosRegistrados").doc(user.id).get();
-                        if (userDoc.exists) {
-                            const userData = userDoc.data();
-                            const role = userData.role || 'user';
-                            currentUserRole = role;
-                            if (role && !['user', 'cliente'].includes(role.toLowerCase())) {
-                                const roleSnapshot = await db.collection("RolesUsuarios").where("name", "==", role).limit(1).get();
-                                if (!roleSnapshot.empty) {
-                                    const perms = roleSnapshot.docs[0].data().permissions || {};
-                                    if (perms.canAccessConfig) hasConfigAccess = true;
-                                }
-                            }
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    const roleFromDB = userData.role || 'cliente'; // Por defecto cliente
+                    currentUserRole = roleFromDB;
+                    
+                    // Si tiene un rol personalizado (ej: Soporte), verificar permisos
+                    if (roleFromDB && !['user', 'cliente'].includes(roleFromDB.toLowerCase())) {
+                        const roleSnapshot = await db.collection("RolesUsuarios")
+                            .where("name", "==", roleFromDB)
+                            .limit(1)
+                            .get();
+                            
+                        if (!roleSnapshot.empty) {
+                            const perms = roleSnapshot.docs[0].data().permissions || {};
+                            // Si el rol "Soporte" tiene permiso de config, se lo damos
+                            if (perms.canAccessConfig) hasConfigAccess = true;
                         }
-                    } catch (e) { console.error("Error checking roles:", e); }
+                    }
                 }
-
-                if (hasConfigAccess) {
-                    document.getElementById('user-panel-config-btn').style.display = 'flex';
-                } else {
-                    document.getElementById('user-panel-config-btn').style.display = 'none';
-                }
-                
-                updateAuthUI(); applyRoleUI(); registerUserInFirebase(user);
-                loadUserStats(); loadSalesStats();
-                loadMyAssignments().then(() => loadProducts());
-            } catch (err) { console.error(err); logout(); }
+            } catch (e) { 
+                console.error("Error checking roles from Firebase:", e); 
+            }
         }
 
+        // Mostrar/Ocultar botón Config según permisos
+        if (hasConfigAccess) {
+            document.getElementById('user-panel-config-btn').style.display = 'flex';
+        } else {
+            document.getElementById('user-panel-config-btn').style.display = 'none';
+        }
+        
+        updateAuthUI(); 
+        applyRoleUI(); 
+        registerUserInFirebase(user);
+        loadUserStats(); 
+        loadSalesStats();
+        loadMyAssignments().then(() => loadProducts());
+        
+    } catch (err) { 
+        console.error(err); 
+        logout(); 
+    }
+}
         function updateAuthUI() {
             const loginBtn = document.getElementById('login-btn');
             const userSection = document.getElementById('user-section');
