@@ -814,9 +814,6 @@
             if (accessToken) { window.location.hash = ''; localStorage.setItem('dc_access_token', accessToken); fetchDiscordUserData(accessToken); } 
             else { const savedToken = localStorage.getItem('dc_access_token'); if (savedToken) fetchDiscordUserData(savedToken); else { updateAuthUI(); loadProducts(); loadSalesStats(); loadUserStats(); } }
         }
-
-        // --- ACTUALIZADO: LÓGICA DE ROLES Y PERMISOS DESDE FIREBASE ---
-       // --- ACTUALIZADO: LÓGICA DE ROLES Y PERMISOS DESDE FIREBASE ---
 async function fetchDiscordUserData(token) {
     try {
         const res = await fetch('https://discord.com/api/users/@me', { 
@@ -827,7 +824,7 @@ async function fetchDiscordUserData(token) {
         const user = await res.json();
         
         currentUser = user;
-        document.getElementById('user-name').innerText = `${user.username}`;
+        document.getElementById('user-name').innerText = user.username;
         
         if (user.avatar) {
             document.getElementById('user-avatar').src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
@@ -839,39 +836,72 @@ async function fetchDiscordUserData(token) {
         
         // 1. Verificar si es Admin Hardcodeado
         let hasConfigAccess = false;
+        let userPermissions = {};
         
         if (isAdmin(user)) {
             hasConfigAccess = true;
             currentUserRole = 'admin';
+            userPermissions = {
+                canAccessConfig: true,
+                canUploadProducts: true,
+                canDeleteProducts: true,
+                canAssignProducts: true,
+                canViewLicenses: true,
+                canManageRoles: true,
+                canAccessSupport: true
+            };
         } else {
-            // 2. Si no es admin hardcodeado, buscar rol en Firebase
+            // 2. Buscar rol y permisos en Firebase
             try {
                 const userDoc = await db.collection("UsuariosRegistrados").doc(user.id).get();
                 
                 if (userDoc.exists) {
                     const userData = userDoc.data();
-                    const roleFromDB = userData.role || 'cliente'; // Por defecto cliente
+                    const roleFromDB = userData.role || 'Cliente';
                     currentUserRole = roleFromDB;
                     
-                    // Si tiene un rol personalizado (ej: Soporte), verificar permisos
-                    if (roleFromDB && !['user', 'cliente'].includes(roleFromDB.toLowerCase())) {
-                        const roleSnapshot = await db.collection("RolesUsuarios")
-                            .where("name", "==", roleFromDB)
-                            .limit(1)
-                            .get();
-                            
-                        if (!roleSnapshot.empty) {
-                            const perms = roleSnapshot.docs[0].data().permissions || {};
-                            // Si el rol "Soporte" tiene permiso de config, se lo damos
-                            if (perms.canAccessConfig) hasConfigAccess = true;
-                        }
+                    // Intentar obtener permisos de RolesUsuarios
+                    const roleSnapshot = await db.collection("RolesUsuarios")
+                        .where("name", "==", roleFromDB)
+                        .limit(1)
+                        .get();
+                    
+                    if (!roleSnapshot.empty) {
+                        const roleData = roleSnapshot.docs[0].data();
+                        userPermissions = roleData.permissions || {};
+                    } else {
+                        // Si no existe en RolesUsuarios, usar permisos del documento del usuario
+                        userPermissions = {
+                            canAccessConfig: userData.accesoPanelConfig || false,
+                            canUploadProducts: userData.subirProductos || false,
+                            canDeleteProducts: userData.eliminarProductos || false,
+                            canAssignProducts: userData.asignarProductos || false,
+                            canViewLicenses: userData.verLicencias || false,
+                            canManageRoles: userData.gestionarRoles || false,
+                            canAccessSupport: userData.soporte || false
+                        };
                     }
+                    
+                    if (userPermissions.canAccessConfig) hasConfigAccess = true;
                 }
             } catch (e) { 
                 console.error("Error checking roles from Firebase:", e); 
             }
         }
 
+        // Actualizar UI con el rol real
+        const roleBadge = document.getElementById('user-role-badge');
+        if (roleBadge) {
+            roleBadge.innerText = currentUserRole.toUpperCase();
+            if (currentUserRole === 'admin') {
+                roleBadge.className = 'text-[10px] text-red-400 font-bold uppercase tracking-wider';
+            } else if (currentUserRole.toLowerCase() === 'cliente' || currentUserRole.toLowerCase() === 'user') {
+                roleBadge.className = 'text-[10px] text-green-400 font-bold uppercase tracking-wider';
+            } else {
+                roleBadge.className = 'text-[10px] text-yellow-400 font-bold uppercase tracking-wider';
+            }
+        }
+        
         // Mostrar/Ocultar botón Config según permisos
         if (hasConfigAccess) {
             document.getElementById('user-panel-config-btn').style.display = 'flex';
