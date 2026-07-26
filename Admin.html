@@ -1447,10 +1447,12 @@ end, true, "high")
             });
         }
 
-        async function getUserPermissions(discordId, userRole) {
+       // Función para obtener los permisos de un usuario basado en su rol
+async function getUserPermissions(discordId, userRole) {
     const user = allUsers.find(u => u.discord_id === discordId);
     if (!user) return {};
     
+    // Admins hardcodeados tienen todos los permisos
     if (isAdminHardcoded(user)) {
         return {
             canAccessConfig: true,
@@ -1463,10 +1465,12 @@ end, true, "high")
         };
     }
     
+    // Si es rol básico
     if (!userRole || ['user', 'cliente'].includes(userRole.toLowerCase())) {
         return {};
     }
     
+    // Buscar el rol en Firebase
     try {
         const snapshot = await db.collection("RolesUsuarios")
             .where("name", "==", userRole)
@@ -2089,53 +2093,59 @@ end, true, "high")
         });
 
         async function setRole(discordId, newRole) {
-            const user = allUsers.find(u => u.discord_id === discordId);
-            if (!user) return;
-
-            if (isAdminHardcoded(user)) {
-                showToast('No se puede cambiar el rol de un administrador principal', 'warning');
-                return;
-            }
-
-            const confirmMsg = `¿Estás seguro de cambiar el rol de ${user.username} a "${newRole}"?`;
-            if (!confirm(confirmMsg)) return;
-
-            try {
-                let localUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
-                const userIndex = localUsers.findIndex(u => u.discord_id === discordId);
-                
-                if (userIndex >= 0) {
-                    localUsers[userIndex].role = newRole;
-                } else {
-                    localUsers.push({
-                        discord_id: discordId,
-                        username: user.username,
-                        avatar: user.avatar,
-                        role: newRole,
-                        last_login: new Date().toISOString()
-                    });
-                }
-                
-                localStorage.setItem('papeleta_all_users', JSON.stringify(localUsers));
-
-                user.role = newRole;
-
-                if (activeDropdownId === discordId) {
-                    const dropdown = document.getElementById(`dropdown-${discordId}`);
-                    if (dropdown) dropdown.classList.remove('active');
-                    activeDropdownId = null;
-                }
-
-                updateUsersStats();
-                renderUsers();
-
-                showToast(`Rol de ${user.username} actualizado a "${newRole}"`, 'success');
-
-            } catch (error) {
-                console.error("Error setting role:", error);
-                showToast('Error al actualizar el rol: ' + error.message, 'error');
-            }
+    const user = allUsers.find(u => u.discord_id === discordId);
+    if (!user) return;
+    
+    if (isAdminHardcoded(user)) {
+        showToast('No se puede cambiar el rol de un administrador principal', 'warning');
+        return;
+    }
+    
+    const confirmMsg = `¿Estás seguro de cambiar el rol de ${user.username} a "${newRole}"?`;
+    if (!confirm(confirmMsg)) return;
+    
+    try {
+        // Actualizar en Firebase (UsuariosRegistrados)
+        await db.collection("UsuariosRegistrados").doc(discordId).update({
+            role: newRole,
+            updated_at: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        // Actualizar localmente (respaldo)
+        let localUsers = JSON.parse(localStorage.getItem('papeleta_all_users') || '[]');
+        const userIndex = localUsers.findIndex(u => u.discord_id === discordId);
+        if (userIndex >= 0) {
+            localUsers[userIndex].role = newRole;
+        } else {
+            localUsers.push({
+                discord_id: discordId,
+                username: user.username,
+                avatar: user.avatar,
+                role: newRole,
+                last_login: new Date().toISOString()
+            });
         }
+        localStorage.setItem('papeleta_all_users', JSON.stringify(localUsers));
+        
+        user.role = newRole;
+        
+        // Cerrar dropdown si está abierto
+        if (activeDropdownId === discordId) {
+            const dropdown = document.getElementById(`dropdown-${discordId}`);
+            if (dropdown) dropdown.classList.remove('active');
+            activeDropdownId = null;
+        }
+        
+        updateUsersStats();
+        renderUsers();
+        showToast(`Rol de ${user.username} actualizado a "${newRole}" en Firebase`, 'success');
+        
+    } catch (error) {
+        console.error("Error setting role:", error);
+        showToast('Error al actualizar el rol: ' + error.message, 'error');
+    }
+}
+        
 
         // ========== FUNCIONES PARA PASAR A USUARIOS (MIGRATE) ==========
         async function loadMigrateData() {
@@ -2578,16 +2588,20 @@ end, true, "high")
             }).join('');
         }
 
-        function deleteRole(roleId) {
-            if (!confirm('¿Estás seguro de eliminar este rol? Los usuarios que lo tengan perderán sus permisos.')) {
-                return;
-            }
-
-            existingRoles = existingRoles.filter(r => r.id !== roleId);
-            localStorage.setItem('papeleta_custom_roles', JSON.stringify(existingRoles));
-            renderRoles();
-            showToast('Rol eliminado correctamente', 'success');
-        }
+        async function deleteRole(roleId) {
+    if (!confirm('¿Estás seguro de eliminar este rol? Los usuarios que lo tengan perderán sus permisos.')) {
+        return;
+    }
+    
+    try {
+        await db.collection("RolesUsuarios").doc(roleId).delete();
+        await loadRoles();
+        showToast('Rol eliminado correctamente de Firebase', 'success');
+    } catch (error) {
+        console.error("Error deleting role:", error);
+        showToast('Error al eliminar el rol: ' + error.message, 'error');
+    }
+}
 
         function formatPermName(key) {
             const names = {
