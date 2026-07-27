@@ -249,7 +249,7 @@
         const stripe = Stripe(STRIPE_PUBLIC_KEY);
 
         const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1530402751375216720/CM6vWGEYqf3aWPiCmIBf_ycp29k686sO6Fc9HB4wisAZTAGe3OiRt5OKZoxbsINHvjgq";
-        const DISCORD_INVITE_LINK = "https://discord.gg/rvxEdWcGkf"; // Tu enlace de invitación
+        const DISCORD_INVITE_LINK = "https://discord.gg/6XgvxeHEJ"; // Tu enlace de invitación
         
         const firebaseConfig = {
             apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
@@ -405,7 +405,7 @@
         }
 
         // ========== MANEJO DE PAGOS ==========
-        function handlePayment(method) {
+        async function handlePayment(method) {
             if (!currentUser) {
                 showToast('Debes iniciar sesión primero', 'error');
                 return;
@@ -417,37 +417,142 @@
             }
 
             if (method === 'discord') {
-                // Guardar orden pendiente en Firebase
-                saveOrderToFirebase('discord_manual').then(() => {
-                    showToast('Redirigiendo a Discord...', 'success');
-                    setTimeout(() => {
-                        window.open(DISCORD_INVITE_LINK, '_blank');
-                    }, 1500);
-                });
+                await processDiscordPayment();
             } 
             else if (method === 'paypal') {
-                // Aquí iría la integración con PayPal
-                // Por ahora mostramos mensaje
                 showToast('PayPal estará disponible pronto', 'warning');
             }
         }
 
-        async function saveOrderToFirebase(method) {
+        async function processDiscordPayment() {
+            const btn = document.getElementById('stripe-checkout-btn'); // Usamos el botón principal como referencia visual si fuera necesario
+            
             const subtotal = cart.reduce((sum, item) => sum + Number(item.price), 0);
             let total = subtotal;
             if (activeDiscount && discountPercentage > 0) {
                 total = subtotal - (subtotal * (discountPercentage / 100));
             }
 
-            await db.collection("Compra").add({
+            const orderData = {
                 discord_id: currentUser.id,
                 username: currentUser.username,
+                discriminator: currentUser.discriminator || '0000',
+                avatar: currentUser.avatar,
                 products: cart,
                 total_amount: total,
-                payment_method: method,
-                status: "pending_manual",
-                date: firebase.firestore.FieldValue.serverTimestamp()
+                payment_method: 'discord_manual',
+                status: 'pending_approval',
+                date: firebase.firestore.FieldValue.serverTimestamp(),
+                order_id: Date.now().toString()
+            };
+
+            try {
+                // Guardar en Firebase
+                const orderRef = await db.collection("Compra").add(orderData);
+                
+                // Enviar webhook a Discord
+                await sendDiscordOrderWebhook(orderData, orderRef.id);
+                
+                showToast('Solicitud enviada a Discord', 'success');
+                
+                // Redirigir a Discord
+                setTimeout(() => {
+                    window.open(DISCORD_INVITE_LINK, '_blank');
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error al procesar: ' + error.message, 'error');
+            }
+        }
+
+        async function sendDiscordOrderWebhook(orderData, orderId) {
+            const webhookURL = 'https://discord.com/api/webhooks/1531387421990850660/kc92t4PJ7u2a5siEP3NeDYFXtEs0-_Mp5ZiR1LthRW-OOqcH_4apQO41AW7WNe98DLHL';
+            
+            const productNames = orderData.products.map(p => `• ${p.name} - $${Number(p.price).toFixed(2)}`).join('\n');
+            const now = new Date();
+            const timeString = now.toLocaleString('es-DO', { 
+                timeZone: 'America/Santo_Domingo',
+                dateStyle: 'medium',
+                timeStyle: 'short'
             });
+
+            const embed = {
+                title: "🛒 Nueva Solicitud de Compra",
+                description: `Un usuario ha solicitado comprar productos mediante pago manual`,
+                color: 0xff1a1a,
+                timestamp: new Date().toISOString(),
+                fields: [
+                    {
+                        name: "👤 Usuario",
+                        value: `<@${orderData.discord_id}> (**${orderData.username}#${orderData.discriminator}**)`,
+                        inline: true
+                    },
+                    {
+                        name: "🕐 Hora",
+                        value: timeString,
+                        inline: true
+                    },
+                    {
+                        name: " Productos",
+                        value: productNames || "Sin productos",
+                        inline: false
+                    },
+                    {
+                        name: "💰 Total",
+                        value: `**$${orderData.total_amount.toFixed(2)} USD**`,
+                        inline: true
+                    },
+                    {
+                        name: "️ Order ID",
+                        value: `\`${orderId}\``,
+                        inline: true
+                    }
+                ],
+                footer: {
+                    text: "Papeleta Store • Pago Manual",
+                    icon_url: "https://cdn.discordapp.com/embed/avatars/0.png"
+                },
+                thumbnail: {
+                    url: orderData.avatar ? `https://cdn.discordapp.com/avatars/${orderData.discord_id}/${orderData.avatar}.png` : null
+                }
+            };
+
+            // Componentes con botón de aprobar
+            const components = [{
+                type: 1, // Action Row
+                components: [{
+                    type: 2, // Button
+                    style: 3, // Green (Success)
+                    custom_id: `approve_${orderId}`,
+                    label: "✅ Aprobar",
+                    disabled: false
+                }, {
+                    type: 2,
+                    style: 4, // Red (Danger)
+                    custom_id: `reject_${orderId}`,
+                    label: "❌ Rechazar",
+                    disabled: false
+                }]
+            }];
+
+            const payload = {
+                username: "Papeleta Store - Pagos",
+                avatar_url: "https://cdn.discordapp.com/embed/avatars/0.png",
+                embeds: [embed],
+                components: components,
+                content: `🔔 **Nueva orden pendiente de aprobación**\nOrder ID: \`${orderId}\``
+            };
+
+            const response = await fetch(webhookURL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error('Error enviando webhook');
+            }
         }
 
         // ========== LICENCIAS Y NOTIFICACIONES ==========
