@@ -247,7 +247,6 @@
         const STRIPE_PUBLIC_KEY = 'pk_test_51TvO8eJ1XuVrDlLNoQT0uzY3X2sgzvZpqljL1BaOiHIlC82Ln3rrPLLzJamTba89pM3ubnKtOUNGgicqFbFrsYSv0051qu925C'; 
         const stripe = Stripe(STRIPE_PUBLIC_KEY);
 
-        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1530402751375216720/CM6vWGEYqf3aWPiCmIBf_ycp29k686sO6Fc9HB4wisAZTAGe3OiRt5OKZoxbsINHvjgq";
         const DISCORD_INVITE_LINK = "https://discord.gg/6XgvxeHEJ"; 
         
         const firebaseConfig = {
@@ -456,11 +455,8 @@
             };
 
             try {
-                // Guardar en Firebase
+                // Guardar en Firebase (El Bot detectará esto y enviará UN SOLO mensaje)
                 const orderRef = await db.collection("Compra").add(orderData);
-                
-                // Enviar webhook a Discord (el bot lo detectará y añadirá botones)
-                await sendDiscordOrderWebhook(orderData, orderRef.id);
                 
                 showToast('✅ Solicitud enviada correctamente', 'success');
                 
@@ -472,78 +468,6 @@
             } catch (error) {
                 console.error('Error:', error);
                 showToast('Error al procesar: ' + error.message, 'error');
-            }
-        }
-
-        async function sendDiscordOrderWebhook(orderData, orderId) {
-            const webhookURL = 'https://discord.com/api/webhooks/1531387421990850660/kc92t4PJ7u2a5siEP3NeDYFXtEs0-_Mp5ZiR1LthRW-OOqcH_4apQO41AW7WNe98DLHL';
-            
-            const productNames = orderData.products.map(p => `• ${p.name} - $${Number(p.price).toFixed(2)}`).join('\n');
-            const now = new Date();
-            const timeString = now.toLocaleString('es-DO', { 
-                timeZone: 'America/Santo_Domingo',
-                dateStyle: 'medium',
-                timeStyle: 'short'
-            });
-
-            const embed = {
-                title: "🛒 Nueva Solicitud de Compra",
-                description: `Un usuario ha solicitado comprar productos mediante pago manual`,
-                color: 0xff1a1a,
-                timestamp: new Date().toISOString(),
-                fields: [
-                    {
-                        name: "👤 Usuario",
-                        value: `<@${orderData.discord_id}> (**${orderData.username}#${orderData.discriminator}**)`,
-                        inline: true
-                    },
-                    {
-                        name: "🕐 Hora",
-                        value: timeString,
-                        inline: true
-                    },
-                    {
-                        name: " Productos",
-                        value: productNames || "Sin productos",
-                        inline: false
-                    },
-                    {
-                        name: "💰 Total",
-                        value: `**$${orderData.total_amount.toFixed(2)} USD**`,
-                        inline: true
-                    },
-                    {
-                        name: "️ Order ID",
-                        value: `\`${orderId}\``,
-                        inline: true
-                    }
-                ],
-                footer: {
-                    text: "Papeleta Store • Pago Manual",
-                    icon_url: "https://cdn.discordapp.com/embed/avatars/0.png"
-                },
-                thumbnail: {
-                    url: orderData.avatar ? `https://cdn.discordapp.com/avatars/${orderData.discord_id}/${orderData.avatar}.png` : null
-                }
-            };
-
-            // Nota: Los webhooks NO soportan botones interactivos reales.
-            // El bot en tu servidor detectará este mensaje y añadirá los botones automáticamente.
-            const payload = {
-                username: "Papeleta Store - Pagos",
-                avatar_url: "https://cdn.discordapp.com/embed/avatars/0.png",
-                embeds: [embed],
-                content: `🔔 **Nueva orden pendiente de aprobación**\nOrder ID: \`${orderId}\``
-            };
-
-            const response = await fetch(webhookURL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            if (!response.ok) {
-                throw new Error('Error enviando webhook');
             }
         }
 
@@ -571,41 +495,6 @@
             } catch (error) {
                 console.error("Error en getOrCreateLicense:", error);
                 return null;
-            }
-        }
-
-        async function sendDiscordNotification(purchaseData, isFree = false) {
-            try {
-                const productNames = purchaseData.products.map(p => p.name).join(', ');
-                const priceText = isFree ? "GRATIS" : (purchaseData.total_price || "$0.00");
-                const methodText = isFree ? "Reclamo Gratis" : "Stripe";
-                const embedColor = isFree ? 5763719 : 16711680;
-
-                const payload = {
-                    username: "Papeleta Store",
-                    avatar_url: "https://cdn.discordapp.com/embed/avatars/0.png",
-                    embeds: [{
-                        title: isFree ? " Producto reclamado" : "✅ Compra completada",
-                        description: isFree ? `Se reclamó un producto gratuito.` : `Tu compra fue procesada correctamente.`,
-                        color: embedColor,
-                        fields: [
-                            { name: " Cliente", value: `<@${purchaseData.discord_id}> (**${purchaseData.username}**)`, inline: true },
-                            { name: " Producto", value: productNames || "Sin nombre", inline: true },
-                            { name: "💳 Método", value: methodText, inline: true },
-                            { name: "💰 Precio", value: `**${priceText}**`, inline: true }
-                        ],
-                        footer: { text: "Papeleta Store • " + new Date().toLocaleString('es-ES') },
-                        timestamp: new Date().toISOString()
-                    }]
-                };
-
-                if (purchaseData.productImage && (purchaseData.productImage.startsWith('http://') || purchaseData.productImage.startsWith('https://'))) {
-                    payload.embeds[0].image = { url: purchaseData.productImage };
-                }
-
-                await fetch(DISCORD_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            } catch (error) {
-                console.error('❌ Error en notificación:', error);
             }
         }
 
