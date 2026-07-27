@@ -76,6 +76,44 @@
         .divider { border-top: 1px solid rgba(255, 26, 26, 0.15); }
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Estilos para opciones de pago */
+        .payment-option {
+            background: rgba(13, 5, 5, 0.8);
+            border: 1px solid rgba(255, 26, 26, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .payment-option:hover {
+            border-color: #ff1a1a;
+            background: rgba(255, 26, 26, 0.1);
+        }
+        .payment-option.active {
+            border-color: #ff1a1a;
+            background: rgba(255, 26, 26, 0.15);
+            box-shadow: 0 0 15px rgba(255, 26, 26, 0.2);
+        }
+        .payment-option.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(1);
+        }
+        .payment-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            font-size: 20px;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -117,15 +155,38 @@
                         </div>
                     </div>
 
-                    <!-- Método de Pago Simplificado para Stripe -->
+                    <!-- NUEVAS OPCIONES DE PAGO -->
                     <div class="mb-6">
-                        <label class="block text-gray-400 text-sm mb-2">Método de pago</label>
-                        <div class="p-4 bg-[#0d0505] border border-red-900/30 rounded-xl flex items-center gap-3">
-                            <i class="fab fa-stripe text-3xl text-white"></i>
-                            <div>
-                                <p class="text-white font-bold text-sm">Tarjeta / Google Pay / Apple Pay</p>
-                                <p class="text-gray-500 text-xs">Procesado de forma segura por Stripe</p>
+                        <label class="block text-gray-400 text-sm mb-3">Selecciona método de pago</label>
+                        
+                        <!-- Opción 1: Stripe (Próximamente) -->
+                        <div class="payment-option disabled" title="Activa tu cuenta para habilitar">
+                            <div class="payment-icon"><i class="fab fa-stripe text-white"></i></div>
+                            <div class="flex-1">
+                                <p class="text-white font-bold text-sm">Tarjeta / Google Pay</p>
+                                <p class="text-gray-500 text-xs">Procesado por Stripe</p>
                             </div>
+                            <span class="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded">PRÓXIMAMENTE</span>
+                        </div>
+
+                        <!-- Opción 2: PayPal -->
+                        <div class="payment-option" onclick="handlePayment('paypal')">
+                            <div class="payment-icon"><i class="fab fa-paypal text-blue-400"></i></div>
+                            <div class="flex-1">
+                                <p class="text-white font-bold text-sm">PayPal</p>
+                                <p class="text-gray-500 text-xs">Pago seguro internacional</p>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-500"></i>
+                        </div>
+
+                        <!-- Opción 3: Discord Manual -->
+                        <div class="payment-option" onclick="handlePayment('discord')">
+                            <div class="payment-icon"><i class="fab fa-discord text-indigo-400"></i></div>
+                            <div class="flex-1">
+                                <p class="text-white font-bold text-sm">Pago Manual (Discord)</p>
+                                <p class="text-gray-500 text-xs">Coordinar directo con staff</p>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-500"></i>
                         </div>
                     </div>
 
@@ -163,9 +224,9 @@
                         </div>
                     </div>
 
-                    <!-- Botón de Pago con Stripe -->
-                    <button id="stripe-checkout-btn" onclick="initiateStripeCheckout()" disabled class="btn-finalizar w-full text-white font-black py-4 rounded-xl flex items-center justify-center gap-3 transition-all uppercase tracking-wide text-lg mb-3">
-                        <i class="fas fa-lock"></i> Pagar con Stripe
+                    <!-- Botón Principal (Deshabilitado por ahora) -->
+                    <button id="main-checkout-btn" disabled class="btn-finalizar w-full text-white font-black py-4 rounded-xl flex items-center justify-center gap-3 transition-all uppercase tracking-wide text-lg mb-3 opacity-50 cursor-not-allowed">
+                        <i class="fas fa-lock"></i> PRÓXIMAMENTE
                     </button>
                     
                     <button id="continue-shopping-btn" onclick="window.location.href='index.html'" class="w-full bg-transparent border border-red-900/30 hover:bg-red-950/20 text-gray-400 hover:text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition-all">
@@ -184,12 +245,12 @@
 
     <script>
         // ========== CONFIGURACIÓN ==========
-        // ⚠️ IMPORTANTE: En producción, NUNCA expongas tu clave secreta (sk_test...) en el frontend.
-        // Esta clave pública es segura para usar aquí.
         const STRIPE_PUBLIC_KEY = 'pk_test_51TvO8eJ1XuVrDlLNoQT0uzY3X2sgzvZpqljL1BaOiHIlC82Ln3rrPLLzJamTba89pM3ubnKtOUNGgicqFbFrsYSv0051qu925C'; 
         const stripe = Stripe(STRIPE_PUBLIC_KEY);
 
         const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1530402751375216720/CM6vWGEYqf3aWPiCmIBf_ycp29k686sO6Fc9HB4wisAZTAGe3OiRt5OKZoxbsINHvjgq";
+        const DISCORD_INVITE_LINK = "https://discord.gg/rvxEdWcGkf"; // Tu enlace de invitación
+        
         const firebaseConfig = {
             apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
             authDomain: "papeletalicencia.firebaseapp.com",
@@ -284,8 +345,6 @@
             const discountApplied = document.getElementById('discount-applied');
             const discountCodeText = document.getElementById('discount-code-text');
             const loginWarning = document.getElementById('login-warning');
-            const finalizeBtn = document.getElementById('stripe-checkout-btn');
-            const termsCheckbox = document.getElementById('terms-checkbox');
             
             subtotalEl.textContent = '$' + subtotal.toFixed(2);
 
@@ -309,15 +368,9 @@
 
             if (!currentUser) {
                 loginWarning.classList.remove('hidden');
-                finalizeBtn.disabled = true;
             } else {
                 loginWarning.classList.add('hidden');
-                finalizeBtn.disabled = !termsCheckbox.checked || cart.length === 0 || displayTotal <= 0;
             }
-
-            termsCheckbox.onchange = () => {
-                finalizeBtn.disabled = !termsCheckbox.checked || cart.length === 0 || !currentUser || displayTotal <= 0;
-            };
         }
 
         // ========== CÓDIGOS DE DESCUENTO ==========
@@ -351,240 +404,53 @@
             showToast('Código de descuento eliminado', 'success');
         }
 
-        // ========== INTEGRACIÓN CON STRIPE CHECKOUT (DINÁMICO) ==========
-        async function initiateStripeCheckout() {
+        // ========== MANEJO DE PAGOS ==========
+        function handlePayment(method) {
+            if (!currentUser) {
+                showToast('Debes iniciar sesión primero', 'error');
+                return;
+            }
+            
+            if (!document.getElementById('terms-checkbox').checked) {
+                showToast('Acepta los términos de uso', 'warning');
+                return;
+            }
 
-    // Verificar usuario
-    if (!currentUser) {
-        showToast(
-            'Debes iniciar sesión',
-            'error'
-        );
-        return;
-    }
-
-    // Verificar carrito
-    if (!cart || cart.length === 0) {
-        showToast(
-            'El carrito está vacío',
-            'error'
-        );
-        return;
-    }
-
-    // Verificar términos
-    const termsCheckbox =
-        document.getElementById('terms-checkbox');
-
-    if (!termsCheckbox.checked) {
-        showToast(
-            'Debes aceptar los términos de uso',
-            'warning'
-        );
-        return;
-    }
-
-    const btn =
-        document.getElementById(
-            'stripe-checkout-btn'
-        );
-
-    const originalText =
-        btn.innerHTML;
-
-    // Desactivar botón
-    btn.innerHTML = `
-        <i class="fas fa-spinner fa-spin"></i>
-        Procesando...
-    `;
-
-    btn.disabled = true;
-
-    try {
-
-        // ==============================
-        // CALCULAR TOTAL
-        // ==============================
-
-        const subtotal =
-            cart.reduce(
-                (sum, item) =>
-                    sum + Number(item.price),
-                0
-            );
-
-        let total = subtotal;
-
-        // Aplicar descuento
-        if (
-            activeDiscount &&
-            discountPercentage > 0
-        ) {
-
-            total =
-                subtotal -
-                (
-                    subtotal *
-                    (
-                        discountPercentage /
-                        100
-                    )
-                );
+            if (method === 'discord') {
+                // Guardar orden pendiente en Firebase
+                saveOrderToFirebase('discord_manual').then(() => {
+                    showToast('Redirigiendo a Discord...', 'success');
+                    setTimeout(() => {
+                        window.open(DISCORD_INVITE_LINK, '_blank');
+                    }, 1500);
+                });
+            } 
+            else if (method === 'paypal') {
+                // Aquí iría la integración con PayPal
+                // Por ahora mostramos mensaje
+                showToast('PayPal estará disponible pronto', 'warning');
+            }
         }
 
-        // Redondear
-        total =
-            Math.round(
-                total * 100
-            ) / 100;
+        async function saveOrderToFirebase(method) {
+            const subtotal = cart.reduce((sum, item) => sum + Number(item.price), 0);
+            let total = subtotal;
+            if (activeDiscount && discountPercentage > 0) {
+                total = subtotal - (subtotal * (discountPercentage / 100));
+            }
 
-        // Verificar total
-        if (total <= 0) {
-
-            showToast(
-                'El total debe ser mayor a $0.00',
-                'error'
-            );
-
-            btn.innerHTML =
-                originalText;
-
-            btn.disabled = false;
-
-            return;
-        }
-
-        // ==============================
-        // GUARDAR ORDEN EN FIREBASE
-        // ==============================
-
-        await db
-            .collection('Compra')
-            .add({
-
-                discord_id:
-                    currentUser.id,
-
-                username:
-                    currentUser.username,
-
-                products:
-                    cart,
-
-                total_amount:
-                    total,
-
-                status:
-                    'pending',
-
-                date:
-                    firebase.firestore
-                        .FieldValue
-                        .serverTimestamp()
+            await db.collection("Compra").add({
+                discord_id: currentUser.id,
+                username: currentUser.username,
+                products: cart,
+                total_amount: total,
+                payment_method: method,
+                status: "pending_manual",
+                date: firebase.firestore.FieldValue.serverTimestamp()
             });
-
-
-        // ==============================
-        // LLAMAR A VERCEL
-        // ==============================
-
-        const response =
-            await fetch(
-                '/api/create-checkout-session',
-                {
-                    method: 'POST',
-
-                    headers: {
-                        'Content-Type':
-                            'application/json'
-                    },
-
-                    body:
-                        JSON.stringify({
-
-                            items:
-                                cart,
-
-                            total:
-                                total,
-
-                            discount:
-                                activeDiscount
-
-                        })
-                }
-            );
-
-
-        // ==============================
-        // LEER RESPUESTA
-        // ==============================
-
-        const session =
-            await response.json();
-
-        console.log(
-            'Respuesta de Stripe:',
-            session
-        );
-
-
-        // ==============================
-        // VERIFICAR ERROR DE API
-        // ==============================
-
-        if (!response.ok) {
-
-            throw new Error(
-                session.error ||
-                'Error creando el pago'
-            );
         }
 
-
-        // ==============================
-        // VERIFICAR URL
-        // ==============================
-
-        if (!session.url) {
-
-            throw new Error(
-                'Stripe no devolvió la URL de pago'
-            );
-        }
-
-
-        // ==============================
-        // REDIRIGIR A STRIPE
-        // ==============================
-
-        window.location.href =
-            session.url;
-
-
-    } catch (error) {
-
-        console.error(
-            '❌ Error en Checkout:',
-            error
-        );
-
-        showToast(
-            'Error: ' +
-            error.message,
-            'error'
-        );
-
-        // Restaurar botón
-        btn.innerHTML =
-            originalText;
-
-        btn.disabled =
-            false;
-    }
-}
-
-        // ========== LICENCIAS Y NOTIFICACIONES (MANTENIDAS) ==========
+        // ========== LICENCIAS Y NOTIFICACIONES ==========
         async function getOrCreateLicense(userId, productId, productName) {
             try {
                 const querySnapshot = await db.collection("Licencias")
