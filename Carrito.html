@@ -292,9 +292,6 @@
         // ========== CONFIGURACIÓN ==========
         const DISCORD_INVITE_LINK = "https://discord.gg/6XgvxeHEJ"; 
         
-        // ✅ WEBHOOK PARA NOTIFICAR COMPRAS APROBADAS A TODOS (PÚBLICO)
-        const PURCHASE_WEBHOOK_URL = 'https://discord.com/api/webhooks/1530402751375216720/CM6vWGEYqf3aWPiCmIBf_ycp29k686sO6Fc9HB4wisAZTAGe3OiRt5OKZoxbsINHvjgq';
-        
         const firebaseConfig = {
             apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
             authDomain: "papeletalicencia.firebaseapp.com",
@@ -364,37 +361,6 @@
             return String(str).replace(/[&<>'"]/g, tag => ({ '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;' }[tag] || tag));
         }
 
-        // ========== ENVIAR WEBHOOK PÚBLICO DE COMPRA ==========
-        async function sendPurchaseWebhook(username, userId, products, total, method) {
-            try {
-                const productNames = products.map(p => `✅ ${p.name}`).join('\n');
-                const payload = {
-                    username: "Papeleta Store",
-                    avatar_url: "https://papeleta-script-github-io.vercel.app/files/999.png",
-                    embeds: [{
-                        title: "🎉 ¡Nueva Compra Aprobada!",
-                        description: "Un usuario ha completado una compra exitosamente.",
-                        color: 0x10b981,
-                        fields: [
-                            { name: "👤 Cliente", value: `<@${userId}> (**${username}**)`, inline: true },
-                            { name: "💳 Método", value: method, inline: true },
-                            { name: "📦 Productos", value: productNames, inline: false },
-                            { name: "💰 Total Pagado", value: `**$${Number(total).toFixed(2)} USD**`, inline: true }
-                        ],
-                        footer: { text: "Papeleta Store • Entrega Instantánea" },
-                        timestamp: new Date().toISOString()
-                    }]
-                };
-                await fetch(PURCHASE_WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-            } catch (error) {
-                console.error('Error enviando webhook:', error);
-            }
-        }
-
         // ========== ESCUCHAR CAMBIOS EN ÓRDENES EN TIEMPO REAL ==========
         function listenForOrderChanges() {
             if (!currentUser) return;
@@ -435,7 +401,7 @@
             const claimSection = document.getElementById('claim-section');
             
             if (cart.length === 0) {
-                showToast('🛒 Ve a la tienda y añade algo', 'warning');
+                showToast(' Ve a la tienda y añade algo', 'warning');
                 setTimeout(() => { window.location.href = 'index.html'; }, 3000);
                 return;
             }
@@ -561,39 +527,9 @@
             if (!pendingQuery.empty) { showToast('⚠️ Ya tienes una solicitud pendiente de aprobación.', 'warning'); return; }
 
             if (method === 'discord') await processDiscordPayment();
-            else if (method === 'paypal') await processPayPalPayment();
-        }
-
-        // ✅ PROCESO DE PAGO PAYPAL (Con Webhook Público)
-        async function processPayPalPayment() {
-            const subtotal = cart.reduce((sum, item) => sum + Number(item.price), 0);
-            let total = subtotal;
-            if (activeDiscount && discountPercentage > 0) total = subtotal - (subtotal * (discountPercentage / 100));
-
-            try {
-                showToast('⏳ Procesando pago con PayPal...', 'warning');
-                
-                // 1. Generar licencias directamente
-                for (const item of cart) {
-                    const userCode = 'USER_' + Math.random().toString(36).substring(2, 8).toUpperCase();
-                    const key = Array.from({length: 24}, () => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'[Math.floor(Math.random() * 36)]).join('');
-                    await db.collection("Licencias").add({
-                        discord_id: currentUser.id, username: currentUser.username, product_id: item.id, product_name: item.name,
-                        user_code: userCode, key: key, created_at: firebase.firestore.FieldValue.serverTimestamp(), status: 'active'
-                    });
-                }
-
-                // 2. ✅ ENVIAR WEBHOOK PÚBLICO
-                await sendPurchaseWebhook(currentUser.username, currentUser.id, cart, total, 'PayPal');
-
-                // 3. Vaciar carrito
-                cart = [];
-                localStorage.removeItem('papeleta_cart');
-                showToast('✅ ¡Pago con PayPal exitoso! Revisa tu biblioteca.', 'success');
-                setTimeout(() => { window.location.href = 'AreaCliente.html'; }, 2500);
-            } catch (error) {
-                console.error('Error:', error);
-                showToast('Error al procesar el pago: ' + error.message, 'error');
+            else if (method === 'paypal') {
+                // ✅ PAYPAL EN MANTENIMIENTO - SOLO MUESTRA MENSAJE
+                showToast('🔧 PayPal está temporalmente en mantenimiento. Usa Discord Manual por ahora.', 'warning');
             }
         }
 
