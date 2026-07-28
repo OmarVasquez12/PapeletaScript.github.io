@@ -295,7 +295,7 @@
                 <a href="index.html" class="text-gray-400 hover:text-white text-sm flex items-center gap-2 transition-colors hidden md:flex">
                     <i class="fas fa-arrow-left"></i> Volver a la Tienda
                 </a>
-                <button onclick="openCartModal()" class="relative group p-2">
+                <button onclick="openCartModal()" class="relative group p-2 cursor-pointer">
                     <i class="fas fa-shopping-cart text-xl text-gray-300 group-hover:text-red-500 transition-colors"></i>
                     <span id="header-cart-count" class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
                 </button>
@@ -381,7 +381,7 @@
         <p>&copy; 2026 Papeleta Store. Todos los derechos reservados.</p>
     </footer>
 
-    <!-- MODAL DEL CARRITO -->
+    <!-- MODAL DEL CARRITO (Ya no se usa pero se mantiene por si acaso) -->
     <div id="cart-modal" class="cart-modal-overlay">
         <div class="cart-modal-content">
             <div class="cart-header">
@@ -499,9 +499,9 @@
             saveCart();
         }
 
+        // ✅ MODIFICADO: REDIRIGE AL CARRITO PRINCIPAL EN LUGAR DE ABRIR MODAL
         function openCartModal() {
-            renderCartItems();
-            document.getElementById('cart-modal').classList.add('active');
+            window.location.href = 'Carrito.html';
         }
 
         function closeCartModal() {
@@ -568,7 +568,7 @@
             }
         }
 
-        // ✅ FUNCIÓN MODIFICADA: REDIRIGE AL CARRITO PRINCIPAL
+        // ✅ REDIRIGE AL CARRITO PRINCIPAL
         async function goToCheckout() {
             if (cart.length === 0) {
                 alert('Tu carrito está vacío');
@@ -592,7 +592,6 @@
                     return;
                 }
 
-                // Si el usuario está logueado y tiene productos, lo mandamos al Carrito.html principal
                 window.location.href = 'Carrito.html';
 
             } catch (error) {
