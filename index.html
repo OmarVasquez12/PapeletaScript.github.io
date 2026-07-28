@@ -1022,38 +1022,42 @@
             } catch (error) { document.getElementById('stat-clientes').innerText = '+0'; document.getElementById('stat-ventas').innerText = '+0'; }
         }
 
-        // FUNCIÓN CORREGIDA PARA CARGAR LICENCIAS DESDE FIREBASE
         async function loadMyAssignments() {
-            // Reiniciamos el set para evitar datos viejos
-            myAssignedProductIds = new Set();
-            
-            if (!currentUser) return;
-            
-            try {
-                // Consultamos DIRECTAMENTE a Firebase para ver qué licencias tiene este usuario
-                const snapshot = await db.collection("Licencias")
-                    .where("discord_id", "==", currentUser.id)
-                    .where("status", "==", "active")
-                    .get();
-                
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    if (data.product_id) {
-                        myAssignedProductIds.add(data.product_id);
+    // Reiniciamos el set para evitar datos viejos
+    myAssignedProductIds = new Set();
+    
+    if (!currentUser) return;
+    
+    try {
+        // Consultamos la colección "Clientes" para ver qué productos tiene este usuario
+        const snapshot = await db.collection("Clientes")
+            .where("discord_id", "==", currentUser.id)
+            .get();
+        
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            // Extraemos los productos del array "products"
+            if (data.products && Array.isArray(data.products)) {
+                data.products.forEach(product => {
+                    if (product.id) {
+                        myAssignedProductIds.add(product.id);
                     }
                 });
-                
-                // Actualizamos el localStorage con lo que acabamos de traer de Firebase
-                // Esto sincroniza la memoria local con la base de datos real
-                saveUserDataLocally();
-                
-            } catch (error) {
-                console.error("Error cargando asignaciones desde Firebase:", error);
-                // Si falla Firebase, intentamos cargar de localStorage como respaldo
-                const savedData = JSON.parse(localStorage.getItem('papeleta_user_' + currentUser.id) || '{}');
-                if(savedData.assigned_products) myAssignedProductIds = new Set(savedData.assigned_products);
             }
-        }
+        });
+        
+        console.log("Productos asignados al usuario:", Array.from(myAssignedProductIds));
+        
+        // Actualizamos el localStorage con lo que acabamos de traer de Firebase
+        saveUserDataLocally();
+        
+    } catch (error) {
+        console.error("Error cargando asignaciones desde Firebase:", error);
+        // Si falla Firebase, intentamos cargar de localStorage como respaldo
+        const savedData = JSON.parse(localStorage.getItem('papeleta_user_' + currentUser.id) || '{}');
+        if(savedData.assigned_products) myAssignedProductIds = new Set(savedData.assigned_products);
+    }
+}
 
         function isSupport() { return currentUserRole === 'support'; }
         function canUpload() { return isAdmin(currentUser) || isSupport(); }
