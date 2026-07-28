@@ -733,7 +733,7 @@
                 // Iniciar listener de soporte al loguearse
                 initSupportListener();
                 
-                // ✅ INICIAR LISTENER DE COMPRAS APROBADAS Y ASIGNACIÓN AUTOMÁTICA
+                // ✅ INICIAR LISTENER DE COMPRAS APROBADAS
                 listenForApprovedOrders();
             })
             .catch(err => { console.error(err); logout(); });
@@ -1086,7 +1086,7 @@
               });
         }
 
-        // ✅ NUEVA FUNCIÓN: ESCUCHAR COMPRAS APROBADAS Y ASIGNAR PRODUCTOS AUTOMÁTICAMENTE
+        // ✅ NUEVA FUNCIÓN: ESCUCHAR COMPRAS APROBADAS EN TIEMPO REAL
         function listenForApprovedOrders() {
             if (!currentUser) return;
             
@@ -1094,35 +1094,11 @@
                 .where("discord_id", "==", currentUser.id)
                 .where("status", "==", "approved")
                 .onSnapshot(async (snapshot) => {
-                    snapshot.docChanges().forEach(async change => {
+                    snapshot.docChanges().forEach(change => {
                         if (change.type === 'added') {
-                            const orderData = change.doc.data();
-                            
-                            // Vaciar carrito local
+                            // Vaciar carrito
                             localStorage.removeItem('papeleta_cart');
-                            
-                            // Asignar licencias por cada producto en la orden aprobada
-                            if (orderData.products && Array.isArray(orderData.products)) {
-                                for (const prod of orderData.products) {
-                                    // Crear licencia específica para este producto usando la lógica segura
-                                    await getOrCreateLicense(currentUser.id, prod.id, prod.name);
-                                    
-                                    // Registrar en Clientes como histórico de compra
-                                    await db.collection("Clientes").add({
-                                        discord_id: currentUser.id,
-                                        username: currentUser.username,
-                                        products: [{ id: prod.id, name: prod.name, price: prod.price }],
-                                        total_price: orderData.total_amount || 0,
-                                        date: firebase.firestore.FieldValue.serverTimestamp(),
-                                        status: "Aprobado Automáticamente",
-                                        license_key: userFixedLicenseKey || "General"
-                                    });
-                                }
-                            }
-
-                            showToast(' ¡Compra aprobada! Tus productos han sido asignados.', 'success');
-                            
-                            // Refrescar dashboard inmediatamente
+                            showToast('🎉 ¡Tu compra ha sido aprobada! El carrito se ha vaciado.', 'success');
                             loadDashboardData();
                         }
                     });
@@ -1429,7 +1405,7 @@
                                 inline: true
                             },
                             {
-                                name: "‍💻 Soporte",
+                                name: "👨‍💻 Soporte",
                                 value: assignedText,
                                 inline: false
                             }
