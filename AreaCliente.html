@@ -979,11 +979,14 @@
         }
 
         function generateUniqueKey() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; 
-            let key = '';
-            for (let i = 0; i < 24; i++) key += chars.charAt(Math.floor(Math.random() * chars.length));
-            return key;
-        }
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; 
+    let code = '';
+    for (let i = 0; i < 16; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    // Formato solicitado: PAPELETA(CODIGO)
+    return `PAPELETA(${code})`; 
+}
 
         // --- FUNCIÓN MAESTRA ÚNICA PARA LICENCIAS (EVITA DUPLICADOS) ---
         async function getOrCreateLicense(userId, productId, productName) {
@@ -1273,12 +1276,82 @@ async function loadDashboardData() {
     }
 }
 
-        function filterDashboardProducts() {
-            const search = document.getElementById('dashboard-search').value.toLowerCase();
-            document.querySelectorAll('#dashboard-products-list > div').forEach(card => {
-                card.style.display = card.innerText.toLowerCase().includes(search) ? 'flex' : 'none';
+        async function downloadProduct(productId) {
+    // 1. Obtener valores de los campos de configuración
+    const ip = document.getElementById('server-ip').value.trim();
+    const port = document.getElementById('server-port').value.trim();
+    
+    // 2. Validar que haya datos
+    if (!ip || !port) {
+        showToast('⚠️ Debes configurar tu IP y Puerto del servidor MTA antes de descargar.', 'warning', 'Configuración Requerida');
+        document.getElementById('server-ip').focus();
+        return;
+    }
+
+    // 3. Validar formato básico de IP y Puerto
+    const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
+    if (!ipRegex.test(ip) || isNaN(port) || port < 1 || port > 65535) {
+        showToast('❌ El formato de IP o Puerto no es válido. Ej: 192.168.1.1 y 22003', 'error', 'Error de Formato');
+        return;
+    }
+
+    const product = allProducts.find(p => String(p.id) === String(productId) || String(p.docId) === String(productId));
+    if (!product || !product.file_data) {
+        showToast('Archivo no disponible para este producto', 'error');
+        return;
+    }
+
+    try {
+        showToast('⏳ Vinculando licencia con tu servidor...', 'success', 'Procesando');
+        
+        // 4. Buscar la licencia activa del usuario para este producto
+        let licenseRef = null;
+        const licenseSnapshot = await db.collection("Licencias")
+            .where("discord_id", "==", currentUser.id)
+            .where("product_id", "==", productId)
+            .where("status", "==", "active")
+            .limit(1)
+            .get();
+
+        if (!licenseSnapshot.empty) {
+            licenseRef = licenseSnapshot.docs[0].ref;
+        } else {
+            // Fallback: Si no encuentra por product_id, busca cualquier licencia activa del usuario (ej. licencia general)
+            const generalSnapshot = await db.collection("Licencias")
+                .where("discord_id", "==", currentUser.id)
+                .where("status", "==", "active")
+                .limit(1)
+                .get();
+                
+            if (!generalSnapshot.empty) {
+                licenseRef = generalSnapshot.docs[0].ref;
+            }
+        }
+
+        // 5. Si encontramos la licencia, actualizamos la IP y Puerto en Firebase
+        if (licenseRef) {
+            await licenseRef.update({
+                ip: ip,
+                port: port,
+                resource: product.name // Guardamos el nombre del resource para doble validación en Lua
             });
         }
+
+        // 6. Proceder con la descarga real del archivo
+        const link = document.createElement('a');
+        link.href = product.file_data;
+        link.download = product.file_name || 'resource.zip';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        showToast('✅ Descarga iniciada. Licencia vinculada a tu IP:Puerto.', 'success', '¡Listo!');
+        
+    } catch (error) {
+        console.error("Error al vincular licencia:", error);
+        showToast('Error al vincular la licencia. Inténtalo de nuevo.', 'error');
+    }
+}
 
         function downloadProduct(productId) {
             const product = allProducts.find(p => String(p.id) === String(productId) || String(p.docId) === String(productId));
@@ -1303,13 +1376,88 @@ async function loadDashboardData() {
             });
         }
 
-        function saveServerConfig() {
-            localStorage.setItem('server_config', JSON.stringify({ ip: document.getElementById('server-ip').value, port: document.getElementById('server-port').value }));
-            const btn = event.currentTarget;
-            const original = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-check"></i> Guardado';
-            setTimeout(() => btn.innerHTML = original, 2000);
+        async function saveServerConfig() {
+    const ip = document.getElementById('server-ip').value.trim();
+    const port = document.getElementById('server-port').value.trim();
+    
+    if (!ip || !port) {
+        showToast('Por favor ingresa IP y Puerto válidos', 'warning');
+        return;
+    }
+    
+    // Validar formato de IP
+    const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
+    if (!ipRegex.test(ip)) {
+        showToast('Formato de IP inválido. Ejemplo: 192.168.1.1', 'error');
+        return;
+    }
+    
+    // Validar formato de Puerto
+    const portNum = parseInt(port);
+    if (isNaN(portNum) || portNum < 1 || portNum > 65535) {
+        showToast('Puerto inválido. Debe estar entre 1 y 65535', 'error');
+        return;
+    }
+    
+    try {
+        // 1. Guardar en localStorage (para que no se borre al recargar)
+        localStorage.setItem('server_config', JSON.stringify({ ip: ip, port: port }));
+        
+        // 2. Guardar en Firebase - Colección Licencias
+        if (currentUser) {
+            // Buscar la licencia activa del usuario
+            const licenseSnapshot = await db.collection("Licencias")
+                .where("discord_id", "==", currentUser.id)
+                .where("status", "==", "active")
+                .limit(1)
+                .get();
+            
+            if (!licenseSnapshot.empty) {
+                // Actualizar el documento de la licencia con la IP y Puerto
+                const batch = db.batch();
+                licenseSnapshot.forEach((doc) => {
+                    batch.update(doc.ref, {
+                        ip: ip,
+                        port: port,
+                        updated_at: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                });
+                
+                await batch.commit();
+                console.log("✅ IP y Puerto guardados en Firebase Licencias");
+            } else {
+                // Si por alguna razón no tiene licencia activa, creamos un registro de configuración
+                await db.collection("Licencias").add({
+                    discord_id: currentUser.id,
+                    username: currentUser.username,
+                    ip: ip,
+                    port: port,
+                    status: 'pending_config',
+                    type: 'server_config',
+                    created_at: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                console.log("✅ Configuración de servidor guardada en Firebase");
+            }
         }
+        
+        // 3. Mostrar confirmación visual en el botón
+        const btn = event.currentTarget;
+        const original = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check"></i> Guardado en Firebase';
+        btn.classList.add('bg-green-600'); // Cambia a verde temporalmente
+        
+        setTimeout(() => {
+            btn.innerHTML = original;
+            btn.classList.remove('bg-green-600');
+        }, 2000);
+        
+        showToast('IP y Puerto guardados correctamente en la base de datos', 'success');
+        
+    } catch (error) {
+        console.error("Error al guardar en Firebase:", error);
+        showToast('Error al guardar en la base de datos', 'error');
+    }
+}
 
         // =============================================
         //          LÓGICA DE SOPORTE (MEJORADA)
