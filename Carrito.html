@@ -581,73 +581,40 @@ function listenForOrderChanges() {
         }
 
         // ✅ PROCESAR PAGO CON DISCORD - SOLO USA LICENCIA EXISTENTE
-        async function processDiscordPayment() {
-            const subtotal = cart.reduce((sum, item) => sum + Number(item.price), 0);
-            let total = subtotal;
-            if (activeDiscount && discountPercentage > 0) total = subtotal - (subtotal * (discountPercentage / 100));
-            
-            // ✅ Usar la licencia global ya obtenida (NO crea duplicados)
-            const license = await getGlobalLicense(currentUser.id);
-            if (!license) {
-                showToast('❌ Error al obtener tu licencia. Intenta de nuevo.', 'error');
-                return;
-            }
+        // ✅ PROCESAR PAGO CON DISCORD - SIN REDIRECCIÓN A DISCORD
+async function processDiscordPayment() {
+    const subtotal = cart.reduce((sum, item) => sum + Number(item.price), 0);
+    let total = subtotal;
+    if (activeDiscount && discountPercentage > 0) total = subtotal - (subtotal * (discountPercentage / 100));
+    
+    // ✅ Usar la licencia global ya obtenida (NO crea duplicados)
+    const license = await getGlobalLicense(currentUser.id);
+    if (!license) {
+        showToast('❌ Error al obtener tu licencia. Intenta de nuevo.', 'error');
+        return;
+    }
 
-            // ✅ SOLO guardar en "Compra" - NO crear licencia nueva
-            const orderData = {
-                discord_id: currentUser.id, username: currentUser.username, discriminator: currentUser.discriminator || '0000',
-                avatar: currentUser.avatar, products: cart, total_amount: total, payment_method: 'discord_manual',
-                status: 'pending_approval', date: firebase.firestore.FieldValue.serverTimestamp(), order_id: Date.now().toString(),
-                license_key: license.key, // ✅ Solo referencia la licencia global
-                license_user: license.user_code
-            };
-            try {
-                await db.collection("Compra").add(orderData);
-                showToast('✅ Solicitud enviada correctamente. Serás redirigido a Discord...', 'success');
-                setTimeout(() => { window.location.href = DISCORD_INVITE_LINK; }, 2000);
-            } catch (error) {
-                console.error('Error:', error);
-                showToast('Error al procesar: ' + error.message, 'error');
-            }
-        }
-
-        // ✅ RECLAMAR PRODUCTO GRATIS - SOLO guarda en Clientes
-        async function claimFreeProduct() {
-            if (!currentUser) { showToast('Debes iniciar sesión primero', 'error'); return; }
-            if (!document.getElementById('terms-checkbox').checked) { showToast('Acepta los términos de uso', 'warning'); return; }
-
-            try {
-                // ✅ Usar la licencia global (NO crea duplicados)
-                const license = await getGlobalLicense(currentUser.id);
-                if (!license) {
-                    showToast('❌ Error al obtener tu licencia. Intenta de nuevo.', 'error');
-                    return;
-                }
-
-                // ✅ SOLO guardar en "Clientes" el producto comprado
-                for (const item of cart) {
-                    await db.collection("Clientes").add({
-                        discord_id: currentUser.id,
-                        username: currentUser.username,
-                        products: [{ id: item.id, name: item.name, price: "Gratis" }],
-                        total_price: "Gratis",
-                        date: firebase.firestore.FieldValue.serverTimestamp(),
-                        status: "Reclamado Exitosamente",
-                        license_key: license.key, // ✅ Solo referencia la licencia global
-                        license_user: license.user_code
-                    });
-                }
-
-                cart = [];
-                localStorage.removeItem('papeleta_cart');
-                showToast('🎉 ¡Producto reclamado exitosamente!', 'success');
-                setTimeout(() => { window.location.href = 'AreaCliente.html'; }, 2000);
-            } catch (error) {
-                console.error('Error:', error);
-                showToast('Error al reclamar: ' + error.message, 'error');
-            }
-        }
-
+    // ✅ SOLO guardar en "Compra" - NO crear licencia nueva
+    const orderData = {
+        discord_id: currentUser.id, username: currentUser.username, discriminator: currentUser.discriminator || '0000',
+        avatar: currentUser.avatar, products: cart, total_amount: total, payment_method: 'discord_manual',
+        status: 'pending_approval', date: firebase.firestore.FieldValue.serverTimestamp(), order_id: Date.now().toString(),
+        license_key: license.key, // ✅ Solo referencia la licencia global
+        license_user: license.user_code
+    };
+    try {
+        await db.collection("Compra").add(orderData);
+        showToast('✅ Solicitud enviada correctamente. Espera la aprobación del admin.', 'success');
+        
+        // ✅ Redirigir al Área de Cliente en lugar de Discord
+        setTimeout(() => { 
+            window.location.href = 'AreaCliente.html'; 
+        }, 2500);
+    } catch (error) {
+        console.error('Error:', error);
+        showToast('Error al procesar: ' + error.message, 'error');
+    }
+}
         // ========== INICIALIZACIÓN ==========
         document.addEventListener('DOMContentLoaded', () => {
             createParticles();
