@@ -679,73 +679,80 @@
 
         // ✅ FUNCIÓN CORREGIDA: GUARDAR IP/PUERTO EN TODAS LAS LICENCIAS DEL USUARIO
         async function saveServerConfig() {
-            const ip = document.getElementById('server-ip').value.trim();
-            const port = document.getElementById('server-port').value.trim();
+    const ip = document.getElementById('server-ip').value.trim();
+    const port = document.getElementById('server-port').value.trim();
+    
+    console.log("Intentando guardar:", { ip, port, currentUser });
+    
+    if (!ip || !port) {
+        showToast('Por favor ingresa IP y Puerto válidos', 'warning');
+        return;
+    }
+    
+    if (!validateIPPort(ip, port)) {
+        showToast('Formato inválido. Ej: 192.168.1.1 y 22003', 'error');
+        return;
+    }
+    
+    if (!currentUser) {
+        showToast('Debes iniciar sesión primero', 'error');
+        console.error("Usuario no autenticado");
+        return;
+    }
+    
+    try {
+        localStorage.setItem('server_config', JSON.stringify({ ip, port }));
+        
+        const licenseSnapshot = await db.collection("Licencias")
+            .where("discord_id", "==", currentUser.id)
+            .where("status", "==", "active")
+            .get();
+        
+        console.log("Licencias encontradas:", licenseSnapshot.size);
+        
+        if (!licenseSnapshot.empty) {
+            const batch = db.batch();
+            licenseSnapshot.forEach((doc) => {
+                console.log("Actualizando doc:", doc.id);
+                batch.update(doc.ref, {
+                    ip: ip,
+                    port: port,
+                    updated_at: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            });
             
-            if (!ip || !port) {
-                showToast('Por favor ingresa IP y Puerto válidos', 'warning');
-                return;
-            }
-            
-            if (!validateIPPort(ip, port)) {
-                showToast('Formato inválido. Ej: 192.168.1.1 y 22003', 'error');
-                return;
-            }
-            
-            try {
-                // 1. Guardar localmente
-                localStorage.setItem('server_config', JSON.stringify({ ip: ip, port: port }));
-                
-                // 2. Guardar en Firebase - Actualizar TODAS las licencias activas del usuario
-                if (currentUser) {
-                    const licenseSnapshot = await db.collection("Licencias")
-                        .where("discord_id", "==", currentUser.id)
-                        .where("status", "==", "active")
-                        .get();
-                    
-                    if (!licenseSnapshot.empty) {
-                        const batch = db.batch();
-                        licenseSnapshot.forEach((doc) => {
-                            batch.update(doc.ref, {
-                                ip: ip,
-                                port: port,
-                                updated_at: firebase.firestore.FieldValue.serverTimestamp()
-                            });
-                        });
-                        await batch.commit();
-                        console.log("✅ IP y Puerto guardados en Firebase Licencias");
-                    } else {
-                        // Si no tiene licencias, crear un registro temporal
-                        await db.collection("Licencias").add({
-                            discord_id: currentUser.id,
-                            username: currentUser.username,
-                            ip: ip,
-                            port: port,
-                            status: 'pending_config',
-                            type: 'server_config',
-                            created_at: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-                    }
-                }
-                
-                // 3. Feedback visual
-                const btn = event.currentTarget;
-                const original = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check"></i> Guardado en Firebase';
-                btn.classList.add('bg-green-600');
-                
-                setTimeout(() => {
-                    btn.innerHTML = original;
-                    btn.classList.remove('bg-green-600');
-                }, 2000);
-                
-                showToast('IP y Puerto guardados correctamente en la base de datos', 'success');
-                
-            } catch (error) {
-                console.error("Error al guardar en Firebase:", error);
-                showToast('Error al guardar en la base de datos', 'error');
-            }
+            await batch.commit();
+            console.log("✅ Guardado exitoso");
+        } else {
+            console.log("Creando nueva licencia de configuración");
+            await db.collection("Licencias").add({
+                discord_id: currentUser.id,
+                username: currentUser.username,
+                ip: ip,
+                port: port,
+                status: 'pending_config',
+                type: 'server_config',
+                created_at: firebase.firestore.FieldValue.serverTimestamp()
+            });
         }
+        
+        const btn = event.currentTarget;
+        const original = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check"></i> Guardado en Firebase';
+        btn.classList.add('bg-green-600');
+        
+        setTimeout(() => {
+            btn.innerHTML = original;
+            btn.classList.remove('bg-green-600');
+        }, 2000);
+        
+        showToast('IP y Puerto guardados correctamente', 'success');
+        
+    } catch (error) {
+        console.error("❌ Error detallado:", error);
+        showToast('Error: ' + error.message, 'error');
+    }
+}
 
         // ✅ FUNCIÓN CORREGIDA: DESCARGAR CON VALIDACIÓN DE IP/PUERTO
         async function downloadProduct(productId) {
