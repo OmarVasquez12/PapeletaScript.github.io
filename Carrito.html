@@ -11,65 +11,55 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     
     <style>
-        :root { --bg-body: #050507; --primary: #ff1a1a; --border-color: rgba(255, 26, 26, 0.15); }
+        :root { --bg-body: #1a0a0a; --primary: #ff1a1a; --border-color: rgba(255, 26, 26, 0.15); }
         
-        /* FONDO NEGRO/ROJO CON PARTÍCULAS BRILLANTES */
+        /* FONDO MÁS CLARO CON PARTÍCULAS ANIMADAS */
         body { 
-            background: #050507;
+            background: linear-gradient(135deg, #2a0a0a 0%, #1a0505 50%, #0f0505 100%);
             color: #f3f4f6; 
             font-family: 'Segoe UI', system-ui, sans-serif;
             position: relative;
             overflow-x: hidden;
+            min-height: 100vh;
         }
         
-        /* Capa base degradada */
-        body::before {
-            content: '';
+        /* Contenedor de partículas */
+        #particles-container {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(ellipse at center, #1a0505 0%, #0a0505 50%, #050507 100%);
             pointer-events: none;
-            z-index: -2;
+            z-index: 0;
+            overflow: hidden;
         }
         
-        /* Partículas brillantes dispersas */
-        body::after {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                radial-gradient(2px 2px at 20px 30px, rgba(255, 26, 26, 0.8), transparent),
-                radial-gradient(2px 2px at 40px 70px, rgba(255, 100, 100, 0.6), transparent),
-                radial-gradient(1px 1px at 90px 40px, rgba(255, 26, 26, 0.7), transparent),
-                radial-gradient(2px 2px at 160px 120px, rgba(255, 80, 80, 0.5), transparent),
-                radial-gradient(1px 1px at 230px 80px, rgba(255, 26, 26, 0.6), transparent),
-                radial-gradient(2px 2px at 300px 150px, rgba(255, 120, 120, 0.4), transparent),
-                radial-gradient(1px 1px at 350px 200px, rgba(255, 26, 26, 0.7), transparent),
-                radial-gradient(2px 2px at 420px 90px, rgba(255, 60, 60, 0.6), transparent),
-                radial-gradient(1px 1px at 500px 180px, rgba(255, 26, 26, 0.5), transparent),
-                radial-gradient(2px 2px at 580px 140px, rgba(255, 100, 100, 0.7), transparent),
-                radial-gradient(1px 1px at 650px 220px, rgba(255, 26, 26, 0.6), transparent),
-                radial-gradient(2px 2px at 720px 110px, rgba(255, 80, 80, 0.5), transparent),
-                radial-gradient(1px 1px at 800px 190px, rgba(255, 26, 26, 0.8), transparent),
-                radial-gradient(2px 2px at 880px 160px, rgba(255, 120, 120, 0.4), transparent),
-                radial-gradient(1px 1px at 950px 240px, rgba(255, 26, 26, 0.6), transparent);
-            background-repeat: repeat;
-            background-size: 1000px 300px;
-            pointer-events: none;
-            z-index: -1;
-            animation: particlesFloat 20s linear infinite;
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: rgba(255, 26, 26, 0.6);
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(255, 26, 26, 0.8);
+            animation: floatParticle linear infinite;
         }
         
-        @keyframes particlesFloat {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-            100% { transform: translateY(0px); }
+        @keyframes floatParticle {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--moveX), var(--moveY)) scale(0.5);
+                opacity: 0;
+            }
         }
         
         .red-glow { text-shadow: 0 0 18px rgba(255, 26, 26, 0.85); }
@@ -78,6 +68,8 @@
             border: 1px solid rgba(255, 26, 26, 0.15); 
             transition: all 0.3s ease; 
             backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 1;
         }
         .cart-item:hover { border-color: rgba(255, 26, 26, 0.4); }
         
@@ -104,10 +96,12 @@
         @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; transform: translateX(100%); } }
         
         .order-summary-box {
-            background: linear-gradient(180deg, rgba(20, 5, 5, 0.95) 0%, rgba(10, 5, 5, 0.98) 100%);
+            background: linear-gradient(180deg, rgba(30, 10, 10, 0.95) 0%, rgba(20, 5, 5, 0.98) 100%);
             border: 1px solid rgba(255, 26, 26, 0.2);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 1;
         }
         .input-dark {
             background: rgba(13, 5, 5, 0.8);
@@ -164,6 +158,18 @@
             font-size: 20px;
         }
         
+        /* Botón Reclamar para productos gratis */
+        .btn-reclamar {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+            transition: all 0.3s ease;
+        }
+        .btn-reclamar:hover {
+            background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+            box-shadow: 0 6px 25px rgba(16, 185, 129, 0.6);
+            transform: translateY(-2px);
+        }
+        
         @keyframes fadeOutItem {
             from { opacity: 1; transform: translateX(0); }
             to { opacity: 0; transform: translateX(-20px); }
@@ -171,9 +177,18 @@
         .removing {
             animation: fadeOutItem 0.3s ease forwards;
         }
+        
+        /* Asegurar que el contenido esté sobre las partículas */
+        header, main {
+            position: relative;
+            z-index: 1;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
+
+    <!-- Contenedor de Partículas Animadas -->
+    <div id="particles-container"></div>
 
     <header class="bg-[#0d0505]/90 backdrop-blur border-b border-red-900/30 sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
         <a href="index.html" class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
@@ -212,8 +227,8 @@
                         </div>
                     </div>
 
-                    <!-- OPCIONES DE PAGO -->
-                    <div class="mb-6">
+                    <!-- OPCIONES DE PAGO (Solo si NO es gratis) -->
+                    <div id="payment-methods" class="mb-6 hidden">
                         <label class="block text-gray-400 text-sm mb-3">Selecciona método de pago</label>
                         
                         <div class="payment-option disabled" title="Activa tu cuenta para habilitar">
@@ -242,6 +257,22 @@
                             </div>
                             <i class="fas fa-chevron-right text-gray-500"></i>
                         </div>
+                    </div>
+
+                    <!-- BOTÓN RECLAMAR (Solo si es gratis) -->
+                    <div id="claim-section" class="mb-6 hidden">
+                        <div class="p-4 bg-green-900/20 border border-green-600/30 rounded-xl mb-4">
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-gift text-green-400 text-2xl"></i>
+                                <div>
+                                    <p class="text-green-400 font-bold text-sm">¡Producto Gratuito!</p>
+                                    <p class="text-gray-400 text-xs">Reclama tu producto ahora</p>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="claimFreeProduct()" class="btn-reclamar w-full text-white font-black py-4 rounded-xl flex items-center justify-center gap-3 text-lg">
+                            <i class="fas fa-gift"></i> RECLAMAR
+                        </button>
                     </div>
 
                     <div class="mb-6 divider pt-6">
@@ -316,6 +347,43 @@
         let discountPercentage = 0;
         let ownedProducts = new Set();
         let pendingOrderUnsubscribe = null;
+        let isFreeProduct = false;
+
+        // ========== SISTEMA DE PARTÍCULAS ANIMADAS ==========
+        function createParticles() {
+            const container = document.getElementById('particles-container');
+            const particleCount = 50;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                // Posición inicial aleatoria
+                const startX = Math.random() * window.innerWidth;
+                const startY = Math.random() * window.innerHeight;
+                
+                // Dirección de movimiento aleatoria
+                const moveX = (Math.random() - 0.5) * 200;
+                const moveY = (Math.random() - 0.5) * 200;
+                
+                // Duración aleatoria
+                const duration = 10 + Math.random() * 20;
+                
+                particle.style.left = startX + 'px';
+                particle.style.top = startY + 'px';
+                particle.style.setProperty('--moveX', moveX + 'px');
+                particle.style.setProperty('--moveY', moveY + 'px');
+                particle.style.animationDuration = duration + 's';
+                particle.style.animationDelay = Math.random() * 5 + 's';
+                
+                // Tamaño variable
+                const size = 2 + Math.random() * 3;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                
+                container.appendChild(particle);
+            }
+        }
 
         // ========== UTILIDADES ==========
         function showToast(message, type = 'success') {
@@ -387,6 +455,8 @@
         // ========== LÓGICA DEL CARRITO ==========
         function renderCart() {
             const container = document.getElementById('cart-items-container');
+            const paymentMethods = document.getElementById('payment-methods');
+            const claimSection = document.getElementById('claim-section');
             
             // ✅ SI NO HAY NADA EN EL CARRITO - MOSTRAR TOAST Y REDIRECCIONAR
             if (cart.length === 0) {
@@ -395,6 +465,19 @@
                     window.location.href = 'index.html';
                 }, 3000);
                 return;
+            }
+
+            // Verificar si el producto es gratis
+            const total = cart.reduce((sum, item) => sum + Number(item.price), 0);
+            isFreeProduct = total === 0;
+
+            // Mostrar/ocultar secciones según si es gratis o no
+            if (isFreeProduct) {
+                paymentMethods.classList.add('hidden');
+                claimSection.classList.remove('hidden');
+            } else {
+                paymentMethods.classList.remove('hidden');
+                claimSection.classList.add('hidden');
             }
 
             container.innerHTML = cart.map(item => {
@@ -417,6 +500,56 @@
             `}).join('');
 
             updateTotals();
+        }
+
+        // ========== RECLAMAR PRODUCTO GRATIS ==========
+        async function claimFreeProduct() {
+            if (!currentUser) {
+                showToast('Debes iniciar sesión primero', 'error');
+                return;
+            }
+            
+            if (!document.getElementById('terms-checkbox').checked) {
+                showToast('Acepta los términos de uso', 'warning');
+                return;
+            }
+
+            try {
+                // Generar licencia para el producto gratis
+                for (const item of cart) {
+                    const userCode = 'USER_' + Math.random().toString(36).substring(2, 8).toUpperCase();
+                    const key = Array.from({length: 24}, () => 
+                        'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'[Math.floor(Math.random() * 36)]
+                    ).join('');
+
+                    const licenseData = {
+                        discord_id: currentUser.id,
+                        username: currentUser.username,
+                        product_id: item.id,
+                        product_name: item.name,
+                        user_code: userCode,
+                        key: key,
+                        created_at: firebase.firestore.FieldValue.serverTimestamp(),
+                        status: 'active'
+                    };
+
+                    await db.collection("Licencias").add(licenseData);
+                }
+
+                // Vaciar carrito
+                cart = [];
+                localStorage.removeItem('papeleta_cart');
+                
+                showToast('¡Producto reclamado exitosamente!', 'success');
+                
+                setTimeout(() => {
+                    window.location.href = 'AreaCliente.html';
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error al reclamar: ' + error.message, 'error');
+            }
         }
 
         function removeFromCart(productId) {
@@ -573,6 +706,9 @@
 
         // ========== INICIALIZACIÓN ==========
         document.addEventListener('DOMContentLoaded', () => {
+            // Crear partículas animadas
+            createParticles();
+            
             const savedToken = localStorage.getItem('dc_access_token');
             if (savedToken) {
                 fetch('https://discord.com/api/users/@me', { headers: { 'Authorization': `Bearer ${savedToken}` }})
