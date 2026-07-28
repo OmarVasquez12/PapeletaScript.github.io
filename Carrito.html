@@ -13,16 +13,16 @@
     <style>
         :root { --bg-body: #050507; --primary: #ff1a1a; --border-color: rgba(255, 26, 26, 0.15); }
         
-        /* FONDO DEGRADADO NEGRO/ROJO COMO EN LA IMAGEN */
+        /* FONDO NEGRO/ROJO CON PARTÍCULAS BRILLANTES */
         body { 
-            background: radial-gradient(ellipse at center, #1a0505 0%, #0a0505 50%, #050507 100%);
+            background: #050507;
             color: #f3f4f6; 
             font-family: 'Segoe UI', system-ui, sans-serif;
             position: relative;
             overflow-x: hidden;
         }
         
-        /* PUNTOS DECORATIVOS DE FONDO */
+        /* Capa base degradada */
         body::before {
             content: '';
             position: fixed;
@@ -30,11 +30,46 @@
             left: 0;
             width: 100%;
             height: 100%;
+            background: radial-gradient(ellipse at center, #1a0505 0%, #0a0505 50%, #050507 100%);
+            pointer-events: none;
+            z-index: -2;
+        }
+        
+        /* Partículas brillantes dispersas */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background-image: 
-                radial-gradient(circle at 20% 30%, rgba(255, 26, 26, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(220, 38, 38, 0.1) 0%, transparent 50%);
+                radial-gradient(2px 2px at 20px 30px, rgba(255, 26, 26, 0.8), transparent),
+                radial-gradient(2px 2px at 40px 70px, rgba(255, 100, 100, 0.6), transparent),
+                radial-gradient(1px 1px at 90px 40px, rgba(255, 26, 26, 0.7), transparent),
+                radial-gradient(2px 2px at 160px 120px, rgba(255, 80, 80, 0.5), transparent),
+                radial-gradient(1px 1px at 230px 80px, rgba(255, 26, 26, 0.6), transparent),
+                radial-gradient(2px 2px at 300px 150px, rgba(255, 120, 120, 0.4), transparent),
+                radial-gradient(1px 1px at 350px 200px, rgba(255, 26, 26, 0.7), transparent),
+                radial-gradient(2px 2px at 420px 90px, rgba(255, 60, 60, 0.6), transparent),
+                radial-gradient(1px 1px at 500px 180px, rgba(255, 26, 26, 0.5), transparent),
+                radial-gradient(2px 2px at 580px 140px, rgba(255, 100, 100, 0.7), transparent),
+                radial-gradient(1px 1px at 650px 220px, rgba(255, 26, 26, 0.6), transparent),
+                radial-gradient(2px 2px at 720px 110px, rgba(255, 80, 80, 0.5), transparent),
+                radial-gradient(1px 1px at 800px 190px, rgba(255, 26, 26, 0.8), transparent),
+                radial-gradient(2px 2px at 880px 160px, rgba(255, 120, 120, 0.4), transparent),
+                radial-gradient(1px 1px at 950px 240px, rgba(255, 26, 26, 0.6), transparent);
+            background-repeat: repeat;
+            background-size: 1000px 300px;
             pointer-events: none;
             z-index: -1;
+            animation: particlesFloat 20s linear infinite;
+        }
+        
+        @keyframes particlesFloat {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
         }
         
         .red-glow { text-shadow: 0 0 18px rgba(255, 26, 26, 0.85); }
@@ -129,7 +164,6 @@
             font-size: 20px;
         }
         
-        /* Animación para items eliminados */
         @keyframes fadeOutItem {
             from { opacity: 1; transform: translateX(0); }
             to { opacity: 0; transform: translateX(-20px); }
@@ -309,7 +343,6 @@
         function listenForOrderChanges() {
             if (!currentUser) return;
             
-            // Escuchar cambios en la colección Compra para este usuario
             pendingOrderUnsubscribe = db.collection("Compra")
                 .where("discord_id", "==", currentUser.id)
                 .orderBy("date", "desc")
@@ -317,20 +350,14 @@
                 .onSnapshot((snapshot) => {
                     snapshot.docChanges().forEach((change) => {
                         if (change.type === "removed") {
-                            // ✅ LA ORDEN FUE ELIMINADA (Aprobada o Rechazada)
                             console.log("Orden eliminada - Vaciar carrito");
                             
-                            // Vaciar carrito automáticamente
                             cart = [];
                             localStorage.removeItem('papeleta_cart');
                             
-                            // Actualizar UI
                             renderCart();
-                            
-                            // Mostrar notificación
                             showToast(' Tu carrito ha sido vaciado automáticamente', 'success');
                             
-                            // Recargar después de 2 segundos para ver los nuevos productos
                             setTimeout(() => {
                                 window.location.reload();
                             }, 2000);
@@ -343,7 +370,6 @@
         async function checkUserStatus() {
             if (!currentUser) return;
             
-            // 1. Verificar productos que ya posee
             const licensesSnapshot = await db.collection("Licencias")
                 .where("discord_id", "==", currentUser.id)
                 .where("status", "==", "active")
@@ -354,9 +380,7 @@
                 ownedProducts.add(data.product_id);
             });
 
-            // 2. Iniciar listener en tiempo real para órdenes
             listenForOrderChanges();
-
             renderCart();
         }
 
@@ -364,18 +388,12 @@
         function renderCart() {
             const container = document.getElementById('cart-items-container');
             
+            // ✅ SI NO HAY NADA EN EL CARRITO - MOSTRAR TOAST Y REDIRECCIONAR
             if (cart.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-16 bg-[#150a0a] border border-red-900/30 rounded-2xl">
-                        <i class="fas fa-shopping-cart text-gray-600 text-5xl mb-4"></i>
-                        <h3 class="text-white text-xl font-bold mb-2">Tu carrito está vacío</h3>
-                        <p class="text-gray-400 mb-6">Agrega productos para comenzar</p>
-                        <a href="index.html" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-xl transition-all inline-flex items-center gap-2">
-                            <i class="fas fa-arrow-left"></i> Volver a la Tienda
-                        </a>
-                    </div>
-                `;
-                updateTotals();
+                showToast(' Ve a la tienda y añade algo', 'warning');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 3000);
                 return;
             }
 
@@ -493,14 +511,12 @@
                 return;
             }
 
-            // ✅ VERIFICAR SI YA TIENE ALGUNO DE LOS PRODUCTOS
             const alreadyOwnedItems = cart.filter(item => ownedProducts.has(item.id));
             if (alreadyOwnedItems.length > 0) {
-                showToast(' Ya tienes algunos productos en el carrito. Elimínalos para continuar.', 'error');
+                showToast('️ Ya tienes algunos productos en el carrito. Elimínalos para continuar.', 'error');
                 return;
             }
 
-            // ✅ VERIFICAR ORDEN PENDIENTE
             const pendingQuery = await db.collection("Compra")
                 .where("discord_id", "==", currentUser.id)
                 .where("status", "==", "pending_approval")
@@ -574,7 +590,6 @@
                 showToast('Debes iniciar sesión para completar la compra', 'warning');
             }
             
-            // Limpiar listener al salir de la página
             window.addEventListener('beforeunload', () => {
                 if (pendingOrderUnsubscribe) {
                     pendingOrderUnsubscribe();
