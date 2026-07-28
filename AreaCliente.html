@@ -679,11 +679,25 @@
 
         // ✅ FUNCIÓN CORREGIDA: GUARDAR IP/PUERTO EN TODAS LAS LICENCIAS DEL USUARIO
         async function saveServerConfig() {
-    const ip = document.getElementById('server-ip').value.trim();
-    const port = document.getElementById('server-port').value.trim();
+    const ipInput = document.getElementById('server-ip');
+    const portInput = document.getElementById('server-port');
     
-    console.log("Intentando guardar:", { ip, port, currentUser });
+    // Validación de existencia de inputs
+    if (!ipInput || !portInput) {
+        console.error("No se encontraron los campos de IP/Puerto");
+        return;
+    }
+
+    const ip = ipInput.value.trim();
+    const port = portInput.value.trim();
     
+    console.log("🔍 Debug SaveConfig:", { 
+        ip, 
+        port, 
+        userExists: !!currentUser, 
+        userId: currentUser?.id 
+    });
+
     if (!ip || !port) {
         showToast('Por favor ingresa IP y Puerto válidos', 'warning');
         return;
@@ -693,64 +707,89 @@
         showToast('Formato inválido. Ej: 192.168.1.1 y 22003', 'error');
         return;
     }
-    
-    if (!currentUser) {
-        showToast('Debes iniciar sesión primero', 'error');
-        console.error("Usuario no autenticado");
+
+    // Protección crítica: Verificar que el usuario esté cargado
+    if (!currentUser || !currentUser.id) {
+        showToast('⚠️ Error de sesión. Por favor recarga la página e inicia sesión de nuevo.', 'error');
+        console.error("Usuario no autenticado o ID faltante");
         return;
     }
     
     try {
+        // 1. Guardar localmente siempre (fallback)
         localStorage.setItem('server_config', JSON.stringify({ ip, port }));
         
+        // 2. Buscar licencias activas
         const licenseSnapshot = await db.collection("Licencias")
             .where("discord_id", "==", currentUser.id)
             .where("status", "==", "active")
             .get();
         
-        console.log("Licencias encontradas:", licenseSnapshot.size);
+        console.log(`📦 Licencias encontradas: ${licenseSnapshot.size}`);
         
         if (!licenseSnapshot.empty) {
+            // Actualizar todas las licencias existentes
             const batch = db.batch();
+            let count = 0;
+            
             licenseSnapshot.forEach((doc) => {
-                console.log("Actualizando doc:", doc.id);
                 batch.update(doc.ref, {
                     ip: ip,
                     port: port,
                     updated_at: firebase.firestore.FieldValue.serverTimestamp()
                 });
+                count++;
             });
             
             await batch.commit();
-            console.log("✅ Guardado exitoso");
+            console.log(`✅ Batch completado: ${count} documentos actualizados`);
+            
         } else {
-            console.log("Creando nueva licencia de configuración");
+            // Crear licencia de configuración si no tiene ninguna
+            console.log("➕ Creando nueva licencia de configuración...");
             await db.collection("Licencias").add({
                 discord_id: currentUser.id,
-                username: currentUser.username,
+                username: currentUser.username || "Unknown",
                 ip: ip,
                 port: port,
                 status: 'pending_config',
                 type: 'server_config',
                 created_at: firebase.firestore.FieldValue.serverTimestamp()
             });
+            console.log("✅ Nueva licencia creada");
         }
         
+        // Feedback visual exitoso
         const btn = event.currentTarget;
-        const original = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-check"></i> Guardado en Firebase';
-        btn.classList.add('bg-green-600');
-        
-        setTimeout(() => {
-            btn.innerHTML = original;
-            btn.classList.remove('bg-green-600');
-        }, 2000);
+        if (btn) {
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Guardado';
+            btn.classList.add('bg-green-600');
+            
+            setTimeout(() => {
+                btn.innerHTML = original;
+                btn.classList.remove('bg-green-600');
+            }, 2000);
+        }
         
         showToast('IP y Puerto guardados correctamente', 'success');
         
     } catch (error) {
-        console.error("❌ Error detallado:", error);
-        showToast('Error: ' + error.message, 'error');
+        // Captura detallada del error
+        console.error("❌ ERROR CRÍTICO EN SAVE:", error);
+        console.error("Stack:", error.stack);
+        
+        // Mensaje más descriptivo para el usuario
+        let errorMsg = 'Error al guardar';
+        if (error.code === 'permission-denied') {
+            errorMsg = 'Permiso denegado. Contacta al admin.';
+        } else if (error.code === 'unavailable') {
+            errorMsg = 'Sin conexión a Firebase.';
+        } else {
+            errorMsg = error.message.substring(0, 50);
+        }
+        
+        showToast(errorMsg, 'error');
     }
 }
 
