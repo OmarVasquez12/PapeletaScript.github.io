@@ -295,9 +295,10 @@
         let activeDiscount = null;
         let discountPercentage = 0;
         let ownedProducts = new Set();
+        let pendingOrderUnsubscribe = null;
         let isFreeProduct = false;
         let globalLicense = null;
-        let approvalListenerActive = false;
+        let approvalUnsubscribe = null;
 
         function createParticles() {
             const container = document.getElementById('particles-container');
@@ -344,10 +345,12 @@
             return String(str).replace(/[&<>'"]/g, tag => ({ '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;' }[tag] || tag));
         }
 
+        // ✅ FUNCIÓN MEJORADA: OBTENER O CREAR LICENCIA ÚNICA GLOBAL
         async function getGlobalLicense(userId) {
             if (globalLicense) return globalLicense;
             
             try {
+                // Buscar licencia tipo "general" existente
                 const snapshot = await db.collection("Licencias")
                     .where("discord_id", "==", userId)
                     .where("type", "==", "general")
@@ -360,6 +363,7 @@
                     return globalLicense;
                 }
 
+                // Crear nueva licencia global si no existe
                 const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
                 let key = '';
                 for (let i = 0; i < 24; i++) key += chars.charAt(Math.floor(Math.random() * chars.length));
@@ -387,54 +391,32 @@
             }
         }
 
-        // ✅ LISTENER CORREGIDO PARA DETECTAR APROBACIONES
+        // ✅ ESCUCHAR COMPRAS APROBADAS EN TIEMPO REAL
         function listenForApprovedOrders() {
-            if (!currentUser || approvalListenerActive) return;
+            if (!currentUser) return;
             
-            approvalListenerActive = true;
-            console.log("🔍 Iniciando listener de aprobaciones para:", currentUser.id);
-            
-            // Escuchar TODAS las compras del usuario
-            db.collection("Compra")
+            approvalUnsubscribe = db.collection("Compra")
                 .where("discord_id", "==", currentUser.id)
+                .where("status", "==", "approved")
                 .orderBy("date", "desc")
-                .limit(5)
+                .limit(1)
                 .onSnapshot((snapshot) => {
-                    console.log("📦 Snapshot de compras recibido:", snapshot.docs.length);
-                    
-                    snapshot.forEach((doc) => {
-                        const data = doc.data();
-                        console.log("Compra encontrada:", data.status, data.order_id);
-                        
-                        // Si encuentra una compra aprobada
-                        if (data.status === "approved") {
-                            console.log("✅ ¡COMPRA APROBADA DETECTADA!");
-                            handleApprovedOrder();
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === "added") {
+                            console.log("✅ Compra aprobada detectada");
+                            showToast('🎉 ¡Tu compra ha sido aprobada! Redirigiendo...', 'success');
+                            
+                            // Vaciar carrito
+                            cart = [];
+                            localStorage.removeItem('papeleta_cart');
+                            
+                            // Redirigir a AreaCliente.html después de 2 segundos
+                            setTimeout(() => {
+                                window.location.href = 'AreaCliente.html';
+                            }, 2000);
                         }
                     });
-                }, (error) => {
-                    console.error("❌ Error en listener:", error);
-                    approvalListenerActive = false;
                 });
-        }
-
-        function handleApprovedOrder() {
-            console.log("🎉 Procesando compra aprobada...");
-            
-            // Mostrar notificación
-            showToast('🎉 ¡Tu compra ha sido aprobada! Vaciando carrito y redirigiendo...', 'success');
-            
-            // Vaciar carrito inmediatamente
-            cart = [];
-            localStorage.removeItem('papeleta_cart');
-            
-            // Actualizar UI
-            renderCart();
-            
-            // Redirigir después de 2.5 segundos
-            setTimeout(() => {
-                window.location.href = 'AreaCliente.html';
-            }, 2500);
         }
 
         async function checkUserStatus() {
@@ -446,12 +428,8 @@
             licensesSnapshot.forEach(doc => { ownedProducts.add(doc.data().product_id); });
             
             await getGlobalLicense(currentUser.id);
+            listenForApprovedOrders(); // ✅ Iniciar listener de aprobaciones
             renderCart();
-            
-            // Iniciar listener después de renderizar
-            setTimeout(() => {
-                listenForApprovedOrders();
-            }, 1000);
         }
 
         function renderCart() {
@@ -460,13 +438,7 @@
             const claimSection = document.getElementById('claim-section');
             
             if (cart.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5">
-                        <i class="fas fa-shopping-cart text-gray-600 text-5xl mb-4"></i>
-                        <p class="text-gray-400 text-lg">Tu carrito está vacío</p>
-                        <p class="text-gray-500 text-sm mt-2">Redirigiendo a la tienda...</p>
-                    </div>
-                `;
+                showToast(' Ve a la tienda y añade algo', 'warning');
                 setTimeout(() => { window.location.href = 'index.html'; }, 3000);
                 return;
             }
@@ -532,6 +504,7 @@
             document.getElementById('login-warning').classList.toggle('hidden', !!currentUser);
         }
 
+        // ✅ VALIDAR CUPÓN CON USO ÚNICO POR USUARIO
         async function validateAndApplyDiscount() {
             const code = document.getElementById('discount-code-input').value.trim().toUpperCase();
             if (!code) { showToast('Ingresa un código', 'warning'); return; }
@@ -544,6 +517,7 @@
                 const discountData = discountDoc.data();
                 if (!discountData.active) { showToast('Este código ha expirado', 'error'); return; }
                 
+                // ✅ VERIFICAR SI EL USUARIO YA USÓ ESTE CUPÓN
                 const usedByUser = await db.collection("DiscountUsage")
                     .where("code", "==", code)
                     .where("userId", "==", currentUser.id)
@@ -609,6 +583,7 @@
             try {
                 await db.collection("Compra").add(orderData);
                 
+                // ✅ REGISTRAR USO DEL CUPÓN
                 if (activeDiscount) {
                     await db.collection("DiscountUsage").add({
                         code: activeDiscount,
@@ -653,7 +628,7 @@
 
                 cart = [];
                 localStorage.removeItem('papeleta_cart');
-                showToast('🎉 ¡Producto reclamado exitosamente!', 'success');
+                showToast('🎉 ¡Producto reclamado exitosamente con tu licencia global!', 'success');
                 setTimeout(() => { window.location.href = 'AreaCliente.html'; }, 2000);
             } catch (error) {
                 console.error('Error:', error);
@@ -666,20 +641,16 @@
             const savedToken = localStorage.getItem('dc_access_token');
             if (savedToken) {
                 fetch('https://discord.com/api/users/@me', { headers: { 'Authorization': `Bearer ${savedToken}` }})
-                .then(res => res.json()).then(user => { 
-                    currentUser = user; 
-                    console.log("Usuario logueado:", user.id, user.username);
-                    checkUserStatus(); 
-                })
-                .catch((err) => { 
-                    console.error("Error autenticando:", err);
-                    renderCart(); 
-                    showToast('Debes iniciar sesión para completar la compra', 'warning'); 
-                });
+                .then(res => res.json()).then(user => { currentUser = user; checkUserStatus(); })
+                .catch(() => { renderCart(); showToast('Debes iniciar sesión para completar la compra', 'warning'); });
             } else {
                 renderCart();
                 showToast('Debes iniciar sesión para completar la compra', 'warning');
             }
+            window.addEventListener('beforeunload', () => { 
+                if (pendingOrderUnsubscribe) pendingOrderUnsubscribe();
+                if (approvalUnsubscribe) approvalUnsubscribe();
+            });
         });
     </script>
 </body>
