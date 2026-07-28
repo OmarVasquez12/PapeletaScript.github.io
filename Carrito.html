@@ -580,8 +580,7 @@ function listenForOrderChanges() {
             }
         }
 
-        // ✅ PROCESAR PAGO CON DISCORD - SOLO USA LICENCIA EXISTENTE
-        // ✅ PROCESAR PAGO CON DISCORD - SIN REDIRECCIÓN A DISCORD
+// ✅ PROCESAR PAGO CON DISCORD - SOLO USA LICENCIA EXISTENTE
 async function processDiscordPayment() {
     const subtotal = cart.reduce((sum, item) => sum + Number(item.price), 0);
     let total = subtotal;
@@ -604,12 +603,8 @@ async function processDiscordPayment() {
     };
     try {
         await db.collection("Compra").add(orderData);
-        showToast('✅ Solicitud enviada correctamente. Espera la aprobación del admin.', 'success');
-        
-        // ✅ Redirigir al Área de Cliente en lugar de Discord
-        setTimeout(() => { 
-            window.location.href = 'AreaCliente.html'; 
-        }, 2500);
+        showToast('✅ Solicitud enviada correctamente. Serás redirigido a Discord...', 'success');
+        setTimeout(() => { window.location.href = DISCORD_INVITE_LINK; }, 2000);
     } catch (error) {
         console.error('Error:', error);
         showToast('Error al procesar: ' + error.message, 'error');
