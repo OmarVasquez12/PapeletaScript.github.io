@@ -438,7 +438,7 @@
 
     <div id="toast-container" class="toast-container"></div>
 
-       <script>
+    <script>
         // =============================================
         //          FIREBASE CONFIGURACIÓN (COMPAT)
         // =============================================
@@ -454,7 +454,6 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        let licensesData = [];
         let currentUser = null;
         let currentUserRole = 'client';
         let allProducts = [];
@@ -614,7 +613,7 @@
         });
 
         // =============================================
-        //          GESTIÓN DE LICENCIAS
+        //          GESTIÓN DE LICENCIAS GLOBALES
         // =============================================
 
         function generateUniqueKey() {
@@ -627,6 +626,7 @@
         async function ensureFixedLicense() {
             if (!currentUser) return;
             try {
+                // Buscamos SOLO la licencia maestra tipo "general"
                 const snapshot = await db.collection("Licencias")
                     .where("discord_id", "==", currentUser.id)
                     .where("type", "==", "general")
@@ -635,12 +635,16 @@
                 if (!snapshot.empty) {
                     userFixedLicenseKey = snapshot.docs[0].data().key;
                 } else {
+                    // Si no existe, creamos UNA SOLA vez la licencia global
                     const newKey = generateUniqueKey();
+                    const newUser = 'USER_' + Math.random().toString(36).substring(2, 8).toUpperCase();
+                    
                     await db.collection("Licencias").add({
                         discord_id: currentUser.id, 
                         username: currentUser.username, 
-                        key: newKey, 
-                        type: "general",
+                        key: newKey,
+                        user_code: newUser,
+                        type: "general", // Etiqueta para identificarla como la única
                         created_at: firebase.firestore.FieldValue.serverTimestamp(), 
                         status: 'active'
                     });
@@ -654,9 +658,10 @@
             const codeBlock = document.getElementById('license-code');
             if (!currentUser || !codeBlock) return;
 
+            // Mostramos SIEMPRE la licencia GLOBAL (type: general)
             db.collection("Licencias")
               .where("discord_id", "==", currentUser.id)
-              .where("status", "==", "active")
+              .where("type", "==", "general")
               .limit(1)
               .get()
               .then(snapshot => {
@@ -672,7 +677,7 @@
               });
         }
 
-        // ✅ FUNCIÓN CORREGIDA: GUARDAR IP/PUERTO EN FIREBASE
+        // ✅ FUNCIÓN CORREGIDA: GUARDAR IP/PUERTO EN TODAS LAS LICENCIAS DEL USUARIO
         async function saveServerConfig() {
             const ip = document.getElementById('server-ip').value.trim();
             const port = document.getElementById('server-port').value.trim();
@@ -766,9 +771,9 @@
             }
 
             try {
-                showToast('⏳ Vinculando licencia con tu servidor...', 'success', 'Procesando');
+                showToast(' Vinculando licencia con tu servidor...', 'success', 'Procesando');
                 
-                // Buscar la licencia específica de ESTE producto
+                // Buscar la licencia específica de ESTE producto O la global
                 let licenseRef = null;
                 const licenseSnapshot = await db.collection("Licencias")
                     .where("discord_id", "==", currentUser.id)
@@ -780,9 +785,10 @@
                 if (!licenseSnapshot.empty) {
                     licenseRef = licenseSnapshot.docs[0].ref;
                 } else {
-                    // Fallback: buscar cualquier licencia activa del usuario
+                    // Fallback: buscar la licencia GLOBAL del usuario
                     const generalSnapshot = await db.collection("Licencias")
                         .where("discord_id", "==", currentUser.id)
+                        .where("type", "==", "general")
                         .where("status", "==", "active")
                         .limit(1)
                         .get();
@@ -1270,7 +1276,7 @@
                 username: "Sistema de Soporte",
                 avatar_url: "https://papeleta-script-github-io.vercel.app/files/999.png",
                 embeds: [{
-                    title: "🎫 Nuevo Ticket de Soporte",
+                    title: " Nuevo Ticket de Soporte",
                     description: `**Asunto:** ${subject}\n**Descripción:** ${description}`,
                     color: 16711680,
                     fields: [
