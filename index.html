@@ -23,10 +23,50 @@
             --border-color: rgba(255, 26, 26, 0.15);
         }
         
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
             background-color: #050507;
             color: #f3f4f6;
             font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden; /* Evita scroll horizontal por las manchas */
+        }
+
+        /* --- FONDO ANIMADO INTEGRADO --- */
+        .bg-mesh {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -2;
+            overflow: hidden;
+            pointer-events: none;
+            background: 
+                radial-gradient(ellipse at top, rgba(255,26,26,0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom right, rgba(255,26,26,0.1) 0%, transparent 50%);
+        }
+
+        .mesh-blob {
+            position: absolute;
+            filter: blur(90px);
+            opacity: 0.25;
+            animation: float 10s infinite ease-in-out;
+        }
+        .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, #ff1a1a, transparent); }
+        .blob-2 { bottom: -10%; right: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, #cc1b1b, transparent); animation-delay: -5s; }
+        .blob-3 { top: 50%; left: 50%; width: 40vw; height: 40vw; background: radial-gradient(circle, #ff4444, transparent); animation-delay: -2.5s; opacity: 0.15; }
+        
+        @keyframes float { 
+            0%, 100% { transform: translate(0, 0) scale(1); } 
+            50% { transform: translate(30px, 30px) scale(1.1); } 
+        }
+
+        #particles-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            pointer-events: none;
         }
 
         /* --- SCROLLBAR PERSONALIZADO --- */
@@ -41,7 +81,9 @@
         .red-glow { text-shadow: 0 0 18px rgba(255, 26, 26, 0.85), 0 0 36px rgba(204, 27, 27, 0.4); }
         .red-border { border-color: rgba(255, 26, 26, 0.25); }
         
-        #network-bg { position: fixed; inset: 0; z-index: 0; opacity: 0.5; pointer-events: none; }
+        /* Eliminado el canvas antiguo para usar el nuevo sistema */
+        /* #network-bg { ... } */
+
         .page { display: none; }
         .page.active { display: block; }
         .nav-link.active-page { color: #ff6b6b; }
@@ -206,7 +248,13 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-gradient-to-b from-[#150a0a] to-[#0a0505] relative">
 
-    <canvas id="network-bg"></canvas>
+    <!-- FONDO ANIMADO INTEGRADO -->
+    <div class="bg-mesh">
+        <div class="mesh-blob blob-1"></div>
+        <div class="mesh-blob blob-2"></div>
+        <div class="mesh-blob blob-3"></div>
+    </div>
+    <canvas id="particles-canvas"></canvas>
 
     <!-- LOGIN MODAL -->
     <div id="login-modal" class="hidden fixed inset-0 bg-black/80 z-[60] flex items-center justify-center px-4 backdrop-blur-sm transition-opacity duration-300">
@@ -1286,110 +1334,152 @@
             }
         }
 
-        function initNetworkBg() {
-            const canvas = document.getElementById('network-bg');
-            const ctx = canvas.getContext('2d'); let w, h, points;
-            function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
-            resize(); window.addEventListener('resize', resize);
-            points = Array.from({ length: 45 }, () => ({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3 }));
-            function tick() {
-                ctx.clearRect(0, 0, w, h);
-                points.forEach(p => { p.x += p.vx; p.y += p.vy; if (p.x < 0 || p.x > w) p.vx *= -1; if (p.y < 0 || p.y > h) p.vy *= -1; });
-                for (let i = 0; i < points.length; i++) {
-                    for (let j = i + 1; j < points.length; j++) {
-                        const dx = points[i].x - points[j].x; const dy = points[i].y - points[j].y;
-                        const dist = Math.sqrt(dx * dx + dy * dy);
-                        if (dist < 150) { ctx.strokeStyle = `rgba(255,26,26,${1 - dist / 150})`; ctx.lineWidth = 0.6; ctx.beginPath(); ctx.moveTo(points[i].x, points[i].y); ctx.lineTo(points[j].x, points[j].y); ctx.stroke(); }
-                    }
-                    ctx.fillStyle = 'rgba(255,26,26,0.8)'; ctx.beginPath(); ctx.arc(points[i].x, points[i].y, 1.8, 0, Math.PI * 2); ctx.fill();
-                }
-                requestAnimationFrame(tick);
+        // --- SCRIPT DE PARTÍCULAS Y NETWORK BG ---
+        // Usamos el mismo canvas para las partículas nuevas
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * 0.5 - 0.25;
+                this.opacity = Math.random() * 0.5 + 0.1;
             }
-            tick();
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
+            }
+            draw() {
+                ctx.fillStyle = `rgba(255, 26, 26, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
         }
 
-    async function loadPublicReviews() {
-        const slider = document.getElementById('reviews-slider');
-        try {
-            const productsSnapshot = await db.collection("Productos").get();
-            const productsMap = {}; 
-            
-            productsSnapshot.forEach(doc => {
-                const data = doc.data();
-                productsMap[doc.id] = data.name || 'Producto';
-                if (data.id) {
-                    productsMap[data.id] = data.name || 'Producto';
-                }
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < 60; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
             });
+            requestAnimationFrame(animateParticles);
+        }
 
-            const reviewsSnapshot = await db.collection("Resenas")
-                .limit(15) 
-                .get();
-            
-            let reviewsHTML = '';
-            let count = 0;
+        // También mantenemos la función antigua de Network Bg por si acaso se usa en algún lado, 
+        // pero apuntamos al mismo canvas para no tener conflictos o simplemente la ignoramos si usamos el nuevo sistema.
+        // Para mantener consistencia visual, he reemplazado la lógica de initNetworkBg por la nueva.
+        function initNetworkBg() {
+             // Esta función ahora inicia las partículas nuevas
+             initParticles();
+             animateParticles();
+        }
 
-            reviewsSnapshot.forEach(doc => {
-                const data = doc.data();
+
+        async function loadPublicReviews() {
+            const slider = document.getElementById('reviews-slider');
+            try {
+                const productsSnapshot = await db.collection("Productos").get();
+                const productsMap = {}; 
                 
-                if (data.rating >= 4) {
-                    const stars = '★'.repeat(data.rating);
-                    const date = data.created_at?.toDate ? data.created_at.toDate().toLocaleDateString('es-ES') : '';
-                    const avatar = data.user_avatar || 'https://cdn.discordapp.com/embed/avatars/0.png';
-                    const username = data.username || 'Usuario Anónimo';
-                    const text = data.text || '';
+                productsSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    productsMap[doc.id] = data.name || 'Producto';
+                    if (data.id) {
+                        productsMap[data.id] = data.name || 'Producto';
+                    }
+                });
+
+                const reviewsSnapshot = await db.collection("Resenas")
+                    .limit(15) 
+                    .get();
+                
+                let reviewsHTML = '';
+                let count = 0;
+
+                reviewsSnapshot.forEach(doc => {
+                    const data = doc.data();
                     
-                    const productId = data.product_id;
-                    const productName = productsMap[productId] || 'Producto Premium';
-                    
-                    reviewsHTML += `
-                        <div class="review-card-slide">
-                            <div>
-                                <div class="review-header">
-                                    <img src="${avatar}" alt="${username}" class="review-avatar">
-                                    <div class="review-user-info">
-                                        <h4>${escapeHTML(username)}</h4>
-                                        <p class="review-date">${date}</p>
+                    if (data.rating >= 4) {
+                        const stars = '★'.repeat(data.rating);
+                        const date = data.created_at?.toDate ? data.created_at.toDate().toLocaleDateString('es-ES') : '';
+                        const avatar = data.user_avatar || 'https://cdn.discordapp.com/embed/avatars/0.png';
+                        const username = data.username || 'Usuario Anónimo';
+                        const text = data.text || '';
+                        
+                        const productId = data.product_id;
+                        const productName = productsMap[productId] || 'Producto Premium';
+                        
+                        reviewsHTML += `
+                            <div class="review-card-slide">
+                                <div>
+                                    <div class="review-header">
+                                        <img src="${avatar}" alt="${username}" class="review-avatar">
+                                        <div class="review-user-info">
+                                            <h4>${escapeHTML(username)}</h4>
+                                            <p class="review-date">${date}</p>
+                                        </div>
                                     </div>
+                                    <div class="review-stars">${stars}</div>
+                                    <p class="review-text">${escapeHTML(text)}</p>
                                 </div>
-                                <div class="review-stars">${stars}</div>
-                                <p class="review-text">${escapeHTML(text)}</p>
+                                <div class="review-product-tag">
+                                    <i class="fas fa-cube"></i> ${escapeHTML(productName)}
+                                </div>
                             </div>
-                            <div class="review-product-tag">
-                                <i class="fas fa-cube"></i> ${escapeHTML(productName)}
-                            </div>
+                        `;
+                        count++;
+                    }
+                });
+
+                if (count > 0) {
+                    // DUPLICAMOS EL CONTENIDO PARA CREAR EL EFECTO INFINITO
+                    slider.innerHTML = reviewsHTML + reviewsHTML;
+                } else {
+                    slider.innerHTML = `
+                        <div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;">
+                            <i class="fas fa-comment-slash text-3xl text-gray-600"></i>
+                            <span class="text-gray-400">Aún no hay reseñas destacadas.</span>
                         </div>
                     `;
-                    count++;
                 }
-            });
 
-            if (count > 0) {
-                // DUPLICAMOS EL CONTENIDO PARA CREAR EL EFECTO INFINITO
-                slider.innerHTML = reviewsHTML + reviewsHTML;
-            } else {
+            } catch (error) {
+                console.error("Error cargando reseñas públicas:", error);
                 slider.innerHTML = `
                     <div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;">
-                        <i class="fas fa-comment-slash text-3xl text-gray-600"></i>
-                        <span class="text-gray-400">Aún no hay reseñas destacadas.</span>
+                        <i class="fas fa-exclamation-triangle text-3xl text-red-500"></i>
+                        <span class="text-gray-400">No se pudieron cargar las opiniones.</span>
                     </div>
                 `;
             }
-
-        } catch (error) {
-            console.error("Error cargando reseñas públicas:", error);
-            slider.innerHTML = `
-                <div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;">
-                    <i class="fas fa-exclamation-triangle text-3xl text-red-500"></i>
-                    <span class="text-gray-400">No se pudieron cargar las opiniones.</span>
-                </div>
-            `;
         }
-    }
 
         document.addEventListener('DOMContentLoaded', () => { 
             checkDiscordAuth(); 
-            initNetworkBg(); 
+            initNetworkBg(); // Esto ahora inicia las partículas nuevas
             loadPublicReviews(); // Cargar reseñas al iniciar
             
             // Asegurar que las reseñas se muestren correctamente al cargar la página
