@@ -263,8 +263,20 @@
                             <h2 class="text-lg font-bold text-white">Configuración MTA</h2>
                         </div>
                         <div class="space-y-4 mb-6">
-                            <div><label class="block text-gray-400 text-xs uppercase font-semibold mb-2 tracking-wider">Server IP</label><input type="text" id="server-ip" value="213.181.88.154" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none font-mono text-sm"></div>
-                            <div><label class="block text-gray-400 text-xs uppercase font-semibold mb-2 tracking-wider">Puerto</label><input type="text" id="server-port" value="22003" class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none font-mono text-sm"></div>
+                            <div>
+                                <label class="block text-gray-400 text-xs uppercase font-semibold mb-2 tracking-wider">Server IP</label>
+                                <input type="text" id="server-ip" value="0.0.0" 
+                                       onfocus="if(this.value==='0.0.0') this.value=''" 
+                                       onblur="if(this.value.trim()==='') this.value='0.0.0'"
+                                       class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none font-mono text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-gray-400 text-xs uppercase font-semibold mb-2 tracking-wider">Puerto</label>
+                                <input type="text" id="server-port" value="0" 
+                                       onfocus="if(this.value==='0') this.value=''" 
+                                       onblur="if(this.value.trim()==='') this.value='0'"
+                                       class="input-field w-full px-4 py-3 rounded-lg text-white focus:outline-none font-mono text-sm">
+                            </div>
                         </div>
                         <div class="mb-6">
                             <div class="flex items-center justify-between mb-2">
@@ -569,16 +581,17 @@
             
             checkDiscordAuth();
             
+            // Cargar config guardada localmente (sin sobrescribir los placeholders por defecto)
             const saved = JSON.parse(localStorage.getItem('server_config') || '{}');
-            if (saved.ip) document.getElementById('server-ip').value = saved.ip;
-            if (saved.port) document.getElementById('server-port').value = saved.port;
+            if (saved.ip && saved.ip !== '0.0.0') document.getElementById('server-ip').value = saved.ip;
+            if (saved.port && saved.port !== '0') document.getElementById('server-port').value = saved.port;
         });
 
         function generateUniqueKey() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; 
             let code = '';
             for (let i = 0; i < 16; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
-            return `PAPELETA(${code})`; 
+            return code; 
         }
 
         async function ensureFixedLicense() {
@@ -593,7 +606,7 @@
                     userFixedLicenseKey = snapshot.docs[0].data().key;
                 } else {
                     const newKey = generateUniqueKey();
-                    const newUser = 'USER_' + Math.random().toString(36).substring(2, 8).toUpperCase();
+                    const newUser = generateUniqueKey();
                     
                     await db.collection("Licencias").add({
                         discord_id: currentUser.id, 
@@ -622,7 +635,8 @@
               .then(snapshot => {
                   if (!snapshot.empty) {
                       const license = snapshot.docs[0].data();
-                      codeBlock.textContent = `configLicense = {\n    ["User"] = "${license.user_code || 'PENDIENTE'}", \n    ["Key"] = "${license.key}"\n}`;
+                      // ✅ NUEVO FORMATO: PAPELETA [CODIGO]
+                      codeBlock.textContent = `configLicense = {\n    ["User"] = "PAPELETA [${license.user_code || ''}]", \n    ["Key"] = "PAPELETA [${license.key || ''}"]\n}`;
                   } else {
                       codeBlock.textContent = "No tienes licencias activas aún.";
                   }
@@ -643,8 +657,8 @@
             
             console.log("🔍 Debug SaveConfig:", { ip, port, userExists: !!currentUser, userId: currentUser?.id });
 
-            if (!ip || !port) {
-                showToast('Por favor ingresa IP y Puerto válidos', 'warning');
+            if (!ip || !port || ip === '0.0.0' || port === '0') {
+                showToast('Por favor ingresa una IP y Puerto válidos de tu servidor MTA', 'warning');
                 return;
             }
             
@@ -728,7 +742,7 @@
             const ip = document.getElementById('server-ip').value.trim();
             const port = document.getElementById('server-port').value.trim();
             
-            if (!ip || !port) {
+            if (!ip || !port || ip === '0.0.0' || port === '0') {
                 showToast('Debes configurar tu IP y Puerto antes de descargar.', 'warning', 'Configuración Requerida');
                 document.getElementById('server-ip').focus();
                 return;
@@ -856,7 +870,7 @@
 
                                         if (existingLicense.empty) {
                                             const newKey = generateUniqueKey();
-                                            const userCode = 'USER_' + Math.random().toString(36).substring(2, 8).toUpperCase();
+                                            const userCode = generateUniqueKey();
 
                                             await db.collection("Licencias").add({
                                                 discord_id: currentUser.id,
@@ -1257,7 +1271,7 @@
                         username: "Sistema de Soporte",
                         avatar_url: "https://papeleta-script-github-io.vercel.app/files/999.png",
                         embeds: [{
-                            title: "🔒 Ticket Cerrado",
+                            title: " Ticket Cerrado",
                             description: `El ticket \`${currentTicketId}\` ha sido cerrado.`,
                             color: 65280,
                             footer: { text: "Papeleta Store Support" },
