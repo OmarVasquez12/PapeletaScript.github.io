@@ -1169,7 +1169,7 @@ function listenForApprovedOrders() {
 async function loadDashboardData() {
     if (!currentUser) return;
     try {
-        // Cargar todos los productos disponibles para obtener nombres e imágenes
+        // Cargar todos los productos disponibles
         const productsSnapshot = await db.collection("Productos").get();
         allProducts = [];
         productsSnapshot.forEach((doc) => {
@@ -1177,48 +1177,44 @@ async function loadDashboardData() {
             allProducts.push({ docId: doc.id, id: data.id || doc.id, ...data });
         });
 
-        // OBTENER TODAS LAS LICENCIAS ACTIVAS DEL USUARIO
-        const licensesSnapshot = await db.collection("Licencias")
+        // ✅ CORRECCIÓN: Buscar en Clientes en lugar de Licencias
+        const clientsSnapshot = await db.collection("Clientes")
             .where("discord_id", "==", currentUser.id)
-            .where("status", "==", "active")
             .get();
 
         let purchasedProducts = [];
         let totalSpent = 0;
         const processedProductIds = new Set();
 
-        licensesSnapshot.forEach((doc) => {
-            const license = doc.data();
-            const productId = license.product_id;
+        clientsSnapshot.forEach((doc) => {
+            const clientData = doc.data();
+            const products = clientData.products || [];
             
-            // ⚠️ IMPORTANTE: Saltar licencias tipo "general" que no son productos comprables
-            if (license.type === "general" || !productId) {
-                return;
-            }
-            
-            if (processedProductIds.has(productId)) return;
-            processedProductIds.add(productId);
+            products.forEach(product => {
+                if (processedProductIds.has(product.id)) return;
+                processedProductIds.add(product.id);
 
-            const productData = allProducts.find(p => 
-                String(p.id) === String(productId) || 
-                String(p.docId) === String(productId)
-            );
-            
-            if (productData) {
-                purchasedProducts.push({ 
-                    ...productData, 
-                    licenseKey: license.key,
-                    userCode: license.user_code,
-                    purchaseDate: license.created_at?.toDate ? license.created_at.toDate() : new Date(),
-                    price: productData.price || 'Gratis'
-                });
+                const productData = allProducts.find(p => 
+                    String(p.id) === String(product.id) || 
+                    String(p.docId) === String(product.id)
+                );
                 
-                const rawPrice = String(productData.price).toLowerCase();
-                const numericPrice = parseFloat(rawPrice.replace('$', '').replace(',', ''));
-                if (!isNaN(numericPrice) && numericPrice > 0) {
-                    totalSpent += numericPrice;
+                if (productData) {
+                    purchasedProducts.push({ 
+                        ...productData, 
+                        licenseKey: clientData.license_key || 'N/A',
+                        userCode: clientData.license_user || 'N/A',
+                        purchaseDate: clientData.date?.toDate ? clientData.date.toDate() : new Date(),
+                        price: product.price || productData.price || 'Gratis'
+                    });
+                    
+                    const rawPrice = String(product.price || productData.price).toLowerCase();
+                    const numericPrice = parseFloat(rawPrice.replace('$', '').replace(',', ''));
+                    if (!isNaN(numericPrice) && numericPrice > 0) {
+                        totalSpent += numericPrice;
+                    }
                 }
-            }
+            });
         });
 
         document.getElementById('stat-total-spent').innerText = '$' + totalSpent.toFixed(2);
