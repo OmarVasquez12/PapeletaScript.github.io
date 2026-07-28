@@ -30,46 +30,21 @@
             color: #f3f4f6;
             font-family: 'Segoe UI', system-ui, sans-serif;
             min-height: 100vh;
-            overflow-x: hidden; /* Evita scroll horizontal por las manchas */
+            overflow-x: hidden;
         }
 
-        /* --- FONDO ANIMADO INTEGRADO --- */
         .bg-mesh {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: -2;
-            overflow: hidden;
-            pointer-events: none;
-            background: 
-                radial-gradient(ellipse at top, rgba(255,26,26,0.15) 0%, transparent 50%),
-                radial-gradient(ellipse at bottom right, rgba(255,26,26,0.1) 0%, transparent 50%);
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; overflow: hidden; pointer-events: none;
+            background: radial-gradient(ellipse at top, rgba(255,26,26,0.15) 0%, transparent 50%), radial-gradient(ellipse at bottom right, rgba(255,26,26,0.1) 0%, transparent 50%);
         }
-
-        .mesh-blob {
-            position: absolute;
-            filter: blur(90px);
-            opacity: 0.25;
-            animation: float 10s infinite ease-in-out;
-        }
+        .mesh-blob { position: absolute; filter: blur(90px); opacity: 0.25; animation: float 10s infinite ease-in-out; }
         .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, #ff1a1a, transparent); }
         .blob-2 { bottom: -10%; right: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, #cc1b1b, transparent); animation-delay: -5s; }
         .blob-3 { top: 50%; left: 50%; width: 40vw; height: 40vw; background: radial-gradient(circle, #ff4444, transparent); animation-delay: -2.5s; opacity: 0.15; }
-        
-        @keyframes float { 
-            0%, 100% { transform: translate(0, 0) scale(1); } 
-            50% { transform: translate(30px, 30px) scale(1.1); } 
-        }
+        @keyframes float { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(30px, 30px) scale(1.1); } }
 
-        #particles-canvas {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: -1;
-            pointer-events: none;
-        }
+        #particles-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
 
-        /* --- SCROLLBAR PERSONALIZADO --- */
         ::-webkit-scrollbar { width: 10px; }
         ::-webkit-scrollbar-track { background: #111111; }
         ::-webkit-scrollbar-thumb { background: #6e6e6e; border-radius: 5px; border: 2px solid #111111; }
@@ -81,16 +56,12 @@
         .red-glow { text-shadow: 0 0 18px rgba(255, 26, 26, 0.85), 0 0 36px rgba(204, 27, 27, 0.4); }
         .red-border { border-color: rgba(255, 26, 26, 0.25); }
         
-        /* Eliminado el canvas antiguo para usar el nuevo sistema */
-        /* #network-bg { ... } */
-
         .page { display: none; }
         .page.active { display: block; }
         .nav-link.active-page { color: #ff6b6b; }
         
         .cart-badge {
-            position: absolute; top: -8px; right: -8px;
-            background: #ff1a1a; color: white; border-radius: 50%;
+            position: absolute; top: -8px; right: -8px; background: #ff1a1a; color: white; border-radius: 50%;
             width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;
             font-size: 11px; font-weight: bold; animation: bounce 0.3s ease;
         }
@@ -111,7 +82,6 @@
         .preview-item img { width: 100%; height: 150px; object-fit: cover; }
         .preview-item .remove-btn { position: absolute; top: 5px; right: 5px; background: rgba(220, 38, 38, 0.9); color: white; border: none; width: 25px; height: 25px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; }
 
-        /* ESTILOS PANEL CONFIGURACIÓN */
         .config-panel-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
         .config-panel-overlay.active { opacity: 1; pointer-events: auto; }
         .config-panel { position: fixed; top: 0; right: -400px; width: 350px; height: 100vh; background: linear-gradient(180deg, #150a0a 0%, #0a0505 100%); border-left: 1px solid rgba(255, 26, 26, 0.3); box-shadow: -10px 0 40px rgba(0,0,0,0.8); z-index: 101; transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 24px; overflow-y: auto; }
@@ -122,7 +92,6 @@
         .config-menu-text h4 { margin: 0; font-size: 14px; font-weight: 700; color: #fff; }
         .config-menu-text p { margin: 2px 0 0; font-size: 11px; color: #9496a1; }
 
-        /* ESTILOS PANEL DE USUARIO (CLIENTE) */
         .user-panel-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
         .user-panel-overlay.active { opacity: 1; pointer-events: auto; }
         .user-panel { position: fixed; top: 0; left: -400px; width: 350px; height: 100vh; background: linear-gradient(180deg, #150a0a 0%, #0a0505 100%); border-right: 1px solid rgba(255, 26, 26, 0.3); box-shadow: 10px 0 40px rgba(0,0,0,0.8); z-index: 101; transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 24px; overflow-y: auto; }
@@ -141,101 +110,32 @@
         .logout-btn { width: 100%; padding: 12px; background: rgba(255, 26, 26, 0.15); border: 1px solid rgba(255, 26, 26, 0.4); color: #ff1a1a; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .logout-btn:hover { background: rgba(255, 26, 26, 0.25); transform: translateY(-2px); }
 
-        /* --- NUEVOS ESTILOS PARA SECCIÓN DE RESEÑAS (OVERLAP EFFECT) --- */
         .reviews-section {
-            padding: 80px 0;
-            position: relative;
-            overflow: hidden;
-            width: 100vw;
-            margin-left: calc(50% - 50vw);
+            padding: 80px 0; position: relative; overflow: hidden; width: 100vw; margin-left: calc(50% - 50vw);
             background: linear-gradient(to bottom, transparent, rgba(20, 10, 10, 0.4), transparent);
         }
+        .reviews-container { max-width: 7xl; margin: 0 auto; position: relative; padding: 0 20px; }
+        .reviews-title { text-align: center; margin-bottom: 50px; position: relative; z-index: 10; padding: 10px 0; }
+        .reviews-title h2 { font-size: 2.5rem; font-weight: 900; color: white; margin-bottom: 15px; }
+        .reviews-title h2 span { color: var(--primary); text-shadow: 0 0 20px rgba(255, 26, 26, 0.5); }
+        .reviews-title p { color: var(--text-muted); font-size: 1.1rem; }
 
-        /* Contenedor principal que alinea todo */
-        .reviews-container {
-            max-width: 7xl; /* Mismo ancho que el título */
-            margin: 0 auto;
-            position: relative;
-            padding: 0 20px;
-        }
-
-        /* El título flota ENCIMA del slider */
-        .reviews-title {
-            text-align: center;
-            margin-bottom: 50px;
-            position: relative;
-            z-index: 10; /* Mayor que el slider */
-            /* Opcional: Añadir un pequeño gradiente detrás del texto para asegurar legibilidad si las tarjetas pasan muy cerca */
-           
-            padding: 10px 0;
-        }
-        
-        .reviews-title h2 {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: white;
-            margin-bottom: 15px;
-        }
-        
-        .reviews-title h2 span {
-            color: var(--primary);
-            text-shadow: 0 0 20px rgba(255, 26, 26, 0.5);
-        }
-        
-        .reviews-title p {
-            color: var(--text-muted);
-            font-size: 1.1rem;
-        }
-
-        /* Wrapper del slider con la máscara de desvanecimiento */
         .reviews-slider-wrapper {
-            position: relative;
-            width: 100%;
-            overflow: hidden;
-            /* La máscara crea el efecto fade en los bordes */
+            position: relative; width: 100%; overflow: hidden;
             -webkit-mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
             mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
-            padding: 20px 0; /* Espacio para sombras */
+            padding: 20px 0;
         }
-
-        /* Slider Infinito */
-        .reviews-slider {
-            display: flex;
-            gap: 25px;
-            width: max-content; 
-            animation: scroll-infinite 40s linear infinite;
-        }
-
-        /* Pausar animación al pasar el mouse */
-        .reviews-slider:hover {
-            animation-play-state: paused;
-        }
-
-        @keyframes scroll-infinite {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
+        .reviews-slider { display: flex; gap: 25px; width: max-content; animation: scroll-infinite 40s linear infinite; }
+        .reviews-slider:hover { animation-play-state: paused; }
+        @keyframes scroll-infinite { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
         .review-card-slide {
-            min-width: 350px;
-            max-width: 350px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            backdrop-filter: blur(10px);
-            transition: transform 0.3s ease, border-color 0.3s ease;
+            min-width: 350px; max-width: 350px; background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 20px; padding: 30px; display: flex; flex-direction: column; justify-content: space-between;
+            backdrop-filter: blur(10px); transition: transform 0.3s ease, border-color 0.3s ease;
         }
-
-        .review-card-slide:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary);
-            box-shadow: 0 10px 30px rgba(255, 26, 26, 0.1);
-        }
-
+        .review-card-slide:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 30px rgba(255, 26, 26, 0.1); }
         .review-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
         .review-avatar { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; }
         .review-user-info h4 { color: white; font-weight: 700; font-size: 1.1rem; margin: 0; }
@@ -244,11 +144,64 @@
         .review-text { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 25px; flex-grow: 1; }
         .review-product-tag { display: inline-flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: #ffffff; padding: 8px 16px; border-radius: 50px; font-size: 0.85rem; font-weight: 600; width: fit-content; }
         .review-product-tag i { color: #ff1a1a; }
+
+        /* --- ESTILOS DEL PODIO DE TOP USUARIOS --- */
+        .leaderboard-section { padding: 40px 0 60px 0; position: relative; z-index: 5; }
+        .podium-container { display: flex; justify-content: center; align-items: flex-end; gap: 20px; max-width: 900px; margin: 0 auto; padding: 0 20px; }
+        .podium-card {
+            background: var(--bg-card); border: 1px solid var(--border-color); backdrop-filter: blur(10px);
+            border-radius: 16px; padding: 24px 20px; text-align: center; position: relative;
+            transition: transform 0.3s ease, border-color 0.3s ease; width: 100%; max-width: 260px;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .podium-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 30px rgba(255, 26, 26, 0.15); }
+
+        /* Orden visual: 2do a la izq, 1ro al centro (más grande), 3ro a la der */
+        .rank-1 { order: 2; transform: scale(1.1); z-index: 10; border-color: rgba(255, 26, 26, 0.5); box-shadow: 0 0 25px rgba(255, 26, 26, 0.2); }
+        .rank-1:hover { transform: scale(1.12); }
+        .rank-2 { order: 1; opacity: 0.9; margin-bottom: 20px; }
+        .rank-3 { order: 3; opacity: 0.9; margin-bottom: 20px; }
+
+        .rank-badge {
+            width: 36px; height: 36px; background: #1a1a1a; border: 2px solid #444;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-weight: 900; color: white; font-size: 1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            position: absolute; top: -10px; left: 50%; transform: translateX(-50%); z-index: 5;
+        }
+        .rank-1 .rank-badge { background: linear-gradient(135deg, #ffd700, #b8860b); border-color: #ffd700; color: black; width: 44px; height: 44px; font-size: 1.3rem; top: -15px; }
+        .rank-2 .rank-badge { background: linear-gradient(135deg, #e0e0e0, #9e9e9e); border-color: #e0e0e0; color: black; }
+        .rank-3 .rank-badge { background: linear-gradient(135deg, #cd7f32, #8b4513); border-color: #cd7f32; color: white; }
+
+        .podium-avatar {
+            width: 80px; height: 80px; border-radius: 50%; border: 3px solid #333; object-fit: cover;
+            margin-top: 15px; margin-bottom: 12px; background: #000;
+        }
+        .rank-1 .podium-avatar { width: 100px; height: 100px; border-color: #ff1a1a; box-shadow: 0 0 15px rgba(255, 26, 26, 0.4); margin-top: 20px; }
+
+        .podium-name {
+            color: white; font-weight: 700; font-size: 1.1rem; margin-bottom: 0;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
+        }
+        .rank-1 .podium-name { font-size: 1.25rem; margin-bottom: 5px; }
+
+        .podium-stats {
+            display: flex; flex-direction: column; align-items: center; background: rgba(255, 255, 255, 0.03);
+            padding: 10px 15px; border-radius: 12px; margin-top: auto; width: 100%; border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .stat-number { color: #ff1a1a; font-weight: 900; font-size: 1.5rem; line-height: 1; }
+        .rank-1 .stat-number { font-size: 1.8rem; }
+        .stat-label { color: #9496a1; font-size: 0.75rem; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; margin-top: 4px; }
+
+        @media (max-width: 768px) {
+            .podium-container { flex-direction: column; align-items: center; }
+            .rank-1 { order: 1; transform: scale(1); margin-bottom: 0; }
+            .rank-2 { order: 2; margin-bottom: 0; }
+            .rank-3 { order: 3; margin-bottom: 0; }
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-gradient-to-b from-[#150a0a] to-[#0a0505] relative">
 
-    <!-- FONDO ANIMADO INTEGRADO -->
     <div class="bg-mesh">
         <div class="mesh-blob blob-1"></div>
         <div class="mesh-blob blob-2"></div>
@@ -334,13 +287,11 @@
             <h2 id="panel-user-name" class="user-panel-name">Usuario</h2>
             <span id="panel-user-role" class="user-panel-role">CLIENTE</span>
         </div>
-        
         <div class="space-y-2">
             <a href="AreaCliente.html" class="user-menu-item">
                 <div class="user-menu-icon"><i class="fas fa-box"></i></div>
                 <div class="user-menu-text"><h4>Mis Productos</h4><p>Ver y descargar mis compras</p></div>
             </a>
-            
             <a href="#" onclick="toggleUserPanel(); showPage('productos')" class="user-menu-item">
                 <div class="user-menu-icon"><i class="fas fa-store"></i></div>
                 <div class="user-menu-text"><h4>Tienda</h4><p>Explorar más productos</p></div>
@@ -349,14 +300,11 @@
                 <div class="user-menu-icon"><i class="fas fa-shopping-cart"></i></div>
                 <div class="user-menu-text"><h4>Carrito</h4><p>Ver mi carrito de compras</p></div>
             </a>
-            
-            <!-- BOTÓN CONFIG - SOLO PARA ADMINS -->
             <a href="Admin.html" id="user-panel-config-btn" class="user-menu-item hidden" style="display: none;">
                 <div class="user-menu-icon"><i class="fas fa-cog"></i></div>
                 <div class="user-menu-text"><h4>Config</h4><p>Panel de Administrador</p></div>
             </a>
         </div>
-
         <div class="user-panel-footer">
             <button onclick="logout()" class="logout-btn">
                 <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
@@ -409,29 +357,22 @@
                 <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-red-500 to-red-800 flex items-center justify-center font-black">P</div>
                 <span class="text-white font-black tracking-widest text-lg">PAPELETA <span class="text-red-400">STORE</span></span>
             </div>
-
             <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-gray-300">
                 <a href="#" onclick="showPage('inicio')" data-page="inicio" class="nav-link hover:text-red-400 transition-colors">Inicio</a>
                 <a href="#" onclick="showPage('productos')" data-page="productos" class="nav-link hover:text-red-400 transition-colors">Productos</a>
                 <a href="#" onclick="showPage('preguntas')" data-page="preguntas" class="nav-link hover:text-red-400 transition-colors">Preguntas</a>
             </nav>
-
             <div class="flex items-center gap-3">
-                <!-- ENLACE AL CARRITO EXTERNO -->
                 <a href="Carrito.html" class="relative bg-[#150a0a] hover:bg-[#1a0a0a] border border-red-900/50 w-10 h-10 rounded-full flex items-center justify-center transition-all group">
                     <i class="fas fa-shopping-cart text-gray-300 group-hover:text-white transition-colors"></i>
                     <span id="cart-count" class="cart-badge hidden">0</span>
                 </a>
-                
                 <button id="logout-btn" onclick="logout()" class="hidden bg-[#150a0a] hover:bg-[#1a0a0a] border border-red-900/50 text-red-400 hover:text-red-300 px-4 py-2 rounded-lg flex items-center gap-2 transition-all text-sm font-semibold">
                     <i class="fas fa-sign-out-alt"></i> <span class="hidden sm:inline">Salir</span>
                 </button>
-                
                 <button id="login-btn" onclick="openLoginModal()" class="bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-2 px-5 rounded-lg flex items-center gap-2 transition-all text-sm shadow-lg shadow-blue-900/20">
                     <i class="fab fa-discord"></i> Acceder
                 </button>
-                
-                <!-- SECCIÓN DE USUARIO - AHORA ABRE EL PANEL LATERAL -->
                 <div id="user-section" class="hidden flex items-center gap-3 bg-[#150a0a] px-3 py-1.5 rounded-full border border-red-900/50 cursor-pointer hover:border-red-600 transition-all group" onclick="toggleUserPanel()">
                     <img id="user-avatar" src="" alt="Avatar" class="w-8 h-8 rounded-full border border-red-500 group-hover:border-red-400 transition-colors">
                     <div class="flex flex-col items-start leading-none">
@@ -485,15 +426,12 @@
         <section id="page-productos" class="page max-w-6xl w-full mx-auto px-6 py-12">
             <h2 class="text-3xl md:text-4xl font-black text-white uppercase tracking-tight mb-2 text-center md:text-left">Productos <span class="text-red-400">Premium</span></h2>
             <p class="text-gray-400 text-sm mb-8 text-center md:text-left">Descubre nuestra selección de productos de alta calidad para tu servidor.</p>
-
             <div class="flex flex-col md:flex-row gap-3 mb-6">
                 <div id="category-filters" class="flex flex-wrap gap-2">
                     <button onclick="filterCategory('all')" class="cat-btn bg-red-600 text-white text-sm font-semibold px-4 py-2 rounded-full" data-cat="all"><i class="fas fa-th-large mr-1"></i> Todas las Categorías</button>
                 </div>
             </div>
-
             <input id="search-input" oninput="renderProducts()" type="text" placeholder="Pesquisar productos..." class="w-full bg-[#150a0a] border border-red-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 mb-8 focus:outline-none focus:border-red-500">
-
             <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <p class="text-gray-500 text-sm col-span-full text-center py-10"><i class="fas fa-spinner animate-spin text-red-500 mr-2"></i>Cargando productos...</p>
             </div>
@@ -513,7 +451,6 @@
             </div>
         </section>
 
-        <!-- SECCIÓN ADMIN OCULTA POR DEFECTO -->
         <section id="page-admin" class="page max-w-3xl w-full mx-auto px-6 py-12">
             <h2 class="text-3xl font-black text-white uppercase tracking-tight mb-8 flex items-center gap-3"><i class="fas fa-user-shield text-red-400"></i> Panel de Admin (Legacy)</h2>
             <div id="admin-upload-section" class="bg-[#150a0a] border border-red-950/40 rounded-2xl p-6 mb-6">
@@ -538,17 +475,37 @@
             </div>
         </section>
 
+        <!-- ========================================== -->
+        <!-- SECCIÓN TOP 3 CLIENTES HISTÓRICOS (NUEVO) -->
+        <!-- ========================================== -->
+        <div id="leaderboard-section-container" style="display: block;">
+            <section class="leaderboard-section">
+                <div class="reviews-container">
+                    <div class="text-center mb-10">
+                        <h2 class="text-2xl md:text-3xl font-black text-white uppercase tracking-tight">
+                            TOP <span class="text-red-400 red-glow">CLIENTES</span> HISTÓRICOS
+                        </h2>
+                        <p class="text-gray-400 text-sm mt-2">Los que más han confiado en nosotros desde el día 1</p>
+                    </div>
+
+                    <div class="podium-container" id="top-users-podium">
+                        <div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;">
+                            <i class="fas fa-spinner animate-spin text-3xl text-red-500"></i>
+                            <span class="text-gray-400">Cargando ranking...</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
         <!-- CONTENEDOR DE RESEÑAS (SOLO INICIO) -->
         <div id="reviews-section-container">
             <section class="reviews-section">
                 <div class="reviews-container">
-                    <!-- TÍTULO FLOTANTE (ENCIMA DEL SLIDER) -->
                     <div class="reviews-title">
                         <h2>LA VOZ DE QUIENES CONFIAN EN <span> NOSOTROS</span></h2>
                         <p>No lo decimos nosotros. Lo dicen quienes ya confían en nuestros scripts</p>
                     </div>
-                    
-                    <!-- WRAPPER DEL SLIDER (DEBAJO DEL TÍTULO, CON FADE) -->
                     <div class="reviews-slider-wrapper">
                         <div class="reviews-slider" id="reviews-slider">
                             <div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;">
@@ -570,13 +527,8 @@
         const CLIENT_ID = '1213866547181780992'; 
         const REDIRECT_URI = 'https://papeleta-script-github-io.vercel.app';
         const DISCORD_INVITE = 'https://discord.gg/rvxEdWcGkf';
-        
-        // URL DEL WEBHOOK DE DISCORD ACTUALIZADA
         const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1530402751375216720/CM6vWGEYqf3aWPiCmIBf_ycp29k686sO6Fc9HB4wisAZTAGe3OiRt5OKZoxbsINHvjgq";
-        
-        // IMPORTANTE: CAMBIA ESTA URL POR LA DE TU LOGO REAL
         const STORE_LOGO_URL = "https://cdn.discordapp.com/embed/avatars/0.png"; 
-
         const ADMIN_DISCORD_IDS = ['890526767608127489']; 
         const ADMIN_DISCORD_USERNAMES = ['Papeleta']; 
 
@@ -611,7 +563,6 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // ========== SISTEMA DE CARRITO (LOCALSTORAGE) ==========
         function updateCartBadge() {
             const cart = JSON.parse(localStorage.getItem('papeleta_cart') || '[]');
             const countEl = document.getElementById('cart-count');
@@ -624,52 +575,38 @@
         function addToCart(productId) {
             const product = allProducts.find(p => p.id === productId);
             if (!product) return;
-            
             if (currentUser && myAssignedProductIds.has(productId)) { 
                 window.location.href = 'AreaCliente.html'; 
                 return; 
             }
-            
             let cart = JSON.parse(localStorage.getItem('papeleta_cart') || '[]');
             const existingItem = cart.find(item => item.id === productId);
-            
             if (existingItem) { 
                 showToast('Este producto ya está en tu carrito', 'warning'); 
                 return; 
             }
-            
             cart.push({ id: product.id, name: product.name, price: product.price, image: product.image_url });
             localStorage.setItem('papeleta_cart', JSON.stringify(cart));
-            
             updateCartBadge();
             showToast('Producto añadido al carrito', 'success');
         }
 
-        // --- FUNCIONES PANEL DE USUARIO (CLIENTE) ---
         function toggleUserPanel() {
-            if (!currentUser) {
-                openLoginModal();
-                return;
-            }
+            if (!currentUser) { openLoginModal(); return; }
             const panel = document.getElementById('user-panel');
             const overlay = document.getElementById('user-panel-overlay');
             panel.classList.toggle('active');
             overlay.classList.toggle('active');
-            
-            // Actualizar información del panel
             if (currentUser) {
                 document.getElementById('panel-user-name').textContent = currentUser.username;
                 document.getElementById('user-name').textContent = currentUser.username;
-                
                 if (currentUser.avatar) {
                     const avatarUrl = `https://cdn.discordapp.com/avatars/${currentUser.id}/${currentUser.avatar}.png`;
                     document.getElementById('panel-user-avatar').src = avatarUrl;
                     document.getElementById('user-avatar').src = avatarUrl;
                 }
-                
                 const roleBadge = document.getElementById('panel-user-role');
                 const roleBadgeHeader = document.getElementById('user-role-badge');
-                
                 if (currentUserRole === 'admin' || currentUserRole === 'mod') {
                     roleBadge.textContent = currentUserRole.toUpperCase();
                     roleBadge.className = 'user-panel-role admin';
@@ -682,7 +619,6 @@
             }
         }
 
-        // --- FUNCIONES PANEL CONFIG ---
         function toggleConfigPanel() {
             const panel = document.getElementById('config-panel');
             const overlay = document.getElementById('config-overlay');
@@ -690,11 +626,8 @@
             overlay.classList.toggle('active');
         }
 
-        function openAssignProductModal() {
-            window.location.href = 'PasarUsuarios.html';
-        }
+        function openAssignProductModal() { window.location.href = 'PasarUsuarios.html'; }
 
-        // Preview de múltiples imágenes
         function previewMultipleImages(input) {
             const previewContainer = document.getElementById('multiple-images-preview');
             previewContainer.innerHTML = '';
@@ -778,28 +711,18 @@
                 for (let i = 0; i < imageFiles.length; i++) { const resized = await resizeImage(imageFiles[i]); resizedImages.push(resized); }
                 const fileBase64 = await fileToBase64(downloadFile);
                 
-                // GENERAR ID SECUENCIAL (Producto-1, Producto-2, etc.)
                 const productsSnapshot = await db.collection("Productos").get();
                 const nextIdNumber = productsSnapshot.size + 1;
                 const sequentialId = `Producto-${nextIdNumber}`;
 
                 const newProduct = {
-                id: sequentialId,
-                name: name, 
-                price: price, 
-                original_price: price, // AGREGAR ESTA LÍNEA
-                category: category, 
-                description: description,
-                image_url: resizedImages[0], 
-                images: resizedImages, 
-                file_data: fileBase64, 
-                file_name: downloadFile.name,
-                created_at: firebase.firestore.FieldValue.serverTimestamp()
+                    id: sequentialId, name: name, price: price, original_price: price,
+                    category: category, description: description, image_url: resizedImages[0], 
+                    images: resizedImages, file_data: fileBase64, file_name: downloadFile.name,
+                    created_at: firebase.firestore.FieldValue.serverTimestamp()
                 };
                 
-                // Guardamos usando el ID secuencial como ID del documento
                 await db.collection("Productos").doc(newProduct.id).set(newProduct);
-                
                 alert('Producto guardado en Firebase exitosamente con ID: ' + sequentialId);
                 document.getElementById('product-form').reset();
                 document.getElementById('multiple-images-preview').innerHTML = '';
@@ -810,45 +733,32 @@
         }
         
         function loadAdminProductsList() {
-    const container = document.getElementById('admin-products-list');
-    if (allProducts.length === 0) { container.innerHTML = '<p class="text-gray-500 text-sm">No hay productos locales aún.</p>'; return; }
-    container.innerHTML = allProducts.map(p => {
-        const originalPrice = p.original_price || p.price;
-        const currentPrice = p.price;
-        const hasDiscount = originalPrice > 0 && currentPrice < originalPrice;
-        let priceHtml = '';
-        
-        if (hasDiscount) {
-            const discountPercent = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
-            
-            // Si el precio actual es 0, mostrar GRATIS
-            const currentPriceDisplay = currentPrice === 0 ? 'GRATIS' : '$' + Number(currentPrice).toFixed(2);
-            
-            priceHtml = `
-                <div class="flex items-baseline gap-2">
-                    <span class="text-gray-500 text-xs line-through">$${Number(originalPrice).toFixed(2)}</span>
-                    <span class="text-green-400 text-sm font-bold">${currentPriceDisplay}</span>
-                </div>
-            `;
-        } else {
-            // Sin descuento
-            const priceDisplay = currentPrice === 0 ? 'GRATIS' : '$' + Number(currentPrice).toFixed(2);
-            const priceClass = currentPrice === 0 ? 'text-green-400' : 'text-red-400';
-            priceHtml = `<p class="${priceClass} text-sm font-bold">${priceDisplay}</p>`;
+            const container = document.getElementById('admin-products-list');
+            if (allProducts.length === 0) { container.innerHTML = '<p class="text-gray-500 text-sm">No hay productos locales aún.</p>'; return; }
+            container.innerHTML = allProducts.map(p => {
+                const originalPrice = p.original_price || p.price;
+                const currentPrice = p.price;
+                const hasDiscount = originalPrice > 0 && currentPrice < originalPrice;
+                let priceHtml = '';
+                if (hasDiscount) {
+                    const currentPriceDisplay = currentPrice === 0 ? 'GRATIS' : '$' + Number(currentPrice).toFixed(2);
+                    priceHtml = `<div class="flex items-baseline gap-2"><span class="text-gray-500 text-xs line-through">$${Number(originalPrice).toFixed(2)}</span><span class="text-green-400 text-sm font-bold">${currentPriceDisplay}</span></div>`;
+                } else {
+                    const priceDisplay = currentPrice === 0 ? 'GRATIS' : '$' + Number(currentPrice).toFixed(2);
+                    const priceClass = currentPrice === 0 ? 'text-green-400' : 'text-red-400';
+                    priceHtml = `<p class="${priceClass} text-sm font-bold">${priceDisplay}</p>`;
+                }
+                return `<div class="flex items-center gap-3 bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-2.5">
+                    <img src="${p.image_url}" class="w-10 h-10 rounded-lg object-cover">
+                    <div class="flex-grow min-w-0">
+                        <p class="text-white text-sm font-semibold truncate">${escapeHTML(p.name)}</p>
+                        ${priceHtml}
+                        <p class="text-gray-500 text-[10px] truncate"><i class="fas fa-file-archive mr-1"></i>${escapeHTML(p.file_name || 'Sin archivo')}</p>
+                    </div>
+                    <button onclick="deleteProduct('${p.id}')" class="text-red-400 hover:text-red-300 w-8 h-8 rounded-lg hover:bg-red-950/30 flex items-center justify-center transition-all"><i class="fas fa-trash"></i></button>
+                </div>`;
+            }).join('');
         }
-        
-        return `
-            <div class="flex items-center gap-3 bg-[#0d0505] border border-red-950/40 rounded-xl px-4 py-2.5">
-                <img src="${p.image_url}" class="w-10 h-10 rounded-lg object-cover">
-                <div class="flex-grow min-w-0">
-                    <p class="text-white text-sm font-semibold truncate">${escapeHTML(p.name)}</p>
-                    ${priceHtml}
-                    <p class="text-gray-500 text-[10px] truncate"><i class="fas fa-file-archive mr-1"></i>${escapeHTML(p.file_name || 'Sin archivo')}</p>
-                </div>
-                <button onclick="deleteProduct('${p.id}')" class="text-red-400 hover:text-red-300 w-8 h-8 rounded-lg hover:bg-red-950/30 flex items-center justify-center transition-all"><i class="fas fa-trash"></i></button>
-            </div>`;
-    }).join('');
-}
         
         async function deleteProduct(id) {
             if (!confirm('¿Eliminar este producto de la tienda?')) return;
@@ -861,7 +771,6 @@
             } catch (error) { console.error(error); alert('Error al eliminar: ' + error.message); }
         }
 
-        // Funciones para la galería
         function changeImage(direction) {
             if (!currentDetailProduct || !currentDetailProduct.images) return;
             currentImageIndex += direction;
@@ -871,10 +780,8 @@
         }
         function updateGallery() {
             if (!currentDetailProduct || !currentDetailProduct.images) return;
-            const mainImage = document.getElementById('detail-image');
-            const thumbnails = document.getElementById('gallery-thumbnails');
-            mainImage.src = currentDetailProduct.images[currentImageIndex];
-            const thumbElements = thumbnails.querySelectorAll('.gallery-thumbnail');
+            document.getElementById('detail-image').src = currentDetailProduct.images[currentImageIndex];
+            const thumbElements = document.getElementById('gallery-thumbnails').querySelectorAll('.gallery-thumbnail');
             thumbElements.forEach((thumb, idx) => { if (idx === currentImageIndex) thumb.classList.add('active'); else thumb.classList.remove('active'); });
         }
 
@@ -936,10 +843,7 @@
             if (!currentDetailProduct) return;
             if (currentUser && myAssignedProductIds.has(currentDetailProduct.id)) { window.location.href = 'AreaCliente.html'; return; }
             if (!currentUser) { closeProductDetailModal(); openLoginModal(); } 
-            else {
-                addToCart(currentDetailProduct.id); 
-                closeProductDetailModal(); 
-            }
+            else { addToCart(currentDetailProduct.id); closeProductDetailModal(); }
         }
 
         function openLoginModal() { window.location.href = 'Login.html'; }
@@ -971,25 +875,20 @@
                 document.getElementById('user-name').innerText = `${user.username}`;
                 if (user.avatar) document.getElementById('user-avatar').src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
                 else document.getElementById('user-avatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
-                
                 closeLoginModal();
-                
-                // LÓGICA DE ROLES PARA EL BOTÓN CONFIG EN PANEL LATERAL
                 if (isAdmin(user)) {
-                    document.getElementById('user-panel-config-btn').style.display = 'flex'; // Mostrar botón en panel
+                    document.getElementById('user-panel-config-btn').style.display = 'flex';
                     currentUserRole = 'admin';
                 } else {
-                    // Verificar si tiene rol de Mod u otro rol con acceso a config
                     const savedData = JSON.parse(localStorage.getItem('papeleta_user_' + user.id) || '{}');
                     if(savedData.role && ['mod', 'staff', 'developer'].includes(savedData.role.toLowerCase())) {
-                         document.getElementById('user-panel-config-btn').style.display = 'flex'; // Mostrar botón en panel
+                         document.getElementById('user-panel-config-btn').style.display = 'flex';
                          currentUserRole = savedData.role;
                     } else {
-                        document.getElementById('user-panel-config-btn').style.display = 'none'; // Ocultar botón
+                        document.getElementById('user-panel-config-btn').style.display = 'none';
                         currentUserRole = 'cliente';
                     }
                 }
-                
                 updateAuthUI(); applyRoleUI(); registerUserInFirebase(user);
                 loadUserStats(); loadSalesStats();
                 loadMyAssignments().then(() => loadProducts());
@@ -1016,8 +915,6 @@
                     else { roleBadge.classList.remove('text-green-400'); roleBadge.classList.add('text-red-400'); }
                 }
             }
-            // El panel de admin legacy solo lo ve el admin principal
-            if (canUpload()) { /* document.getElementById('nav-admin').classList.remove('hidden'); */ }
             document.getElementById('admin-upload-section').style.display = canUpload() ? '' : 'none';
             document.getElementById('admin-users-section').style.display = isAdmin(currentUser) ? '' : 'none';
         }
@@ -1071,45 +968,26 @@
         }
 
         async function loadMyAssignments() {
-    // Reiniciamos el set para evitar datos viejos
-    myAssignedProductIds = new Set();
-    
-    if (!currentUser) return;
-    
-    try {
-        // Consultamos la colección "Clientes" para ver qué productos tiene este usuario
-        const snapshot = await db.collection("Clientes")
-            .where("discord_id", "==", currentUser.id)
-            .get();
-        
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            // Extraemos los productos del array "products"
-            if (data.products && Array.isArray(data.products)) {
-                data.products.forEach(product => {
-                    if (product.id) {
-                        myAssignedProductIds.add(product.id);
+            myAssignedProductIds = new Set();
+            if (!currentUser) return;
+            try {
+                const snapshot = await db.collection("Clientes").where("discord_id", "==", currentUser.id).get();
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.products && Array.isArray(data.products)) {
+                        data.products.forEach(product => { if (product.id) myAssignedProductIds.add(product.id); });
                     }
                 });
+                saveUserDataLocally();
+            } catch (error) {
+                console.error("Error cargando asignaciones desde Firebase:", error);
+                const savedData = JSON.parse(localStorage.getItem('papeleta_user_' + currentUser.id) || '{}');
+                if(savedData.assigned_products) myAssignedProductIds = new Set(savedData.assigned_products);
             }
-        });
-        
-        console.log("Productos asignados al usuario:", Array.from(myAssignedProductIds));
-        
-        // Actualizamos el localStorage con lo que acabamos de traer de Firebase
-        saveUserDataLocally();
-        
-    } catch (error) {
-        console.error("Error cargando asignaciones desde Firebase:", error);
-        // Si falla Firebase, intentamos cargar de localStorage como respaldo
-        const savedData = JSON.parse(localStorage.getItem('papeleta_user_' + currentUser.id) || '{}');
-        if(savedData.assigned_products) myAssignedProductIds = new Set(savedData.assigned_products);
-    }
-}
+        }
 
         function isSupport() { return currentUserRole === 'support'; }
         function canUpload() { return isAdmin(currentUser) || isSupport(); }
-
         document.getElementById('discord-invite-link').href = DISCORD_INVITE;
 
         async function loadAdminUsers() {
@@ -1142,8 +1020,7 @@
         function logout() {
             localStorage.removeItem('dc_access_token');
             currentUser = null; currentUserRole = 'user';
-            document.getElementById('user-panel-config-btn').style.display = 'none'; // Ocultar botón config
-            // Cerrar paneles si están abiertos
+            document.getElementById('user-panel-config-btn').style.display = 'none';
             document.getElementById('user-panel').classList.remove('active');
             document.getElementById('user-panel-overlay').classList.remove('active');
             document.getElementById('config-panel').classList.remove('active');
@@ -1157,18 +1034,18 @@
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active-page'));
             const link = document.querySelector(`.nav-link[data-page="${name}"]`);
             if (link) link.classList.add('active-page');
-            
-            // CONTROL DE VISIBILIDAD DE RESEÑAS (SOLO EN INICIO)
             checkReviewsVisibility(name);
         }
 
-        // FUNCIÓN PARA MOSTRAR/OCULTAR RESEÑAS SEGÚN LA PÁGINA ACTIVA
         function checkReviewsVisibility(activePageName) {
             const reviewsContainer = document.getElementById('reviews-section-container');
+            const leaderboardContainer = document.getElementById('leaderboard-section-container');
             if (activePageName === 'inicio') {
-                reviewsContainer.style.display = 'block';
+                if(reviewsContainer) reviewsContainer.style.display = 'block';
+                if(leaderboardContainer) leaderboardContainer.style.display = 'block';
             } else {
-                reviewsContainer.style.display = 'none';
+                if(reviewsContainer) reviewsContainer.style.display = 'none';
+                if(leaderboardContainer) leaderboardContainer.style.display = 'none';
             }
         }
 
@@ -1220,22 +1097,13 @@
                 const originalPrice = p.original_price || p.price;
                 const currentPrice = p.price;
                 const hasDiscount = originalPrice > 0 && currentPrice < originalPrice;
-                
                 let priceHtml = '';
                 let discountBadge = '';
                 
                 if (hasDiscount) {
                     const discountPercent = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
-                    
-                    // Si el precio actual es 0, mostrar GRATIS
                     const currentPriceDisplay = currentPrice === 0 ? 'GRATIS' : '$' + Number(currentPrice).toFixed(2);
-                    
-                    priceHtml = `
-                        <div class="flex items-baseline gap-2">
-                            <span class="text-gray-500 text-sm line-through">$${Number(originalPrice).toFixed(2)}</span>
-                            <span class="text-2xl font-black text-green-400">${currentPriceDisplay}</span>
-                        </div>
-                    `;
+                    priceHtml = `<div class="flex items-baseline gap-2"><span class="text-gray-500 text-sm line-through">$${Number(originalPrice).toFixed(2)}</span><span class="text-2xl font-black text-green-400">${currentPriceDisplay}</span></div>`;
                     discountBadge = `<span class="absolute top-3 left-3 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full z-10">-${discountPercent}%</span>`;
                 } else {
                     const priceDisplay = Number(currentPrice) === 0 ? 'GRATIS' : '$' + Number(currentPrice).toFixed(2);
@@ -1243,30 +1111,24 @@
                     priceHtml = `<span class="text-2xl font-black ${priceClass}">${priceDisplay}</span>`;
                 }
                 
-                const priceClass = Number(currentPrice) === 0 ? 'text-green-400' : 'text-red-400';
                 const alreadyOwned = currentUser && myAssignedProductIds.has(p.id);
                 
                 return `
                 <div class="bg-[#150a0a] border ${alreadyOwned ? 'border-green-600/50' : 'border-red-950/40'} rounded-2xl overflow-hidden shadow-xl group hover:border-red-600/40 transition-all relative">
                     ${alreadyOwned ? '<span class="absolute top-3 right-3 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full z-10"><i class="fas fa-check mr-1"></i>YA LO TIENE</span>' : ''}
                     ${discountBadge}
-                    
                     <div class="product-card-img-container relative overflow-hidden">
                         <img src="${escapeHTML(p.image_url || '')}" alt="${escapeHTML(p.name)}" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300 bg-[#0d0505]">
                         <div class="absolute inset-0 bg-gradient-to-t from-[#150a0a] to-transparent opacity-60 pointer-events-none"></div>
                     </div>
-                    
                     <div class="p-5">
                         <h4 class="text-xl font-bold text-white mb-2">${escapeHTML(p.name)}</h4>
                         <p class="text-gray-400 text-sm mb-4 line-clamp-2">${escapeHTML(p.description || '')}</p>
-                        
                         ${p.category ? `<span class="inline-block bg-red-950/60 border border-red-800 text-red-300 text-xs font-bold px-2.5 py-1 rounded-md mb-4">${escapeHTML(p.category)}</span>` : ''}
-                        
                         <div class="flex items-center justify-between mb-4">
                             ${priceHtml}
                             ${Number(currentPrice) > 0 && !hasDiscount ? '<span class="text-xs text-gray-500">USD</span>' : (hasDiscount ? '<span class="text-xs text-green-400 font-semibold">Oferta</span>' : '<span class="text-xs text-green-400 font-semibold">Sin costo</span>')}
                         </div>
-                        
                         ${alreadyOwned ? `
                             <div class="grid grid-cols-2 gap-2">
                                 <button onclick="window.location.href='AreaCliente.html'" class="bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2"><i class="fas fa-download"></i> Descargar</button>
@@ -1278,7 +1140,6 @@
                                 <a href="Producto.html?id=${p.id}" class="bg-[#0d0505] hover:bg-[#1a0a0a] border border-red-800/50 text-gray-300 hover:text-white text-sm font-semibold py-3 rounded-xl transition-all text-center no-underline flex items-center justify-center gap-2"><i class="fas fa-info-circle"></i> Detalles</a>
                             </div>
                         `}
-                        
                         ${isAdmin(currentUser) ? `<button onclick="deleteProduct('${p.id}')" class="w-full mt-3 bg-transparent border border-red-900/50 hover:border-red-500 hover:bg-red-950/30 text-red-300 text-xs font-semibold py-2 rounded-xl transition-all"><i class="fas fa-trash mr-1"></i> Eliminar</button>` : ''}
                     </div>
                 </div>`;
@@ -1287,148 +1148,81 @@
 
         function escapeHTML(str) { return String(str).replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)); }
 
-        function generateUniqueKey() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; let key = '';
-            for (let i = 0; i < 20; i++) key += chars.charAt(Math.floor(Math.random() * chars.length));
-            return key;
-        }
-
-        // --- FUNCIÓN MAESTRA ÚNICA PARA LICENCIAS (EVITA DUPLICADOS) ---
         async function getOrCreateLicense(userId, productId, productName) {
             try {
-                // 1. Buscar SI YA EXISTE una licencia activa para este usuario y producto
-                const querySnapshot = await db.collection("Licencias")
-                    .where("discord_id", "==", userId)
-                    .where("product_id", "==", productId)
-                    .where("status", "==", "active")
-                    .limit(1)
-                    .get();
-
+                const querySnapshot = await db.collection("Licencias").where("discord_id", "==", userId).where("product_id", "==", productId).where("status", "==", "active").limit(1).get();
                 if (!querySnapshot.empty) {
                     console.log(`✅ Licencia ya existente para ${userId} en ${productId}. No se crea duplicado.`);
-                    return querySnapshot.docs[0].data(); // Retorna la existente sin crear nada
+                    return querySnapshot.docs[0].data();
                 }
-
-                // 2. Generar User y Key únicos
                 const newUser = "USER_" + Math.random().toString(36).substring(2, 8).toUpperCase();
                 const newKey = Array.from({length: 24}, () => "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[Math.floor(Math.random() * 36)]).join('');
-
                 const licenseData = { 
-                    discord_id: userId, 
-                    username: currentUser ? currentUser.username : 'Unknown', 
-                    product_id: productId, 
-                    product_name: productName, 
-                    user_code: newUser, // Este es el dato ["User"]
-                    key: newKey,        // Este es el dato ["Key"]
-                    created_at: firebase.firestore.FieldValue.serverTimestamp(), 
-                    status: 'active' 
+                    discord_id: userId, username: currentUser ? currentUser.username : 'Unknown', product_id: productId, 
+                    product_name: productName, user_code: newUser, key: newKey,
+                    created_at: firebase.firestore.FieldValue.serverTimestamp(), status: 'active' 
                 };
-                
                 const docRef = await db.collection("Licencias").add(licenseData);
-                console.log(`✨ Nueva licencia creada: ${docRef.id}`);
                 return { id: docRef.id, ...licenseData };
-
             } catch (error) {
                 console.error("❌ Error en getOrCreateLicense:", error);
                 return null;
             }
         }
 
-        // --- SCRIPT DE PARTÍCULAS Y NETWORK BG ---
-        // Usamos el mismo canvas para las partículas nuevas
         const canvas = document.getElementById('particles-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
-
         class Particle {
             constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2 + 0.5;
-                this.speedX = Math.random() * 0.5 - 0.25;
-                this.speedY = Math.random() * 0.5 - 0.25;
+                this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5; this.speedX = Math.random() * 0.5 - 0.25; this.speedY = Math.random() * 0.5 - 0.25;
                 this.opacity = Math.random() * 0.5 + 0.1;
             }
             update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                if (this.x > canvas.width) this.x = 0;
-                if (this.x < 0) this.x = canvas.width;
-                if (this.y > canvas.height) this.y = 0;
-                if (this.y < 0) this.y = canvas.height;
+                this.x += this.speedX; this.y += this.speedY;
+                if (this.x > canvas.width) this.x = 0; if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0; if (this.y < 0) this.y = canvas.height;
             }
             draw() {
                 ctx.fillStyle = `rgba(255, 26, 26, ${this.opacity})`;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
             }
         }
-
-        function initParticles() {
-            particles = [];
-            for (let i = 0; i < 60; i++) {
-                particles.push(new Particle());
-            }
-        }
-
+        function initParticles() { particles = []; for (let i = 0; i < 60; i++) { particles.push(new Particle()); } }
         function animateParticles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-            });
+            particles.forEach(p => { p.update(); p.draw(); });
             requestAnimationFrame(animateParticles);
         }
-
-        // También mantenemos la función antigua de Network Bg por si acaso se usa en algún lado, 
-        // pero apuntamos al mismo canvas para no tener conflictos o simplemente la ignoramos si usamos el nuevo sistema.
-        // Para mantener consistencia visual, he reemplazado la lógica de initNetworkBg por la nueva.
-        function initNetworkBg() {
-             // Esta función ahora inicia las partículas nuevas
-             initParticles();
-             animateParticles();
-        }
-
+        function initNetworkBg() { initParticles(); animateParticles(); }
 
         async function loadPublicReviews() {
             const slider = document.getElementById('reviews-slider');
             try {
                 const productsSnapshot = await db.collection("Productos").get();
                 const productsMap = {}; 
-                
                 productsSnapshot.forEach(doc => {
                     const data = doc.data();
                     productsMap[doc.id] = data.name || 'Producto';
-                    if (data.id) {
-                        productsMap[data.id] = data.name || 'Producto';
-                    }
+                    if (data.id) productsMap[data.id] = data.name || 'Producto';
                 });
 
-                const reviewsSnapshot = await db.collection("Resenas")
-                    .limit(15) 
-                    .get();
-                
+                const reviewsSnapshot = await db.collection("Resenas").limit(15).get();
                 let reviewsHTML = '';
                 let count = 0;
 
                 reviewsSnapshot.forEach(doc => {
                     const data = doc.data();
-                    
                     if (data.rating >= 4) {
                         const stars = '★'.repeat(data.rating);
                         const date = data.created_at?.toDate ? data.created_at.toDate().toLocaleDateString('es-ES') : '';
                         const avatar = data.user_avatar || 'https://cdn.discordapp.com/embed/avatars/0.png';
                         const username = data.username || 'Usuario Anónimo';
                         const text = data.text || '';
-                        
                         const productId = data.product_id;
                         const productName = productsMap[productId] || 'Producto Premium';
                         
@@ -1445,47 +1239,150 @@
                                     <div class="review-stars">${stars}</div>
                                     <p class="review-text">${escapeHTML(text)}</p>
                                 </div>
-                                <div class="review-product-tag">
-                                    <i class="fas fa-cube"></i> ${escapeHTML(productName)}
-                                </div>
-                            </div>
-                        `;
+                                <div class="review-product-tag"><i class="fas fa-cube"></i> ${escapeHTML(productName)}</div>
+                            </div>`;
                         count++;
                     }
                 });
 
                 if (count > 0) {
-                    // DUPLICAMOS EL CONTENIDO PARA CREAR EL EFECTO INFINITO
                     slider.innerHTML = reviewsHTML + reviewsHTML;
                 } else {
-                    slider.innerHTML = `
-                        <div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;">
-                            <i class="fas fa-comment-slash text-3xl text-gray-600"></i>
-                            <span class="text-gray-400">Aún no hay reseñas destacadas.</span>
+                    slider.innerHTML = `<div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;"><i class="fas fa-comment-slash text-3xl text-gray-600"></i><span class="text-gray-400">Aún no hay reseñas destacadas.</span></div>`;
+                }
+            } catch (error) {
+                console.error("Error cargando reseñas públicas:", error);
+                slider.innerHTML = `<div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;"><i class="fas fa-exclamation-triangle text-3xl text-red-500"></i><span class="text-gray-400">No se pudieron cargar las opiniones.</span></div>`;
+            }
+        }
+
+        // --- FUNCIÓN PARA CARGAR TOP 3 CLIENTES HISTÓRICOS ---
+        async function loadTopUsers() {
+            const container = document.getElementById('top-users-podium');
+            try {
+                const snapshot = await db.collection("Clientes").get();
+                const userStats = {};
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const userId = data.discord_id;
+                    if (!userId) return;
+
+                    if (!userStats[userId]) {
+                        userStats[userId] = {
+                            discord_id: userId,
+                            username: data.username || 'Usuario',
+                            avatar: data.user_avatar || null,
+                            productCount: 0
+                        };
+                    }
+
+                    if (data.username) userStats[userId].username = data.username;
+                    if (data.user_avatar) userStats[userId].avatar = data.user_avatar;
+
+                    if (data.products && Array.isArray(data.products)) {
+                        userStats[userId].productCount += data.products.length;
+                    } else if (data.product_id) {
+                        userStats[userId].productCount += 1;
+                    } else {
+                        userStats[userId].productCount += 1;
+                    }
+                });
+
+                const sortedUsers = Object.values(userStats)
+                    .filter(u => u.productCount > 0)
+                    .sort((a, b) => b.productCount - a.productCount);
+
+                const top3 = sortedUsers.slice(0, 3);
+
+                if (top3.length > 0) {
+                    const renderCard = (user, rank) => {
+                        if (!user) return '';
+                        let avatarUrl = 'https://cdn.discordapp.com/embed/avatars/0.png';
+                        if (user.avatar) {
+                            avatarUrl = `https://cdn.discordapp.com/avatars/${user.discord_id}/${user.avatar}.png?size=256`;
+                        }
+                        const productoTexto = user.productCount === 1 ? 'PRODUCTO' : 'PRODUCTOS';
+
+                        return `
+                        <div class="podium-card rank-${rank}">
+                            <h3 class="podium-name">${escapeHTML(user.username)}</h3>
+                            <div style="position: relative; display: flex; justify-content: center; margin: 10px 0;">
+                                <div class="rank-badge">${rank}</div>
+                                <img src="${avatarUrl}" alt="${escapeHTML(user.username)}" class="podium-avatar" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'">
+                            </div>
+                            <div class="podium-stats">
+                                <span class="stat-number">${user.productCount}</span>
+                                <span class="stat-label">${productoTexto}</span>
+                            </div>
+                        </div>
+                        `;
+                    };
+
+                    const firstPlace = top3[0] || null;
+                    const secondPlace = top3[1] || null;
+                    const thirdPlace = top3[2] || null;
+
+                    let html = '';
+                    html += renderCard(secondPlace, 2); // Izquierda
+                    html += renderCard(firstPlace, 1);  // Centro
+                    html += renderCard(thirdPlace, 3);  // Derecha
+
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = `
+                        <div style="text-align: center; width: 100%; padding: 40px 0;">
+                            <i class="fas fa-trophy text-4xl text-gray-700 mb-4"></i>
+                            <p class="text-gray-500">Aún no hay compras registradas.</p>
+                            <p class="text-gray-600 text-sm mt-1">¡Sé el primero en aparecer aquí!</p>
                         </div>
                     `;
                 }
-
             } catch (error) {
-                console.error("Error cargando reseñas públicas:", error);
-                slider.innerHTML = `
-                    <div style="display: flex; gap: 20px; width: 100%; justify-content: center; align-items: center; min-height: 200px;">
-                        <i class="fas fa-exclamation-triangle text-3xl text-red-500"></i>
-                        <span class="text-gray-400">No se pudieron cargar las opiniones.</span>
+                console.error("Error cargando top usuarios:", error);
+                container.innerHTML = `
+                    <div style="text-align: center; width: 100%; padding: 40px 0;">
+                        <i class="fas fa-exclamation-triangle text-3xl text-red-500 mb-3"></i>
+                        <p class="text-gray-500">No se pudo cargar el ranking.</p>
                     </div>
                 `;
             }
         }
 
+        // Función Toast para notificaciones elegantes
+        function showToast(message, type = 'success') {
+            let container = document.querySelector('.toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.className = 'toast-container';
+                container.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px;';
+                document.body.appendChild(container);
+            }
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.style.cssText = `background: rgba(20, 10, 10, 0.95); border-left: 4px solid ${type === 'success' ? '#00ff44' : '#ff1a1a'}; color: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); backdrop-filter: blur(5px); transform: translateX(120%); transition: transform 0.3s ease-out; display: flex; align-items: center; gap: 10px; min-width: 250px;`;
+            
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+            const iconColor = type === 'success' ? '#00ff44' : '#ff1a1a';
+            
+            toast.innerHTML = `<i class="fas ${icon}" style="font-size: 1.2rem; color: ${iconColor};"></i> <span>${message}</span>`;
+            container.appendChild(toast);
+
+            setTimeout(() => toast.style.transform = 'translateX(0)', 10);
+            setTimeout(() => {
+                toast.style.transform = 'translateX(120%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
         document.addEventListener('DOMContentLoaded', () => { 
             checkDiscordAuth(); 
-            initNetworkBg(); // Esto ahora inicia las partículas nuevas
-            loadPublicReviews(); // Cargar reseñas al iniciar
+            initNetworkBg();
+            loadPublicReviews();
+            loadTopUsers(); // <-- Carga el nuevo ranking
             
-            // Asegurar que las reseñas se muestren correctamente al cargar la página
             checkReviewsVisibility('inicio');
-            
-            // Actualizar badge del carrito al cargar
             updateCartBadge();
         });
     </script>
