@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Producto</title>
+    <title>Producto - Papeleta Store</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff1a1a'/%3E%3Cstop offset='1' stop-color='%23cc1b1b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Ctext x='50' y='70' font-family='Arial, sans-serif' font-size='58' font-weight='900' fill='white' text-anchor='middle'%3EP%3C/text%3E%3C/svg%3E">
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -256,7 +256,6 @@
             opacity: 0.5;
         }
 
-        /* Ocultar todo hasta que cargue */
         #product-content {
             opacity: 0;
             transition: opacity 0.3s ease;
@@ -304,16 +303,12 @@
         </div>
     </header>
 
-    <!-- CONTENIDO DEL PRODUCTO - OCULTO HASTA QUE CARGUE -->
+    <!-- CONTENIDO DEL PRODUCTO -->
     <main id="product-content" class="relative z-10 w-full max-w-7xl ml-4 md:ml-10 py-10 pr-4">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
             <div class="lg:col-span-7 flex flex-col">
-                <!-- Gallery Frame con Video o Imagen -->
                 <div class="gallery-frame shadow-2xl shadow-red-900/10 group" id="gallery-container">
-                    <!-- Imagen principal (oculta por defecto) -->
                     <img id="main-image" src="" alt="Producto" class="gallery-image p-2 hidden">
-                    
-                    <!-- Contenedor de Video YouTube -->
                     <div id="youtube-video-container" class="youtube-container"></div>
                     
                     <div class="absolute top-4 left-4 bg-black/60 px-3 py-1 rounded-full text-xs font-mono border border-white/10 backdrop-blur-sm" id="image-counter">
@@ -324,10 +319,8 @@
                     <button class="gallery-nav nav-next" id="nav-next" onclick="moveSlide(1)"><i class="fas fa-chevron-right"></i></button>
                 </div>
                 
-                <!-- Thumbnails (solo para imágenes, ocultos por defecto) -->
                 <div id="thumbnails-list" class="thumbnails-container mt-4 hidden"></div>
                 
-                <!-- Tabs Video/Imagen -->
                 <div class="flex gap-4 mt-6 border-b border-white/10 pb-2">
                     <button class="tab-button active pb-2 px-2 text-sm flex items-center gap-2" onclick="switchTab('video')" id="tab-video">
                         <i class="fas fa-video"></i> VIDEO
@@ -365,8 +358,8 @@
                         <div class="flex-grow border-t border-white/10"></div>
                     </div>
 
-                    <button id="secondary-action-btn" onclick="downloadProduct()" class="btn-secondary w-full py-3.5 rounded-xl text-gray-300 font-semibold flex items-center justify-center gap-3 hover:text-white">
-                        <i class="fas fa-credit-card"></i> Comprar con Tarjeta
+                    <button id="secondary-action-btn" onclick="goToCheckout()" class="btn-secondary w-full py-3.5 rounded-xl text-gray-300 font-semibold flex items-center justify-center gap-3 hover:text-white">
+                        <i class="fas fa-credit-card"></i> Ir al Carrito para Pagar
                     </button>
 
                     <button onclick="window.location.href='index.html'" class="w-full py-3 text-gray-500 hover:text-gray-300 text-sm font-medium transition-colors">
@@ -560,7 +553,7 @@
 
         function redirectToDiscord() {
             const CLIENT_ID = '1213866547181780992'; 
-            const REDIRECT_URI = 'https://papeleta-script-github-io.vercel.app';
+            const REDIRECT_URI = window.location.href.split('#')[0];
             const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20email`;
             window.location.href = url;
         }
@@ -575,6 +568,7 @@
             }
         }
 
+        // ✅ FUNCIÓN MODIFICADA: REDIRIGE AL CARRITO PRINCIPAL
         async function goToCheckout() {
             if (cart.length === 0) {
                 alert('Tu carrito está vacío');
@@ -583,7 +577,6 @@
 
             const token = localStorage.getItem('dc_access_token');
             if (!token) {
-                alert('Debes iniciar sesión para completar la compra');
                 openLoginModal();
                 return;
             }
@@ -595,134 +588,18 @@
                 
                 if (!res.ok) {
                     localStorage.removeItem('dc_access_token');
-                    alert('Sesión expirada. Por favor inicia sesión nuevamente.');
                     openLoginModal();
                     return;
                 }
 
-                const user = await res.json();
-                currentUserDiscordId = user.id;
-                currentUserData = user;
-
-                const allFree = cart.every(item => Number(item.price) === 0);
-
-                if (allFree) {
-                    await claimFreeProducts(user);
-                } else {
-                    await purchasePaidProducts(user);
-                }
+                // Si el usuario está logueado y tiene productos, lo mandamos al Carrito.html principal
+                window.location.href = 'Carrito.html';
 
             } catch (error) {
                 console.error(error);
-                alert('Error al procesar la compra: ' + error.message);
+                localStorage.removeItem('dc_access_token');
+                openLoginModal();
             }
-        }
-
-        async function claimFreeProducts(user) {
-            try {
-                const purchaseData = {
-                    discord_id: user.id,
-                    username: user.username,
-                    avatar: user.avatar,
-                    products: cart.map(item => ({
-                        id: item.id,
-                        name: item.name,
-                        price: "Gratis"
-                    })),
-                    total_price: "Gratis",
-                    date: firebase.firestore.FieldValue.serverTimestamp(),
-                    status: "Reclamado Exitosamente"
-                };
-
-                await db.collection("Clientes").add(purchaseData);
-                
-                for (const item of cart) {
-                    await createLicenseForProduct(item.id, item.name, user);
-                }
-                
-                cart = [];
-                saveCart();
-                
-                alert('¡Productos reclamados exitosamente!');
-                window.location.href = 'AreaCliente.html';
-                
-            } catch (error) {
-                console.error(error);
-                alert('Error al reclamar productos: ' + error.message);
-            }
-        }
-
-        async function purchasePaidProducts(user) {
-            const total = cart.reduce((sum, item) => sum + Number(item.price), 0);
-            
-            const confirmPurchase = confirm(`Total a pagar: $${total.toFixed(2)}\n\n¿Deseas completar la compra?`);
-            
-            if (confirmPurchase) {
-                try {
-                    const purchaseData = {
-                        discord_id: user.id,
-                        username: user.username,
-                        avatar: user.avatar,
-                        products: cart.map(item => ({
-                            id: item.id,
-                            name: item.name,
-                            price: "$" + Number(item.price).toFixed(2)
-                        })),
-                        total_price: "$" + total.toFixed(2),
-                        date: firebase.firestore.FieldValue.serverTimestamp(),
-                        status: "Pagado"
-                    };
-
-                    await db.collection("Clientes").add(purchaseData);
-                    
-                    for (const item of cart) {
-                        await createLicenseForProduct(item.id, item.name, user);
-                    }
-                    
-                    cart = [];
-                    saveCart();
-                    
-                    alert('¡Compra completada exitosamente!');
-                    window.location.href = 'AreaCliente.html';
-                    
-                } catch (error) {
-                    console.error(error);
-                    alert('Error al completar la compra: ' + error.message);
-                }
-            }
-        }
-
-        async function createLicenseForProduct(productId, productName, user) {
-            // VERIFICAR SI YA EXISTE UNA LICENCIA PARA EVITAR DUPLICADOS
-            const existingLicense = await db.collection("Licencias")
-                .where("discord_id", "==", user.id)
-                .where("product_id", "==", productId)
-                .where("status", "==", "active")
-                .limit(1)
-                .get();
-
-            if (!existingLicense.empty) {
-                console.log("El usuario ya tiene una licencia para este producto. No se crea otra.");
-                return existingLicense.docs[0].data();
-            }
-
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let key = '';
-            for (let i = 0; i < 20; i++) {
-                key += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            
-            const licenseData = {
-                discord_id: user.id,
-                username: user.username,
-                product_id: productId,
-                product_name: productName,
-                key: key,
-                created_at: firebase.firestore.FieldValue.serverTimestamp(),
-                status: 'active'
-            };
-            
-            await db.collection("Licencias").add(licenseData);
         }
 
         function handleMainAction() {
@@ -758,9 +635,7 @@
                     .where("product_id", "==", productId)
                     .get();
 
-                if (!licensesSnapshot.empty) {
-                    return true;
-                }
+                if (!licensesSnapshot.empty) return true;
 
                 const clientsSnapshot = await db.collection("Clientes")
                     .where("discord_id", "==", user.id)
@@ -770,10 +645,7 @@
                 clientsSnapshot.forEach((doc) => {
                     const data = doc.data();
                     if (data.products && Array.isArray(data.products)) {
-                        const productFound = data.products.find(p => p.id === productId);
-                        if (productFound) {
-                            ownsProduct = true;
-                        }
+                        if (data.products.find(p => p.id === productId)) ownsProduct = true;
                     }
                 });
 
@@ -799,54 +671,36 @@
             if (tab === 'video') {
                 videoTab.classList.add('active');
                 imageTab.classList.remove('active');
-                
                 mainImage.classList.add('hidden');
                 youtubeContainer.classList.remove('hidden');
                 thumbnailsList.classList.add('hidden');
                 navPrev.style.display = 'none';
                 navNext.style.display = 'none';
                 imageCounter.style.display = 'none';
-                
                 loadYouTubeVideo(true);
-                
             } else if (tab === 'image') {
                 imageTab.classList.add('active');
                 videoTab.classList.remove('active');
-                
                 mainImage.classList.remove('hidden');
                 youtubeContainer.classList.add('hidden');
                 thumbnailsList.classList.remove('hidden');
                 navPrev.style.display = 'flex';
                 navNext.style.display = 'flex';
                 imageCounter.style.display = 'block';
-                
                 youtubeContainer.innerHTML = '';
             }
         }
 
         function loadYouTubeVideo(autoPlay = false) {
             const youtubeContainer = document.getElementById('youtube-video-container');
-            
             if (currentProduct && currentProduct.youtube_id) {
                 const autoplayParam = autoPlay ? '&autoplay=1' : '&autoplay=0';
-                youtubeContainer.innerHTML = `
-                    <iframe 
-                        src="https://www.youtube.com/embed/${currentProduct.youtube_id}?rel=0${autoplayParam}" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowfullscreen>
-                    </iframe>
-                `;
+                youtubeContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${currentProduct.youtube_id}?rel=0${autoplayParam}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
             } else if (currentProduct && currentProduct.youtube_url) {
                 const videoId = extractYouTubeId(currentProduct.youtube_url);
                 if (videoId) {
                     const autoplayParam = autoPlay ? '&autoplay=1' : '&autoplay=0';
-                    youtubeContainer.innerHTML = `
-                        <iframe 
-                            src="https://www.youtube.com/embed/${videoId}?rel=0${autoplayParam}" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                            allowfullscreen>
-                        </iframe>
-                    `;
+                    youtubeContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?rel=0${autoplayParam}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
                 } else {
                     showNoVideoMessage();
                 }
@@ -856,14 +710,12 @@
         }
 
         function showNoVideoMessage() {
-            const youtubeContainer = document.getElementById('youtube-video-container');
-            youtubeContainer.innerHTML = `
+            document.getElementById('youtube-video-container').innerHTML = `
                 <div class="no-video-message">
                     <i class="fas fa-video-slash"></i>
                     <p class="text-lg font-semibold">No hay video disponible</p>
                     <p class="text-sm">Este producto no tiene video de presentación</p>
-                </div>
-            `;
+                </div>`;
         }
 
         function extractYouTubeId(url) {
@@ -873,12 +725,10 @@
             return (match && match[2].length === 11) ? match[2] : null;
         }
 
-        // CARGA RÁPIDA - CARGA TODO DE UNA VEZ
         async function loadProduct() {
             if (!productId) return window.location.href = 'index.html';
 
             try {
-                // Cargar producto y verificar propiedad al mismo tiempo
                 const [doc, ownsProduct] = await Promise.all([
                     db.collection("Productos").doc(productId).get(),
                     checkIfUserOwnsProduct()
@@ -893,12 +743,10 @@
                 const priceStr = String(currentProduct.price).toLowerCase();
                 isFree = (priceVal === 0 || priceStr === 'gratis' || priceStr === 'free');
 
-                // Actualizar UI inmediatamente
                 document.getElementById('prod-title').textContent = currentProduct.name;
                 document.getElementById('prod-desc').textContent = currentProduct.description || "Sin descripción.";
                 document.getElementById('prod-category').textContent = currentProduct.category || "General";
 
-                // Verificar si tiene video
                 const hasVideo = currentProduct.youtube_id || currentProduct.youtube_url;
                 const videoTab = document.getElementById('tab-video');
                 const imageTab = document.getElementById('tab-image');
@@ -924,36 +772,27 @@
                     mainBtn.innerHTML = `<i class="fas fa-book-open"></i> Ir a mi Biblioteca`;
                     secBtn.classList.add('hidden');
                     divider.classList.add('hidden');
-
-                    const badge = document.createElement('span');
-                    badge.className = "absolute top-4 right-4 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg animate-pulse";
-                    badge.innerHTML = '<i class="fas fa-check-circle mr-1"></i>YA LO TIENES';
-                    document.querySelector('.gallery-frame').appendChild(badge);
-
+                    document.querySelector('.gallery-frame').insertAdjacentHTML('beforeend', '<span class="absolute top-4 right-4 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg animate-pulse"><i class="fas fa-check-circle mr-1"></i>YA LO TIENES</span>');
                 } else if (isFree) {
                     priceTag.innerHTML = `<span class="badge-gratis">GRATIS</span>`;
                     mainBtn.className = "btn-primary w-full py-4 rounded-xl text-white font-bold text-lg flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(74,222,128,0.2)]";
                     mainBtn.innerHTML = `<i class="fas fa-gift"></i> Añadir al Carrito (Gratis)`;
                     secBtn.innerHTML = `<i class="fas fa-info-circle"></i> Más Información`;
                     divider.classList.add('hidden');
-
                 } else {
                     priceTag.textContent = `$${currentProduct.price}`;
                     mainBtn.className = "btn-primary w-full py-4 rounded-xl text-white font-bold text-lg flex items-center justify-center gap-3";
                     mainBtn.innerHTML = `<i class="fas fa-shopping-cart"></i> Añadir al Carrito`;
-                    secBtn.innerHTML = `<i class="fas fa-credit-card"></i> Comprar con Tarjeta`;
+                    secBtn.innerHTML = `<i class="fas fa-credit-card"></i> Ir al Carrito para Pagar`;
                     divider.classList.remove('hidden');
                 }
 
                 setupGallery();
                 updateCartBadge();
-
-                // Mostrar todo de una vez
                 document.getElementById('product-content').classList.add('loaded');
 
             } catch (error) {
                 console.error(error);
-                // Si hay error, mostrar contenido vacío pero sin "Cargando..."
                 document.getElementById('product-content').classList.add('loaded');
             }
         }
@@ -962,13 +801,11 @@
             images = currentProduct.images && currentProduct.images.length > 0 
                      ? currentProduct.images 
                      : [currentProduct.image_url || 'https://via.placeholder.com/800x450'];
-            
             currentIndex = 0;
             updateGalleryUI();
 
             const container = document.getElementById('thumbnails-list');
             container.innerHTML = '';
-            
             if (images.length > 1) {
                 images.forEach((src, idx) => {
                     const img = document.createElement('img');
@@ -981,16 +818,11 @@
         }
 
         function updateGalleryUI() {
-            const mainImg = document.getElementById('main-image');
-            mainImg.src = images[currentIndex];
-            
+            document.getElementById('main-image').src = images[currentIndex];
             document.getElementById('current-img-idx').textContent = currentIndex + 1;
             document.getElementById('total-img-idx').textContent = images.length;
-
-            const thumbs = document.querySelectorAll('.thumb');
-            thumbs.forEach((t, i) => {
-                if(i === currentIndex) t.classList.add('active');
-                else t.classList.remove('active');
+            document.querySelectorAll('.thumb').forEach((t, i) => {
+                t.classList.toggle('active', i === currentIndex);
             });
         }
 
@@ -1004,10 +836,6 @@
         function jumpTo(idx) {
             currentIndex = idx;
             updateGalleryUI();
-        }
-
-        async function downloadProduct() {
-            alert("Redirigiendo a pasarela de pago segura...");
         }
 
         function initNetworkBg() {
@@ -1053,10 +881,9 @@
             animate();
         }
 
-        // INICIALIZACIÓN - CARGAR TODO DE UNA VEZ
         document.addEventListener('DOMContentLoaded', () => {
             checkDiscordAuth();
-            loadProduct(); // Carga todo inmediatamente
+            loadProduct();
             initNetworkBg();
         });
     </script>
