@@ -24,14 +24,35 @@
             align-items: center;
             justify-content: center;
             overflow-x: hidden;
+            position: relative;
         }
 
-        #network-bg {
+        /* --- NUEVO FONDO ANIMADO (MESH BLOBS) --- */
+        .bg-mesh {
             position: fixed;
-            inset: 0;
-            z-index: 0;
-            opacity: 0.4;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            overflow: hidden;
             pointer-events: none;
+            background: 
+                radial-gradient(ellipse at top, rgba(255,26,26,0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom right, rgba(255,26,26,0.1) 0%, transparent 50%);
+        }
+
+        .mesh-blob {
+            position: absolute;
+            filter: blur(90px);
+            opacity: 0.25;
+            animation: float 10s infinite ease-in-out;
+        }
+        .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, #ff1a1a, transparent); }
+        .blob-2 { bottom: -10%; right: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, #cc1b1b, transparent); animation-delay: -5s; }
+        .blob-3 { top: 50%; left: 50%; width: 40vw; height: 40vw; background: radial-gradient(circle, #ff4444, transparent); animation-delay: -2.5s; opacity: 0.15; }
+        
+        @keyframes float { 
+            0%, 100% { transform: translate(0, 0) scale(1); } 
+            50% { transform: translate(30px, 30px) scale(1.1); } 
         }
 
         .login-card {
@@ -62,8 +83,12 @@
     </style>
 </head>
 <body>
-    <!-- Fondo Animado -->
-    <canvas id="network-bg"></canvas>
+    <!-- Nuevo Fondo Animado -->
+    <div class="bg-mesh">
+        <div class="mesh-blob blob-1"></div>
+        <div class="mesh-blob blob-2"></div>
+        <div class="mesh-blob blob-3"></div>
+    </div>
     
     <div class="login-card">
         <div class="mx-auto w-20 h-20 rounded-xl mb-6 shadow-lg border-2 border-red-600 bg-gradient-to-br from-red-500 to-red-800 flex items-center justify-center text-3xl font-black">P</div>
@@ -89,51 +114,7 @@
             window.location.href = url;
         }
 
-        // --- FONDO ANIMADO (Red Network) ---
-        function initNetworkBg() {
-            const canvas = document.getElementById('network-bg');
-            const ctx = canvas.getContext('2d');
-            let w, h, points = [];
-
-            function resize() {
-                w = canvas.width = window.innerWidth;
-                h = canvas.height = window.innerHeight;
-                points = Array.from({length: 50}, () => ({
-                    x: Math.random() * w, y: Math.random() * h,
-                    vx: (Math.random() - 0.5) * 0.4, vy: (Math.random() - 0.5) * 0.4
-                }));
-            }
-            window.addEventListener('resize', resize);
-            resize();
-
-            function animate() {
-                ctx.clearRect(0, 0, w, h);
-                for(let i=0; i<points.length; i++) {
-                    let p = points[i];
-                    p.x += p.vx; p.y += p.vy;
-                    if(p.x < 0 || p.x > w) p.vx *= -1;
-                    if(p.y < 0 || p.y > h) p.vy *= -1;
-                    
-                    ctx.fillStyle = 'rgba(255, 26, 26, 0.5)';
-                    ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI*2); ctx.fill();
-
-                    for(let j=i+1; j<points.length; j++) {
-                        let p2 = points[j];
-                        let dx = p.x - p2.x, dy = p.y - p2.y;
-                        let dist = Math.sqrt(dx*dx + dy*dy);
-                        if(dist < 150) {
-                            ctx.strokeStyle = `rgba(255, 26, 26, ${1 - dist/150})`;
-                            ctx.lineWidth = 0.5;
-                            ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
-                        }
-                    }
-                }
-                requestAnimationFrame(animate);
-            }
-            animate();
-        }
-
-        document.addEventListener('DOMContentLoaded', initNetworkBg);
+        // El script anterior del canvas ha sido eliminado ya que ahora usamos CSS puro para el fondo
     </script>
 </body>
 </html>
