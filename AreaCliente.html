@@ -1087,36 +1087,24 @@ function updateLicenseDisplay() {
 }
 
         // ✅ NUEVA FUNCIÓN: ESCUCHAR COMPRAS APROBADAS EN TIEMPO REAL
-        function listenForApprovedOrders() {
-            if (!currentUser) return;
-            
-            db.collection("Compra")
-                .where("discord_id", "==", currentUser.id)
-                .where("status", "==", "approved")
-                .onSnapshot(async (snapshot) => {
-                    snapshot.docChanges().forEach(change => {
-                        if (change.type === 'added' || change.type === 'modified') {
-                            const data = change.doc.data();
-                            
-                            // Solo procesar si fue aprobada recientemente (últimos 5 minutos)
-                            const approvedAt = data.approved_at?.toDate();
-                            const now = new Date();
-                            const diffMinutes = (now - approvedAt) / (1000 * 60);
-                            
-                            if (diffMinutes < 5 && diffMinutes >= 0) {
-                                // ✅ VACIAR EL CARRITO AUTOMÁTICAMENTE
-                                localStorage.removeItem('papeleta_cart');
-                                
-                                // Notificar al usuario
-                                showToast('🎉 ¡Tu compra ha sido aprobada! El carrito se ha vaciado.', 'success');
-                                
-                                // Recargar el dashboard para mostrar los nuevos productos
-                                loadDashboardData();
-                            }
-                        }
-                    });
-                });
-        }
+        // Escuchar cuando se aprueba una compra y vaciar carrito
+function listenForApprovedOrders() {
+    if (!currentUser) return;
+    
+    db.collection("Compra")
+        .where("discord_id", "==", currentUser.id)
+        .where("status", "==", "approved")
+        .onSnapshot(async (snapshot) => {
+            snapshot.docChanges().forEach(change => {
+                if (change.type === 'added') {
+                    // Vaciar carrito
+                    localStorage.removeItem('papeleta_cart');
+                    showToast('🎉 ¡Tu compra ha sido aprobada! El carrito se ha vaciado.', 'success');
+                    loadDashboardData();
+                }
+            });
+        });
+}
 
         async function loadDashboardData() {
             if (!currentUser) return;
