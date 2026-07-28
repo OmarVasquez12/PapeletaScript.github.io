@@ -733,7 +733,7 @@
                 // Iniciar listener de soporte al loguearse
                 initSupportListener();
                 
-                // ✅ INICIAR LISTENER DE COMPRAS APROBADAS
+                // ✅ INICIAR LISTENER DE COMPRAS APROBADAS (ENTREGA AUTOMÁTICA)
                 listenForApprovedOrders();
             })
             .catch(err => { console.error(err); logout(); });
@@ -1086,33 +1086,90 @@
               });
         }
 
+// ✅ FUNCIÓN CORREGIDA: ESCUCHA APROBACIONES Y ENTREGA PRODUCTOS
 function listenForApprovedOrders() {
     if (!currentUser) return;
-    
+
+    // Escuchamos TODAS las órdenes del usuario para detectar el cambio de estado en tiempo real
     db.collection("Compra")
         .where("discord_id", "==", currentUser.id)
-        .where("status", "==", "approved")
         .onSnapshot(async (snapshot) => {
-            snapshot.docChanges().forEach(change => {
-                // Se activa cuando se aprueba una orden nueva o se modifica a aprobada
-                if (change.type === 'added' || change.type === 'modified') {
-                    
-                    // Vaciar carrito por seguridad al ser aprobado
-                    localStorage.removeItem('papeleta_cart');
-                    
-                    showToast('🎉 ¡Tu compra ha sido aprobada! Revisa tus productos activos.', 'success');
-                    
-                    // Recargar los datos del dashboard para mostrar el nuevo producto
-                    loadDashboardData();
+            snapshot.docChanges().forEach(async (change) => {
+                // Detectamos cuando el staff modifica la orden (ej: de 'pending_approval' a 'approved')
+                if (change.type === "modified") {
+                    const data = change.doc.data();
+                    const orderId = change.doc.id;
+
+                    // Si el estado cambia a aprobado (acepta 'approved' o 'aprobado' por si tu panel usa español)
+                    if (data.status === "approved" || data.status === "aprobado" || data.status === "completed") {
+                        
+                        // Evitamos procesar la misma orden dos veces
+                        if (data.status === "completed") return;
+
+                        console.log("✅ Orden aprobada detectada:", orderId);
+
+                        // 1. OTORGAR LOS PRODUCTOS (Crear licencias si no existen)
+                        if (data.products && Array.isArray(data.products)) {
+                            for (const product of data.products) {
+                                // Verificar si el usuario YA tiene la licencia de este producto específico
+                                const existingLicense = await db.collection("Licencias")
+                                    .where("discord_id", "==", currentUser.id)
+                                    .where("product_id", "==", product.id)
+                                    .where("status", "==", "active")
+                                    .limit(1)
+                                    .get();
+
+                                if (existingLicense.empty) {
+                                    // Generar datos únicos para el producto
+                                    const newKey = Array.from({length: 24}, () => "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[Math.floor(Math.random() * 36)]).join('');
+                                    const userCode = 'USER_' + Math.random().toString(36).substring(2, 8).toUpperCase();
+
+                                    // Crear la licencia del producto en la base de datos
+                                    await db.collection("Licencias").add({
+                                        discord_id: currentUser.id,
+                                        username: currentUser.username,
+                                        product_id: product.id,
+                                        product_name: product.name,
+                                        key: newKey,
+                                        user_code: userCode,
+                                        type: "product", // Diferente a "general" para que el dashboard lo muestre
+                                        created_at: firebase.firestore.FieldValue.serverTimestamp(),
+                                        status: 'active'
+                                    });
+
+                                    // Registro histórico en "Clientes"
+                                    await db.collection("Clientes").add({
+                                        discord_id: currentUser.id,
+                                        username: currentUser.username,
+                                        products: [{ id: product.id, name: product.name, price: product.price }],
+                                        total_price: data.total_amount,
+                                        date: firebase.firestore.FieldValue.serverTimestamp(),
+                                        status: "Entregado por Aprobación",
+                                        order_id: orderId
+                                    });
+                                }
+                            }
+                        }
+
+                        // 2. Marcar la orden como 'completed' para que no se vuelva a procesar en el futuro
+                        await change.doc.ref.update({ status: "completed" });
+
+                        // 3. Vaciar carrito y notificar al usuario
+                        localStorage.removeItem('papeleta_cart');
+                        showToast('🎉 ¡Tu solicitud fue aprobada! Se ha vaciado el carrito y se te ha otorgado el producto.', 'success');
+
+                        // 4. Recargar el dashboard inmediatamente para mostrar el nuevo producto
+                        loadDashboardData();
+                    }
                 }
             });
         });
 }
 
-        async function loadDashboardData() {
+async function loadDashboardData() {
     if (!currentUser) return;
     try {
-        // Cargar todos los productos disponibles
+        // Cargar todos los productos disponibles para obtener nombres e imágenes
         const productsSnapshot = await db.collection("Productos").get();
         allProducts = [];
         productsSnapshot.forEach((doc) => {
@@ -1134,9 +1191,8 @@ function listenForApprovedOrders() {
             const license = doc.data();
             const productId = license.product_id;
             
-            // Saltar licencias tipo "general" que no tienen product_id
+            // ⚠️ IMPORTANTE: Saltar licencias tipo "general" que no son productos comprables
             if (license.type === "general" || !productId) {
-                console.log("Licencia general omitida:", doc.id);
                 return;
             }
             
@@ -1162,8 +1218,6 @@ function listenForApprovedOrders() {
                 if (!isNaN(numericPrice) && numericPrice > 0) {
                     totalSpent += numericPrice;
                 }
-            } else {
-                console.warn("Producto no encontrado para product_id:", productId);
             }
         });
 
@@ -1202,7 +1256,7 @@ function listenForApprovedOrders() {
                 return `<div class="bg-[#0d0505] border border-red-900/30 rounded-xl p-4 flex items-center justify-between hover:border-red-600/50 transition-all">
                     <div class="flex items-center gap-4">
                         <div class="w-16 h-16 rounded-lg bg-[#150a0a] border border-red-900/20 overflow-hidden">
-                            <img src="${item.image_url || ''}" class="w-full h-full object-cover">
+                            <img src="${item.image_url || 'https://via.placeholder.com/64'}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/64'">
                         </div>
                         <div>
                             <h3 class="text-white font-bold">${item.name}</h3>
