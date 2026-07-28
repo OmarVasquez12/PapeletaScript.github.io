@@ -13,7 +13,6 @@
     <style>
         :root { --bg-body: #1a0a0a; --primary: #ff1a1a; --border-color: rgba(255, 26, 26, 0.15); }
         
-        /* FONDO MÁS CLARO CON PARTÍCULAS ANIMADAS */
         body { 
             background: linear-gradient(135deg, #2a0a0a 0%, #1a0505 50%, #0f0505 100%);
             color: #f3f4f6; 
@@ -23,61 +22,37 @@
             min-height: 100vh;
         }
         
-        /* Contenedor de partículas */
         #particles-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            overflow: hidden;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0; overflow: hidden;
         }
         
         .particle {
-            position: absolute;
-            width: 3px;
-            height: 3px;
-            background: rgba(255, 26, 26, 0.6);
-            border-radius: 50%;
+            position: absolute; width: 3px; height: 3px;
+            background: rgba(255, 26, 26, 0.6); border-radius: 50%;
             box-shadow: 0 0 10px rgba(255, 26, 26, 0.8);
             animation: floatParticle linear infinite;
         }
         
         @keyframes floatParticle {
             0% { transform: translate(0, 0) scale(1); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
+            10% { opacity: 1; } 90% { opacity: 1; }
             100% { transform: translate(var(--moveX), var(--moveY)) scale(0.5); opacity: 0; }
         }
         
-        .red-glow { text-shadow: 0 0 18px rgba(255, 26, 26, 0.85); }
         .cart-item { 
-            background: rgba(21, 10, 10, 0.6); 
-            border: 1px solid rgba(255, 26, 26, 0.15); 
-            transition: all 0.3s ease; 
-            backdrop-filter: blur(10px);
-            position: relative;
-            z-index: 1;
+            background: rgba(21, 10, 10, 0.6); border: 1px solid rgba(255, 26, 26, 0.15); 
+            transition: all 0.3s ease; backdrop-filter: blur(10px); position: relative; z-index: 1;
         }
         .cart-item:hover { border-color: rgba(255, 26, 26, 0.4); }
         
         .toast-container { position: fixed; top: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
         .toast { 
-            background: rgba(21, 10, 10, 0.95); 
-            border: 1px solid rgba(255, 26, 26, 0.3); 
-            border-left: 4px solid #dc2626; 
-            border-radius: 12px; 
-            padding: 16px 20px; 
-            min-width: 320px; 
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); 
+            background: rgba(21, 10, 10, 0.95); border: 1px solid rgba(255, 26, 26, 0.3); 
+            border-left: 4px solid #dc2626; border-radius: 12px; padding: 16px 20px; 
+            min-width: 320px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); 
             animation: slideInRight 0.4s ease, fadeOut 0.4s ease 4.6s forwards; 
-            display: flex; 
-            align-items: center; 
-            gap: 12px; 
-            pointer-events: auto;
-            backdrop-filter: blur(10px);
+            display: flex; align-items: center; gap: 12px; pointer-events: auto; backdrop-filter: blur(10px);
         }
         .toast.success { border-left-color: #10b981; }
         .toast.error { border-left-color: #ef4444; }
@@ -87,62 +62,35 @@
         
         .order-summary-box {
             background: linear-gradient(180deg, rgba(30, 10, 10, 0.95) 0%, rgba(20, 5, 5, 0.98) 100%);
-            border: 1px solid rgba(255, 26, 26, 0.2);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            position: relative;
-            z-index: 1;
+            border: 1px solid rgba(255, 26, 26, 0.2); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px); position: relative; z-index: 1;
         }
-        .input-dark {
-            background: rgba(13, 5, 5, 0.8);
-            border: 1px solid rgba(255, 26, 26, 0.3);
-            color: #fff;
-        }
+        .input-dark { background: rgba(13, 5, 5, 0.8); border: 1px solid rgba(255, 26, 26, 0.3); color: #fff; }
         .input-dark::placeholder { color: rgba(255, 255, 255, 0.4); }
         .input-dark:focus { outline: none; border-color: #ff1a1a; box-shadow: 0 0 0 3px rgba(255, 26, 26, 0.1); }
-        .btn-aplicar {
-            background: linear-gradient(135deg, #ff1a1a 0%, #cc0000 100%);
-            box-shadow: 0 4px 15px rgba(255, 26, 26, 0.4);
-        }
+        .btn-aplicar { background: linear-gradient(135deg, #ff1a1a 0%, #cc0000 100%); box-shadow: 0 4px 15px rgba(255, 26, 26, 0.4); }
         .btn-aplicar:hover { background: linear-gradient(135deg, #ff3333 0%, #ff1a1a 100%); box-shadow: 0 6px 20px rgba(255, 26, 26, 0.6); }
         .checkbox-custom { accent-color: #ff1a1a; }
-        .warning-box {
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(245, 158, 11, 0.05) 100%);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.1);
-        }
+        .warning-box { background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(245, 158, 11, 0.05) 100%); border: 1px solid rgba(245, 158, 11, 0.3); }
         .total-price { color: #ff1a1a; text-shadow: 0 0 20px rgba(255, 26, 26, 0.6); }
         .divider { border-top: 1px solid rgba(255, 26, 26, 0.15); }
         
         .payment-option {
-            background: rgba(13, 5, 5, 0.8);
-            border: 1px solid rgba(255, 26, 26, 0.3);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            backdrop-filter: blur(10px);
+            background: rgba(13, 5, 5, 0.8); border: 1px solid rgba(255, 26, 26, 0.3); border-radius: 12px;
+            padding: 16px; margin-bottom: 12px; cursor: pointer; transition: all 0.3s ease;
+            display: flex; align-items: center; gap: 12px; backdrop-filter: blur(10px);
         }
         .payment-option:hover { border-color: #ff1a1a; background: rgba(255, 26, 26, 0.1); }
         .payment-option.disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
-        .payment-icon {
-            width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
-            background: rgba(255,255,255,0.1); border-radius: 8px; font-size: 20px;
-        }
+        .payment-icon { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); border-radius: 8px; font-size: 20px; }
         
         .btn-reclamar {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
-            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4); transition: all 0.3s ease;
         }
         .btn-reclamar:hover {
             background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
-            box-shadow: 0 6px 25px rgba(16, 185, 129, 0.6);
-            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(16, 185, 129, 0.6); transform: translateY(-2px);
         }
         
         @keyframes fadeOutItem { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(-20px); } }
@@ -192,7 +140,6 @@
                         </div>
                     </div>
 
-                    <!-- OPCIONES DE PAGO (Solo si NO es gratis) -->
                     <div id="payment-methods" class="mb-6 hidden">
                         <label class="block text-gray-400 text-sm mb-3">Selecciona método de pago</label>
                         
@@ -224,7 +171,6 @@
                         </div>
                     </div>
 
-                    <!-- BOTÓN RECLAMAR (Solo si es gratis) -->
                     <div id="claim-section" class="mb-6 hidden">
                         <div class="p-4 bg-green-900/20 border border-green-600/30 rounded-xl mb-4">
                             <div class="flex items-center gap-3">
@@ -289,7 +235,6 @@
     <div id="toast-container" class="toast-container"></div>
 
     <script>
-        // ========== CONFIGURACIÓN ==========
         const DISCORD_INVITE_LINK = "https://discord.gg/6XgvxeHEJ"; 
         
         const firebaseConfig = {
@@ -313,9 +258,8 @@
         let ownedProducts = new Set();
         let pendingOrderUnsubscribe = null;
         let isFreeProduct = false;
-        let globalLicense = null; // ✅ LICENCIA GLOBAL ÚNICA DEL USUARIO
+        let globalLicense = null;
 
-        // ========== SISTEMA DE PARTÍCULAS ANIMADAS ==========
         function createParticles() {
             const container = document.getElementById('particles-container');
             const particleCount = 50;
@@ -340,7 +284,6 @@
             }
         }
 
-        // ========== UTILIDADES ==========
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -362,12 +305,9 @@
             return String(str).replace(/[&<>'"]/g, tag => ({ '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;' }[tag] || tag));
         }
 
-        // ✅ OBTENER O CREAR LICENCIA GLOBAL ÚNICA
         async function getGlobalLicense(userId) {
             if (globalLicense) return globalLicense;
-            
             try {
-                // Buscar licencia tipo "general" existente
                 const snapshot = await db.collection("Licencias")
                     .where("discord_id", "==", userId)
                     .where("type", "==", "general")
@@ -376,80 +316,68 @@
 
                 if (!snapshot.empty) {
                     globalLicense = snapshot.docs[0].data();
-                    console.log("✅ Licencia global encontrada:", globalLicense.key);
                     return globalLicense;
                 }
 
-                // Crear nueva licencia global SOLO si no existe
                 const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
                 let key = '';
                 for (let i = 0; i < 24; i++) key += chars.charAt(Math.floor(Math.random() * chars.length));
-                
                 const userCode = 'USER_' + Math.random().toString(36).substring(2, 8).toUpperCase();
                 
                 const licenseData = {
-                    discord_id: userId,
-                    username: currentUser.username,
-                    key: key,
-                    user_code: userCode,
-                    type: "general",
-                    created_at: firebase.firestore.FieldValue.serverTimestamp(),
-                    status: 'active'
+                    discord_id: userId, username: currentUser.username, key: key, user_code: userCode,
+                    type: "general", created_at: firebase.firestore.FieldValue.serverTimestamp(), status: 'active'
                 };
 
                 await db.collection("Licencias").add(licenseData);
                 globalLicense = licenseData;
-                console.log("✨ Nueva licencia global creada:", globalLicense.key);
                 return globalLicense;
-
             } catch (error) {
                 console.error("Error obteniendo licencia global:", error);
                 return null;
             }
         }
 
-        // ========== ESCUCHAR CAMBIOS EN ÓRDENES EN TIEMPO REAL ==========
-        // ========== ESCUCHAR CAMBIOS EN ÓRDENES EN TIEMPO REAL ==========
-function listenForOrderChanges() {
-    if (!currentUser) return;
-    
-    pendingOrderUnsubscribe = db.collection("Compra")
-        .where("discord_id", "==", currentUser.id)
-        .orderBy("date", "desc")
-        .onSnapshot((snapshot) => {
-            snapshot.docChanges().forEach((change) => {
-                
-                // CASO 1: El admin cambió el estado a "approved"
-                if (change.type === "modified") {
-                    const data = change.doc.data();
-                    if (data.status === "approved") {
-                        showToast('🎉 ¡Producto aprobado! Redirigiendo a tu área...', 'success');
+        // ✅ ESCUCHAR CAMBIOS EN ÓRDENES EN TIEMPO REAL (MODIFICADO PARA APROBACIÓN)
+        function listenForOrderChanges() {
+            if (!currentUser) return;
+            pendingOrderUnsubscribe = db.collection("Compra")
+                .where("discord_id", "==", currentUser.id)
+                .orderBy("date", "desc")
+                .limit(1)
+                .onSnapshot((snapshot) => {
+                    snapshot.docChanges().forEach((change) => {
+                        // CUANDO EL STAFF MODIFICA LA ORDEN (POR EJEMPLO, LA APRUEBA)
+                        if (change.type === "modified") {
+                            const data = change.doc.data();
+                            // Ajusta 'approved' o 'aprobado' según como lo guarde tu panel de staff
+                            if (data.status === 'approved' || data.status === 'aprobado') {
+                                console.log("Orden aprobada - Vaciar carrito y notificar");
+                                cart = [];
+                                localStorage.removeItem('papeleta_cart');
+                                renderCart();
+                                showToast('🎉 ¡Tu solicitud fue aprobada! Se ha vaciado el carrito y se te ha otorgado el producto.', 'success');
+                                
+                                // Redirigir al área de cliente para que vea sus productos
+                                setTimeout(() => { 
+                                    window.location.href = 'AreaCliente.html'; 
+                                }, 3000);
+                            }
+                        }
                         
-                        // 1. Vaciar el carrito en memoria y localStorage
-                        cart = [];
-                        localStorage.removeItem('papeleta_cart');
-                        
-                        // 2. Redirigir al Área de Cliente después de 2 segundos
-                        setTimeout(() => {
-                            window.location.href = 'AreaCliente.html';
-                        }, 2000);
-                    }
-                }
-                
-                // CASO 2: El admin eliminó o rechazó la orden
-                if (change.type === "removed") {
-                    showToast('⚠️ Tu solicitud de compra fue cancelada o rechazada.', 'warning');
-                    cart = [];
-                    localStorage.removeItem('papeleta_cart');
-                    setTimeout(() => { window.location.reload(); }, 2000);
-                }
-            });
-        }, (error) => {
-            console.error("Error escuchando órdenes:", error);
-        });
-}
+                        // POR SI ACASO EL STAFF ELIMINA LA ORDEN EN LUGAR DE APROBARLA
+                        if (change.type === "removed") {
+                            console.log("Orden eliminada - Vaciar carrito");
+                            cart = [];
+                            localStorage.removeItem('papeleta_cart');
+                            renderCart();
+                            showToast('🎉 Tu carrito ha sido vaciado automáticamente', 'success');
+                            setTimeout(() => { window.location.reload(); }, 2000);
+                        }
+                    });
+                });
+        }
 
-        // ========== VERIFICAR ESTADO DEL USUARIO ==========
         async function checkUserStatus() {
             if (!currentUser) return;
             const licensesSnapshot = await db.collection("Licencias")
@@ -457,22 +385,18 @@ function listenForOrderChanges() {
                 .where("status", "==", "active")
                 .get();
             licensesSnapshot.forEach(doc => { ownedProducts.add(doc.data().product_id); });
-            
-            // ✅ Obtener licencia global al iniciar
             await getGlobalLicense(currentUser.id);
-            
             listenForOrderChanges();
             renderCart();
         }
 
-        // ========== LÓGICA DEL CARRITO ==========
         function renderCart() {
             const container = document.getElementById('cart-items-container');
             const paymentMethods = document.getElementById('payment-methods');
             const claimSection = document.getElementById('claim-section');
             
             if (cart.length === 0) {
-                showToast(' Ve a la tienda y añade algo', 'warning');
+                showToast('Ve a la tienda y añade algo', 'warning');
                 setTimeout(() => { window.location.href = 'index.html'; }, 3000);
                 return;
             }
@@ -538,7 +462,6 @@ function listenForOrderChanges() {
             document.getElementById('login-warning').classList.toggle('hidden', !!currentUser);
         }
 
-        // ========== CÓDIGOS DE DESCUENTO ==========
         async function validateAndApplyDiscount() {
             const code = document.getElementById('discount-code-input').value.trim().toUpperCase();
             if (!code) { showToast('Ingresa un código', 'warning'); return; }
@@ -564,53 +487,81 @@ function listenForOrderChanges() {
             showToast('Código de descuento eliminado', 'success');
         }
 
-        // ========== MANEJO DE PAGOS ==========
         async function handlePayment(method) {
             if (!currentUser) { showToast('Debes iniciar sesión primero', 'error'); return; }
             if (!document.getElementById('terms-checkbox').checked) { showToast('Acepta los términos de uso', 'warning'); return; }
             const alreadyOwnedItems = cart.filter(item => ownedProducts.has(item.id));
-            if (alreadyOwnedItems.length > 0) { showToast('️ Ya tienes algunos productos en el carrito. Elimínalos para continuar.', 'error'); return; }
+            if (alreadyOwnedItems.length > 0) { showToast('Ya tienes algunos productos en el carrito. Elimínalos para continuar.', 'error'); return; }
             const pendingQuery = await db.collection("Compra").where("discord_id", "==", currentUser.id).where("status", "==", "pending_approval").limit(1).get();
             if (!pendingQuery.empty) { showToast('⚠️ Ya tienes una solicitud pendiente de aprobación.', 'warning'); return; }
 
             if (method === 'discord') await processDiscordPayment();
             else if (method === 'paypal') {
-                // ✅ PAYPAL EN MANTENIMIENTO - SOLO MUESTRA MENSAJE
                 showToast('🔧 PayPal está temporalmente en mantenimiento. Usa Discord Manual por ahora.', 'warning');
             }
         }
 
-// ✅ PROCESAR PAGO CON DISCORD - SOLO USA LICENCIA EXISTENTE
-async function processDiscordPayment() {
-    const subtotal = cart.reduce((sum, item) => sum + Number(item.price), 0);
-    let total = subtotal;
-    if (activeDiscount && discountPercentage > 0) total = subtotal - (subtotal * (discountPercentage / 100));
-    
-    // ✅ Usar la licencia global ya obtenida (NO crea duplicados)
-    const license = await getGlobalLicense(currentUser.id);
-    if (!license) {
-        showToast('❌ Error al obtener tu licencia. Intenta de nuevo.', 'error');
-        return;
-    }
+        // ✅ PROCESAR PAGO CON DISCORD (MODIFICADO: YA NO REDIRIGE)
+        async function processDiscordPayment() {
+            const subtotal = cart.reduce((sum, item) => sum + Number(item.price), 0);
+            let total = subtotal;
+            if (activeDiscount && discountPercentage > 0) total = subtotal - (subtotal * (discountPercentage / 100));
+            
+            const license = await getGlobalLicense(currentUser.id);
+            if (!license) {
+                showToast('❌ Error al obtener tu licencia. Intenta de nuevo.', 'error');
+                return;
+            }
 
-    // ✅ SOLO guardar en "Compra" - NO crear licencia nueva
-    const orderData = {
-        discord_id: currentUser.id, username: currentUser.username, discriminator: currentUser.discriminator || '0000',
-        avatar: currentUser.avatar, products: cart, total_amount: total, payment_method: 'discord_manual',
-        status: 'pending_approval', date: firebase.firestore.FieldValue.serverTimestamp(), order_id: Date.now().toString(),
-        license_key: license.key, // ✅ Solo referencia la licencia global
-        license_user: license.user_code
-    };
-    try {
-        await db.collection("Compra").add(orderData);
-        showToast('✅ Solicitud enviada correctamente. Serás redirigido a Discord...', 'success');
-        setTimeout(() => { window.location.href = DISCORD_INVITE_LINK; }, 2000);
-    } catch (error) {
-        console.error('Error:', error);
-        showToast('Error al procesar: ' + error.message, 'error');
-    }
-}
-        // ========== INICIALIZACIÓN ==========
+            const orderData = {
+                discord_id: currentUser.id, username: currentUser.username, discriminator: currentUser.discriminator || '0000',
+                avatar: currentUser.avatar, products: cart, total_amount: total, payment_method: 'discord_manual',
+                status: 'pending_approval', date: firebase.firestore.FieldValue.serverTimestamp(), order_id: Date.now().toString(),
+                license_key: license.key, license_user: license.user_code
+            };
+            try {
+                await db.collection("Compra").add(orderData);
+                // ✅ CAMBIO: Ya no redirige automáticamente. Se queda en la página y espera la aprobación.
+                showToast('✅ Solicitud enviada correctamente. Por favor, espera a que el staff la apruebe. No cierres esta pestaña.', 'success');
+                
+                // Opcional: Si quieres que se abra Discord en otra pestaña sin sacar al usuario de aquí, descomenta la siguiente línea:
+                // window.open(DISCORD_INVITE_LINK, '_blank');
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error al procesar: ' + error.message, 'error');
+            }
+        }
+
+        async function claimFreeProduct() {
+            if (!currentUser) { showToast('Debes iniciar sesión primero', 'error'); return; }
+            if (!document.getElementById('terms-checkbox').checked) { showToast('Acepta los términos de uso', 'warning'); return; }
+
+            try {
+                const license = await getGlobalLicense(currentUser.id);
+                if (!license) {
+                    showToast('❌ Error al obtener tu licencia. Intenta de nuevo.', 'error');
+                    return;
+                }
+
+                for (const item of cart) {
+                    await db.collection("Clientes").add({
+                        discord_id: currentUser.id, username: currentUser.username,
+                        products: [{ id: item.id, name: item.name, price: "Gratis" }],
+                        total_price: "Gratis", date: firebase.firestore.FieldValue.serverTimestamp(),
+                        status: "Reclamado Exitosamente", license_key: license.key, license_user: license.user_code
+                    });
+                }
+
+                cart = [];
+                localStorage.removeItem('papeleta_cart');
+                showToast('🎉 ¡Producto reclamado exitosamente!', 'success');
+                setTimeout(() => { window.location.href = 'AreaCliente.html'; }, 2000);
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error al reclamar: ' + error.message, 'error');
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             createParticles();
             const savedToken = localStorage.getItem('dc_access_token');
