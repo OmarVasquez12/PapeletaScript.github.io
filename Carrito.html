@@ -409,25 +409,45 @@
         }
 
         // ========== ESCUCHAR CAMBIOS EN ÓRDENES EN TIEMPO REAL ==========
-        function listenForOrderChanges() {
-            if (!currentUser) return;
-            pendingOrderUnsubscribe = db.collection("Compra")
-                .where("discord_id", "==", currentUser.id)
-                .orderBy("date", "desc")
-                .limit(1)
-                .onSnapshot((snapshot) => {
-                    snapshot.docChanges().forEach((change) => {
-                        if (change.type === "removed") {
-                            console.log("Orden eliminada - Vaciar carrito");
-                            cart = [];
-                            localStorage.removeItem('papeleta_cart');
-                            renderCart();
-                            showToast('🎉 Tu carrito ha sido vaciado automáticamente', 'success');
-                            setTimeout(() => { window.location.reload(); }, 2000);
-                        }
-                    });
-                });
-        }
+        // ========== ESCUCHAR CAMBIOS EN ÓRDENES EN TIEMPO REAL ==========
+function listenForOrderChanges() {
+    if (!currentUser) return;
+    
+    pendingOrderUnsubscribe = db.collection("Compra")
+        .where("discord_id", "==", currentUser.id)
+        .orderBy("date", "desc")
+        .onSnapshot((snapshot) => {
+            snapshot.docChanges().forEach((change) => {
+                
+                // CASO 1: El admin cambió el estado a "approved"
+                if (change.type === "modified") {
+                    const data = change.doc.data();
+                    if (data.status === "approved") {
+                        showToast('🎉 ¡Producto aprobado! Redirigiendo a tu área...', 'success');
+                        
+                        // 1. Vaciar el carrito en memoria y localStorage
+                        cart = [];
+                        localStorage.removeItem('papeleta_cart');
+                        
+                        // 2. Redirigir al Área de Cliente después de 2 segundos
+                        setTimeout(() => {
+                            window.location.href = 'AreaCliente.html';
+                        }, 2000);
+                    }
+                }
+                
+                // CASO 2: El admin eliminó o rechazó la orden
+                if (change.type === "removed") {
+                    showToast('⚠️ Tu solicitud de compra fue cancelada o rechazada.', 'warning');
+                    cart = [];
+                    localStorage.removeItem('papeleta_cart');
+                    setTimeout(() => { window.location.reload(); }, 2000);
+                }
+            });
+        }, (error) => {
+            console.error("Error escuchando órdenes:", error);
+        });
+}
 
         // ========== VERIFICAR ESTADO DEL USUARIO ==========
         async function checkUserStatus() {
