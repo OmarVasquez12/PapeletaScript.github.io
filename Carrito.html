@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carrito de Compras - Papeleta Store</title>
+    <title>Carrito </title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff1a1a'/%3E%3Cstop offset='1' stop-color='%23cc1b1b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Ctext x='50' y='70' font-family='Arial, sans-serif' font-size='58' font-weight='900' fill='white' text-anchor='middle'%3EP%3C/text%3E%3C/svg%3E">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -12,6 +12,8 @@
     
     <style>
         :root { --bg-body: #1a0a0a; --primary: #ff1a1a; --border-color: rgba(255, 26, 26, 0.15); }
+        
+        /* FONDO MÁS CLARO CON PARTÍCULAS ANIMADAS */
         body { 
             background: linear-gradient(135deg, #2a0a0a 0%, #1a0505 50%, #0f0505 100%);
             color: #f3f4f6; 
@@ -20,6 +22,8 @@
             overflow-x: hidden;
             min-height: 100vh;
         }
+        
+        /* Contenedor de partículas */
         #particles-container {
             position: fixed;
             top: 0;
@@ -30,6 +34,7 @@
             z-index: 0;
             overflow: hidden;
         }
+        
         .particle {
             position: absolute;
             width: 3px;
@@ -39,12 +44,14 @@
             box-shadow: 0 0 10px rgba(255, 26, 26, 0.8);
             animation: floatParticle linear infinite;
         }
+        
         @keyframes floatParticle {
             0% { transform: translate(0, 0) scale(1); opacity: 0; }
             10% { opacity: 1; }
             90% { opacity: 1; }
             100% { transform: translate(var(--moveX), var(--moveY)) scale(0.5); opacity: 0; }
         }
+        
         .red-glow { text-shadow: 0 0 18px rgba(255, 26, 26, 0.85); }
         .cart-item { 
             background: rgba(21, 10, 10, 0.6); 
@@ -55,6 +62,7 @@
             z-index: 1;
         }
         .cart-item:hover { border-color: rgba(255, 26, 26, 0.4); }
+        
         .toast-container { position: fixed; top: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
         .toast { 
             background: rgba(21, 10, 10, 0.95); 
@@ -76,6 +84,7 @@
         .toast.warning { border-left-color: #f59e0b; }
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; transform: translateX(100%); } }
+        
         .order-summary-box {
             background: linear-gradient(180deg, rgba(30, 10, 10, 0.95) 0%, rgba(20, 5, 5, 0.98) 100%);
             border: 1px solid rgba(255, 26, 26, 0.2);
@@ -104,6 +113,7 @@
         }
         .total-price { color: #ff1a1a; text-shadow: 0 0 20px rgba(255, 26, 26, 0.6); }
         .divider { border-top: 1px solid rgba(255, 26, 26, 0.15); }
+        
         .payment-option {
             background: rgba(13, 5, 5, 0.8);
             border: 1px solid rgba(255, 26, 26, 0.3);
@@ -123,6 +133,7 @@
             width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
             background: rgba(255,255,255,0.1); border-radius: 8px; font-size: 20px;
         }
+        
         .btn-reclamar {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
@@ -133,8 +144,10 @@
             box-shadow: 0 6px 25px rgba(16, 185, 129, 0.6);
             transform: translateY(-2px);
         }
+        
         @keyframes fadeOutItem { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(-20px); } }
         .removing { animation: fadeOutItem 0.3s ease forwards; }
+        
         header, main { position: relative; z-index: 1; }
     </style>
 </head>
@@ -179,6 +192,7 @@
                         </div>
                     </div>
 
+                    <!-- OPCIONES DE PAGO (Solo si NO es gratis) -->
                     <div id="payment-methods" class="mb-6 hidden">
                         <label class="block text-gray-400 text-sm mb-3">Selecciona método de pago</label>
                         
@@ -210,6 +224,7 @@
                         </div>
                     </div>
 
+                    <!-- BOTÓN RECLAMAR (Solo si es gratis) -->
                     <div id="claim-section" class="mb-6 hidden">
                         <div class="p-4 bg-green-900/20 border border-green-600/30 rounded-xl mb-4">
                             <div class="flex items-center gap-3">
@@ -274,6 +289,7 @@
     <div id="toast-container" class="toast-container"></div>
 
     <script>
+        // ========== CONFIGURACIÓN ==========
         const DISCORD_INVITE_LINK = "https://discord.gg/6XgvxeHEJ"; 
         
         const firebaseConfig = {
@@ -297,9 +313,9 @@
         let ownedProducts = new Set();
         let pendingOrderUnsubscribe = null;
         let isFreeProduct = false;
-        let globalLicense = null;
-        let approvalUnsubscribe = null;
+        let globalLicense = null; // ✅ LICENCIA GLOBAL DEL USUARIO
 
+        // ========== SISTEMA DE PARTÍCULAS ANIMADAS ==========
         function createParticles() {
             const container = document.getElementById('particles-container');
             const particleCount = 50;
@@ -324,6 +340,7 @@
             }
         }
 
+        // ========== UTILIDADES ==========
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -345,7 +362,7 @@
             return String(str).replace(/[&<>'"]/g, tag => ({ '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;' }[tag] || tag));
         }
 
-        // ✅ FUNCIÓN MEJORADA: OBTENER O CREAR LICENCIA ÚNICA GLOBAL
+        // ✅ OBTENER O CREAR LICENCIA GLOBAL
         async function getGlobalLicense(userId) {
             if (globalLicense) return globalLicense;
             
@@ -391,34 +408,28 @@
             }
         }
 
-        // ✅ ESCUCHAR COMPRAS APROBADAS EN TIEMPO REAL
-        function listenForApprovedOrders() {
+        // ========== ESCUCHAR CAMBIOS EN ÓRDENES EN TIEMPO REAL ==========
+        function listenForOrderChanges() {
             if (!currentUser) return;
-            
-            approvalUnsubscribe = db.collection("Compra")
+            pendingOrderUnsubscribe = db.collection("Compra")
                 .where("discord_id", "==", currentUser.id)
-                .where("status", "==", "approved")
                 .orderBy("date", "desc")
                 .limit(1)
                 .onSnapshot((snapshot) => {
                     snapshot.docChanges().forEach((change) => {
-                        if (change.type === "added") {
-                            console.log("✅ Compra aprobada detectada");
-                            showToast('🎉 ¡Tu compra ha sido aprobada! Redirigiendo...', 'success');
-                            
-                            // Vaciar carrito
+                        if (change.type === "removed") {
+                            console.log("Orden eliminada - Vaciar carrito");
                             cart = [];
                             localStorage.removeItem('papeleta_cart');
-                            
-                            // Redirigir a AreaCliente.html después de 2 segundos
-                            setTimeout(() => {
-                                window.location.href = 'AreaCliente.html';
-                            }, 2000);
+                            renderCart();
+                            showToast('🎉 Tu carrito ha sido vaciado automáticamente', 'success');
+                            setTimeout(() => { window.location.reload(); }, 2000);
                         }
                     });
                 });
         }
 
+        // ========== VERIFICAR ESTADO DEL USUARIO ==========
         async function checkUserStatus() {
             if (!currentUser) return;
             const licensesSnapshot = await db.collection("Licencias")
@@ -427,11 +438,14 @@
                 .get();
             licensesSnapshot.forEach(doc => { ownedProducts.add(doc.data().product_id); });
             
+            // ✅ Obtener licencia global al iniciar
             await getGlobalLicense(currentUser.id);
-            listenForApprovedOrders(); // ✅ Iniciar listener de aprobaciones
+            
+            listenForOrderChanges();
             renderCart();
         }
 
+        // ========== LÓGICA DEL CARRITO ==========
         function renderCart() {
             const container = document.getElementById('cart-items-container');
             const paymentMethods = document.getElementById('payment-methods');
@@ -504,31 +518,15 @@
             document.getElementById('login-warning').classList.toggle('hidden', !!currentUser);
         }
 
-        // ✅ VALIDAR CUPÓN CON USO ÚNICO POR USUARIO
+        // ========== CÓDIGOS DE DESCUENTO ==========
         async function validateAndApplyDiscount() {
             const code = document.getElementById('discount-code-input').value.trim().toUpperCase();
             if (!code) { showToast('Ingresa un código', 'warning'); return; }
-            if (!currentUser) { showToast('Debes iniciar sesión primero', 'error'); return; }
-            
             try {
                 const discountDoc = await db.collection("DiscountCodes").doc(code).get();
                 if (!discountDoc.exists) { showToast('Código inválido', 'error'); return; }
-                
                 const discountData = discountDoc.data();
                 if (!discountData.active) { showToast('Este código ha expirado', 'error'); return; }
-                
-                // ✅ VERIFICAR SI EL USUARIO YA USÓ ESTE CUPÓN
-                const usedByUser = await db.collection("DiscountUsage")
-                    .where("code", "==", code)
-                    .where("userId", "==", currentUser.id)
-                    .limit(1)
-                    .get();
-                
-                if (!usedByUser.empty) {
-                    showToast(' Ya has usado este cupón anteriormente', 'error');
-                    return;
-                }
-                
                 activeDiscount = code;
                 discountPercentage = discountData.percentage || 0;
                 showToast(`¡Código ${code} aplicado! ${discountPercentage}% de descuento`, 'success');
@@ -546,6 +544,7 @@
             showToast('Código de descuento eliminado', 'success');
         }
 
+        // ========== MANEJO DE PAGOS ==========
         async function handlePayment(method) {
             if (!currentUser) { showToast('Debes iniciar sesión primero', 'error'); return; }
             if (!document.getElementById('terms-checkbox').checked) { showToast('Acepta los términos de uso', 'warning'); return; }
@@ -556,6 +555,7 @@
 
             if (method === 'discord') await processDiscordPayment();
             else if (method === 'paypal') {
+                // ✅ PAYPAL EN MANTENIMIENTO - SOLO MUESTRA MENSAJE
                 showToast('🔧 PayPal está temporalmente en mantenimiento. Usa Discord Manual por ahora.', 'warning');
             }
         }
@@ -565,6 +565,7 @@
             let total = subtotal;
             if (activeDiscount && discountPercentage > 0) total = subtotal - (subtotal * (discountPercentage / 100));
             
+            // ✅ Usar la licencia global ya obtenida
             const license = await getGlobalLicense(currentUser.id);
             if (!license) {
                 showToast('❌ Error al obtener tu licencia. Intenta de nuevo.', 'error');
@@ -575,25 +576,11 @@
                 discord_id: currentUser.id, username: currentUser.username, discriminator: currentUser.discriminator || '0000',
                 avatar: currentUser.avatar, products: cart, total_amount: total, payment_method: 'discord_manual',
                 status: 'pending_approval', date: firebase.firestore.FieldValue.serverTimestamp(), order_id: Date.now().toString(),
-                license_key: license.key,
-                license_user: license.user_code,
-                discount_used: activeDiscount || null
+                license_key: license.key, // ✅ Guardar referencia a la licencia global
+                license_user: license.user_code
             };
-            
             try {
                 await db.collection("Compra").add(orderData);
-                
-                // ✅ REGISTRAR USO DEL CUPÓN
-                if (activeDiscount) {
-                    await db.collection("DiscountUsage").add({
-                        code: activeDiscount,
-                        userId: currentUser.id,
-                        username: currentUser.username,
-                        used_at: firebase.firestore.FieldValue.serverTimestamp(),
-                        order_id: orderData.order_id
-                    });
-                }
-                
                 showToast('✅ Solicitud enviada correctamente. Serás redirigido a Discord...', 'success');
                 setTimeout(() => { window.location.href = DISCORD_INVITE_LINK; }, 2000);
             } catch (error) {
@@ -602,17 +589,20 @@
             }
         }
 
+        // ✅ RECLAMAR PRODUCTO GRATIS CON LICENCIA GLOBAL
         async function claimFreeProduct() {
             if (!currentUser) { showToast('Debes iniciar sesión primero', 'error'); return; }
             if (!document.getElementById('terms-checkbox').checked) { showToast('Acepta los términos de uso', 'warning'); return; }
 
             try {
+                // ✅ Usar la licencia global
                 const license = await getGlobalLicense(currentUser.id);
                 if (!license) {
                     showToast('❌ Error al obtener tu licencia. Intenta de nuevo.', 'error');
                     return;
                 }
 
+                // Registrar la compra como reclamada usando la licencia global
                 for (const item of cart) {
                     await db.collection("Clientes").add({
                         discord_id: currentUser.id,
@@ -636,6 +626,7 @@
             }
         }
 
+        // ========== INICIALIZACIÓN ==========
         document.addEventListener('DOMContentLoaded', () => {
             createParticles();
             const savedToken = localStorage.getItem('dc_access_token');
@@ -647,10 +638,7 @@
                 renderCart();
                 showToast('Debes iniciar sesión para completar la compra', 'warning');
             }
-            window.addEventListener('beforeunload', () => { 
-                if (pendingOrderUnsubscribe) pendingOrderUnsubscribe();
-                if (approvalUnsubscribe) approvalUnsubscribe();
-            });
+            window.addEventListener('beforeunload', () => { if (pendingOrderUnsubscribe) pendingOrderUnsubscribe(); });
         });
     </script>
 </body>
