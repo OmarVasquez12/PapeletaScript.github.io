@@ -1271,6 +1271,7 @@
                     if (!userStats[userId]) {
                         userStats[userId] = {
                             discord_id: userId,
+                            user_avatar: currentUser.avatar, 
                             username: data.username || 'Usuario',
                             avatar: data.user_avatar || null,
                             productCount: 0
@@ -1295,60 +1296,120 @@
 
                 const top3 = sortedUsers.slice(0, 3);
 
-                if (top3.length > 0) {
-                    const renderCard = (user, rank) => {
-                        if (!user) return '';
-                        let avatarUrl = 'https://cdn.discordapp.com/embed/avatars/0.png';
-                        if (user.avatar) {
-                            avatarUrl = `https://cdn.discordapp.com/avatars/${user.discord_id}/${user.avatar}.png?size=256`;
-                        }
-                        const productoTexto = user.productCount === 1 ? 'PRODUCTO' : 'PRODUCTOS';
+                if (top3.length > 0) {async function loadTopUsers() {
+    const container = document.getElementById('top-users-podium');
+    try {
+        // 1. Primero obtenemos todos los usuarios registrados con sus avatares
+        const usersSnapshot = await db.collection("UsuariosRegistrados").get();
+        const usersMap = {};
+        
+        usersSnapshot.forEach(doc => {
+            const data = doc.data();
+            usersMap[data.discord_id] = {
+                username: data.username || 'Usuario',
+                avatar: data.avatar || null
+            };
+        });
 
-                        return `
-                        <div class="podium-card rank-${rank}">
-                            <h3 class="podium-name">${escapeHTML(user.username)}</h3>
-                            <div style="position: relative; display: flex; justify-content: center; margin: 10px 0;">
-                                <div class="rank-badge">${rank}</div>
-                                <img src="${avatarUrl}" alt="${escapeHTML(user.username)}" class="podium-avatar" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'">
-                            </div>
-                            <div class="podium-stats">
-                                <span class="stat-number">${user.productCount}</span>
-                                <span class="stat-label">${productoTexto}</span>
-                            </div>
-                        </div>
-                        `;
-                    };
+        // 2. Ahora obtenemos las compras
+        const snapshot = await db.collection("Clientes").get();
+        const userStats = {};
 
-                    const firstPlace = top3[0] || null;
-                    const secondPlace = top3[1] || null;
-                    const thirdPlace = top3[2] || null;
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            const userId = data.discord_id;
+            if (!userId) return;
 
-                    let html = '';
-                    html += renderCard(secondPlace, 2); // Izquierda
-                    html += renderCard(firstPlace, 1);  // Centro
-                    html += renderCard(thirdPlace, 3);  // Derecha
-
-                    container.innerHTML = html;
-                } else {
-                    container.innerHTML = `
-                        <div style="text-align: center; width: 100%; padding: 40px 0;">
-                            <i class="fas fa-trophy text-4xl text-gray-700 mb-4"></i>
-                            <p class="text-gray-500">Aún no hay compras registradas.</p>
-                            <p class="text-gray-600 text-sm mt-1">¡Sé el primero en aparecer aquí!</p>
-                        </div>
-                    `;
+            if (!userStats[userId]) {
+                userStats[userId] = {
+                    discord_id: userId,
+                    username: data.username || 'Usuario',
+                    avatar: null,
+                    productCount: 0
+                };
+                
+                // Buscamos el avatar en el mapa de usuarios registrados
+                if (usersMap[userId]) {
+                    userStats[userId].avatar = usersMap[userId].avatar;
+                    userStats[userId].username = usersMap[userId].username;
                 }
-            } catch (error) {
-                console.error("Error cargando top usuarios:", error);
-                container.innerHTML = `
-                    <div style="text-align: center; width: 100%; padding: 40px 0;">
-                        <i class="fas fa-exclamation-triangle text-3xl text-red-500 mb-3"></i>
-                        <p class="text-gray-500">No se pudo cargar el ranking.</p>
-                    </div>
-                `;
             }
-        }
 
+            // Contamos productos
+            if (data.products && Array.isArray(data.products)) {
+                userStats[userId].productCount += data.products.length;
+            } else if (data.product_id) {
+                userStats[userId].productCount += 1;
+            } else {
+                userStats[userId].productCount += 1;
+            }
+        });
+
+        const sortedUsers = Object.values(userStats)
+            .filter(u => u.productCount > 0)
+            .sort((a, b) => b.productCount - a.productCount);
+
+        const top3 = sortedUsers.slice(0, 3);
+
+        if (top3.length > 0) {
+            const renderCard = (user, rank) => {
+                if (!user) return '';
+                
+                // Construir URL del avatar correctamente
+                let avatarUrl = `https://cdn.discordapp.com/embed/avatars/${rank % 5}.png`;
+                if (user.avatar) {
+                    avatarUrl = `https://cdn.discordapp.com/avatars/${user.discord_id}/${user.avatar}.png?size=256`;
+                }
+                
+                const productoTexto = user.productCount === 1 ? 'PRODUCTO' : 'PRODUCTOS';
+
+                return `
+                <div class="podium-card rank-${rank}">
+                    <h3 class="podium-name">${escapeHTML(user.username)}</h3>
+                    <div style="position: relative; display: flex; justify-content: center; margin: 10px 0;">
+                        <div class="rank-badge">${rank}</div>
+                        <img src="${avatarUrl}" 
+                             alt="${escapeHTML(user.username)}" 
+                             class="podium-avatar" 
+                             onerror="this.src='https://cdn.discordapp.com/embed/avatars/${rank % 5}.png'">
+                    </div>
+                    <div class="podium-stats">
+                        <span class="stat-number">${user.productCount}</span>
+                        <span class="stat-label">${productoTexto}</span>
+                    </div>
+                </div>
+                `;
+            };
+
+            const firstPlace = top3[0] || null;
+            const secondPlace = top3[1] || null;
+            const thirdPlace = top3[2] || null;
+
+            let html = '';
+            html += renderCard(secondPlace, 2);
+            html += renderCard(firstPlace, 1);
+            html += renderCard(thirdPlace, 3);
+
+            container.innerHTML = html;
+        } else {
+            container.innerHTML = `
+                <div style="text-align: center; width: 100%; padding: 40px 0;">
+                    <i class="fas fa-trophy text-4xl text-gray-700 mb-4"></i>
+                    <p class="text-gray-500">Aún no hay compras registradas.</p>
+                    <p class="text-gray-600 text-sm mt-1">¡Sé el primero en aparecer aquí!</p>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error("Error cargando top usuarios:", error);
+        container.innerHTML = `
+            <div style="text-align: center; width: 100%; padding: 40px 0;">
+                <i class="fas fa-exclamation-triangle text-3xl text-red-500 mb-3"></i>
+                <p class="text-gray-500">No se pudo cargar el ranking.</p>
+            </div>
+        `;
+    }
+}
         // Función Toast para notificaciones elegantes
         function showToast(message, type = 'success') {
             let container = document.querySelector('.toast-container');
