@@ -1086,24 +1086,28 @@
               });
         }
 
-        // ✅ NUEVA FUNCIÓN: ESCUCHAR COMPRAS APROBADAS EN TIEMPO REAL
-        function listenForApprovedOrders() {
-            if (!currentUser) return;
-            
-            db.collection("Compra")
-                .where("discord_id", "==", currentUser.id)
-                .where("status", "==", "approved")
-                .onSnapshot(async (snapshot) => {
-                    snapshot.docChanges().forEach(change => {
-                        if (change.type === 'added') {
-                            // Vaciar carrito
-                            localStorage.removeItem('papeleta_cart');
-                            showToast('🎉 ¡Tu compra ha sido aprobada! El carrito se ha vaciado.', 'success');
-                            loadDashboardData();
-                        }
-                    });
-                });
-        }
+function listenForApprovedOrders() {
+    if (!currentUser) return;
+    
+    db.collection("Compra")
+        .where("discord_id", "==", currentUser.id)
+        .where("status", "==", "approved")
+        .onSnapshot(async (snapshot) => {
+            snapshot.docChanges().forEach(change => {
+                // Se activa cuando se aprueba una orden nueva o se modifica a aprobada
+                if (change.type === 'added' || change.type === 'modified') {
+                    
+                    // Vaciar carrito por seguridad al ser aprobado
+                    localStorage.removeItem('papeleta_cart');
+                    
+                    showToast('🎉 ¡Tu compra ha sido aprobada! Revisa tus productos activos.', 'success');
+                    
+                    // Recargar los datos del dashboard para mostrar el nuevo producto
+                    loadDashboardData();
+                }
+            });
+        });
+}
 
         async function loadDashboardData() {
             if (!currentUser) return;
