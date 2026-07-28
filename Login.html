@@ -10,29 +10,31 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
         :root {
             --primary: #ff1a1a;
             --bg-dark: #050507;
         }
         
         body {
-            background-color: var(--bg-dark);
+            background-color: #050507;
             color: #f3f4f6;
             font-family: 'Segoe UI', system-ui, sans-serif;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow-x: hidden;
+            overflow: hidden;
             position: relative;
         }
 
-        /* --- NUEVO FONDO ANIMADO (MESH BLOBS) --- */
+        /* Malla degradada de fondo */
         .bg-mesh {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            z-index: -1;
+            z-index: -2;
             overflow: hidden;
             pointer-events: none;
             background: 
@@ -40,6 +42,7 @@
                 radial-gradient(ellipse at bottom right, rgba(255,26,26,0.1) 0%, transparent 50%);
         }
 
+        /* Manchas flotantes */
         .mesh-blob {
             position: absolute;
             filter: blur(90px);
@@ -53,6 +56,15 @@
         @keyframes float { 
             0%, 100% { transform: translate(0, 0) scale(1); } 
             50% { transform: translate(30px, 30px) scale(1.1); } 
+        }
+
+        /* Canvas de partículas */
+        #particles-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            pointer-events: none;
         }
 
         .login-card {
@@ -83,12 +95,16 @@
     </style>
 </head>
 <body>
-    <!-- Nuevo Fondo Animado -->
+
+    <!-- Fondo de malla y manchas -->
     <div class="bg-mesh">
         <div class="mesh-blob blob-1"></div>
         <div class="mesh-blob blob-2"></div>
         <div class="mesh-blob blob-3"></div>
     </div>
+
+    <!-- Canvas de partículas interactivo -->
+    <canvas id="particles-canvas"></canvas>
     
     <div class="login-card">
         <div class="mx-auto w-20 h-20 rounded-xl mb-6 shadow-lg border-2 border-red-600 bg-gradient-to-br from-red-500 to-red-800 flex items-center justify-center text-3xl font-black">P</div>
@@ -104,17 +120,71 @@
         </a>
     </div>
 
+    <!-- Script de partículas -->
     <script>
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * 0.5 - 0.25;
+                this.opacity = Math.random() * 0.5 + 0.1;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
+            }
+            draw() {
+                ctx.fillStyle = `rgba(255, 26, 26, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < 60; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        initParticles();
+        animateParticles();
+
+        // Función de Discord
         const CLIENT_ID = '1213866547181780992'; 
-        // Asegúrate de que esta URI coincida EXACTAMENTE con la configurada en tu App de Discord Developer Portal
         const REDIRECT_URI = 'https://papeleta-script-github-io.vercel.app'; 
 
         function redirectToDiscord() {
             const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20email`;
             window.location.href = url;
         }
-
-        // El script anterior del canvas ha sido eliminado ya que ahora usamos CSS puro para el fondo
     </script>
 </body>
 </html>
