@@ -171,15 +171,8 @@
     <!-- Sidebar -->
     <aside class="sidebar w-64 fixed left-0 top-0 h-full z-50 hidden md:block">
     <div class="p-6">
-        <!-- Contenedor del Logo -->
         <div class="flex items-center gap-3 mb-8 cursor-pointer" onclick="window.location.href='index.html'">
-            
-            <!-- NUEVO CÓDIGO DE IMAGEN -->
-            <img src="/files/999.png" 
-                 alt="Logo Papeleta Store" 
-                 class="w-10 h-10 rounded-lg object-cover shadow-lg shadow-red-900/50 bg-white">
-            
-            <!-- Texto (Se mantiene igual) -->
+            <img src="/files/999.png" alt="Logo Papeleta Store" class="w-10 h-10 rounded-lg object-cover shadow-lg shadow-red-900/50 bg-white">
             <div>
                <span class="text-white font-bold text-base tracking-wide block">PAPELETA STORE</span>
                 <span id="admin-badge-sidebar" class="admin-badge hidden">ADMIN</span>
@@ -187,10 +180,10 @@
         </div>
             <nav class="space-y-2">
                 <div class="text-xs text-gray-500 uppercase font-semibold mb-4 px-3 tracking-wider">Principal</div>
-                <a href="#" onclick="showSection('dashboard')" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fas fa-home w-5"></i><span>Inicio</span></a>
+                <a href="#" onclick="showSection('dashboard', event)" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fas fa-home w-5"></i><span>Inicio</span></a>
                 <a href="index.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fas fa-store w-5"></i><span>Tienda</span></a>
-                <a href="#" onclick="showSection('reviews')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fas fa-star w-5"></i><span>Mis Reseñas</span></a>
-                <a href="#" onclick="showSection('support')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fas fa-headset w-5"></i><span>Soporte</span></a>
+                <a href="#" onclick="showSection('reviews', event)" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fas fa-star w-5"></i><span>Mis Reseñas</span></a>
+                <a href="#" onclick="showSection('support', event)" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fas fa-headset w-5"></i><span>Soporte</span></a>
                 <a href="https://discord.gg/rvxEdWcGkf" target="_blank" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fab fa-discord w-5"></i><span>Discord</span></a>
             </nav>
         </div>
@@ -219,8 +212,6 @@
         </header>
 
         <div class="p-6 md:p-8 flex-grow">
-            
-            <!-- Dashboard Section -->
             <div id="section-dashboard" class="section active">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div class="stat-card rounded-xl p-6 relative overflow-hidden group">
@@ -285,14 +276,13 @@
                             </div>
                         </div>
                         <div class="grid grid-cols-2 gap-3 mb-4">
-                            <button onclick="saveServerConfig()" class="btn-primary px-4 py-2.5 rounded-lg text-white font-medium flex items-center justify-center gap-2 text-sm"><i class="fas fa-save"></i> Guardar</button>
-                            <button onclick="copyLicenseCode()" class="px-4 py-2.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 font-medium flex items-center justify-center gap-2 text-sm"><i class="fas fa-copy"></i> Copiar</button>
+                            <button onclick="saveServerConfig(event)" class="btn-primary px-4 py-2.5 rounded-lg text-white font-medium flex items-center justify-center gap-2 text-sm"><i class="fas fa-save"></i> Guardar</button>
+                            <button onclick="copyLicenseCode(event)" class="px-4 py-2.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 font-medium flex items-center justify-center gap-2 text-sm"><i class="fas fa-copy"></i> Copiar</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Reviews Section -->
             <div id="section-reviews" class="section">
                 <div class="card rounded-xl p-6">
                     <div class="flex items-center gap-3 mb-6">
@@ -309,7 +299,6 @@
                 </div>
             </div>
 
-            <!-- Support Section -->
             <div id="section-support" class="section">
                 <div class="card rounded-xl p-6">
                     <div class="flex items-center gap-3 mb-6">
@@ -317,7 +306,6 @@
                         <h2 class="text-lg font-bold text-white">Centro de Soporte</h2>
                     </div>
                     
-                    <!-- Estado del Ticket -->
                     <div id="support-status-container" class="mb-6 p-4 bg-[#0d0505] border border-red-900/30 rounded-xl flex justify-between items-center">
                         <div>
                             <p class="text-gray-400 text-sm">Estado actual:</p>
@@ -331,21 +319,14 @@
                         </button>
                     </div>
 
-                    <!-- Área de Chat -->
                     <div id="chat-interface" class="chat-container hidden">
-                        <div id="chat-messages" class="chat-messages">
-                            <!-- Los mensajes se cargarán aquí dinámicamente -->
-                        </div>
-                        
+                        <div id="chat-messages" class="chat-messages"></div>
                         <div class="support-input-area">
                             <input type="text" id="support-message-input" class="input-field flex-1 px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none" placeholder="Escribe tu mensaje...">
-                            <button onclick="sendSupportMessage()" class="btn-primary px-6 py-3 rounded-lg text-white font-bold">
-                                <i class="fas fa-paper-plane"></i>
-                            </button>
+                            <button onclick="sendSupportMessage()" class="btn-primary px-6 py-3 rounded-lg text-white font-bold"><i class="fas fa-paper-plane"></i></button>
                         </div>
                     </div>
 
-                    <!-- Mensaje cuando no hay ticket -->
                     <div id="no-ticket-message" class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5">
                         <i class="fas fa-life-ring text-gray-600 text-5xl mb-4"></i>
                         <p class="text-gray-400 text-lg">No tienes ningún ticket de soporte abierto.</p>
@@ -408,9 +389,7 @@
     <div id="close-ticket-modal" class="custom-modal-overlay">
         <div class="custom-modal">
             <div class="flex items-center gap-3 mb-4">
-                <div class="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center">
-                    <i class="fas fa-exclamation-triangle text-red-500 text-xl"></i>
-                </div>
+                <div class="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center"><i class="fas fa-exclamation-triangle text-red-500 text-xl"></i></div>
                 <div>
                     <h3 class="text-xl font-bold text-white">Cerrar Ticket</h3>
                     <p class="text-gray-400 text-sm">¿Estás seguro de cerrar este ticket?</p>
@@ -419,9 +398,7 @@
             <p class="text-gray-300 text-sm mb-6">Se eliminará el acceso al chat y se notificará a Discord.</p>
             <div class="custom-modal-buttons">
                 <button class="btn-modal-cancel" onclick="closeCloseTicketModal()">Cancelar</button>
-                <button class="btn-modal-confirm" onclick="confirmCloseTicket()">
-                    <i class="fas fa-check mr-2"></i> Sí, cerrar ticket
-                </button>
+                <button class="btn-modal-confirm" onclick="confirmCloseTicket()"><i class="fas fa-check mr-2"></i> Sí, cerrar ticket</button>
             </div>
         </div>
     </div>
@@ -439,9 +416,6 @@
     <div id="toast-container" class="toast-container"></div>
 
     <script>
-        // =============================================
-        //          FIREBASE CONFIGURACIÓN (COMPAT)
-        // =============================================
         const firebaseConfig = {
             apiKey: "AIzaSyBWggE0KFiVZDxwxvmhuWXEKu6bNguV0mM",
             authDomain: "papeletalicencia.firebaseapp.com",
@@ -464,16 +438,11 @@
         let currentTicketData = null;
         let supportUnsubscribe = null;
 
-        // Configuración Discord
         const CLIENT_ID = '1213866547181780992'; 
         const REDIRECT_URI = window.location.href.split('#')[0]; 
         const ADMIN_DISCORD_IDS = ['890526767608127489']; 
         const TICKET_WEBHOOK_URL = "https://discord.com/api/webhooks/1530747464569716756/LLK7Msvn-NNXbrP5bN8lYBzkjCR7G6D1CE63w41AozCfN2mVxRxiMQUoWpHK2g6ahHg7";
         const REVIEW_WEBHOOK_URL = "https://discord.com/api/webhooks/1530350855100956853/mqzdvlTBOx2JZ3wlumx-LdLAus3sZyg610PeoxK9ds4jpqxMK9t0sBT_2Lo-U-TDutRF";
-
-        // =============================================
-        //          FUNCIONES AUXILIARES
-        // =============================================
 
         function showToast(message, type = 'success', title = '') {
             const container = document.getElementById('toast-container');
@@ -494,10 +463,6 @@
             const portNum = parseInt(port);
             return ipRegex.test(ip) && !isNaN(portNum) && portNum >= 1 && portNum <= 65535;
         }
-
-        // =============================================
-        //          AUTENTICACIÓN DISCORD
-        // =============================================
 
         function redirectToDiscord() {
             window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20email`;
@@ -555,15 +520,13 @@
             location.reload();
         }
 
-        // =============================================
-        //          NAVEGACIÓN Y UI
-        // =============================================
-
-        function showSection(section) {
+        function showSection(section, event) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(`section-${section}`).classList.add('active');
-            event.currentTarget.classList.add('active');
+            if (event && event.currentTarget) {
+                event.currentTarget.classList.add('active');
+            }
             if (section === 'reviews') loadMyReviews();
             if (section === 'support') loadSupportInterface();
         }
@@ -606,15 +569,10 @@
             
             checkDiscordAuth();
             
-            // Cargar config guardada localmente
             const saved = JSON.parse(localStorage.getItem('server_config') || '{}');
             if (saved.ip) document.getElementById('server-ip').value = saved.ip;
             if (saved.port) document.getElementById('server-port').value = saved.port;
         });
-
-        // =============================================
-        //          GESTIÓN DE LICENCIAS GLOBALES
-        // =============================================
 
         function generateUniqueKey() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; 
@@ -626,7 +584,6 @@
         async function ensureFixedLicense() {
             if (!currentUser) return;
             try {
-                // Buscamos SOLO la licencia maestra tipo "general"
                 const snapshot = await db.collection("Licencias")
                     .where("discord_id", "==", currentUser.id)
                     .where("type", "==", "general")
@@ -635,7 +592,6 @@
                 if (!snapshot.empty) {
                     userFixedLicenseKey = snapshot.docs[0].data().key;
                 } else {
-                    // Si no existe, creamos UNA SOLA vez la licencia global
                     const newKey = generateUniqueKey();
                     const newUser = 'USER_' + Math.random().toString(36).substring(2, 8).toUpperCase();
                     
@@ -644,7 +600,7 @@
                         username: currentUser.username, 
                         key: newKey,
                         user_code: newUser,
-                        type: "general", // Etiqueta para identificarla como la única
+                        type: "general",
                         created_at: firebase.firestore.FieldValue.serverTimestamp(), 
                         status: 'active'
                     });
@@ -658,7 +614,6 @@
             const codeBlock = document.getElementById('license-code');
             if (!currentUser || !codeBlock) return;
 
-            // Mostramos SIEMPRE la licencia GLOBAL (type: general)
             db.collection("Licencias")
               .where("discord_id", "==", currentUser.id)
               .where("type", "==", "general")
@@ -667,146 +622,120 @@
               .then(snapshot => {
                   if (!snapshot.empty) {
                       const license = snapshot.docs[0].data();
-                      codeBlock.textContent = `configLicense = {
-    ["User"] = "${license.user_code || 'PENDIENTE'}", 
-    ["Key"] = "${license.key}"
-}`;
+                      codeBlock.textContent = `configLicense = {\n    ["User"] = "${license.user_code || 'PENDIENTE'}", \n    ["Key"] = "${license.key}"\n}`;
                   } else {
                       codeBlock.textContent = "No tienes licencias activas aún.";
                   }
               });
         }
 
-        // ✅ FUNCIÓN CORREGIDA: GUARDAR IP/PUERTO EN TODAS LAS LICENCIAS DEL USUARIO
-        async function saveServerConfig() {
-    const ipInput = document.getElementById('server-ip');
-    const portInput = document.getElementById('server-port');
-    
-    // Validación de existencia de inputs
-    if (!ipInput || !portInput) {
-        console.error("No se encontraron los campos de IP/Puerto");
-        return;
-    }
-
-    const ip = ipInput.value.trim();
-    const port = portInput.value.trim();
-    
-    console.log("🔍 Debug SaveConfig:", { 
-        ip, 
-        port, 
-        userExists: !!currentUser, 
-        userId: currentUser?.id 
-    });
-
-    if (!ip || !port) {
-        showToast('Por favor ingresa IP y Puerto válidos', 'warning');
-        return;
-    }
-    
-    if (!validateIPPort(ip, port)) {
-        showToast('Formato inválido. Ej: 192.168.1.1 y 22003', 'error');
-        return;
-    }
-
-    // Protección crítica: Verificar que el usuario esté cargado
-    if (!currentUser || !currentUser.id) {
-        showToast('⚠️ Error de sesión. Por favor recarga la página e inicia sesión de nuevo.', 'error');
-        console.error("Usuario no autenticado o ID faltante");
-        return;
-    }
-    
-    try {
-        // 1. Guardar localmente siempre (fallback)
-        localStorage.setItem('server_config', JSON.stringify({ ip, port }));
-        
-        // 2. Buscar licencias activas
-        const licenseSnapshot = await db.collection("Licencias")
-            .where("discord_id", "==", currentUser.id)
-            .where("status", "==", "active")
-            .get();
-        
-        console.log(`📦 Licencias encontradas: ${licenseSnapshot.size}`);
-        
-        if (!licenseSnapshot.empty) {
-            // Actualizar todas las licencias existentes
-            const batch = db.batch();
-            let count = 0;
+        async function saveServerConfig(event) {
+            const ipInput = document.getElementById('server-ip');
+            const portInput = document.getElementById('server-port');
             
-            licenseSnapshot.forEach((doc) => {
-                batch.update(doc.ref, {
-                    ip: ip,
-                    port: port,
-                    updated_at: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                count++;
-            });
+            if (!ipInput || !portInput) {
+                console.error("No se encontraron los campos de IP/Puerto");
+                return;
+            }
+
+            const ip = ipInput.value.trim();
+            const port = portInput.value.trim();
             
-            await batch.commit();
-            console.log(`✅ Batch completado: ${count} documentos actualizados`);
+            console.log("🔍 Debug SaveConfig:", { ip, port, userExists: !!currentUser, userId: currentUser?.id });
+
+            if (!ip || !port) {
+                showToast('Por favor ingresa IP y Puerto válidos', 'warning');
+                return;
+            }
             
-        } else {
-            // Crear licencia de configuración si no tiene ninguna
-            console.log("➕ Creando nueva licencia de configuración...");
-            await db.collection("Licencias").add({
-                discord_id: currentUser.id,
-                username: currentUser.username || "Unknown",
-                ip: ip,
-                port: port,
-                status: 'pending_config',
-                type: 'server_config',
-                created_at: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            console.log("✅ Nueva licencia creada");
+            if (!validateIPPort(ip, port)) {
+                showToast('Formato inválido. Ej: 192.168.1.1 y 22003', 'error');
+                return;
+            }
+
+            if (!currentUser || !currentUser.id) {
+                showToast('⚠️ Error de sesión. Por favor recarga la página e inicia sesión de nuevo.', 'error');
+                console.error("Usuario no autenticado o ID faltante");
+                return;
+            }
+            
+            try {
+                localStorage.setItem('server_config', JSON.stringify({ ip, port }));
+                
+                const licenseSnapshot = await db.collection("Licencias")
+                    .where("discord_id", "==", currentUser.id)
+                    .where("status", "==", "active")
+                    .get();
+                
+                console.log(`📦 Licencias encontradas: ${licenseSnapshot.size}`);
+                
+                if (!licenseSnapshot.empty) {
+                    const batch = db.batch();
+                    let count = 0;
+                    
+                    licenseSnapshot.forEach((doc) => {
+                        batch.update(doc.ref, {
+                            ip: ip,
+                            port: port,
+                            updated_at: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                        count++;
+                    });
+                    
+                    await batch.commit();
+                    console.log(`✅ Batch completado: ${count} documentos actualizados`);
+                    
+                } else {
+                    console.log("➕ Creando nueva licencia de configuración...");
+                    await db.collection("Licencias").add({
+                        discord_id: currentUser.id,
+                        username: currentUser.username || "Unknown",
+                        ip: ip,
+                        port: port,
+                        status: 'pending_config',
+                        type: 'server_config',
+                        created_at: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    console.log("✅ Nueva licencia creada");
+                }
+                
+                const btn = event?.currentTarget;
+                if (btn) {
+                    const original = btn.innerHTML;
+                    btn.innerHTML = '<i class="fas fa-check"></i> Guardado';
+                    btn.classList.add('bg-green-600');
+                    
+                    setTimeout(() => {
+                        btn.innerHTML = original;
+                        btn.classList.remove('bg-green-600');
+                    }, 2000);
+                }
+                
+                showToast('IP y Puerto guardados correctamente', 'success');
+                
+            } catch (error) {
+                console.error("❌ ERROR CRÍTICO EN SAVE:", error);
+                let errorMsg = 'Error al guardar';
+                if (error.code === 'permission-denied') errorMsg = 'Permiso denegado.';
+                else if (error.code === 'unavailable') errorMsg = 'Sin conexión a Firebase.';
+                else errorMsg = error.message.substring(0, 50);
+                
+                showToast(errorMsg, 'error');
+            }
         }
-        
-        // Feedback visual exitoso
-        const btn = event.currentTarget;
-        if (btn) {
-            const original = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-check"></i> Guardado';
-            btn.classList.add('bg-green-600');
-            
-            setTimeout(() => {
-                btn.innerHTML = original;
-                btn.classList.remove('bg-green-600');
-            }, 2000);
-        }
-        
-        showToast('IP y Puerto guardados correctamente', 'success');
-        
-    } catch (error) {
-        // Captura detallada del error
-        console.error("❌ ERROR CRÍTICO EN SAVE:", error);
-        console.error("Stack:", error.stack);
-        
-        // Mensaje más descriptivo para el usuario
-        let errorMsg = 'Error al guardar';
-        if (error.code === 'permission-denied') {
-            errorMsg = 'Permiso denegado. Contacta al admin.';
-        } else if (error.code === 'unavailable') {
-            errorMsg = 'Sin conexión a Firebase.';
-        } else {
-            errorMsg = error.message.substring(0, 50);
-        }
-        
-        showToast(errorMsg, 'error');
-    }
-}
 
-        // ✅ FUNCIÓN CORREGIDA: DESCARGAR CON VALIDACIÓN DE IP/PUERTO
         async function downloadProduct(productId) {
             const ip = document.getElementById('server-ip').value.trim();
             const port = document.getElementById('server-port').value.trim();
             
-            // Validar que tenga IP y Puerto configurados
             if (!ip || !port) {
-                showToast('️ Debes configurar tu IP y Puerto antes de descargar.', 'warning', 'Configuración Requerida');
+                showToast('Debes configurar tu IP y Puerto antes de descargar.', 'warning', 'Configuración Requerida');
                 document.getElementById('server-ip').focus();
                 return;
             }
 
             if (!validateIPPort(ip, port)) {
-                showToast('❌ Formato de IP o Puerto inválido.', 'error', 'Error de Formato');
+                showToast('Formato de IP o Puerto inválido.', 'error', 'Error de Formato');
                 return;
             }
 
@@ -817,9 +746,8 @@
             }
 
             try {
-                showToast(' Vinculando licencia con tu servidor...', 'success', 'Procesando');
+                showToast('Vinculando licencia con tu servidor...', 'success', 'Procesando');
                 
-                // Buscar la licencia específica de ESTE producto O la global
                 let licenseRef = null;
                 const licenseSnapshot = await db.collection("Licencias")
                     .where("discord_id", "==", currentUser.id)
@@ -831,7 +759,6 @@
                 if (!licenseSnapshot.empty) {
                     licenseRef = licenseSnapshot.docs[0].ref;
                 } else {
-                    // Fallback: buscar la licencia GLOBAL del usuario
                     const generalSnapshot = await db.collection("Licencias")
                         .where("discord_id", "==", currentUser.id)
                         .where("type", "==", "general")
@@ -844,7 +771,6 @@
                     }
                 }
 
-                // Actualizar la licencia con IP, Puerto y nombre del resource
                 if (licenseRef) {
                     await licenseRef.update({
                         ip: ip,
@@ -853,7 +779,6 @@
                     });
                 }
 
-                // Proceder con la descarga
                 const link = document.createElement('a');
                 link.href = product.file_data;
                 link.download = product.file_name || 'resource.zip';
@@ -861,7 +786,7 @@
                 link.click();
                 document.body.removeChild(link);
                 
-                showToast('✅ Descarga iniciada. Licencia vinculada.', 'success', '¡Listo!');
+                showToast('Descarga iniciada. Licencia vinculada.', 'success', '¡Listo!');
                 
             } catch (error) {
                 console.error("Error al vincular licencia:", error);
@@ -869,19 +794,17 @@
             }
         }
 
-        function copyLicenseCode() {
+        function copyLicenseCode(event) {
             const code = document.getElementById('license-code').textContent;
             navigator.clipboard.writeText(code).then(() => {
-                const btn = event.currentTarget;
-                const original = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check"></i> Copiado';
-                setTimeout(() => btn.innerHTML = original, 2000);
+                const btn = event?.currentTarget;
+                if (btn) {
+                    const original = btn.innerHTML;
+                    btn.innerHTML = '<i class="fas fa-check"></i> Copiado';
+                    setTimeout(() => btn.innerHTML = original, 2000);
+                }
             });
         }
-
-        // =============================================
-        //          DASHBOARD Y PRODUCTOS
-        // =============================================
 
         async function getOrCreateLicense(userId, productId, productName) {
             try {
@@ -907,7 +830,7 @@
                 const docRef = await db.collection("Licencias").add(licenseData);
                 return { id: docRef.id, ...licenseData };
             } catch (error) {
-                console.error("❌ Error en getOrCreateLicense:", error);
+                console.error("Error en getOrCreateLicense:", error);
                 return null;
             }
         }
@@ -920,8 +843,6 @@
                     snapshot.docChanges().forEach(async (change) => {
                         if (change.type === "modified") {
                             const data = change.doc.data();
-                            const orderId = change.doc.id;
-
                             if (data.status === "approved" || data.status === "aprobado" || data.status === "completed") {
                                 if (data.status === "completed") return;
 
@@ -955,8 +876,7 @@
                                                 products: [{ id: product.id, name: product.name, price: product.price }],
                                                 total_price: data.total_amount,
                                                 date: firebase.firestore.FieldValue.serverTimestamp(),
-                                                status: "Entregado por Aprobación",
-                                                order_id: orderId
+                                                status: "Entregado por Aprobación"
                                             });
                                         }
                                     }
@@ -964,7 +884,7 @@
 
                                 await change.doc.ref.update({ status: "completed" });
                                 localStorage.removeItem('papeleta_cart');
-                                showToast('🎉 ¡Solicitud aprobada! Producto otorgado.', 'success');
+                                showToast('¡Solicitud aprobada! Producto otorgado.', 'success');
                                 loadDashboardData();
                             }
                         }
@@ -982,9 +902,7 @@
                     allProducts.push({ docId: doc.id, id: data.id || doc.id, ...data });
                 });
 
-                const clientsSnapshot = await db.collection("Clientes")
-                    .where("discord_id", "==", currentUser.id).get();
-
+                const clientsSnapshot = await db.collection("Clientes").where("discord_id", "==", currentUser.id).get();
                 let purchasedProducts = [];
                 let totalSpent = 0;
                 const processedProductIds = new Set();
@@ -992,22 +910,13 @@
                 clientsSnapshot.forEach((doc) => {
                     const clientData = doc.data();
                     const products = clientData.products || [];
-                    
                     products.forEach(product => {
                         if (processedProductIds.has(product.id)) return;
                         processedProductIds.add(product.id);
 
-                        const productData = allProducts.find(p => 
-                            String(p.id) === String(product.id) || String(p.docId) === String(product.id)
-                        );
-                        
+                        const productData = allProducts.find(p => String(p.id) === String(product.id) || String(p.docId) === String(product.id));
                         if (productData) {
-                            purchasedProducts.push({ 
-                                ...productData, 
-                                purchaseDate: clientData.date?.toDate ? clientData.date.toDate() : new Date(),
-                                price: product.price || productData.price || 'Gratis'
-                            });
-                            
+                            purchasedProducts.push({ ...productData, price: product.price || productData.price || 'Gratis' });
                             const rawPrice = String(product.price || productData.price).toLowerCase();
                             const numericPrice = parseFloat(rawPrice.replace('$', '').replace(',', ''));
                             if (!isNaN(numericPrice) && numericPrice > 0) totalSpent += numericPrice;
@@ -1024,7 +933,6 @@
                     container.innerHTML = '';
                 } else {
                     document.getElementById('dashboard-empty-state').classList.add('hidden');
-                    
                     const reviewsSnapshot = await db.collection("Resenas").where("user_id", "==", currentUser.id).get();
                     const reviewedProductIds = new Set();
                     reviewsSnapshot.forEach(doc => reviewedProductIds.add(doc.data().product_id));
@@ -1032,19 +940,10 @@
                     container.innerHTML = purchasedProducts.map(item => {
                         const hasReview = reviewedProductIds.has(String(item.id)) || reviewedProductIds.has(String(item.docId));
                         const safeName = item.name.replace(/'/g, "\\'");
-                        
-                        let priceDisplay = '';
-                        let priceClass = 'text-white font-bold';
-                        
                         const rawPrice = String(item.price).toLowerCase();
                         const numericPrice = parseFloat(rawPrice.replace('$', '').replace(',', ''));
-                        
-                        if (!isNaN(numericPrice) && numericPrice > 0) {
-                            priceDisplay = 'Listo';
-                            priceClass = 'text-green-400 font-bold';
-                        } else {
-                            priceDisplay = 'Gratis';
-                        }
+                        const priceDisplay = (!isNaN(numericPrice) && numericPrice > 0) ? 'Listo' : 'Gratis';
+                        const priceClass = (!isNaN(numericPrice) && numericPrice > 0) ? 'text-green-400 font-bold' : 'text-white font-bold';
 
                         return `<div class="bg-[#0d0505] border border-red-900/30 rounded-xl p-4 flex items-center justify-between hover:border-red-600/50 transition-all">
                             <div class="flex items-center gap-4">
@@ -1076,10 +975,6 @@
             });
         }
 
-        // =============================================
-        //          RESEÑAS
-        // =============================================
-
         async function submitReview() {
             if (!currentReviewProduct) return;
             if (selectedRating === 0) { showToast('Selecciona una calificación', 'warning'); return; }
@@ -1087,10 +982,7 @@
             if (!reviewText) { showToast('Escribe tu reseña', 'warning'); return; }
             
             try {
-                const existingReview = await db.collection("Resenas")
-                    .where("product_id", "==", currentReviewProduct)
-                    .where("user_id", "==", currentUser.id).limit(1).get();
-                
+                const existingReview = await db.collection("Resenas").where("product_id", "==", currentReviewProduct).where("user_id", "==", currentUser.id).limit(1).get();
                 if (!existingReview.empty) { showToast('Ya reseñaste este producto', 'error'); closeReviewModal(); return; }
                 
                 const product = allProducts.find(p => String(p.id) === String(currentReviewProduct) || String(p.docId) === String(currentReviewProduct));
@@ -1118,7 +1010,6 @@
                 showToast('¡Reseña enviada!', 'success');
                 closeReviewModal();
                 if (document.getElementById('section-reviews').classList.contains('active')) loadMyReviews();
-
             } catch (error) {
                 console.error("Error al enviar reseña:", error);
                 showToast('Error al enviar la reseña', 'error');
@@ -1152,17 +1043,8 @@
                     payload.embeds[0].image = { url: imageUrl };
                 }
 
-                const response = await fetch(REVIEW_WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                console.log("✅ Reseña enviada a Discord.");
-            } catch (err) {
-                console.error("Error en webhook:", err);
-            }
+                await fetch(REVIEW_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            } catch (err) { console.error("Error en webhook:", err); }
         }
 
         async function loadMyReviews() {
@@ -1179,7 +1061,6 @@
                 }
                 
                 const snapshot = await db.collection("Resenas").where("user_id", "==", currentUser.id).get();
-                
                 if (snapshot.empty) {
                     container.innerHTML = `<div class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5"><i class="fas fa-comment-slash text-gray-600 text-4xl mb-3"></i><p class="text-gray-400">Aún no has dejado ninguna reseña.</p></div>`;
                     return;
@@ -1202,7 +1083,6 @@
                 container.innerHTML = reviewsHTML;
             } catch (error) {
                 console.error("Error al cargar reseñas:", error);
-                container.innerHTML = `<div class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5"><i class="fas fa-exclamation-triangle text-red-500 text-4xl mb-3"></i><p class="text-red-400 font-semibold">Error al cargar las reseñas</p></div>`;
             }
         }
 
@@ -1216,10 +1096,6 @@
                 showToast('Error al eliminar', 'error');
             }
         }
-
-        // =============================================
-        //          SOPORTE / TICKETS
-        // =============================================
 
         function initSupportListener() {
             if (!currentUser) return;
@@ -1262,7 +1138,6 @@
                             input.placeholder = "Este ticket está siendo atendido por otro soporte";
                             input.disabled = true;
                         }
-
                     } else {
                         currentTicketId = null;
                         currentTicketData = null;
@@ -1276,7 +1151,6 @@
         }
 
         function loadSupportInterface() { if (currentUser) initSupportListener(); }
-
         function openCreateTicketModal() {
             document.getElementById('ticket-subject').value = '';
             document.getElementById('ticket-description').value = '';
@@ -1286,7 +1160,6 @@
         async function createNewTicket() {
             const subject = document.getElementById('ticket-subject').value.trim();
             const description = document.getElementById('ticket-description').value.trim();
-
             if (!subject || !description) { showToast('Completa todos los campos', 'warning'); return; }
 
             try {
@@ -1299,13 +1172,7 @@
                     assigned_to: isStaff ? currentUser.id : null,
                     assigned_to_name: isStaff ? currentUser.username : null,
                     created_at: firebase.firestore.FieldValue.serverTimestamp(),
-                    messages: [{
-                        sender: currentUser.username,
-                        sender_id: currentUser.id,
-                        text: description,
-                        timestamp: new Date().toISOString(),
-                        is_support: isStaff
-                    }]
+                    messages: [{ sender: currentUser.username, sender_id: currentUser.id, text: description, timestamp: new Date().toISOString(), is_support: isStaff }]
                 });
 
                 await sendTicketWebhook(subject, description, newTicketRef.id, isStaff);
@@ -1322,24 +1189,19 @@
                 username: "Sistema de Soporte",
                 avatar_url: "https://papeleta-script-github-io.vercel.app/files/999.png",
                 embeds: [{
-                    title: " Nuevo Ticket de Soporte",
+                    title: "🎫 Nuevo Ticket de Soporte",
                     description: `**Asunto:** ${subject}\n**Descripción:** ${description}`,
                     color: 16711680,
                     fields: [
                         { name: "👤 Usuario", value: `<@${currentUser.id}> (${currentUser.username})`, inline: true },
                         { name: "🆔 ID Ticket", value: `\`${ticketId}\``, inline: true },
-                        { name: "👨💻 Soporte", value: assignedText, inline: false }
+                        { name: "👨‍💻 Soporte", value: assignedText, inline: false }
                     ],
                     footer: { text: "Papeleta Store Support" },
                     timestamp: new Date().toISOString()
                 }]
             };
-
-            await fetch(TICKET_WEBHOOK_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+            await fetch(TICKET_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
         }
 
         function renderChatMessages(messages) {
