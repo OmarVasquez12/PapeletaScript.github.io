@@ -1110,112 +1110,118 @@ function listenForApprovedOrders() {
 }
 
         async function loadDashboardData() {
-            if (!currentUser) return;
-            try {
-                // Cargar todos los productos disponibles
-                const productsSnapshot = await db.collection("Productos").get();
-                allProducts = [];
-                productsSnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    allProducts.push({ docId: doc.id, id: data.id || doc.id, ...data });
-                });
+    if (!currentUser) return;
+    try {
+        // Cargar todos los productos disponibles
+        const productsSnapshot = await db.collection("Productos").get();
+        allProducts = [];
+        productsSnapshot.forEach((doc) => {
+            const data = doc.data();
+            allProducts.push({ docId: doc.id, id: data.id || doc.id, ...data });
+        });
 
-                // ✅ OBTENER PRODUCTOS COMPRADOS DESDE LAS LICENCIAS ACTIVAS
-                const licensesSnapshot = await db.collection("Licencias")
-                    .where("discord_id", "==", currentUser.id)
-                    .where("status", "==", "active")
-                    .get();
+        // OBTENER TODAS LAS LICENCIAS ACTIVAS DEL USUARIO
+        const licensesSnapshot = await db.collection("Licencias")
+            .where("discord_id", "==", currentUser.id)
+            .where("status", "==", "active")
+            .get();
 
-                let purchasedProducts = [];
-                let totalSpent = 0;
-                const processedProductIds = new Set(); // Evitar duplicados
+        let purchasedProducts = [];
+        let totalSpent = 0;
+        const processedProductIds = new Set();
 
-                licensesSnapshot.forEach((doc) => {
-                    const license = doc.data();
-                    const productId = license.product_id;
-                    
-                    // Evitar procesar el mismo producto dos veces
-                    if (processedProductIds.has(productId)) return;
-                    processedProductIds.add(productId);
-
-                    // Buscar información del producto en el catálogo
-                    const productData = allProducts.find(p => String(p.id) === String(productId) || String(p.docId) === String(productId));
-                    
-                    if (productData) {
-                        purchasedProducts.push({ 
-                            ...productData, 
-                            licenseKey: license.key,
-                            userCode: license.user_code,
-                            purchaseDate: license.created_at?.toDate ? license.created_at.toDate() : new Date(),
-                            price: productData.price || 'Gratis'
-                        });
-                        
-                        // Sumar al total invertido (solo si tiene precio numérico)
-                        const rawPrice = String(productData.price).toLowerCase();
-                        const numericPrice = parseFloat(rawPrice.replace('$', '').replace(',', ''));
-                        if (!isNaN(numericPrice) && numericPrice > 0) {
-                            totalSpent += numericPrice;
-                        }
-                    }
-                });
-
-                // Actualizar estadísticas
-                document.getElementById('stat-total-spent').innerText = '$' + totalSpent.toFixed(2);
-                document.getElementById('stat-active-scripts').innerText = purchasedProducts.length;
-                
-                // Renderizar lista de productos
-                const container = document.getElementById('dashboard-products-list');
-                if (purchasedProducts.length === 0) {
-                    document.getElementById('dashboard-empty-state').classList.remove('hidden');
-                    container.innerHTML = '';
-                } else {
-                    document.getElementById('dashboard-empty-state').classList.add('hidden');
-                    
-                    // Obtener reseñas existentes para mostrar estado
-                    const reviewsSnapshot = await db.collection("Resenas").where("user_id", "==", currentUser.id).get();
-                    const reviewedProductIds = new Set();
-                    reviewsSnapshot.forEach(doc => reviewedProductIds.add(doc.data().product_id));
-                    
-                    container.innerHTML = purchasedProducts.map(item => {
-                        const hasReview = reviewedProductIds.has(String(item.id)) || reviewedProductIds.has(String(item.docId));
-                        const safeName = item.name.replace(/'/g, "\\'");
-                        
-                        // Determinar si es comprado o gratis
-                        let priceDisplay = '';
-                        let priceClass = 'text-white font-bold';
-                        
-                        const rawPrice = String(item.price).toLowerCase();
-                        const numericPrice = parseFloat(rawPrice.replace('$', '').replace(',', ''));
-                        
-                        if (!isNaN(numericPrice) && numericPrice > 0) {
-                            priceDisplay = 'Listo';
-                            priceClass = 'text-green-400 font-bold';
-                        } else {
-                            priceDisplay = 'Gratis';
-                            priceClass = 'text-white font-bold';
-                        }
-
-                        return `<div class="bg-[#0d0505] border border-red-900/30 rounded-xl p-4 flex items-center justify-between hover:border-red-600/50 transition-all">
-                            <div class="flex items-center gap-4">
-                                <div class="w-16 h-16 rounded-lg bg-[#150a0a] border border-red-900/20 overflow-hidden"><img src="${item.image_url || ''}" class="w-full h-full object-cover"></div>
-                                <div>
-                                    <h3 class="text-white font-bold">${item.name}</h3>
-                                    <p class="${priceClass} text-sm">${priceDisplay}</p>
-                                    <p class="text-gray-500 text-xs font-mono mt-1">Key: ${item.licenseKey ? item.licenseKey.substring(0, 8) + '...' : 'N/A'}</p>
-                                </div>
-                            </div>
-                            <div class="flex gap-2">
-                                ${item.file_data ? `<button onclick="downloadProduct('${item.id}')" class="btn-primary px-4 py-2 rounded-lg text-white text-sm"><i class="fas fa-download"></i> Descargar</button>` : '<button disabled class="px-4 py-2 rounded-lg bg-gray-800 text-gray-500 text-sm">No disponible</button>'}
-                                ${hasReview ? `<button disabled class="px-4 py-2 rounded-lg bg-green-900/30 border border-green-600/30 text-green-400 text-sm cursor-not-allowed"><i class="fas fa-check mr-1"></i> Reseñado</button>` : `<button onclick="openReviewModal('${item.id}', '${safeName}')" class="px-4 py-2 rounded-lg bg-yellow-900/30 border border-yellow-600/30 text-yellow-400 hover:bg-yellow-900/50 text-sm"><i class="fas fa-star mr-1"></i> Reseñar</button>`}
-                            </div>
-                        </div>`;
-                    }).join('');
-                }
-            } catch (error) {
-                console.error("Error cargando dashboard:", error);
-                showToast('Error al cargar datos', 'error');
+        licensesSnapshot.forEach((doc) => {
+            const license = doc.data();
+            const productId = license.product_id;
+            
+            // Saltar licencias tipo "general" que no tienen product_id
+            if (license.type === "general" || !productId) {
+                console.log("Licencia general omitida:", doc.id);
+                return;
             }
+            
+            if (processedProductIds.has(productId)) return;
+            processedProductIds.add(productId);
+
+            const productData = allProducts.find(p => 
+                String(p.id) === String(productId) || 
+                String(p.docId) === String(productId)
+            );
+            
+            if (productData) {
+                purchasedProducts.push({ 
+                    ...productData, 
+                    licenseKey: license.key,
+                    userCode: license.user_code,
+                    purchaseDate: license.created_at?.toDate ? license.created_at.toDate() : new Date(),
+                    price: productData.price || 'Gratis'
+                });
+                
+                const rawPrice = String(productData.price).toLowerCase();
+                const numericPrice = parseFloat(rawPrice.replace('$', '').replace(',', ''));
+                if (!isNaN(numericPrice) && numericPrice > 0) {
+                    totalSpent += numericPrice;
+                }
+            } else {
+                console.warn("Producto no encontrado para product_id:", productId);
+            }
+        });
+
+        document.getElementById('stat-total-spent').innerText = '$' + totalSpent.toFixed(2);
+        document.getElementById('stat-active-scripts').innerText = purchasedProducts.length;
+        
+        const container = document.getElementById('dashboard-products-list');
+        if (purchasedProducts.length === 0) {
+            document.getElementById('dashboard-empty-state').classList.remove('hidden');
+            container.innerHTML = '';
+        } else {
+            document.getElementById('dashboard-empty-state').classList.add('hidden');
+            
+            const reviewsSnapshot = await db.collection("Resenas").where("user_id", "==", currentUser.id).get();
+            const reviewedProductIds = new Set();
+            reviewsSnapshot.forEach(doc => reviewedProductIds.add(doc.data().product_id));
+            
+            container.innerHTML = purchasedProducts.map(item => {
+                const hasReview = reviewedProductIds.has(String(item.id)) || reviewedProductIds.has(String(item.docId));
+                const safeName = item.name.replace(/'/g, "\\'");
+                
+                let priceDisplay = '';
+                let priceClass = 'text-white font-bold';
+                
+                const rawPrice = String(item.price).toLowerCase();
+                const numericPrice = parseFloat(rawPrice.replace('$', '').replace(',', ''));
+                
+                if (!isNaN(numericPrice) && numericPrice > 0) {
+                    priceDisplay = 'Listo';
+                    priceClass = 'text-green-400 font-bold';
+                } else {
+                    priceDisplay = 'Gratis';
+                    priceClass = 'text-white font-bold';
+                }
+
+                return `<div class="bg-[#0d0505] border border-red-900/30 rounded-xl p-4 flex items-center justify-between hover:border-red-600/50 transition-all">
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 rounded-lg bg-[#150a0a] border border-red-900/20 overflow-hidden">
+                            <img src="${item.image_url || ''}" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h3 class="text-white font-bold">${item.name}</h3>
+                            <p class="${priceClass} text-sm">${priceDisplay}</p>
+                            <p class="text-gray-500 text-xs font-mono mt-1">Key: ${item.licenseKey ? item.licenseKey.substring(0, 8) + '...' : 'N/A'}</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        ${item.file_data ? `<button onclick="downloadProduct('${item.id}')" class="btn-primary px-4 py-2 rounded-lg text-white text-sm"><i class="fas fa-download"></i> Descargar</button>` : '<button disabled class="px-4 py-2 rounded-lg bg-gray-800 text-gray-500 text-sm">No disponible</button>'}
+                        ${hasReview ? `<button disabled class="px-4 py-2 rounded-lg bg-green-900/30 border border-green-600/30 text-green-400 text-sm cursor-not-allowed"><i class="fas fa-check mr-1"></i> Reseñado</button>` : `<button onclick="openReviewModal('${item.id}', '${safeName}')" class="px-4 py-2 rounded-lg bg-yellow-900/30 border border-yellow-600/30 text-yellow-400 hover:bg-yellow-900/50 text-sm"><i class="fas fa-star mr-1"></i> Reseñar</button>`}
+                    </div>
+                </div>`;
+            }).join('');
         }
+    } catch (error) {
+        console.error("Error cargando dashboard:", error);
+        showToast('Error al cargar datos', 'error');
+    }
+}
 
         function filterDashboardProducts() {
             const search = document.getElementById('dashboard-search').value.toLowerCase();
