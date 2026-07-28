@@ -438,8 +438,7 @@
 
     <div id="toast-container" class="toast-container"></div>
 
-    <!-- SCRIPT LIMPIO INTEGRADO -->
-    <script>
+       <script>
         // =============================================
         //          FIREBASE CONFIGURACIÓN (COMPAT)
         // =============================================
@@ -452,224 +451,30 @@
             appId: "1:677208314051:web:a27c04f31d402e83f29276"
         };
 
-        // Inicializar Firebase si no está iniciado
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Variables globales
         let licensesData = [];
-        
-        // =============================================
-        //          FUNCIONES AUXILIARES (VALIDACIÓN)
-        // =============================================
-
-        function validateIPPort(ipPort) {
-            if (!ipPort || typeof ipPort !== 'string') return false;
-            const parts = ipPort.trim().split(':');
-            if (parts.length !== 2) return false;
-            const ip = parts[0].trim();
-            const port = parts[1].trim();
-            // Regex simple para IP
-            const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
-            if (!ipRegex.test(ip)) return false;
-            const portNum = parseInt(port);
-            if (isNaN(portNum) || portNum < 1 || portNum > 65535) return false;
-            return true;
-        }
-
-        function parseIPPort(ipPort) {
-            const parts = ipPort.trim().split(':');
-            return { ip: parts[0].trim(), port: parts[1].trim(), full: ipPort.trim() };
-        }
-
-        // Función para mostrar logs visuales (Toast)
-        const updateLog = (msg, isError = false) => {
-            console.log(msg);
-            // Usamos tu función showToast existente si está disponible, sino console
-            if (typeof showToast === 'function') {
-                showToast(msg, isError ? 'error' : 'success');
-            }
-        };
-
-        // =============================================
-        //          GESTIÓN DE LICENCIAS (CRUD)
-        // =============================================
-
-        // Escuchar cambios en tiempo real en la colección 'Licencias' (Mayúscula inicial como en tu DB)
-        db.collection("Licencias").onSnapshot((snapshot) => {
-            licensesData = [];
-            snapshot.forEach((docSnap) => {
-                licensesData.push({ id: docSnap.id, ...docSnap.data() });
-            });
-            
-            // Actualizar la vista si estamos en el panel de cliente
-            if (currentUser && document.getElementById('license-code')) {
-                updateLicenseDisplay(); 
-            }
-            
-            console.log("Licencias sincronizadas:", licensesData.length);
-        });
-
-        // Crear Licencia (Manual o Automática)
-        window.addLicense = async (resourceName = "Recurso General") => {
-            // Intenta obtener valores del DOM si existen (para uso manual), sino usa prompts
-            let resource = resourceName;
-            let ipPort = "";
-            
-            const resInput = document.getElementById("resourceName");
-            const ipInput = document.getElementById("ipAddr");
-            
-            if(resInput && ipInput) {
-                resource = resInput.value.trim().toUpperCase() || resource;
-                ipPort = ipInput.value.trim();
-            } else {
-                // Fallback manual si no hay inputs en pantalla
-                ipPort = prompt("IP:PUERTO del Servidor MTA (Ej: 127.0.0.1:22005):");
-            }
-
-            if(!currentUser) return alert("Debes iniciar sesión primero.");
-            if (!ipPort) return alert("Falta la IP:PUERTO");
-            if (!validateIPPort(ipPort)) return alert("FORMATO IP:PUERTO INVÁLIDO");
-            
-            const parsed = parseIPPort(ipPort);
-            
-            // Generar datos únicos
-            const newUser = "USER_" + Math.random().toString(36).substring(2, 8).toUpperCase();
-            const newKey = Array.from({length: 24}, () => "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[Math.floor(Math.random() * 36)]).join('');
-            
-            const newLic = {
-                discord_id: currentUser.id,
-                username: currentUser.username,
-                product_id: "manual_" + Date.now(), // ID temporal para licencias manuales
-                product_name: resource,
-                user_code: newUser,
-                key: newKey,
-                ip: parsed.ip,
-                port: parsed.port,
-                created_at: firebase.firestore.FieldValue.serverTimestamp(),
-                status: 'active'
-            };
-            
-            try {
-                await db.collection("Licencias").add(newLic);
-                updateLog("✅ Licencia Creada Correctamente");
-                
-                // Limpiar inputs si existen
-                if(resInput) resInput.value = "";
-                if(ipInput) ipInput.value = "";
-                
-            } catch (e) { 
-                updateLog("❌ Error: " + e.message, true); 
-            }
-        };
-
-        // Eliminar Licencia
-        window.deleteLicense = (id) => {
-            if(confirm("¿Estás seguro de eliminar esta licencia permanentemente?")) {
-                db.collection("Licencias").doc(id).delete()
-                    .then(() => updateLog("✅ Licencia Eliminada"))
-                    .catch(e => alert("Error: " + e.message));
-            }
-        };
-
-        // Cambiar Estado (Activo/Inactivo)
-        window.toggleStatus = async (id, currentStatus) => {
-            try {
-                await db.collection("Licencias").doc(id).update({ active: !currentStatus });
-                updateLog(`Estado cambiado a ${!currentStatus ? 'ACTIVO' : 'INACTIVO'}`);
-            } catch (e) {
-                alert("Error al cambiar estado: " + e.message);
-            }
-        };
-
-        // Editar Campo Individual (IP, User, Key)
-        window.editField = async (id, campo, valorActual) => {
-            let nuevoValor = prompt(`MODIFICAR ${campo.toUpperCase()} (Valor actual: ${valorActual}):`, valorActual);
-            
-            if(nuevoValor && nuevoValor !== valorActual) {
-                const valUpper = nuevoValor.trim().toUpperCase();
-                
-                if (campo === 'key') {
-                    // Verificación local rápida
-                    const keyExists = licensesData.some(l => l.key.toUpperCase() === valUpper && l.id !== id);
-                    if (keyExists) return alert("ESTA KEY YA ESTÁ EN USO POR OTRO SISTEMA.");
-                    await db.collection("Licencias").doc(id).update({ key: valUpper });
-                } 
-                else if (campo === 'ip' || campo === 'port') {
-                     // Para editar IP y Puerto juntos o por separado
-                     if(campo === 'ip') {
-                         // Asumimos que el usuario podría escribir IP:PORT de nuevo
-                         if(validateIPPort(nuevoValor)) {
-                             const parsed = parseIPPort(nuevoValor);
-                             await db.collection("Licencias").doc(id).update({ ip: parsed.ip, port: parsed.port });
-                         } else {
-                             return alert("Formato inválido. Usa IP:PUERTO");
-                         }
-                     }
-                } 
-                else {
-                    // Para User u otros campos
-                    await db.collection("Licencias").doc(id).update({ [campo]: valUpper });
-                }
-                updateLog(`✅ ${campo.toUpperCase()} actualizado correctamente`);
-            }
-        };
-
-        // =============================================
-        //          UTILIDADES DE INTERFAZ
-        // =============================================
-
-        // Mostrar código Lua exacto solicitado
-        window.showLua = (user, key) => {
-            const code = `configLicense = {
-    ["User"] = "${user}", 
-    ["Key"] = "${key}"
-}`;
-            
-            const luaEl = document.getElementById("luaCode");
-            if (luaEl) {
-                luaEl.innerText = code;
-            }
-            return code;
-        };
-
-        // Copiar texto al portapapeles
-        window.copyText = (elementId) => {
-            const text = document.getElementById(elementId).innerText;
-            navigator.clipboard.writeText(text).then(() => {
-                if(typeof showToast === 'function') showToast("¡Código copiado!", "success");
-                else alert("¡Copiado!");
-            });
-        };
-    </script>
-
-    <script>
-        // Configuración
-        const CLIENT_ID = '1213866547181780992'; 
-        const REDIRECT_URI = window.location.href.split('#')[0]; 
-        const ADMIN_DISCORD_IDS = ['890526767608127489']; 
-        
-        // ID DEL ROL DE SOPORTE (DEBES PONER EL ID DEL ROL DE TU DISCORD AQUÍ)
-        const SUPPORT_ROLE_ID = ''; 
-
-        // URL DEL WEBHOOK DE DISCORD PARA TICKETS
-        const TICKET_WEBHOOK_URL = "https://discord.com/api/webhooks/1530747464569716756/LLK7Msvn-NNXbrP5bN8lYBzkjCR7G6D1CE63w41AozCfN2mVxRxiMQUoWpHK2g6ahHg7";
-        
-        // URL DEL WEBHOOK DE DISCORD PARA RESEÑAS (MANTENIDO)
-        const REVIEW_WEBHOOK_URL = "https://discord.com/api/webhooks/1530350855100956853/mqzdvlTBOx2JZ3wlumx-LdLAus3sZyg610PeoxK9ds4jpqxMK9t0sBT_2Lo-U-TDutRF";
-
         let currentUser = null;
         let currentUserRole = 'client';
         let allProducts = [];
         let userFixedLicenseKey = null;
         let currentReviewProduct = null;
         let selectedRating = 0;
-        let currentTicketId = null; // ID del ticket activo en Firebase
-        let currentTicketData = null; // Datos completos del ticket actual
+        let currentTicketId = null;
+        let currentTicketData = null;
+        let supportUnsubscribe = null;
 
-        // --- Funciones de Utilidad ---
+        // Configuración Discord
+        const CLIENT_ID = '1213866547181780992'; 
+        const REDIRECT_URI = window.location.href.split('#')[0]; 
+        const ADMIN_DISCORD_IDS = ['890526767608127489']; 
+        const TICKET_WEBHOOK_URL = "https://discord.com/api/webhooks/1530747464569716756/LLK7Msvn-NNXbrP5bN8lYBzkjCR7G6D1CE63w41AozCfN2mVxRxiMQUoWpHK2g6ahHg7";
+        const REVIEW_WEBHOOK_URL = "https://discord.com/api/webhooks/1530350855100956853/mqzdvlTBOx2JZ3wlumx-LdLAus3sZyg610PeoxK9ds4jpqxMK9t0sBT_2Lo-U-TDutRF";
+
+        // =============================================
+        //          FUNCIONES AUXILIARES
+        // =============================================
 
         function showToast(message, type = 'success', title = '') {
             const container = document.getElementById('toast-container');
@@ -683,13 +488,17 @@
         }
 
         function isAdmin() { return currentUser && ADMIN_DISCORD_IDS.includes(currentUser.id); }
-        
-        // Función para verificar si es Staff (Admin o tiene el Rol de Soporte)
-        function isSupportStaff() {
-            if (!currentUser) return false;
-            if (isAdmin()) return true;
-            return false; 
+        function isSupportStaff() { return isAdmin(); }
+
+        function validateIPPort(ip, port) {
+            const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
+            const portNum = parseInt(port);
+            return ipRegex.test(ip) && !isNaN(portNum) && portNum >= 1 && portNum <= 65535;
         }
+
+        // =============================================
+        //          AUTENTICACIÓN DISCORD
+        // =============================================
 
         function redirectToDiscord() {
             window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20email`;
@@ -728,12 +537,13 @@
                 document.getElementById('sidebar-username').innerText = user.username;
                 document.getElementById('sidebar-avatar').src = user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png';
                 document.getElementById('login-modal').classList.add('hidden');
-                ensureFixedLicense().then(() => { loadDashboardData(); updateLicenseDisplay(); });
                 
-                // Iniciar listener de soporte al loguearse
+                ensureFixedLicense().then(() => { 
+                    loadDashboardData(); 
+                    updateLicenseDisplay(); 
+                });
+                
                 initSupportListener();
-                
-                // ✅ INICIAR LISTENER DE COMPRAS APROBADAS (ENTREGA AUTOMÁTICA)
                 listenForApprovedOrders();
             })
             .catch(err => { console.error(err); logout(); });
@@ -745,6 +555,10 @@
             currentUserRole = 'client';
             location.reload();
         }
+
+        // =============================================
+        //          NAVEGACIÓN Y UI
+        // =============================================
 
         function showSection(section) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -790,35 +604,447 @@
             document.getElementById('star-rating').addEventListener('mouseleave', function() {
                 stars.forEach((s, index) => { s.style.color = index < selectedRating ? '#fbbf24' : '#374151'; });
             });
+            
             checkDiscordAuth();
+            
+            // Cargar config guardada localmente
             const saved = JSON.parse(localStorage.getItem('server_config') || '{}');
             if (saved.ip) document.getElementById('server-ip').value = saved.ip;
             if (saved.port) document.getElementById('server-port').value = saved.port;
         });
 
-        // --- Lógica Principal de Reseñas ---
+        // =============================================
+        //          GESTIÓN DE LICENCIAS
+        // =============================================
+
+        function generateUniqueKey() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; 
+            let code = '';
+            for (let i = 0; i < 16; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+            return `PAPELETA(${code})`; 
+        }
+
+        async function ensureFixedLicense() {
+            if (!currentUser) return;
+            try {
+                const snapshot = await db.collection("Licencias")
+                    .where("discord_id", "==", currentUser.id)
+                    .where("type", "==", "general")
+                    .limit(1).get();
+
+                if (!snapshot.empty) {
+                    userFixedLicenseKey = snapshot.docs[0].data().key;
+                } else {
+                    const newKey = generateUniqueKey();
+                    await db.collection("Licencias").add({
+                        discord_id: currentUser.id, 
+                        username: currentUser.username, 
+                        key: newKey, 
+                        type: "general",
+                        created_at: firebase.firestore.FieldValue.serverTimestamp(), 
+                        status: 'active'
+                    });
+                    userFixedLicenseKey = newKey;
+                }
+                updateLicenseDisplay();
+            } catch (error) { console.error("Error gestionando licencia fija:", error); }
+        }
+
+        function updateLicenseDisplay() {
+            const codeBlock = document.getElementById('license-code');
+            if (!currentUser || !codeBlock) return;
+
+            db.collection("Licencias")
+              .where("discord_id", "==", currentUser.id)
+              .where("status", "==", "active")
+              .limit(1)
+              .get()
+              .then(snapshot => {
+                  if (!snapshot.empty) {
+                      const license = snapshot.docs[0].data();
+                      codeBlock.textContent = `configLicense = {
+    ["User"] = "${license.user_code || 'PENDIENTE'}", 
+    ["Key"] = "${license.key}"
+}`;
+                  } else {
+                      codeBlock.textContent = "No tienes licencias activas aún.";
+                  }
+              });
+        }
+
+        // ✅ FUNCIÓN CORREGIDA: GUARDAR IP/PUERTO EN FIREBASE
+        async function saveServerConfig() {
+            const ip = document.getElementById('server-ip').value.trim();
+            const port = document.getElementById('server-port').value.trim();
+            
+            if (!ip || !port) {
+                showToast('Por favor ingresa IP y Puerto válidos', 'warning');
+                return;
+            }
+            
+            if (!validateIPPort(ip, port)) {
+                showToast('Formato inválido. Ej: 192.168.1.1 y 22003', 'error');
+                return;
+            }
+            
+            try {
+                // 1. Guardar localmente
+                localStorage.setItem('server_config', JSON.stringify({ ip: ip, port: port }));
+                
+                // 2. Guardar en Firebase - Actualizar TODAS las licencias activas del usuario
+                if (currentUser) {
+                    const licenseSnapshot = await db.collection("Licencias")
+                        .where("discord_id", "==", currentUser.id)
+                        .where("status", "==", "active")
+                        .get();
+                    
+                    if (!licenseSnapshot.empty) {
+                        const batch = db.batch();
+                        licenseSnapshot.forEach((doc) => {
+                            batch.update(doc.ref, {
+                                ip: ip,
+                                port: port,
+                                updated_at: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        });
+                        await batch.commit();
+                        console.log("✅ IP y Puerto guardados en Firebase Licencias");
+                    } else {
+                        // Si no tiene licencias, crear un registro temporal
+                        await db.collection("Licencias").add({
+                            discord_id: currentUser.id,
+                            username: currentUser.username,
+                            ip: ip,
+                            port: port,
+                            status: 'pending_config',
+                            type: 'server_config',
+                            created_at: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    }
+                }
+                
+                // 3. Feedback visual
+                const btn = event.currentTarget;
+                const original = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> Guardado en Firebase';
+                btn.classList.add('bg-green-600');
+                
+                setTimeout(() => {
+                    btn.innerHTML = original;
+                    btn.classList.remove('bg-green-600');
+                }, 2000);
+                
+                showToast('IP y Puerto guardados correctamente en la base de datos', 'success');
+                
+            } catch (error) {
+                console.error("Error al guardar en Firebase:", error);
+                showToast('Error al guardar en la base de datos', 'error');
+            }
+        }
+
+        // ✅ FUNCIÓN CORREGIDA: DESCARGAR CON VALIDACIÓN DE IP/PUERTO
+        async function downloadProduct(productId) {
+            const ip = document.getElementById('server-ip').value.trim();
+            const port = document.getElementById('server-port').value.trim();
+            
+            // Validar que tenga IP y Puerto configurados
+            if (!ip || !port) {
+                showToast('️ Debes configurar tu IP y Puerto antes de descargar.', 'warning', 'Configuración Requerida');
+                document.getElementById('server-ip').focus();
+                return;
+            }
+
+            if (!validateIPPort(ip, port)) {
+                showToast('❌ Formato de IP o Puerto inválido.', 'error', 'Error de Formato');
+                return;
+            }
+
+            const product = allProducts.find(p => String(p.id) === String(productId) || String(p.docId) === String(productId));
+            if (!product || !product.file_data) {
+                showToast('Archivo no disponible', 'error');
+                return;
+            }
+
+            try {
+                showToast('⏳ Vinculando licencia con tu servidor...', 'success', 'Procesando');
+                
+                // Buscar la licencia específica de ESTE producto
+                let licenseRef = null;
+                const licenseSnapshot = await db.collection("Licencias")
+                    .where("discord_id", "==", currentUser.id)
+                    .where("product_id", "==", productId)
+                    .where("status", "==", "active")
+                    .limit(1)
+                    .get();
+
+                if (!licenseSnapshot.empty) {
+                    licenseRef = licenseSnapshot.docs[0].ref;
+                } else {
+                    // Fallback: buscar cualquier licencia activa del usuario
+                    const generalSnapshot = await db.collection("Licencias")
+                        .where("discord_id", "==", currentUser.id)
+                        .where("status", "==", "active")
+                        .limit(1)
+                        .get();
+                        
+                    if (!generalSnapshot.empty) {
+                        licenseRef = generalSnapshot.docs[0].ref;
+                    }
+                }
+
+                // Actualizar la licencia con IP, Puerto y nombre del resource
+                if (licenseRef) {
+                    await licenseRef.update({
+                        ip: ip,
+                        port: port,
+                        resource: product.name
+                    });
+                }
+
+                // Proceder con la descarga
+                const link = document.createElement('a');
+                link.href = product.file_data;
+                link.download = product.file_name || 'resource.zip';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showToast('✅ Descarga iniciada. Licencia vinculada.', 'success', '¡Listo!');
+                
+            } catch (error) {
+                console.error("Error al vincular licencia:", error);
+                showToast('Error al vincular la licencia.', 'error');
+            }
+        }
+
+        function copyLicenseCode() {
+            const code = document.getElementById('license-code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = event.currentTarget;
+                const original = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> Copiado';
+                setTimeout(() => btn.innerHTML = original, 2000);
+            });
+        }
+
+        // =============================================
+        //          DASHBOARD Y PRODUCTOS
+        // =============================================
+
+        async function getOrCreateLicense(userId, productId, productName) {
+            try {
+                const querySnapshot = await db.collection("Licencias")
+                    .where("discord_id", "==", userId)
+                    .where("product_id", "==", productId)
+                    .where("status", "==", "active")
+                    .limit(1).get();
+
+                if (!querySnapshot.empty) return querySnapshot.docs[0].data();
+
+                const uniqueKey = generateUniqueKey();
+                const licenseData = { 
+                    discord_id: userId, 
+                    username: currentUser ? currentUser.username : 'Unknown', 
+                    product_id: productId, 
+                    product_name: productName, 
+                    key: uniqueKey, 
+                    created_at: firebase.firestore.FieldValue.serverTimestamp(), 
+                    status: 'active' 
+                };
+                
+                const docRef = await db.collection("Licencias").add(licenseData);
+                return { id: docRef.id, ...licenseData };
+            } catch (error) {
+                console.error("❌ Error en getOrCreateLicense:", error);
+                return null;
+            }
+        }
+
+        function listenForApprovedOrders() {
+            if (!currentUser) return;
+            db.collection("Compra")
+                .where("discord_id", "==", currentUser.id)
+                .onSnapshot(async (snapshot) => {
+                    snapshot.docChanges().forEach(async (change) => {
+                        if (change.type === "modified") {
+                            const data = change.doc.data();
+                            const orderId = change.doc.id;
+
+                            if (data.status === "approved" || data.status === "aprobado" || data.status === "completed") {
+                                if (data.status === "completed") return;
+
+                                if (data.products && Array.isArray(data.products)) {
+                                    for (const product of data.products) {
+                                        const existingLicense = await db.collection("Licencias")
+                                            .where("discord_id", "==", currentUser.id)
+                                            .where("product_id", "==", product.id)
+                                            .where("status", "==", "active")
+                                            .limit(1).get();
+
+                                        if (existingLicense.empty) {
+                                            const newKey = generateUniqueKey();
+                                            const userCode = 'USER_' + Math.random().toString(36).substring(2, 8).toUpperCase();
+
+                                            await db.collection("Licencias").add({
+                                                discord_id: currentUser.id,
+                                                username: currentUser.username,
+                                                product_id: product.id,
+                                                product_name: product.name,
+                                                key: newKey,
+                                                user_code: userCode,
+                                                type: "product",
+                                                created_at: firebase.firestore.FieldValue.serverTimestamp(),
+                                                status: 'active'
+                                            });
+
+                                            await db.collection("Clientes").add({
+                                                discord_id: currentUser.id,
+                                                username: currentUser.username,
+                                                products: [{ id: product.id, name: product.name, price: product.price }],
+                                                total_price: data.total_amount,
+                                                date: firebase.firestore.FieldValue.serverTimestamp(),
+                                                status: "Entregado por Aprobación",
+                                                order_id: orderId
+                                            });
+                                        }
+                                    }
+                                }
+
+                                await change.doc.ref.update({ status: "completed" });
+                                localStorage.removeItem('papeleta_cart');
+                                showToast('🎉 ¡Solicitud aprobada! Producto otorgado.', 'success');
+                                loadDashboardData();
+                            }
+                        }
+                    });
+                });
+        }
+
+        async function loadDashboardData() {
+            if (!currentUser) return;
+            try {
+                const productsSnapshot = await db.collection("Productos").get();
+                allProducts = [];
+                productsSnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    allProducts.push({ docId: doc.id, id: data.id || doc.id, ...data });
+                });
+
+                const clientsSnapshot = await db.collection("Clientes")
+                    .where("discord_id", "==", currentUser.id).get();
+
+                let purchasedProducts = [];
+                let totalSpent = 0;
+                const processedProductIds = new Set();
+
+                clientsSnapshot.forEach((doc) => {
+                    const clientData = doc.data();
+                    const products = clientData.products || [];
+                    
+                    products.forEach(product => {
+                        if (processedProductIds.has(product.id)) return;
+                        processedProductIds.add(product.id);
+
+                        const productData = allProducts.find(p => 
+                            String(p.id) === String(product.id) || String(p.docId) === String(product.id)
+                        );
+                        
+                        if (productData) {
+                            purchasedProducts.push({ 
+                                ...productData, 
+                                purchaseDate: clientData.date?.toDate ? clientData.date.toDate() : new Date(),
+                                price: product.price || productData.price || 'Gratis'
+                            });
+                            
+                            const rawPrice = String(product.price || productData.price).toLowerCase();
+                            const numericPrice = parseFloat(rawPrice.replace('$', '').replace(',', ''));
+                            if (!isNaN(numericPrice) && numericPrice > 0) totalSpent += numericPrice;
+                        }
+                    });
+                });
+
+                document.getElementById('stat-total-spent').innerText = '$' + totalSpent.toFixed(2);
+                document.getElementById('stat-active-scripts').innerText = purchasedProducts.length;
+                
+                const container = document.getElementById('dashboard-products-list');
+                if (purchasedProducts.length === 0) {
+                    document.getElementById('dashboard-empty-state').classList.remove('hidden');
+                    container.innerHTML = '';
+                } else {
+                    document.getElementById('dashboard-empty-state').classList.add('hidden');
+                    
+                    const reviewsSnapshot = await db.collection("Resenas").where("user_id", "==", currentUser.id).get();
+                    const reviewedProductIds = new Set();
+                    reviewsSnapshot.forEach(doc => reviewedProductIds.add(doc.data().product_id));
+                    
+                    container.innerHTML = purchasedProducts.map(item => {
+                        const hasReview = reviewedProductIds.has(String(item.id)) || reviewedProductIds.has(String(item.docId));
+                        const safeName = item.name.replace(/'/g, "\\'");
+                        
+                        let priceDisplay = '';
+                        let priceClass = 'text-white font-bold';
+                        
+                        const rawPrice = String(item.price).toLowerCase();
+                        const numericPrice = parseFloat(rawPrice.replace('$', '').replace(',', ''));
+                        
+                        if (!isNaN(numericPrice) && numericPrice > 0) {
+                            priceDisplay = 'Listo';
+                            priceClass = 'text-green-400 font-bold';
+                        } else {
+                            priceDisplay = 'Gratis';
+                        }
+
+                        return `<div class="bg-[#0d0505] border border-red-900/30 rounded-xl p-4 flex items-center justify-between hover:border-red-600/50 transition-all">
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 h-16 rounded-lg bg-[#150a0a] border border-red-900/20 overflow-hidden">
+                                    <img src="${item.image_url || 'https://via.placeholder.com/64'}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/64'">
+                                </div>
+                                <div>
+                                    <h3 class="text-white font-bold">${item.name}</h3>
+                                    <p class="${priceClass} text-sm">${priceDisplay}</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                ${item.file_data ? `<button onclick="downloadProduct('${item.id}')" class="btn-primary px-4 py-2 rounded-lg text-white text-sm"><i class="fas fa-download"></i> Descargar</button>` : '<button disabled class="px-4 py-2 rounded-lg bg-gray-800 text-gray-500 text-sm">No disponible</button>'}
+                                ${hasReview ? `<button disabled class="px-4 py-2 rounded-lg bg-green-900/30 border border-green-600/30 text-green-400 text-sm cursor-not-allowed"><i class="fas fa-check mr-1"></i> Reseñado</button>` : `<button onclick="openReviewModal('${item.id}', '${safeName}')" class="px-4 py-2 rounded-lg bg-yellow-900/30 border border-yellow-600/30 text-yellow-400 hover:bg-yellow-900/50 text-sm"><i class="fas fa-star mr-1"></i> Reseñar</button>`}
+                            </div>
+                        </div>`;
+                    }).join('');
+                }
+            } catch (error) {
+                console.error("Error cargando dashboard:", error);
+                showToast('Error al cargar datos', 'error');
+            }
+        }
+
+        function filterDashboardProducts() {
+            const search = document.getElementById('dashboard-search').value.toLowerCase();
+            document.querySelectorAll('#dashboard-products-list > div').forEach(card => {
+                card.style.display = card.innerText.toLowerCase().includes(search) ? 'flex' : 'none';
+            });
+        }
+
+        // =============================================
+        //          RESEÑAS
+        // =============================================
 
         async function submitReview() {
             if (!currentReviewProduct) return;
-            if (selectedRating === 0) { showToast('Por favor selecciona una calificación', 'warning'); return; }
+            if (selectedRating === 0) { showToast('Selecciona una calificación', 'warning'); return; }
             const reviewText = document.getElementById('review-text').value.trim();
-            if (!reviewText) { showToast('Por favor escribe tu reseña', 'warning'); return; }
+            if (!reviewText) { showToast('Escribe tu reseña', 'warning'); return; }
             
             try {
-                // Verificar si ya reseñó
                 const existingReview = await db.collection("Resenas")
                     .where("product_id", "==", currentReviewProduct)
-                    .where("user_id", "==", currentUser.id)
-                    .limit(1).get();
+                    .where("user_id", "==", currentUser.id).limit(1).get();
                 
-                if (!existingReview.empty) { showToast('Ya has dejado una reseña para este producto', 'error'); closeReviewModal(); return; }
+                if (!existingReview.empty) { showToast('Ya reseñaste este producto', 'error'); closeReviewModal(); return; }
                 
-                // Obtener datos del producto (Nombre e Imagen)
                 const product = allProducts.find(p => String(p.id) === String(currentReviewProduct) || String(p.docId) === String(currentReviewProduct));
                 const productName = product ? product.name : 'Producto General';
                 const productImage = product && product.image_url ? product.image_url : null;
 
-                // 1. Guardar en Firebase
                 await db.collection("Resenas").add({
                     product_id: currentReviewProduct,
                     user_id: currentUser.id,
@@ -830,24 +1056,16 @@
                     visible_to: 'admin'
                 });
                 
-                // 2. ENVIAR AL WEBHOOK CON DISEÑO ROJO NEÓN E IMAGEN GRANDE
                 await sendReviewToWebhook(productName, reviewText, selectedRating, productImage);
 
-                // ✅ ACTUALIZACIÓN INSTANTÁNEA DE LA INTERFAZ (SIN RECARGAR)
-                // Buscamos el botón específico en la lista de productos y lo cambiamos por el verde
                 const reviewBtn = document.querySelector(`button[onclick*="openReviewModal"][onclick*="'${currentReviewProduct}'"]`);
                 if (reviewBtn) {
-                    // Reemplazamos el HTML del botón por el estado "Reseñado"
                     reviewBtn.outerHTML = `<button disabled class="px-4 py-2 rounded-lg bg-green-900/30 border border-green-600/30 text-green-400 text-sm cursor-not-allowed"><i class="fas fa-check mr-1"></i> Reseñado</button>`;
                 }
 
-                showToast('¡Reseña enviada exitosamente!', 'success');
+                showToast('¡Reseña enviada!', 'success');
                 closeReviewModal();
-                
-                // Si estamos en la pestaña de reseñas, actualizamos esa lista también
-                if (document.getElementById('section-reviews').classList.contains('active')) {
-                    loadMyReviews();
-                }
+                if (document.getElementById('section-reviews').classList.contains('active')) loadMyReviews();
 
             } catch (error) {
                 console.error("Error al enviar reseña:", error);
@@ -855,73 +1073,43 @@
             }
         }
 
-        // ✅ FUNCIÓN DE WEBHOOK MEJORADA (ROJO NEÓN + IMAGEN PRODUCTO)
         async function sendReviewToWebhook(productName, reviewText, rating, imageUrl) {
             try {
-                // Limpiar texto para evitar errores JSON
                 const safeReviewText = reviewText.replace(/"/g, "'").replace(/\\/g, "");
                 const safeProductName = productName.replace(/"/g, "'").replace(/\\/g, "");
-
-                // Generar estrellas visuales
                 const starsString = "★".repeat(rating) + "☆".repeat(5 - rating);
                 
-                // Construir payload
                 const payload = {
                     username: "Papeleta Store",
-                     avatar_url: "https://papeleta-script-github-io.vercel.app/files/999.png",
-                    embeds: [
-                        {
-                            title: "✨ Nueva Valoración Recibida",
-                            description: `**Opinión del cliente:**\n> "${safeReviewText}"`,
-                            color: 16711680, // ROJO PURO (0xFF0000) para efecto neón en Discord
-                            fields: [
-                                {
-                                    name: " Producto",
-                                    value: `\`${safeProductName}\``,
-                                    inline: true
-                                },
-                                {
-                                    name: "⭐ Calificación",
-                                    value: `${starsString} (${rating}/5)`,
-                                    inline: true
-                                },
-                                {
-                                    name: "👤 Cliente",
-                                    value: `<@${currentUser.id}> (${currentUser.username})`,
-                                    inline: false
-                                }
-                            ],
-                            footer: {
-                                text: "Papeleta Store",
-                                icon_url: "https://papeleta-script-github-io.vercel.app/favicon.ico"
-                            },
-                            timestamp: new Date().toISOString()
-                        }
-                    ]
+                    avatar_url: "https://papeleta-script-github-io.vercel.app/files/999.png",
+                    embeds: [{
+                        title: "✨ Nueva Valoración Recibida",
+                        description: `**Opinión del cliente:**\n> "${safeReviewText}"`,
+                        color: 16711680,
+                        fields: [
+                            { name: "📦 Producto", value: `\`${safeProductName}\``, inline: true },
+                            { name: "⭐ Calificación", value: `${starsString} (${rating}/5)`, inline: true },
+                            { name: "👤 Cliente", value: `<@${currentUser.id}> (${currentUser.username})`, inline: false }
+                        ],
+                        footer: { text: "Papeleta Store", icon_url: "https://papeleta-script-github-io.vercel.app/favicon.ico" },
+                        timestamp: new Date().toISOString()
+                    }]
                 };
 
-                // Agregar imagen grande al final si existe y es válida
                 if (imageUrl && typeof imageUrl === 'string' && imageUrl.startsWith('http')) {
                     payload.embeds[0].image = { url: imageUrl };
                 }
 
-                // Enviar petición
                 const response = await fetch(REVIEW_WEBHOOK_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
 
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error(" Discord API Error:", response.status, errorText);
-                    throw new Error(`HTTP ${response.status}: ${errorText}`);
-                }
-
-                console.log("✅ Reseña enviada a Discord correctamente.");
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                console.log("✅ Reseña enviada a Discord.");
             } catch (err) {
-                console.error(" Error crítico en sendReviewToWebhook:", err);
-                showToast('Error al enviar a Discord. Revisa la consola (F12).', 'error');
+                console.error("Error en webhook:", err);
             }
         }
 
@@ -941,7 +1129,7 @@
                 const snapshot = await db.collection("Resenas").where("user_id", "==", currentUser.id).get();
                 
                 if (snapshot.empty) {
-                    container.innerHTML = `<div class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5"><i class="fas fa-comment-slash text-gray-600 text-4xl mb-3"></i><p class="text-gray-400">Aún no has dejado ninguna reseña.</p><p class="text-gray-500 text-sm mt-2">Ve a tus productos activos y deja tu opinión.</p></div>`;
+                    container.innerHTML = `<div class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5"><i class="fas fa-comment-slash text-gray-600 text-4xl mb-3"></i><p class="text-gray-400">Aún no has dejado ninguna reseña.</p></div>`;
                     return;
                 }
                 
@@ -961,517 +1149,30 @@
                 });
                 container.innerHTML = reviewsHTML;
             } catch (error) {
-                console.error("Error detallado al cargar reseñas:", error);
-                container.innerHTML = `<div class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5"><i class="fas fa-exclamation-triangle text-red-500 text-4xl mb-3"></i><p class="text-red-400 font-semibold">Error al cargar las reseñas</p><p class="text-gray-500 text-sm mt-2">${error.message}</p></div>`;
+                console.error("Error al cargar reseñas:", error);
+                container.innerHTML = `<div class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5"><i class="fas fa-exclamation-triangle text-red-500 text-4xl mb-3"></i><p class="text-red-400 font-semibold">Error al cargar las reseñas</p></div>`;
             }
         }
 
         async function deleteReview(reviewId) {
-            if (!confirm('¿Estás seguro de eliminar esta reseña?')) return;
+            if (!confirm('¿Eliminar esta reseña?')) return;
             try {
                 await db.collection("Resenas").doc(reviewId).delete();
                 showToast('Reseña eliminada', 'success');
                 loadMyReviews();
             } catch (error) {
-                console.error("Error al eliminar reseña:", error);
-                showToast('Error al eliminar la reseña', 'error');
+                showToast('Error al eliminar', 'error');
             }
         }
-
-        function generateUniqueKey() {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; 
-    let code = '';
-    for (let i = 0; i < 16; i++) {
-        code += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    // Formato solicitado: PAPELETA(CODIGO)
-    return `PAPELETA(${code})`; 
-}
-
-        // --- FUNCIÓN MAESTRA ÚNICA PARA LICENCIAS (EVITA DUPLICADOS) ---
-        async function getOrCreateLicense(userId, productId, productName) {
-            try {
-                // 1. Buscar SI YA EXISTE una licencia activa para este usuario y producto
-                const querySnapshot = await db.collection("Licencias")
-                    .where("discord_id", "==", userId)
-                    .where("product_id", "==", productId)
-                    .where("status", "==", "active")
-                    .limit(1)
-                    .get();
-
-                if (!querySnapshot.empty) {
-                    console.log(`✅ Licencia ya existente para ${userId} en ${productId}. No se crea duplicado.`);
-                    return querySnapshot.docs[0].data(); // Retorna la existente sin crear nada
-                }
-
-                // 2. Si NO existe, creamos UNA SOLA licencia nueva
-                const uniqueKey = generateUniqueKey();
-                const licenseData = { 
-                    discord_id: userId, 
-                    username: currentUser ? currentUser.username : 'Unknown', 
-                    product_id: productId, 
-                    product_name: productName, 
-                    key: uniqueKey, 
-                    created_at: firebase.firestore.FieldValue.serverTimestamp(), 
-                    status: 'active' 
-                };
-                
-                const docRef = await db.collection("Licencias").add(licenseData);
-                console.log(`✨ Nueva licencia creada: ${docRef.id}`);
-                return { id: docRef.id, ...licenseData };
-
-            } catch (error) {
-                console.error("❌ Error en getOrCreateLicense:", error);
-                return null;
-            }
-        }
-
-        async function ensureFixedLicense() {
-            if (!currentUser) return;
-            
-            try {
-                // 1. Buscamos si el usuario YA tiene una licencia "general" creada
-                const snapshot = await db.collection("Licencias")
-                    .where("discord_id", "==", currentUser.id)
-                    .where("type", "==", "general") // Buscamos SOLO la licencia maestra
-                    .limit(1)
-                    .get();
-
-                if (!snapshot.empty) {
-                    // Si ya existe, usamos esa misma clave (no creamos otra)
-                    userFixedLicenseKey = snapshot.docs[0].data().key;
-                    console.log("✅ Licencia fija encontrada:", userFixedLicenseKey);
-                } else {
-                    // 2. Si NO existe, creamos UNA SOLA vez la licencia maestra
-                    const newKey = generateUniqueKey();
-                    await db.collection("Licencias").add({
-                        discord_id: currentUser.id, 
-                        username: currentUser.username, 
-                        key: newKey, 
-                        type: "general", // Etiqueta para identificarla como la única
-                        created_at: firebase.firestore.FieldValue.serverTimestamp(), 
-                        status: 'active'
-                    });
-                    userFixedLicenseKey = newKey;
-                    console.log("✨ Nueva licencia maestra creada:", userFixedLicenseKey);
-                }
-                
-                // Actualizamos la visualización en el panel lateral
-                updateLicenseDisplay();
-
-            } catch (error) { 
-                console.error("Error gestionando licencia fija:", error); 
-            }
-        }
-
-        // REEMPLAZA updateLicenseDisplay EN AreaCliente.html POR ESTA VERSIÓN:
-        function updateLicenseDisplay() {
-            const codeBlock = document.getElementById('license-code');
-            if (!currentUser) return;
-
-            // Buscamos la primera licencia activa que tenga este usuario en Firebase
-            db.collection("Licencias")
-              .where("discord_id", "==", currentUser.id)
-              .where("status", "==", "active")
-              .limit(1)
-              .get()
-              .then(snapshot => {
-                  if (!snapshot.empty) {
-                      const license = snapshot.docs[0].data();
-                      // Mostramos la clave real generada para sus productos
-                      codeBlock.textContent = `configLicense = {
-    ["User"] = "${license.user_code || 'PENDIENTE'}", 
-    ["Key"] = "${license.key}"
-}`;
-                  } else {
-                      codeBlock.textContent = "No tienes licencias activas aún.";
-                  }
-              });
-        }
-
-// ✅ FUNCIÓN CORREGIDA: ESCUCHA APROBACIONES Y ENTREGA PRODUCTOS
-function listenForApprovedOrders() {
-    if (!currentUser) return;
-
-    // Escuchamos TODAS las órdenes del usuario para detectar el cambio de estado en tiempo real
-    db.collection("Compra")
-        .where("discord_id", "==", currentUser.id)
-        .onSnapshot(async (snapshot) => {
-            snapshot.docChanges().forEach(async (change) => {
-                // Detectamos cuando el staff modifica la orden (ej: de 'pending_approval' a 'approved')
-                if (change.type === "modified") {
-                    const data = change.doc.data();
-                    const orderId = change.doc.id;
-
-                    // Si el estado cambia a aprobado (acepta 'approved' o 'aprobado' por si tu panel usa español)
-                    if (data.status === "approved" || data.status === "aprobado" || data.status === "completed") {
-                        
-                        // Evitamos procesar la misma orden dos veces
-                        if (data.status === "completed") return;
-
-                        console.log("✅ Orden aprobada detectada:", orderId);
-
-                        // 1. OTORGAR LOS PRODUCTOS (Crear licencias si no existen)
-                        if (data.products && Array.isArray(data.products)) {
-                            for (const product of data.products) {
-                                // Verificar si el usuario YA tiene la licencia de este producto específico
-                                const existingLicense = await db.collection("Licencias")
-                                    .where("discord_id", "==", currentUser.id)
-                                    .where("product_id", "==", product.id)
-                                    .where("status", "==", "active")
-                                    .limit(1)
-                                    .get();
-
-                                if (existingLicense.empty) {
-                                    // Generar datos únicos para el producto
-                                    const newKey = Array.from({length: 24}, () => "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[Math.floor(Math.random() * 36)]).join('');
-                                    const userCode = 'USER_' + Math.random().toString(36).substring(2, 8).toUpperCase();
-
-                                    // Crear la licencia del producto en la base de datos
-                                    await db.collection("Licencias").add({
-                                        discord_id: currentUser.id,
-                                        username: currentUser.username,
-                                        product_id: product.id,
-                                        product_name: product.name,
-                                        key: newKey,
-                                        user_code: userCode,
-                                        type: "product", // Diferente a "general" para que el dashboard lo muestre
-                                        created_at: firebase.firestore.FieldValue.serverTimestamp(),
-                                        status: 'active'
-                                    });
-
-                                    // Registro histórico en "Clientes"
-                                    await db.collection("Clientes").add({
-                                        discord_id: currentUser.id,
-                                        username: currentUser.username,
-                                        products: [{ id: product.id, name: product.name, price: product.price }],
-                                        total_price: data.total_amount,
-                                        date: firebase.firestore.FieldValue.serverTimestamp(),
-                                        status: "Entregado por Aprobación",
-                                        order_id: orderId
-                                    });
-                                }
-                            }
-                        }
-
-                        // 2. Marcar la orden como 'completed' para que no se vuelva a procesar en el futuro
-                        await change.doc.ref.update({ status: "completed" });
-
-                        // 3. Vaciar carrito y notificar al usuario
-                        localStorage.removeItem('papeleta_cart');
-                        showToast('🎉 ¡Tu solicitud fue aprobada! Se ha vaciado el carrito y se te ha otorgado el producto.', 'success');
-
-                        // 4. Recargar el dashboard inmediatamente para mostrar el nuevo producto
-                        loadDashboardData();
-                    }
-                }
-            });
-        });
-}
-
-async function loadDashboardData() {
-    if (!currentUser) return;
-    try {
-        // Cargar todos los productos disponibles
-        const productsSnapshot = await db.collection("Productos").get();
-        allProducts = [];
-        productsSnapshot.forEach((doc) => {
-            const data = doc.data();
-            allProducts.push({ docId: doc.id, id: data.id || doc.id, ...data });
-        });
-
-        // ✅ CORRECCIÓN: Buscar en Clientes en lugar de Licencias
-        const clientsSnapshot = await db.collection("Clientes")
-            .where("discord_id", "==", currentUser.id)
-            .get();
-
-        let purchasedProducts = [];
-        let totalSpent = 0;
-        const processedProductIds = new Set();
-
-        clientsSnapshot.forEach((doc) => {
-            const clientData = doc.data();
-            const products = clientData.products || [];
-            
-            products.forEach(product => {
-                if (processedProductIds.has(product.id)) return;
-                processedProductIds.add(product.id);
-
-                const productData = allProducts.find(p => 
-                    String(p.id) === String(product.id) || 
-                    String(p.docId) === String(product.id)
-                );
-                
-                if (productData) {
-                    purchasedProducts.push({ 
-                        ...productData, 
-                        licenseKey: clientData.license_key || 'N/A',
-                        userCode: clientData.license_user || 'N/A',
-                        purchaseDate: clientData.date?.toDate ? clientData.date.toDate() : new Date(),
-                        price: product.price || productData.price || 'Gratis'
-                    });
-                    
-                    const rawPrice = String(product.price || productData.price).toLowerCase();
-                    const numericPrice = parseFloat(rawPrice.replace('$', '').replace(',', ''));
-                    if (!isNaN(numericPrice) && numericPrice > 0) {
-                        totalSpent += numericPrice;
-                    }
-                }
-            });
-        });
-
-        document.getElementById('stat-total-spent').innerText = '$' + totalSpent.toFixed(2);
-        document.getElementById('stat-active-scripts').innerText = purchasedProducts.length;
-        
-        const container = document.getElementById('dashboard-products-list');
-        if (purchasedProducts.length === 0) {
-            document.getElementById('dashboard-empty-state').classList.remove('hidden');
-            container.innerHTML = '';
-        } else {
-            document.getElementById('dashboard-empty-state').classList.add('hidden');
-            
-            const reviewsSnapshot = await db.collection("Resenas").where("user_id", "==", currentUser.id).get();
-            const reviewedProductIds = new Set();
-            reviewsSnapshot.forEach(doc => reviewedProductIds.add(doc.data().product_id));
-            
-            container.innerHTML = purchasedProducts.map(item => {
-                const hasReview = reviewedProductIds.has(String(item.id)) || reviewedProductIds.has(String(item.docId));
-                const safeName = item.name.replace(/'/g, "\\'");
-                
-                let priceDisplay = '';
-                let priceClass = 'text-white font-bold';
-                
-                const rawPrice = String(item.price).toLowerCase();
-                const numericPrice = parseFloat(rawPrice.replace('$', '').replace(',', ''));
-                
-                if (!isNaN(numericPrice) && numericPrice > 0) {
-                    priceDisplay = 'Listo';
-                    priceClass = 'text-green-400 font-bold';
-                } else {
-                    priceDisplay = 'Gratis';
-                    priceClass = 'text-white font-bold';
-                }
-
-                return `<div class="bg-[#0d0505] border border-red-900/30 rounded-xl p-4 flex items-center justify-between hover:border-red-600/50 transition-all">
-                    <div class="flex items-center gap-4">
-                        <div class="w-16 h-16 rounded-lg bg-[#150a0a] border border-red-900/20 overflow-hidden">
-                            <img src="${item.image_url || 'https://via.placeholder.com/64'}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/64'">
-                        </div>
-                        <div>
-                            <h3 class="text-white font-bold">${item.name}</h3>
-                            <p class="${priceClass} text-sm">${priceDisplay}</p>
-                            
-                        </div>
-                    </div>
-                    <div class="flex gap-2">
-                        ${item.file_data ? `<button onclick="downloadProduct('${item.id}')" class="btn-primary px-4 py-2 rounded-lg text-white text-sm"><i class="fas fa-download"></i> Descargar</button>` : '<button disabled class="px-4 py-2 rounded-lg bg-gray-800 text-gray-500 text-sm">No disponible</button>'}
-                        ${hasReview ? `<button disabled class="px-4 py-2 rounded-lg bg-green-900/30 border border-green-600/30 text-green-400 text-sm cursor-not-allowed"><i class="fas fa-check mr-1"></i> Reseñado</button>` : `<button onclick="openReviewModal('${item.id}', '${safeName}')" class="px-4 py-2 rounded-lg bg-yellow-900/30 border border-yellow-600/30 text-yellow-400 hover:bg-yellow-900/50 text-sm"><i class="fas fa-star mr-1"></i> Reseñar</button>`}
-                    </div>
-                </div>`;
-            }).join('');
-        }
-    } catch (error) {
-        console.error("Error cargando dashboard:", error);
-        showToast('Error al cargar datos', 'error');
-    }
-}
-
-        async function downloadProduct(productId) {
-    // 1. Obtener valores de los campos de configuración
-    const ip = document.getElementById('server-ip').value.trim();
-    const port = document.getElementById('server-port').value.trim();
-    
-    // 2. Validar que haya datos
-    if (!ip || !port) {
-        showToast('⚠️ Debes configurar tu IP y Puerto del servidor MTA antes de descargar.', 'warning', 'Configuración Requerida');
-        document.getElementById('server-ip').focus();
-        return;
-    }
-
-    // 3. Validar formato básico de IP y Puerto
-    const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
-    if (!ipRegex.test(ip) || isNaN(port) || port < 1 || port > 65535) {
-        showToast('❌ El formato de IP o Puerto no es válido. Ej: 192.168.1.1 y 22003', 'error', 'Error de Formato');
-        return;
-    }
-
-    const product = allProducts.find(p => String(p.id) === String(productId) || String(p.docId) === String(productId));
-    if (!product || !product.file_data) {
-        showToast('Archivo no disponible para este producto', 'error');
-        return;
-    }
-
-    try {
-        showToast('⏳ Vinculando licencia con tu servidor...', 'success', 'Procesando');
-        
-        // 4. Buscar la licencia activa del usuario para este producto
-        let licenseRef = null;
-        const licenseSnapshot = await db.collection("Licencias")
-            .where("discord_id", "==", currentUser.id)
-            .where("product_id", "==", productId)
-            .where("status", "==", "active")
-            .limit(1)
-            .get();
-
-        if (!licenseSnapshot.empty) {
-            licenseRef = licenseSnapshot.docs[0].ref;
-        } else {
-            // Fallback: Si no encuentra por product_id, busca cualquier licencia activa del usuario (ej. licencia general)
-            const generalSnapshot = await db.collection("Licencias")
-                .where("discord_id", "==", currentUser.id)
-                .where("status", "==", "active")
-                .limit(1)
-                .get();
-                
-            if (!generalSnapshot.empty) {
-                licenseRef = generalSnapshot.docs[0].ref;
-            }
-        }
-
-        // 5. Si encontramos la licencia, actualizamos la IP y Puerto en Firebase
-        if (licenseRef) {
-            await licenseRef.update({
-                ip: ip,
-                port: port,
-                resource: product.name // Guardamos el nombre del resource para doble validación en Lua
-            });
-        }
-
-        // 6. Proceder con la descarga real del archivo
-        const link = document.createElement('a');
-        link.href = product.file_data;
-        link.download = product.file_name || 'resource.zip';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        showToast('✅ Descarga iniciada. Licencia vinculada a tu IP:Puerto.', 'success', '¡Listo!');
-        
-    } catch (error) {
-        console.error("Error al vincular licencia:", error);
-        showToast('Error al vincular la licencia. Inténtalo de nuevo.', 'error');
-    }
-}
-
-        function downloadProduct(productId) {
-            const product = allProducts.find(p => String(p.id) === String(productId) || String(p.docId) === String(productId));
-            if (product && product.file_data) {
-                const link = document.createElement('a');
-                link.href = product.file_data;
-                link.download = product.file_name || 'resource.zip';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                showToast('Descarga iniciada', 'success');
-            }
-        }
-
-        function copyLicenseCode() {
-            const code = document.getElementById('license-code').textContent;
-            navigator.clipboard.writeText(code).then(() => {
-                const btn = event.currentTarget;
-                const original = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check"></i> Copiado';
-                setTimeout(() => btn.innerHTML = original, 2000);
-            });
-        }
-
-        async function saveServerConfig() {
-    const ip = document.getElementById('server-ip').value.trim();
-    const port = document.getElementById('server-port').value.trim();
-    
-    if (!ip || !port) {
-        showToast('Por favor ingresa IP y Puerto válidos', 'warning');
-        return;
-    }
-    
-    // Validar formato de IP
-    const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
-    if (!ipRegex.test(ip)) {
-        showToast('Formato de IP inválido. Ejemplo: 192.168.1.1', 'error');
-        return;
-    }
-    
-    // Validar formato de Puerto
-    const portNum = parseInt(port);
-    if (isNaN(portNum) || portNum < 1 || portNum > 65535) {
-        showToast('Puerto inválido. Debe estar entre 1 y 65535', 'error');
-        return;
-    }
-    
-    try {
-        // 1. Guardar en localStorage (para que no se borre al recargar)
-        localStorage.setItem('server_config', JSON.stringify({ ip: ip, port: port }));
-        
-        // 2. Guardar en Firebase - Colección Licencias
-        if (currentUser) {
-            // Buscar la licencia activa del usuario
-            const licenseSnapshot = await db.collection("Licencias")
-                .where("discord_id", "==", currentUser.id)
-                .where("status", "==", "active")
-                .limit(1)
-                .get();
-            
-            if (!licenseSnapshot.empty) {
-                // Actualizar el documento de la licencia con la IP y Puerto
-                const batch = db.batch();
-                licenseSnapshot.forEach((doc) => {
-                    batch.update(doc.ref, {
-                        ip: ip,
-                        port: port,
-                        updated_at: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                });
-                
-                await batch.commit();
-                console.log("✅ IP y Puerto guardados en Firebase Licencias");
-            } else {
-                // Si por alguna razón no tiene licencia activa, creamos un registro de configuración
-                await db.collection("Licencias").add({
-                    discord_id: currentUser.id,
-                    username: currentUser.username,
-                    ip: ip,
-                    port: port,
-                    status: 'pending_config',
-                    type: 'server_config',
-                    created_at: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                console.log("✅ Configuración de servidor guardada en Firebase");
-            }
-        }
-        
-        // 3. Mostrar confirmación visual en el botón
-        const btn = event.currentTarget;
-        const original = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-check"></i> Guardado en Firebase';
-        btn.classList.add('bg-green-600'); // Cambia a verde temporalmente
-        
-        setTimeout(() => {
-            btn.innerHTML = original;
-            btn.classList.remove('bg-green-600');
-        }, 2000);
-        
-        showToast('IP y Puerto guardados correctamente en la base de datos', 'success');
-        
-    } catch (error) {
-        console.error("Error al guardar en Firebase:", error);
-        showToast('Error al guardar en la base de datos', 'error');
-    }
-}
 
         // =============================================
-        //          LÓGICA DE SOPORTE (MEJORADA)
+        //          SOPORTE / TICKETS
         // =============================================
-
-        let supportUnsubscribe = null;
 
         function initSupportListener() {
             if (!currentUser) return;
-            
-            // Cancelar listener anterior si existe
             if (supportUnsubscribe) supportUnsubscribe();
 
-            // Escuchar tickets activos del usuario
             supportUnsubscribe = db.collection("Tickets")
                 .where("discord_id", "==", currentUser.id)
                 .where("status", "==", "open")
@@ -1482,33 +1183,23 @@ async function loadDashboardData() {
                         currentTicketId = ticketDoc.id;
                         currentTicketData = ticketDoc.data();
                         
-                        // Mostrar interfaz de chat
                         document.getElementById('no-ticket-message').classList.add('hidden');
                         document.getElementById('chat-interface').classList.remove('hidden');
                         document.getElementById('btn-create-ticket').classList.add('hidden');
                         document.getElementById('btn-close-ticket').classList.remove('hidden');
                         
-                        // Actualizar estado mostrando quién tiene el ticket
                         const statusEl = document.getElementById('current-ticket-status');
                         const assignedTo = currentTicketData.assigned_to_name || 'Sin asignar';
                         const isAssignedToMe = currentTicketData.assigned_to === currentUser.id;
                         
                         if (isSupportStaff() && !isAssignedToMe) {
-                            // Si es soporte pero no es su ticket asignado
-                            statusEl.innerHTML = `
-                                <div class="flex flex-col gap-1">
-                                    <span class="ticket-status-badge status-assigned">Asignado</span>
-                                    <span class="text-xs text-blue-400">Ticket abierto por: <strong>${assignedTo}</strong></span>
-                                </div>
-                            `;
+                            statusEl.innerHTML = `<div class="flex flex-col gap-1"><span class="ticket-status-badge status-assigned">Asignado</span><span class="text-xs text-blue-400">Ticket de: <strong>${assignedTo}</strong></span></div>`;
                         } else {
                             statusEl.innerHTML = `<span class="ticket-status-badge status-open">Ticket Abierto #${ticketDoc.id.substr(-4)}</span>`;
                         }
                         
-                        // Renderizar mensajes
                         renderChatMessages(currentTicketData.messages || []);
                         
-                        // Habilitar input solo si es el asignado o admin
                         const input = document.getElementById('support-message-input');
                         const canRespond = isAdmin() || isAssignedToMe;
                         
@@ -1521,7 +1212,6 @@ async function loadDashboardData() {
                         }
 
                     } else {
-                        // No hay ticket activo
                         currentTicketId = null;
                         currentTicketData = null;
                         document.getElementById('no-ticket-message').classList.remove('hidden');
@@ -1530,14 +1220,10 @@ async function loadDashboardData() {
                         document.getElementById('btn-close-ticket').classList.add('hidden');
                         document.getElementById('current-ticket-status').textContent = "Sin ticket activo";
                     }
-                }, (error) => {
-                    console.error("Error escuchando tickets:", error);
                 });
         }
 
-        function loadSupportInterface() {
-            if (currentUser) initSupportListener();
-        }
+        function loadSupportInterface() { if (currentUser) initSupportListener(); }
 
         function openCreateTicketModal() {
             document.getElementById('ticket-subject').value = '';
@@ -1549,16 +1235,10 @@ async function loadDashboardData() {
             const subject = document.getElementById('ticket-subject').value.trim();
             const description = document.getElementById('ticket-description').value.trim();
 
-            if (!subject || !description) {
-                showToast('Por favor completa todos los campos', 'warning');
-                return;
-            }
+            if (!subject || !description) { showToast('Completa todos los campos', 'warning'); return; }
 
             try {
-                // Determinar quién asigna el ticket
                 const isStaff = isSupportStaff();
-                
-                // 1. Crear en Firebase
                 const newTicketRef = await db.collection("Tickets").add({
                     discord_id: currentUser.id,
                     username: currentUser.username,
@@ -1567,63 +1247,40 @@ async function loadDashboardData() {
                     assigned_to: isStaff ? currentUser.id : null,
                     assigned_to_name: isStaff ? currentUser.username : null,
                     created_at: firebase.firestore.FieldValue.serverTimestamp(),
-                    messages: [
-                        {
-                            sender: currentUser.username,
-                            sender_id: currentUser.id,
-                            text: description,
-                            timestamp: new Date().toISOString(),
-                            is_support: isStaff
-                        }
-                    ]
+                    messages: [{
+                        sender: currentUser.username,
+                        sender_id: currentUser.id,
+                        text: description,
+                        timestamp: new Date().toISOString(),
+                        is_support: isStaff
+                    }]
                 });
 
-                // 2. Enviar Webhook a Discord
                 await sendTicketWebhook(subject, description, newTicketRef.id, isStaff);
-
-                showToast('Ticket creado correctamente', 'success');
+                showToast('Ticket creado', 'success');
                 document.getElementById('create-ticket-modal').classList.remove('active');
-
             } catch (error) {
-                console.error("Error creando ticket:", error);
-                showToast('Error al crear el ticket', 'error');
+                showToast('Error al crear ticket', 'error');
             }
         }
 
         async function sendTicketWebhook(subject, description, ticketId, isStaff) {
             const assignedText = isStaff ? `**Asignado a:** <@${currentUser.id}>` : '**Esperando asignación**';
-            
             const payload = {
                 username: "Sistema de Soporte",
                 avatar_url: "https://papeleta-script-github-io.vercel.app/files/999.png",
-                embeds: [
-                    {
-                        title: " Nuevo Ticket de Soporte",
-                        description: `**Asunto:** ${subject}\n**Descripción:** ${description}`,
-                        color: 16711680, // Rojo
-                        fields: [
-                            {
-                                name: " Usuario",
-                                value: `<@${currentUser.id}> (${currentUser.username})`,
-                                inline: true
-                            },
-                            {
-                                name: "🆔 ID Ticket",
-                                value: `\`${ticketId}\``,
-                                inline: true
-                            },
-                            {
-                                name: "👨‍💻 Soporte",
-                                value: assignedText,
-                                inline: false
-                            }
-                        ],
-                        footer: {
-                            text: "Papeleta Store Support"
-                        },
-                        timestamp: new Date().toISOString()
-                    }
-                ]
+                embeds: [{
+                    title: "🎫 Nuevo Ticket de Soporte",
+                    description: `**Asunto:** ${subject}\n**Descripción:** ${description}`,
+                    color: 16711680,
+                    fields: [
+                        { name: "👤 Usuario", value: `<@${currentUser.id}> (${currentUser.username})`, inline: true },
+                        { name: "🆔 ID Ticket", value: `\`${ticketId}\``, inline: true },
+                        { name: "👨💻 Soporte", value: assignedText, inline: false }
+                    ],
+                    footer: { text: "Papeleta Store Support" },
+                    timestamp: new Date().toISOString()
+                }]
             };
 
             await fetch(TICKET_WEBHOOK_URL, {
@@ -1636,25 +1293,12 @@ async function loadDashboardData() {
         function renderChatMessages(messages) {
             const container = document.getElementById('chat-messages');
             container.innerHTML = '';
-            
             messages.forEach(msg => {
                 const isMe = msg.sender_id === currentUser.id;
-                const isSupport = msg.is_support;
-                
-                let bubbleClass = isMe ? 'message-user' : 'message-support';
-                
+                const bubbleClass = isMe ? 'message-user' : 'message-support';
                 const date = new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                
-                const html = `
-                    <div class="message-bubble ${bubbleClass}">
-                        <div class="font-bold text-xs mb-1 opacity-80">${isSupport ? 'Soporte' : msg.sender}</div>
-                        <div>${msg.text}</div>
-                        <div class="message-meta">${date}</div>
-                    </div>
-                `;
-                container.innerHTML += html;
+                container.innerHTML += `<div class="message-bubble ${bubbleClass}"><div class="font-bold text-xs mb-1 opacity-80">${msg.is_support ? 'Soporte' : msg.sender}</div><div>${msg.text}</div><div class="message-meta">${date}</div></div>`;
             });
-            
             container.scrollTop = container.scrollHeight;
         }
 
@@ -1664,7 +1308,6 @@ async function loadDashboardData() {
             if (!text || !currentTicketId) return;
 
             const isStaff = isAdmin() || isSupportStaff();
-
             try {
                 await db.collection("Tickets").doc(currentTicketId).update({
                     messages: firebase.firestore.FieldValue.arrayUnion({
@@ -1675,64 +1318,42 @@ async function loadDashboardData() {
                         is_support: isStaff
                     })
                 });
-
                 input.value = '';
-
             } catch (error) {
-                console.error("Error enviando mensaje:", error);
                 showToast('Error al enviar mensaje', 'error');
             }
         }
 
-        // Funciones para el modal personalizado de cerrar ticket
-        function openCloseTicketModal() {
-            document.getElementById('close-ticket-modal').classList.add('active');
-        }
-
-        function closeCloseTicketModal() {
-            document.getElementById('close-ticket-modal').classList.remove('active');
-        }
+        function openCloseTicketModal() { document.getElementById('close-ticket-modal').classList.add('active'); }
+        function closeCloseTicketModal() { document.getElementById('close-ticket-modal').classList.remove('active'); }
 
         async function confirmCloseTicket() {
             closeCloseTicketModal();
-            
             if (!currentTicketId) return;
-            
             try {
-                // 1. Actualizar estado en Firebase a 'closed'
                 await db.collection("Tickets").doc(currentTicketId).update({
                     status: 'closed',
                     closed_at: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                // 2. Enviar aviso de cierre a Discord
-                const payload = {
-                    username: "Sistema de Soporte",
-                    avatar_url: "https://papeleta-script-github-io.vercel.app/files/999.png",
-                    embeds: [
-                        {
-                            title: "🔒 Ticket Cerrado",
-                            description: `El ticket \`${currentTicketId}\` ha sido cerrado.`,
-                            color: 65280, // Verde
-                            footer: {
-                                text: "Papeleta Store Support"
-                            },
-                            timestamp: new Date().toISOString()
-                        }
-                    ]
-                };
-
                 await fetch(TICKET_WEBHOOK_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({
+                        username: "Sistema de Soporte",
+                        avatar_url: "https://papeleta-script-github-io.vercel.app/files/999.png",
+                        embeds: [{
+                            title: "🔒 Ticket Cerrado",
+                            description: `El ticket \`${currentTicketId}\` ha sido cerrado.`,
+                            color: 65280,
+                            footer: { text: "Papeleta Store Support" },
+                            timestamp: new Date().toISOString()
+                        }]
+                    })
                 });
-
-                showToast('Ticket cerrado correctamente', 'success');
-
+                showToast('Ticket cerrado', 'success');
             } catch (error) {
-                console.error("Error cerrando ticket:", error);
-                showToast('Error al cerrar el ticket', 'error');
+                showToast('Error al cerrar ticket', 'error');
             }
         }
     </script>
