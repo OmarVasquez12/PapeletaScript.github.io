@@ -633,11 +633,11 @@ function generateUserCode() {
       .then(snapshot => {
           if (!snapshot.empty) {
               const license = snapshot.docs[0].data();
-              // ✅ NUEVO FORMATO CON PARÉNTESIS: PAPELETA (CODIGO)
+              // ✅ Mostrar el valor TAL CUAL viene de Firebase (ya tiene PAPELETA (...))
               codeBlock.textContent = 
                   'configLicense = {\n' +
-                  '    ["User"] = "PAPELETA (' + (license.user_code || '') + ')",\n' +
-                  '    ["Key"] = "PAPELETA (' + (license.key || '') + ')"\n' +
+                  '    ["User"] = "' + (license.user_code || 'PAPELETA (PENDIENTE)') + '",\n' +
+                  '    ["Key"] = "' + (license.key || 'PAPELETA (PENDIENTE)') + '"\n' +
                   '}';
           } else {
               codeBlock.textContent = 
