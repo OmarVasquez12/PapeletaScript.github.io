@@ -67,21 +67,6 @@
         }
         @keyframes bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
 
-        .product-detail-modal { backdrop-filter: blur(10px); }
-        .gallery-main-image { width: 100%; height: 400px; object-fit: contain; border-radius: 16px; background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(153, 27, 27, 0.1)); }
-        .gallery-thumbnails { display: flex; gap: 10px; margin-top: 15px; overflow-x: auto; padding: 5px; }
-        .gallery-thumbnail { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 2px solid transparent; transition: all 0.3s; flex-shrink: 0; }
-        .gallery-thumbnail:hover { border-color: #dc2626; transform: scale(1.05); }
-        .gallery-thumbnail.active { border-color: #dc2626; box-shadow: 0 0 10px rgba(220, 38, 38, 0.5); }
-        .gallery-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(220, 38, 38, 0.8); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
-        .gallery-nav.prev { left: 10px; }
-        .gallery-nav.next { right: 10px; }
-
-        .multiple-preview-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 15px; }
-        .preview-item { position: relative; border-radius: 8px; overflow: hidden; border: 2px solid rgba(220, 38, 38, 0.3); }
-        .preview-item img { width: 100%; height: 150px; object-fit: cover; }
-        .preview-item .remove-btn { position: absolute; top: 5px; right: 5px; background: rgba(220, 38, 38, 0.9); color: white; border: none; width: 25px; height: 25px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; }
-
         .config-panel-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
         .config-panel-overlay.active { opacity: 1; pointer-events: auto; }
         .config-panel { position: fixed; top: 0; right: -400px; width: 350px; height: 100vh; background: linear-gradient(180deg, #150a0a 0%, #0a0505 100%); border-left: 1px solid rgba(255, 26, 26, 0.3); box-shadow: -10px 0 40px rgba(0,0,0,0.8); z-index: 101; transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 24px; overflow-y: auto; }
@@ -235,7 +220,6 @@
                 <div class="user-menu-icon"><i class="fas fa-box"></i></div>
                 <div class="user-menu-text"><h4>Mis Productos</h4><p>Ver y descargar mis compras</p></div>
             </a>
-            <!-- CAMBIO: Ahora lleva a Tienda.html -->
             <a href="Tienda.html" onclick="toggleUserPanel()" class="user-menu-item">
                 <div class="user-menu-icon"><i class="fas fa-store"></i></div>
                 <div class="user-menu-text"><h4>Tienda</h4><p>Explorar más productos</p></div>
@@ -303,7 +287,6 @@
             </div>
             <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-gray-300">
                 <a href="#" onclick="showPage('inicio')" data-page="inicio" class="nav-link hover:text-red-400 transition-colors">Inicio</a>
-                <!-- CAMBIO: Ahora lleva a Tienda.html -->
                 <a href="Tienda.html" class="nav-link hover:text-red-400 transition-colors">Productos</a>
                 <a href="#" onclick="showPage('preguntas')" data-page="preguntas" class="nav-link hover:text-red-400 transition-colors">Preguntas</a>
             </nav>
@@ -335,7 +318,6 @@
                     <h2 class="text-4xl md:text-5xl font-black text-white uppercase tracking-tight mb-4">PAPELETA <span class="text-red-400 red-glow">STORE</span></h2>
                     <p class="text-gray-300 text-sm md:text-base mb-8">PAPELETA STORE — LA TIENDA DE SCRIPTS QUE LLEVA TU SERVIDOR AL SIGUIENTE NIVEL</p>
                     <div class="flex flex-col sm:flex-row gap-4">
-                        <!-- CAMBIO: Ahora es un enlace a Tienda.html -->
                         <a href="Tienda.html" class="bg-red-600 hover:bg-red-700 text-white font-black px-8 py-4 rounded-xl shadow-lg shadow-red-600/20 transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2 uppercase tracking-wider no-underline">
                             Ver Recursos <i class="fas fa-arrow-right text-xs"></i>
                         </a>
