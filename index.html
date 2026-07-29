@@ -756,137 +756,220 @@
             }
         }
 
-        function initPriceSlider() {
-            const minSlider = document.getElementById('min-price-slider');
-            const maxSlider = document.getElementById('max-price-slider');
-            const minThumb = document.getElementById('min-price-thumb');
-            const maxThumb = document.getElementById('max-price-thumb');
-            const progress = document.getElementById('price-slider-progress');
-            const minDisplay = document.getElementById('min-price-display');
-            const maxDisplay = document.getElementById('max-price-display');
+        // Reemplaza las funciones del slider con estas versiones mejoradas:
 
-            // Encontrar el precio máximo real de los productos
-            const maxProductPrice = Math.max(...allProducts.map(p => p.price || 0), 100);
-            const sliderMax = Math.ceil(maxProductPrice / 10) * 10; // Redondear hacia arriba
-            
-            minSlider.max = sliderMax;
-            maxSlider.max = sliderMax;
-            minSlider.value = filterMinPrice;
-            maxSlider.value = filterMaxPrice > sliderMax ? sliderMax : filterMaxPrice;
+function initPriceSlider() {
+    const minSlider = document.getElementById('min-price-slider');
+    const maxSlider = document.getElementById('max-price-slider');
+    const minThumb = document.getElementById('min-price-thumb');
+    const maxThumb = document.getElementById('max-price-thumb');
+    const progress = document.getElementById('price-slider-progress');
+    const minDisplay = document.getElementById('min-price-display');
+    const maxDisplay = document.getElementById('max-price-display');
 
-            function updateSlider() {
-                let minVal = parseInt(minSlider.value);
-                let maxVal = parseInt(maxSlider.value);
+    // Encontrar el precio máximo real de los productos
+    const prices = allProducts.map(p => p.price || 0);
+    const maxProductPrice = Math.max(...prices, 100);
+    const minProductPrice = Math.min(...prices, 0);
+    
+    // Calcular un máximo redondeado hacia arriba
+    const sliderMax = Math.ceil(maxProductPrice / 10) * 10;
+    const sliderMin = 0;
+    
+    // Configurar sliders
+    minSlider.min = sliderMin;
+    minSlider.max = sliderMax;
+    maxSlider.min = sliderMin;
+    maxSlider.max = sliderMax;
+    
+    // Valores iniciales
+    filterMinPrice = 0;
+    filterMaxPrice = sliderMax;
+    
+    minSlider.value = filterMinPrice;
+    maxSlider.value = filterMaxPrice;
 
-                if (maxVal - minVal < 5) {
-                    if (minSlider === document.activeElement) {
-                        maxVal = minVal + 5;
-                        maxSlider.value = maxVal;
-                    } else {
-                        minVal = maxVal - 5;
-                        minSlider.value = minVal;
-                    }
-                }
-
-                const minPercent = (minVal / sliderMax) * 100;
-                const maxPercent = (maxVal / sliderMax) * 100;
-
-                minThumb.style.left = minPercent + '%';
-                maxThumb.style.left = maxPercent + '%';
-                progress.style.left = minPercent + '%';
-                progress.style.width = (maxPercent - minPercent) + '%';
-
-                minDisplay.textContent = '$' + minVal.toFixed(2);
-                maxDisplay.textContent = '$' + maxVal.toFixed(2);
-
-                filterMinPrice = minVal;
-                filterMaxPrice = maxVal;
+    function updateSlider() {
+        let minVal = parseInt(minSlider.value);
+        let maxVal = parseInt(maxSlider.value);
+        
+        // Asegurar separación mínima entre los valores
+        const minGap = 5;
+        
+        if (maxVal - minVal < minGap) {
+            if (document.activeElement === minSlider) {
+                // Si estamos moviendo el mínimo, ajustar el máximo
+                maxVal = Math.min(minVal + minGap, sliderMax);
+                maxSlider.value = maxVal;
+            } else {
+                // Si estamos moviendo el máximo, ajustar el mínimo
+                minVal = Math.max(maxVal - minGap, sliderMin);
+                minSlider.value = minVal;
             }
-
-            minSlider.addEventListener('input', updateSlider);
-            maxSlider.addEventListener('input', updateSlider);
-
-            // Hacer los thumbs arrastrables
-            let isDraggingMin = false;
-            let isDraggingMax = false;
-
-            minThumb.addEventListener('mousedown', () => isDraggingMin = true);
-            maxThumb.addEventListener('mousedown', () => isDraggingMax = true);
-            document.addEventListener('mouseup', () => { isDraggingMin = false; isDraggingMax = false; });
-            document.addEventListener('mousemove', (e) => {
-                if (!isDraggingMin && !isDraggingMax) return;
-                
-                const rect = minSlider.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const percent = Math.max(0, Math.min(100, (x / rect.width) * 100));
-                const value = (percent / 100) * sliderMax;
-
-                if (isDraggingMin) {
-                    minSlider.value = value;
-                } else if (isDraggingMax) {
-                    maxSlider.value = value;
-                }
-                updateSlider();
-            });
-
-            updateSlider();
         }
+        
+        // Calcular porcentajes
+        const minPercent = ((minVal - sliderMin) / (sliderMax - sliderMin)) * 100;
+        const maxPercent = ((maxVal - sliderMin) / (sliderMax - sliderMin)) * 100;
 
-        function buildCategoryFiltersList() {
-            const cats = [...new Set(allProducts.map(p => p.category).filter(Boolean))];
-            const container = document.getElementById('category-filters-list');
-            
-            container.innerHTML = cats.map(cat => `
-                <div class="category-checkbox">
-                    <input type="checkbox" id="cat-${cat}" value="${cat}" ${selectedCategories.includes(cat) ? 'checked' : ''}>
-                    <label for="cat-${cat}">${cat}</label>
-                </div>
-            `).join('');
-            
-            // Agregar opción "Gratis" si hay productos gratuitos
-            const hasFreeProducts = allProducts.some(p => p.price === 0);
-            if (hasFreeProducts) {
-                container.innerHTML += `
-                    <div class="category-checkbox">
-                        <input type="checkbox" id="cat-gratis" value="Gratis" ${selectedCategories.includes('Gratis') ? 'checked' : ''}>
-                        <label for="cat-gratis">Gratis</label>
-                    </div>
-                `;
-            }
+        // Actualizar posición de thumbs
+        minThumb.style.left = minPercent + '%';
+        maxThumb.style.left = maxPercent + '%';
+        
+        // Actualizar barra de progreso
+        progress.style.left = minPercent + '%';
+        progress.style.width = (maxPercent - minPercent) + '%';
 
-            // Agregar listeners
-            container.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-                checkbox.addEventListener('change', () => {
-                    if (checkbox.checked) {
-                        if (!selectedCategories.includes(checkbox.value)) {
-                            selectedCategories.push(checkbox.value);
-                        }
-                    } else {
-                        selectedCategories = selectedCategories.filter(c => c !== checkbox.value);
-                    }
-                    // Auto-aplicar filtros al cambiar
-                    renderProducts();
-                });
-            });
-        }
+        // Actualizar textos
+        minDisplay.textContent = '$' + minVal.toFixed(2);
+        maxDisplay.textContent = '$' + maxVal.toFixed(2);
 
-        function clearFilters() {
-            filterMinPrice = 0;
-            filterMaxPrice = 100;
-            selectedCategories = [];
-            
-            // Resetear UI
-            document.getElementById('min-price-display').textContent = '$0.00';
-            document.getElementById('max-price-display').textContent = '$100.00';
-            document.getElementById('price-slider-progress').style.left = '0%';
-            document.getElementById('price-slider-progress').style.width = '100%';
-            document.getElementById('min-price-thumb').style.left = '0%';
-            document.getElementById('max-price-thumb').style.left = '100%';
-            
-            document.querySelectorAll('.category-checkbox input[type="checkbox"]').forEach(cb => cb.checked = false);
-            
+        // Guardar valores
+        filterMinPrice = minVal;
+        filterMaxPrice = maxVal;
+    }
+
+    // Event listeners
+    minSlider.addEventListener('input', updateSlider);
+    maxSlider.addEventListener('input', updateSlider);
+    
+    minSlider.addEventListener('change', () => renderProducts());
+    maxSlider.addEventListener('change', () => renderProducts());
+
+    // Hacer los thumbs arrastrables con el mouse
+    let isDraggingMin = false;
+    let isDraggingMax = false;
+    const sliderWrapper = document.querySelector('.price-slider-wrapper');
+
+    minThumb.addEventListener('mousedown', (e) => {
+        isDraggingMin = true;
+        e.preventDefault();
+    });
+    
+    maxThumb.addEventListener('mousedown', (e) => {
+        isDraggingMax = true;
+        e.preventDefault();
+    });
+    
+    document.addEventListener('mouseup', () => {
+        if (isDraggingMin || isDraggingMax) {
             renderProducts();
         }
+        isDraggingMin = false;
+        isDraggingMax = false;
+    });
+    
+    document.addEventListener('mousemove', (e) => {
+        if (!isDraggingMin && !isDraggingMax) return;
+        
+        const rect = sliderWrapper.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const percent = Math.max(0, Math.min(100, (x / rect.width) * 100));
+        const value = sliderMin + (percent / 100) * (sliderMax - sliderMin);
+
+        if (isDraggingMin) {
+            minSlider.value = Math.round(value);
+        } else if (isDraggingMax) {
+            maxSlider.value = Math.round(value);
+        }
+        updateSlider();
+    });
+
+    // Soporte para touch
+    minThumb.addEventListener('touchstart', (e) => { isDraggingMin = true; });
+    maxThumb.addEventListener('touchstart', (e) => { isDraggingMax = true; });
+    
+    document.addEventListener('touchend', () => {
+        if (isDraggingMin || isDraggingMax) {
+            renderProducts();
+        }
+        isDraggingMin = false;
+        isDraggingMax = false;
+    });
+    
+    document.addEventListener('touchmove', (e) => {
+        if (!isDraggingMin && !isDraggingMax) return;
+        
+        const touch = e.touches[0];
+        const rect = sliderWrapper.getBoundingClientRect();
+        const x = touch.clientX - rect.left;
+        const percent = Math.max(0, Math.min(100, (x / rect.width) * 100));
+        const value = sliderMin + (percent / 100) * (sliderMax - sliderMin);
+
+        if (isDraggingMin) {
+            minSlider.value = Math.round(value);
+        } else if (isDraggingMax) {
+            maxSlider.value = Math.round(value);
+        }
+        updateSlider();
+    });
+
+    updateSlider();
+}
+
+function buildCategoryFiltersList() {
+    const cats = [...new Set(allProducts.map(p => p.category).filter(Boolean))];
+    const container = document.getElementById('category-filters-list');
+    
+    container.innerHTML = cats.map(cat => `
+        <div class="category-checkbox">
+            <input type="checkbox" id="cat-${cat}" value="${cat}" ${selectedCategories.includes(cat) ? 'checked' : ''}>
+            <label for="cat-${cat}">${cat}</label>
+        </div>
+    `).join('');
+    
+    // Agregar opción "Gratis" si hay productos gratuitos
+    const hasFreeProducts = allProducts.some(p => p.price === 0);
+    if (hasFreeProducts) {
+        container.innerHTML += `
+            <div class="category-checkbox">
+                <input type="checkbox" id="cat-gratis" value="Gratis" ${selectedCategories.includes('Gratis') ? 'checked' : ''}>
+                <label for="cat-gratis">Gratis</label>
+            </div>
+        `;
+    }
+
+    // Agregar listeners
+    container.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+            if (checkbox.checked) {
+                if (!selectedCategories.includes(checkbox.value)) {
+                    selectedCategories.push(checkbox.value);
+                }
+            } else {
+                selectedCategories = selectedCategories.filter(c => c !== checkbox.value);
+            }
+            // Auto-aplicar filtros al cambiar
+            renderProducts();
+        });
+    });
+}
+
+function clearFilters() {
+    const minSlider = document.getElementById('min-price-slider');
+    const maxSlider = document.getElementById('max-price-slider');
+    
+    // Resetear valores
+    filterMinPrice = 0;
+    filterMaxPrice = Math.max(...allProducts.map(p => p.price || 0), 100);
+    
+    minSlider.value = filterMinPrice;
+    maxSlider.value = filterMaxPrice;
+    
+    selectedCategories = [];
+    
+    // Resetear UI
+    document.getElementById('min-price-display').textContent = '$0.00';
+    document.getElementById('max-price-display').textContent = '$' + filterMaxPrice.toFixed(2);
+    document.getElementById('price-slider-progress').style.left = '0%';
+    document.getElementById('price-slider-progress').style.width = '100%';
+    document.getElementById('min-price-thumb').style.left = '0%';
+    document.getElementById('max-price-thumb').style.left = '100%';
+    
+    document.querySelectorAll('.category-checkbox input[type="checkbox"]').forEach(cb => cb.checked = false);
+    
+    renderProducts();
+}
 
         function toggleUserPanel() {
             if (!currentUser) { openLoginModal(); return; }
