@@ -579,18 +579,18 @@
         // =============================================
 
         function generateUniqueKey() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; 
-            let code = '';
-            for (let i = 0; i < 24; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
-            return code; 
-        }
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; 
+    let code = '';
+    for (let i = 0; i < 24; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+    return `PAPELETA (${code})`; // ✅ Ahora incluye el formato completo
+}
 
-        function generateUserCode() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; 
-            let code = '';
-            for (let i = 0; i < 8; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
-            return code;
-        }
+function generateUserCode() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; 
+    let code = '';
+    for (let i = 0; i < 8; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+    return `PAPELETA (${code})`; // ✅ Ahora incluye el formato completo
+}
 
         async function ensureFixedLicense() {
             if (!currentUser) return;
