@@ -98,7 +98,7 @@
         .review-date { font-size: 12px; color: #6b7280; margin-bottom: 8px; }
         .review-text { color: #d1d5db; line-height: 1.6; }
 
-        /* ESTILOS NUEVOS PARA SOPORTE MEJORADO */
+        /* ESTILOS NUEVOS PARA SOPORTE */
         .chat-container { display: flex; flex-direction: column; height: 500px; }
         .chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; background: rgba(5, 5, 7, 0.5); border-radius: 12px; border: 1px solid rgba(255, 26, 26, 0.1); margin-bottom: 15px; }
         .message-bubble { max-width: 80%; padding: 12px 16px; border-radius: 12px; font-size: 14px; line-height: 1.5; position: relative; animation: fadeIn 0.3s ease; }
@@ -106,84 +106,10 @@
         .message-support { align-self: flex-start; background: rgba(31, 41, 55, 0.9); border: 1px solid rgba(255, 255, 255, 0.1); color: #e2e8f0; border-bottom-left-radius: 2px; }
         .message-meta { font-size: 10px; opacity: 0.7; margin-top: 4px; text-align: right; }
         .support-input-area { display: flex; gap: 10px; }
-        
-        /* TARJETA DE TICKET EN LISTA */
-        .ticket-list-item {
-            background: linear-gradient(135deg, rgba(21, 10, 10, 0.9) 0%, rgba(13, 5, 5, 0.9) 100%);
-            border: 1px solid rgba(255, 26, 26, 0.3);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        .ticket-list-item:hover {
-            border-color: #ff1a1a;
-            transform: translateX(5px);
-            box-shadow: 0 5px 20px rgba(220, 38, 38, 0.2);
-        }
-        .ticket-list-item.active-ticket {
-            border-color: #10b981;
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(13, 5, 5, 0.9) 100%);
-        }
-        
-        .ticket-avatar-wrapper {
-            position: relative;
-        }
-        .ticket-avatar {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            border: 2px solid #dc2626;
-            object-fit: cover;
-        }
-        .ticket-notification-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #ef4444;
-            color: white;
-            font-size: 11px;
-            font-weight: 800;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-
-        .ticket-info h3 { font-size: 16px; font-weight: 700; color: white; margin-bottom: 4px; }
-        .ticket-info p { font-size: 13px; color: #9ca3af; }
-        
-        .ticket-status-pill {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
+        .ticket-status-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
         .status-open { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
         .status-closed { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
-
-        /* VISTA ACTIVA DETALLADA */
-        .ticket-active-header {
-            background: rgba(13, 5, 5, 0.8);
-            border-bottom: 1px solid rgba(255, 26, 26, 0.2);
-            padding: 20px;
-            border-radius: 12px 12px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        .status-assigned { background: rgba(59, 130, 246, 0.2); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); }
 
         /* MODAL PERSONALIZADO */
         .custom-modal-overlay {
@@ -373,50 +299,58 @@
                 </div>
             </div>
 
+            <!-- SECCIÓN DE SOPORTE MODIFICADA -->
             <div id="section-support" class="section">
                 <div class="card rounded-xl p-6">
                     <div class="flex items-center gap-3 mb-6">
                         <div class="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center"><i class="fas fa-headset text-blue-400"></i></div>
                         <h2 class="text-lg font-bold text-white">Centro de Soporte</h2>
-                        <button onclick="openCreateTicketModal()" class="ml-auto btn-primary px-4 py-2 rounded-lg text-white text-sm font-bold"><i class="fas fa-plus mr-2"></i> Nuevo Ticket</button>
                     </div>
                     
-                    <!-- VISTA DE LISTA DE TICKETS -->
-                    <div id="support-list-view">
-                        <div id="tickets-container" class="space-y-4">
-                            <!-- Aquí se inyectan los tickets dinámicamente -->
-                            <div class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5">
-                                <i class="fas fa-life-ring text-gray-600 text-5xl mb-4"></i>
-                                <p class="text-gray-400 text-lg">No tienes tickets creados.</p>
+                    <!-- Contenido Principal: Texto de Mantenimiento -->
+                    <div class="text-center py-16 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5">
+                        <div class="mb-6">
+                            <i class="fas fa-tools text-red-500 text-6xl animate-pulse"></i>
+                        </div>
+                        
+                        <h2 class="text-4xl font-black text-white mb-4 tracking-wider gradient-text">PRÓXIMAMENTE</h2>
+                        
+                        <div class="max-w-md mx-auto mt-8">
+                            <div class="bg-[#0d0505] border border-red-600/30 p-4 rounded-lg">
+                                <p class="text-gray-300 text-lg font-medium leading-relaxed">
+                                    Esto es para enviar un ticket a discord esta en matemineto
+                                </p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- VISTA DE CHAT ACTIVO (Oculta por defecto) -->
-                    <div id="support-chat-view" class="hidden">
-                        <div class="ticket-active-header mb-4">
-                            <div class="flex items-center gap-4">
-                                <button onclick="closeChatView()" class="text-gray-400 hover:text-white"><i class="fas fa-arrow-left"></i> Volver</button>
-                                <div>
-                                    <h3 id="active-ticket-subject" class="text-white font-bold text-lg">Asunto</h3>
-                                    <span id="active-ticket-status" class="ticket-status-pill status-open">Abierto</span>
-                                </div>
-                            </div>
-                            <!-- Botón solo para Staff -->
-                            <button id="btn-close-ticket-staff" onclick="openCloseTicketModal()" class="hidden px-4 py-2 rounded-lg bg-red-900/20 border border-red-600/50 text-red-400 hover:bg-red-900/40 font-bold text-sm transition-all">
-                                <i class="fas fa-times-circle mr-2"></i> Cerrar Ticket
-                            </button>
+                    <!-- Interfaz Oculta (Se mantiene para que el JS no falle si se activa manualmente) -->
+                    <div id="support-status-container" class="hidden mb-6 p-4 bg-[#0d0505] border border-red-900/30 rounded-xl flex justify-between items-center">
+                        <div>
+                            <p class="text-gray-400 text-sm">Estado actual:</p>
+                            <p id="current-ticket-status" class="text-white font-bold">Sin ticket activo</p>
                         </div>
+                        <button id="btn-create-ticket" onclick="openCreateTicketModal()" class="btn-primary px-6 py-2 rounded-lg text-white font-bold shadow-lg shadow-red-900/20">
+                            <i class="fas fa-plus-circle mr-2"></i> Crear Ticket
+                        </button>
+                        <button id="btn-close-ticket" onclick="openCloseTicketModal()" class="hidden px-6 py-2 rounded-lg bg-red-900/20 border border-red-600/50 text-red-400 hover:bg-red-900/40 font-bold">
+                            <i class="fas fa-times-circle mr-2"></i> Cerrar Ticket
+                        </button>
+                    </div>
 
-                        <div class="chat-container">
-                            <div id="chat-messages" class="chat-messages"></div>
-                            <div class="support-input-area">
-                                <input type="text" id="support-message-input" class="input-field flex-1 px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none" placeholder="Escribe tu mensaje...">
-                                <button onclick="sendSupportMessage()" class="btn-primary px-6 py-3 rounded-lg text-white font-bold"><i class="fas fa-paper-plane"></i></button>
-                            </div>
+                    <div id="chat-interface" class="chat-container hidden">
+                        <div id="chat-messages" class="chat-messages"></div>
+                        <div class="support-input-area">
+                            <input type="text" id="support-message-input" class="input-field flex-1 px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none" placeholder="Escribe tu mensaje...">
+                            <button onclick="sendSupportMessage()" class="btn-primary px-6 py-3 rounded-lg text-white font-bold"><i class="fas fa-paper-plane"></i></button>
                         </div>
                     </div>
 
+                    <div id="no-ticket-message" class="hidden text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5">
+                        <i class="fas fa-life-ring text-gray-600 text-5xl mb-4"></i>
+                        <p class="text-gray-400 text-lg">No tienes ningún ticket de soporte abierto.</p>
+                        <p class="text-gray-500 text-sm mt-2">Si necesitas ayuda, crea un nuevo ticket.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -480,10 +414,10 @@
                     <p class="text-gray-400 text-sm">¿Estás seguro de cerrar este ticket?</p>
                 </div>
             </div>
-            <p class="text-gray-300 text-sm mb-6">Se enviará una transcripción completa a Discord y se archivará el chat.</p>
+            <p class="text-gray-300 text-sm mb-6">Se eliminará el acceso al chat y se notificará a Discord.</p>
             <div class="custom-modal-buttons">
                 <button class="btn-modal-cancel" onclick="closeCloseTicketModal()">Cancelar</button>
-                <button class="btn-modal-confirm" onclick="confirmCloseTicket()"><i class="fas fa-check mr-2"></i> Sí, cerrar</button>
+                <button class="btn-modal-confirm" onclick="confirmCloseTicket()"><i class="fas fa-check mr-2"></i> Sí, cerrar ticket</button>
             </div>
         </div>
     </div>
@@ -522,14 +456,12 @@
         let currentTicketId = null;
         let currentTicketData = null;
         let supportUnsubscribe = null;
-        let localReadCount = 0; // Para contar mensajes leídos localmente
 
         const CLIENT_ID = '1213866547181780992'; 
         const REDIRECT_URI = window.location.href.split('#')[0]; 
         const ADMIN_DISCORD_IDS = ['890526767608127489']; 
         const TICKET_WEBHOOK_URL = "https://discord.com/api/webhooks/1530747464569716756/LLK7Msvn-NNXbrP5bN8lYBzkjCR7G6D1CE63w41AozCfN2mVxRxiMQUoWpHK2g6ahHg7";
         const REVIEW_WEBHOOK_URL = "https://discord.com/api/webhooks/1530350855100956853/mqzdvlTBOx2JZ3wlumx-LdLAus3sZyg610PeoxK9ds4jpqxMK9t0sBT_2Lo-U-TDutRF";
-        const TRANSCRIPT_WEBHOOK_URL = "https://discord.com/api/webhooks/1532131617668333678/jAW1VAbwATzxQrVC9T1gjMDRh9yqBqzean6UGB0gLjjj6BcQoL5lL0koh5BoSshH3kOc";
 
         function showToast(message, type = 'success', title = '') {
             const container = document.getElementById('toast-container');
@@ -615,10 +547,8 @@
                 event.currentTarget.classList.add('active');
             }
             if (section === 'reviews') loadMyReviews();
-            if (section === 'support') {
-                loadSupportInterface();
-                closeChatView(); // Asegurar que empieza en la lista
-            }
+            // Ya no necesitamos forzar la carga de la interfaz de soporte porque ahora es estática
+            // if (section === 'support') loadSupportInterface(); 
         }
 
         function openReviewModal(productId, productName) {
@@ -669,18 +599,18 @@
         // =============================================
 
         function generateUniqueKey() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; 
-            let code = '';
-            for (let i = 0; i < 24; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
-            return `PAPELETA (${code})`; 
-        }
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; 
+    let code = '';
+    for (let i = 0; i < 24; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+    return `PAPELETA (${code})`; // ✅ Ahora incluye el formato completo
+}
 
-        function generateUserCode() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; 
-            let code = '';
-            for (let i = 0; i < 8; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
-            return `PAPELETA (${code})`; 
-        }
+function generateUserCode() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; 
+    let code = '';
+    for (let i = 0; i < 8; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+    return `PAPELETA (${code})`; // ✅ Ahora incluye el formato completo
+}
 
         async function ensureFixedLicense() {
             if (!currentUser) return;
@@ -693,14 +623,14 @@
                 if (!snapshot.empty) {
                     userFixedLicenseKey = snapshot.docs[0].data().key;
                 } else {
-                    const newKey = generateUniqueKey(); 
-                    const newUser = generateUserCode(); 
+                    const newKey = generateUniqueKey(); // 24 caracteres
+                    const newUser = generateUserCode(); // 8 caracteres SIN prefijo
                     
                     await db.collection("Licencias").add({
                         discord_id: currentUser.id, 
                         username: currentUser.username, 
                         key: newKey,
-                        user_code: newUser, 
+                        user_code: newUser, // Solo el código, sin "USER_"
                         type: "general",
                         created_at: firebase.firestore.FieldValue.serverTimestamp(), 
                         status: 'active'
@@ -712,31 +642,32 @@
         }
 
         function updateLicenseDisplay() {
-            const codeBlock = document.getElementById('license-code');
-            if (!currentUser || !codeBlock) return;
+    const codeBlock = document.getElementById('license-code');
+    if (!currentUser || !codeBlock) return;
 
-            db.collection("Licencias")
-              .where("discord_id", "==", currentUser.id)
-              .where("type", "==", "general")
-              .limit(1)
-              .get()
-              .then(snapshot => {
-                  if (!snapshot.empty) {
-                      const license = snapshot.docs[0].data();
-                      codeBlock.textContent = 
-                          'configLicense = {\n' +
-                          '    ["User"] = "' + (license.user_code || 'PAPELETA (PENDIENTE)') + '",\n' +
-                          '    ["Key"] = "' + (license.key || 'PAPELETA (PENDIENTE)') + '"\n' +
-                          '}';
-                  } else {
-                      codeBlock.textContent = 
-                          'configLicense = {\n' +
-                          '    ["User"] = "PAPELETA (PENDIENTE)",\n' +
-                          '    ["Key"] = "PAPELETA (PENDIENTE)"\n' +
-                          '}';
-                  }
-              });
-        }
+    db.collection("Licencias")
+      .where("discord_id", "==", currentUser.id)
+      .where("type", "==", "general")
+      .limit(1)
+      .get()
+      .then(snapshot => {
+          if (!snapshot.empty) {
+              const license = snapshot.docs[0].data();
+              // ✅ Mostrar el valor TAL CUAL viene de Firebase (ya tiene PAPELETA (...))
+              codeBlock.textContent = 
+                  'configLicense = {\n' +
+                  '    ["User"] = "' + (license.user_code || 'PAPELETA (PENDIENTE)') + '",\n' +
+                  '    ["Key"] = "' + (license.key || 'PAPELETA (PENDIENTE)') + '"\n' +
+                  '}';
+          } else {
+              codeBlock.textContent = 
+                  'configLicense = {\n' +
+                  '    ["User"] = "PAPELETA (PENDIENTE)",\n' +
+                  '    ["Key"] = "PAPELETA (PENDIENTE)"\n' +
+                  '}';
+          }
+      });
+}
 
         async function saveServerConfig(event) {
             const ipInput = document.getElementById('server-ip');
@@ -964,8 +895,8 @@
                                             .limit(1).get();
 
                                         if (existingLicense.empty) {
-                                            const newKey = generateUniqueKey(); 
-                                            const newUserCode = generateUserCode(); 
+                                            const newKey = generateUniqueKey(); // 24 chars
+                                            const newUserCode = generateUserCode(); // 8 chars
 
                                             await db.collection("Licencias").add({
                                                 discord_id: currentUser.id,
@@ -973,7 +904,7 @@
                                                 product_id: product.id,
                                                 product_name: product.name,
                                                 key: newKey,
-                                                user_code: newUserCode, 
+                                                user_code: newUserCode, // Sin prefijo
                                                 type: "product",
                                                 created_at: firebase.firestore.FieldValue.serverTimestamp(),
                                                 status: 'active'
@@ -1206,75 +1137,62 @@
             }
         }
 
-        // =============================================
-        //          LÓGICA DE SOPORTE MEJORADA
-        // =============================================
-
         function initSupportListener() {
             if (!currentUser) return;
             if (supportUnsubscribe) supportUnsubscribe();
 
-            // Escuchar TODOS los tickets del usuario (abiertos y cerrados) para la lista
-            // IMPORTANTE: Asegúrate de tener el índice compuesto en Firebase si da error
             supportUnsubscribe = db.collection("Tickets")
                 .where("discord_id", "==", currentUser.id)
-                .orderBy("created_at", "desc")
+                .where("status", "==", "open")
+                .limit(1)
                 .onSnapshot((snapshot) => {
-                    renderTicketList(snapshot);
-                    
-                    // Si hay un ticket abierto, actualizar su vista si está activa
-                    const openTicket = snapshot.docs.find(d => d.data().status === 'open');
-                    if (openTicket && currentTicketId === openTicket.id) {
-                        currentTicketData = openTicket.data();
+                    if (!snapshot.empty) {
+                        const ticketDoc = snapshot.docs[0];
+                        currentTicketId = ticketDoc.id;
+                        currentTicketData = ticketDoc.data();
+                        
+                        // Nota: Como hemos ocultado la interfaz visualmente en HTML, 
+                        // esto actualizará los datos en segundo plano pero el usuario verá el mensaje de mantenimiento.
+                        document.getElementById('no-ticket-message').classList.add('hidden');
+                        document.getElementById('chat-interface').classList.remove('hidden');
+                        document.getElementById('btn-create-ticket').classList.add('hidden');
+                        document.getElementById('btn-close-ticket').classList.remove('hidden');
+                        
+                        const statusEl = document.getElementById('current-ticket-status');
+                        const assignedTo = currentTicketData.assigned_to_name || 'Sin asignar';
+                        const isAssignedToMe = currentTicketData.assigned_to === currentUser.id;
+                        
+                        if (isSupportStaff() && !isAssignedToMe) {
+                            statusEl.innerHTML = `<div class="flex flex-col gap-1"><span class="ticket-status-badge status-assigned">Asignado</span><span class="text-xs text-blue-400">Ticket de: <strong>${assignedTo}</strong></span></div>`;
+                        } else {
+                            statusEl.innerHTML = `<span class="ticket-status-badge status-open">Ticket Abierto #${ticketDoc.id.substr(-4)}</span>`;
+                        }
+                        
                         renderChatMessages(currentTicketData.messages || []);
+                        
+                        const input = document.getElementById('support-message-input');
+                        const canRespond = isAdmin() || isAssignedToMe;
+                        
+                        if (canRespond) {
+                            input.placeholder = isSupportStaff() ? "Responder como Soporte..." : "Escribe tu mensaje...";
+                            input.disabled = false;
+                        } else {
+                            input.placeholder = "Este ticket está siendo atendido por otro soporte";
+                            input.disabled = true;
+                        }
+                    } else {
+                        currentTicketId = null;
+                        currentTicketData = null;
+                        document.getElementById('no-ticket-message').classList.remove('hidden');
+                        document.getElementById('chat-interface').classList.add('hidden');
+                        document.getElementById('btn-create-ticket').classList.remove('hidden');
+                        document.getElementById('btn-close-ticket').classList.add('hidden');
+                        document.getElementById('current-ticket-status').textContent = "Sin ticket activo";
                     }
                 });
         }
 
-        function loadSupportInterface() { 
-            if (currentUser) initSupportListener(); 
-        }
-
-        function renderTicketList(snapshot) {
-            const container = document.getElementById('tickets-container');
-            if (snapshot.empty) {
-                container.innerHTML = `
-                    <div class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5">
-                        <i class="fas fa-life-ring text-gray-600 text-5xl mb-4"></i>
-                        <p class="text-gray-400 text-lg">No tienes tickets creados.</p>
-                        <button onclick="openCreateTicketModal()" class="mt-4 btn-primary px-6 py-2 rounded-lg text-white font-bold">Crear mi primer ticket</button>
-                    </div>`;
-                return;
-            }
-
-            let html = '';
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                const shortId = doc.id.substring(doc.id.length - 4).toUpperCase();
-                const statusClass = data.status === 'open' ? 'status-open' : 'status-closed';
-                const statusText = data.status === 'open' ? 'Abierto' : 'Cerrado';
-                
-                // Calcular mensajes no leídos (simulado con localReadCount)
-                const totalMessages = data.messages ? data.messages.length : 0;
-                const unread = Math.max(0, totalMessages - localReadCount);
-                const badgeHtml = (data.status === 'open' && unread > 0) ? `<div class="ticket-notification-badge">+${unread}</div>` : '';
-
-                html += `
-                <div class="ticket-list-item ${data.status === 'open' ? 'active-ticket' : ''}" onclick="openTicketChat('${doc.id}')">
-                    <div class="ticket-avatar-wrapper">
-                        <img src="${currentUser.avatar ? `https://cdn.discordapp.com/avatars/${currentUser.id}/${currentUser.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png'}" class="ticket-avatar">
-                        ${badgeHtml}
-                    </div>
-                    <div class="ticket-info flex-1">
-                        <h3>${data.subject || 'Sin asunto'} <span class="text-xs text-gray-500 font-normal">#${shortId}</span></h3>
-                        <p>${data.status === 'open' ? 'Haz clic para continuar la conversación...' : 'Este ticket ha sido cerrado.'}</p>
-                    </div>
-                    <div class="ticket-status-pill ${statusClass}">${statusText}</div>
-                </div>`;
-            });
-            container.innerHTML = html;
-        }
-
+        function loadSupportInterface() { if (currentUser) initSupportListener(); }
         function openCreateTicketModal() {
             document.getElementById('ticket-subject').value = '';
             document.getElementById('ticket-description').value = '';
@@ -1302,51 +1220,8 @@
                 await sendTicketWebhook(subject, description, newTicketRef.id, isStaff);
                 showToast('Ticket creado', 'success');
                 document.getElementById('create-ticket-modal').classList.remove('active');
-                // No abrimos el chat automáticamente, nos quedamos en la lista
             } catch (error) {
                 showToast('Error al crear ticket', 'error');
-            }
-        }
-
-        function openTicketChat(ticketId) {
-            currentTicketId = ticketId;
-            // Resetear contador local al abrir
-            localReadCount = 9999; 
-            
-            document.getElementById('support-list-view').classList.add('hidden');
-            document.getElementById('support-chat-view').classList.remove('hidden');
-
-            // Obtener datos frescos para mostrar en el header
-            db.collection("Tickets").doc(ticketId).get().then(doc => {
-                if (doc.exists) {
-                    currentTicketData = doc.data();
-                    document.getElementById('active-ticket-subject').textContent = currentTicketData.subject;
-                    
-                    const statusEl = document.getElementById('active-ticket-status');
-                    statusEl.textContent = currentTicketData.status === 'open' ? 'Abierto' : 'Cerrado';
-                    statusEl.className = `ticket-status-pill ${currentTicketData.status === 'open' ? 'status-open' : 'status-closed'}`;
-
-                    // Mostrar botón de cerrar SOLO si es staff y está abierto
-                    const closeBtn = document.getElementById('btn-close-ticket-staff');
-                    if (isSupportStaff() && currentTicketData.status === 'open') {
-                        closeBtn.classList.remove('hidden');
-                    } else {
-                        closeBtn.classList.add('hidden');
-                    }
-
-                    renderChatMessages(currentTicketData.messages || []);
-                }
-            });
-        }
-
-        function closeChatView() {
-            document.getElementById('support-chat-view').classList.add('hidden');
-            document.getElementById('support-list-view').classList.remove('hidden');
-            currentTicketId = null;
-            // Actualizar la lista para quitar badges
-            if (supportUnsubscribe) {
-                // Forzar re-renderizado de lista
-                db.collection("Tickets").where("discord_id", "==", currentUser.id).limit(1).get(); 
             }
         }
 
@@ -1381,8 +1256,6 @@
                 container.innerHTML += `<div class="message-bubble ${bubbleClass}"><div class="font-bold text-xs mb-1 opacity-80">${msg.is_support ? 'Soporte' : msg.sender}</div><div>${msg.text}</div><div class="message-meta">${date}</div></div>`;
             });
             container.scrollTop = container.scrollHeight;
-            // Actualizar contador local
-            localReadCount = messages.length;
         }
 
         async function sendSupportMessage() {
@@ -1412,56 +1285,30 @@
 
         async function confirmCloseTicket() {
             closeCloseTicketModal();
-            if (!currentTicketId || !currentTicketData) return;
-            
+            if (!currentTicketId) return;
             try {
-                // 1. Generar Transcripción
-                let transcript = `=== TRANSCRIPCIÓN DEL TICKET #${currentTicketId} ===\n`;
-                transcript += `Asunto: ${currentTicketData.subject}\n`;
-                transcript += `Usuario: ${currentTicketData.username}\n`;
-                transcript += `Fecha de cierre: ${new Date().toLocaleString()}\n`;
-                transcript += `=========================================\n\n`;
-
-                if (currentTicketData.messages) {
-                    currentTicketData.messages.forEach(msg => {
-                        const date = new Date(msg.timestamp).toLocaleString();
-                        const role = msg.is_support ? '[SOPORTE]' : '[CLIENTE]';
-                        transcript += `[${date}] ${role} ${msg.sender}: ${msg.text}\n`;
-                    });
-                }
-                transcript += `\n=========================================\nTICKET CERRADO POR: ${currentUser.username}`;
-
-                // 2. Enviar a Discord (Webhook de Transcripción)
-                const payload = {
-                    username: "Archivador de Tickets",
-                    avatar_url: "https://papeleta-script-github-io.vercel.app/files/999.png",
-                    content: `🔒 **Ticket Cerrado:** \`${currentTicketId}\`\n👤 **Usuario:** <@${currentTicketData.discord_id}>`,
-                    embeds: [{
-                        title: "📄 Transcripción Completa",
-                        description: "```txt\n" + transcript.substring(0, 1900) + (transcript.length > 1900 ? "..." : "") + "\n```",
-                        color: 16711680,
-                        footer: { text: "Papeleta Store Archive" },
-                        timestamp: new Date().toISOString()
-                    }]
-                };
-
-                await fetch(TRANSCRIPT_WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                // 3. Cerrar en Firebase
                 await db.collection("Tickets").doc(currentTicketId).update({
                     status: 'closed',
                     closed_at: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                showToast('Ticket cerrado y transcripción enviada', 'success');
-                closeChatView(); // Volver a la lista
-
+                await fetch(TICKET_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: "Sistema de Soporte",
+                        avatar_url: "https://papeleta-script-github-io.vercel.app/files/999.png",
+                        embeds: [{
+                            title: "🔒 Ticket Cerrado",
+                            description: `El ticket \`${currentTicketId}\` ha sido cerrado.`,
+                            color: 65280,
+                            footer: { text: "Papeleta Store Support" },
+                            timestamp: new Date().toISOString()
+                        }]
+                    })
+                });
+                showToast('Ticket cerrado', 'success');
             } catch (error) {
-                console.error(error);
                 showToast('Error al cerrar ticket', 'error');
             }
         }
