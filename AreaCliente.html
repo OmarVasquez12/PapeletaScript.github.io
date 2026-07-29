@@ -184,7 +184,8 @@
                 <a href="index.html" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fas fa-store w-5"></i><span>Tienda</span></a>
                 <a href="#" onclick="showSection('reviews', event)" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fas fa-star w-5"></i><span>Mis Reseñas</span></a>
                 <a href="#" onclick="showSection('support', event)" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fas fa-headset w-5"></i><span>Soporte</span></a>
-                <a href="https://discord.gg/rvxEdWcGkf" target="_blank" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fab fa-discord w-5"></i><span>Discord</span></a>
+                <a href="#" onclick="goToDiscord()" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fab fa-discord w-5"></i><span>Discord</span></a>
+                <a href="#" onclick="openLinkModal()" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300"><i class="fas fa-link w-5"></i><span>Link</span></a>
             </nav>
         </div>
         <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-red-900/20 bg-[#0a0505]/50">
@@ -299,7 +300,7 @@
                 </div>
             </div>
 
-            <!-- SECCIÓN DE SOPORTE MODIFICADA -->
+            <!-- SECCIÓN DE SOPORTE - SOLO MUESTRA EL MENSAJE DE MANTENIMIENTO -->
             <div id="section-support" class="section">
                 <div class="card rounded-xl p-6">
                     <div class="flex items-center gap-3 mb-6">
@@ -307,7 +308,7 @@
                         <h2 class="text-lg font-bold text-white">Centro de Soporte</h2>
                     </div>
                     
-                    <!-- Contenido Principal: Texto de Mantenimiento -->
+                    <!-- SOLO ESTO SE MUESTRA - Mensaje de Mantenimiento -->
                     <div class="text-center py-16 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5">
                         <div class="mb-6">
                             <i class="fas fa-tools text-red-500 text-6xl animate-pulse"></i>
@@ -322,34 +323,6 @@
                                 </p>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Interfaz Oculta (Se mantiene para que el JS no falle si se activa manualmente) -->
-                    <div id="support-status-container" class="hidden mb-6 p-4 bg-[#0d0505] border border-red-900/30 rounded-xl flex justify-between items-center">
-                        <div>
-                            <p class="text-gray-400 text-sm">Estado actual:</p>
-                            <p id="current-ticket-status" class="text-white font-bold">Sin ticket activo</p>
-                        </div>
-                        <button id="btn-create-ticket" onclick="openCreateTicketModal()" class="btn-primary px-6 py-2 rounded-lg text-white font-bold shadow-lg shadow-red-900/20">
-                            <i class="fas fa-plus-circle mr-2"></i> Crear Ticket
-                        </button>
-                        <button id="btn-close-ticket" onclick="openCloseTicketModal()" class="hidden px-6 py-2 rounded-lg bg-red-900/20 border border-red-600/50 text-red-400 hover:bg-red-900/40 font-bold">
-                            <i class="fas fa-times-circle mr-2"></i> Cerrar Ticket
-                        </button>
-                    </div>
-
-                    <div id="chat-interface" class="chat-container hidden">
-                        <div id="chat-messages" class="chat-messages"></div>
-                        <div class="support-input-area">
-                            <input type="text" id="support-message-input" class="input-field flex-1 px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none" placeholder="Escribe tu mensaje...">
-                            <button onclick="sendSupportMessage()" class="btn-primary px-6 py-3 rounded-lg text-white font-bold"><i class="fas fa-paper-plane"></i></button>
-                        </div>
-                    </div>
-
-                    <div id="no-ticket-message" class="hidden text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5">
-                        <i class="fas fa-life-ring text-gray-600 text-5xl mb-4"></i>
-                        <p class="text-gray-400 text-lg">No tienes ningún ticket de soporte abierto.</p>
-                        <p class="text-gray-500 text-sm mt-2">Si necesitas ayuda, crea un nuevo ticket.</p>
                     </div>
                 </div>
             </div>
@@ -382,42 +355,20 @@
         </div>
     </div>
 
-    <!-- Create Ticket Modal -->
-    <div id="create-ticket-modal" class="review-modal">
+    <!-- Modal para cambiar Link de Discord -->
+    <div id="link-modal" class="review-modal">
         <div class="review-modal-content">
             <div class="flex items-center justify-between mb-6">
-                <h3 class="text-xl font-bold text-white">Crear Nuevo Ticket</h3>
-                <button onclick="document.getElementById('create-ticket-modal').classList.remove('active')" class="text-gray-400 hover:text-white text-2xl"><i class="fas fa-times"></i></button>
+                <h3 class="text-xl font-bold text-white">Configurar Link de Discord</h3>
+                <button onclick="closeLinkModal()" class="text-gray-400 hover:text-white text-2xl"><i class="fas fa-times"></i></button>
             </div>
             <div class="mb-6">
-                <label class="block text-gray-400 text-sm mb-2">Asunto:</label>
-                <input type="text" id="ticket-subject" class="input-field w-full px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none" placeholder="Ej: Problema con la licencia">
-            </div>
-            <div class="mb-6">
-                <label class="block text-gray-400 text-sm mb-2">Descripción del problema:</label>
-                <textarea id="ticket-description" class="input-field w-full px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none h-32" placeholder="Describe detalladamente tu problema..."></textarea>
+                <label class="block text-gray-400 text-sm mb-2">Nuevo link de Discord:</label>
+                <input type="text" id="discord-link-input" class="input-field w-full px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none" placeholder="https://discord.gg/...">
             </div>
             <div class="flex gap-3">
-                <button onclick="document.getElementById('create-ticket-modal').classList.remove('active')" class="flex-1 px-4 py-3 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-800 font-medium">Cancelar</button>
-                <button onclick="createNewTicket()" class="flex-1 btn-primary px-4 py-3 rounded-lg text-white font-bold"><i class="fas fa-paper-plane mr-2"></i> Crear Ticket</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Custom Close Ticket Modal -->
-    <div id="close-ticket-modal" class="custom-modal-overlay">
-        <div class="custom-modal">
-            <div class="flex items-center gap-3 mb-4">
-                <div class="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center"><i class="fas fa-exclamation-triangle text-red-500 text-xl"></i></div>
-                <div>
-                    <h3 class="text-xl font-bold text-white">Cerrar Ticket</h3>
-                    <p class="text-gray-400 text-sm">¿Estás seguro de cerrar este ticket?</p>
-                </div>
-            </div>
-            <p class="text-gray-300 text-sm mb-6">Se eliminará el acceso al chat y se notificará a Discord.</p>
-            <div class="custom-modal-buttons">
-                <button class="btn-modal-cancel" onclick="closeCloseTicketModal()">Cancelar</button>
-                <button class="btn-modal-confirm" onclick="confirmCloseTicket()"><i class="fas fa-check mr-2"></i> Sí, cerrar ticket</button>
+                <button onclick="closeLinkModal()" class="flex-1 px-4 py-3 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-800 font-medium">Cancelar</button>
+                <button onclick="saveDiscordLink()" class="flex-1 btn-primary px-4 py-3 rounded-lg text-white font-bold"><i class="fas fa-save mr-2"></i> Guardar</button>
             </div>
         </div>
     </div>
@@ -453,15 +404,52 @@
         let userFixedLicenseKey = null;
         let currentReviewProduct = null;
         let selectedRating = 0;
-        let currentTicketId = null;
-        let currentTicketData = null;
-        let supportUnsubscribe = null;
 
         const CLIENT_ID = '1213866547181780992'; 
         const REDIRECT_URI = window.location.href.split('#')[0]; 
         const ADMIN_DISCORD_IDS = ['890526767608127489']; 
-        const TICKET_WEBHOOK_URL = "https://discord.com/api/webhooks/1530747464569716756/LLK7Msvn-NNXbrP5bN8lYBzkjCR7G6D1CE63w41AozCfN2mVxRxiMQUoWpHK2g6ahHg7";
-        const REVIEW_WEBHOOK_URL = "https://discord.com/api/webhooks/1530350855100956853/mqzdvlTBOx2JZ3wlumx-LdLAus3sZyg610PeoxK9ds4jpqxMK9t0sBT_2Lo-U-TDutRF";
+
+        // Función para obtener el link de Discord (personalizado o por defecto)
+        function getDiscordLink() {
+            return localStorage.getItem('custom_discord_link') || 'https://discord.gg/qZarkeCSA';
+        }
+
+        // Función para ir a Discord
+        function goToDiscord() {
+            window.open(getDiscordLink(), '_blank');
+        }
+
+        // Abrir modal para cambiar link
+        function openLinkModal() {
+            const currentLink = getDiscordLink();
+            document.getElementById('discord-link-input').value = currentLink;
+            document.getElementById('link-modal').classList.add('active');
+        }
+
+        // Cerrar modal
+        function closeLinkModal() {
+            document.getElementById('link-modal').classList.remove('active');
+        }
+
+        // Guardar nuevo link
+        function saveDiscordLink() {
+            const newLink = document.getElementById('discord-link-input').value.trim();
+            
+            if (!newLink) {
+                showToast('Por favor ingresa un link válido', 'warning');
+                return;
+            }
+            
+            // Validar que sea un link de Discord
+            if (!newLink.includes('discord.gg/') && !newLink.includes('discord.com/')) {
+                showToast('El link debe ser de Discord (discord.gg/...)', 'error');
+                return;
+            }
+            
+            localStorage.setItem('custom_discord_link', newLink);
+            showToast('Link de Discord actualizado correctamente', 'success');
+            closeLinkModal();
+        }
 
         function showToast(message, type = 'success', title = '') {
             const container = document.getElementById('toast-container');
@@ -525,9 +513,6 @@
                     loadDashboardData(); 
                     updateLicenseDisplay(); 
                 });
-                
-                initSupportListener();
-                listenForApprovedOrders();
             })
             .catch(err => { console.error(err); logout(); });
         }
@@ -547,8 +532,6 @@
                 event.currentTarget.classList.add('active');
             }
             if (section === 'reviews') loadMyReviews();
-            // Ya no necesitamos forzar la carga de la interfaz de soporte porque ahora es estática
-            // if (section === 'support') loadSupportInterface(); 
         }
 
         function openReviewModal(productId, productName) {
@@ -594,23 +577,19 @@
             document.getElementById('server-port').value = saved.port || '0';
         });
 
-        // =============================================
-        //          GESTIÓN DE LICENCIAS GLOBALES
-        // =============================================
-
         function generateUniqueKey() {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; 
-    let code = '';
-    for (let i = 0; i < 24; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
-    return `PAPELETA (${code})`; // ✅ Ahora incluye el formato completo
-}
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; 
+            let code = '';
+            for (let i = 0; i < 24; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+            return `PAPELETA (${code})`;
+        }
 
-function generateUserCode() {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; 
-    let code = '';
-    for (let i = 0; i < 8; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
-    return `PAPELETA (${code})`; // ✅ Ahora incluye el formato completo
-}
+        function generateUserCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; 
+            let code = '';
+            for (let i = 0; i < 8; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+            return `PAPELETA (${code})`;
+        }
 
         async function ensureFixedLicense() {
             if (!currentUser) return;
@@ -623,14 +602,14 @@ function generateUserCode() {
                 if (!snapshot.empty) {
                     userFixedLicenseKey = snapshot.docs[0].data().key;
                 } else {
-                    const newKey = generateUniqueKey(); // 24 caracteres
-                    const newUser = generateUserCode(); // 8 caracteres SIN prefijo
+                    const newKey = generateUniqueKey();
+                    const newUser = generateUserCode();
                     
                     await db.collection("Licencias").add({
                         discord_id: currentUser.id, 
                         username: currentUser.username, 
                         key: newKey,
-                        user_code: newUser, // Solo el código, sin "USER_"
+                        user_code: newUser,
                         type: "general",
                         created_at: firebase.firestore.FieldValue.serverTimestamp(), 
                         status: 'active'
@@ -642,32 +621,31 @@ function generateUserCode() {
         }
 
         function updateLicenseDisplay() {
-    const codeBlock = document.getElementById('license-code');
-    if (!currentUser || !codeBlock) return;
+            const codeBlock = document.getElementById('license-code');
+            if (!currentUser || !codeBlock) return;
 
-    db.collection("Licencias")
-      .where("discord_id", "==", currentUser.id)
-      .where("type", "==", "general")
-      .limit(1)
-      .get()
-      .then(snapshot => {
-          if (!snapshot.empty) {
-              const license = snapshot.docs[0].data();
-              // ✅ Mostrar el valor TAL CUAL viene de Firebase (ya tiene PAPELETA (...))
-              codeBlock.textContent = 
-                  'configLicense = {\n' +
-                  '    ["User"] = "' + (license.user_code || 'PAPELETA (PENDIENTE)') + '",\n' +
-                  '    ["Key"] = "' + (license.key || 'PAPELETA (PENDIENTE)') + '"\n' +
-                  '}';
-          } else {
-              codeBlock.textContent = 
-                  'configLicense = {\n' +
-                  '    ["User"] = "PAPELETA (PENDIENTE)",\n' +
-                  '    ["Key"] = "PAPELETA (PENDIENTE)"\n' +
-                  '}';
-          }
-      });
-}
+            db.collection("Licencias")
+              .where("discord_id", "==", currentUser.id)
+              .where("type", "==", "general")
+              .limit(1)
+              .get()
+              .then(snapshot => {
+                  if (!snapshot.empty) {
+                      const license = snapshot.docs[0].data();
+                      codeBlock.textContent = 
+                          'configLicense = {\n' +
+                          '    ["User"] = "' + (license.user_code || 'PAPELETA (PENDIENTE)') + '",\n' +
+                          '    ["Key"] = "' + (license.key || 'PAPELETA (PENDIENTE)') + '"\n' +
+                          '}';
+                  } else {
+                      codeBlock.textContent = 
+                          'configLicense = {\n' +
+                          '    ["User"] = "PAPELETA (PENDIENTE)",\n' +
+                          '    ["Key"] = "PAPELETA (PENDIENTE)"\n' +
+                          '}';
+                  }
+              });
+        }
 
         async function saveServerConfig(event) {
             const ipInput = document.getElementById('server-ip');
@@ -681,8 +659,6 @@ function generateUserCode() {
             const ip = ipInput.value.trim();
             const port = portInput.value.trim();
             
-            console.log("🔍 Debug SaveConfig:", { ip, port, userExists: !!currentUser, userId: currentUser?.id });
-
             if (!ip || !port || ip === '0.0.0.0' || port === '0') {
                 showToast('Por favor ingresa una IP y Puerto válidos de tu servidor MTA', 'warning');
                 return;
@@ -694,8 +670,7 @@ function generateUserCode() {
             }
 
             if (!currentUser || !currentUser.id) {
-                showToast('⚠️ Error de sesión. Por favor recarga la página e inicia sesión de nuevo.', 'error');
-                console.error("Usuario no autenticado o ID faltante");
+                showToast('️ Error de sesión. Por favor recarga la página e inicia sesión de nuevo.', 'error');
                 return;
             }
             
@@ -706,8 +681,6 @@ function generateUserCode() {
                     .where("discord_id", "==", currentUser.id)
                     .where("status", "==", "active")
                     .get();
-                
-                console.log(`📦 Licencias encontradas: ${licenseSnapshot.size}`);
                 
                 if (!licenseSnapshot.empty) {
                     const batch = db.batch();
@@ -723,10 +696,8 @@ function generateUserCode() {
                     });
                     
                     await batch.commit();
-                    console.log(`✅ Batch completado: ${count} documentos actualizados`);
                     
                 } else {
-                    console.log("➕ Creando nueva licencia de configuración...");
                     await db.collection("Licencias").add({
                         discord_id: currentUser.id,
                         username: currentUser.username || "Unknown",
@@ -736,7 +707,6 @@ function generateUserCode() {
                         type: 'server_config',
                         created_at: firebase.firestore.FieldValue.serverTimestamp()
                     });
-                    console.log("✅ Nueva licencia creada");
                 }
                 
                 const btn = event?.currentTarget;
@@ -755,12 +725,7 @@ function generateUserCode() {
                 
             } catch (error) {
                 console.error("❌ ERROR CRÍTICO EN SAVE:", error);
-                let errorMsg = 'Error al guardar';
-                if (error.code === 'permission-denied') errorMsg = 'Permiso denegado.';
-                else if (error.code === 'unavailable') errorMsg = 'Sin conexión a Firebase.';
-                else errorMsg = error.message.substring(0, 50);
-                
-                showToast(errorMsg, 'error');
+                showToast('Error al guardar', 'error');
             }
         }
 
@@ -846,35 +811,6 @@ function generateUserCode() {
             });
         }
 
-        async function getOrCreateLicense(userId, productId, productName) {
-            try {
-                const querySnapshot = await db.collection("Licencias")
-                    .where("discord_id", "==", userId)
-                    .where("product_id", "==", productId)
-                    .where("status", "==", "active")
-                    .limit(1).get();
-
-                if (!querySnapshot.empty) return querySnapshot.docs[0].data();
-
-                const uniqueKey = generateUniqueKey();
-                const licenseData = { 
-                    discord_id: userId, 
-                    username: currentUser ? currentUser.username : 'Unknown', 
-                    product_id: productId, 
-                    product_name: productName, 
-                    key: uniqueKey, 
-                    created_at: firebase.firestore.FieldValue.serverTimestamp(), 
-                    status: 'active' 
-                };
-                
-                const docRef = await db.collection("Licencias").add(licenseData);
-                return { id: docRef.id, ...licenseData };
-            } catch (error) {
-                console.error("Error en getOrCreateLicense:", error);
-                return null;
-            }
-        }
-
         function listenForApprovedOrders() {
             if (!currentUser) return;
             db.collection("Compra")
@@ -895,8 +831,8 @@ function generateUserCode() {
                                             .limit(1).get();
 
                                         if (existingLicense.empty) {
-                                            const newKey = generateUniqueKey(); // 24 chars
-                                            const newUserCode = generateUserCode(); // 8 chars
+                                            const newKey = generateUniqueKey();
+                                            const newUserCode = generateUserCode();
 
                                             await db.collection("Licencias").add({
                                                 discord_id: currentUser.id,
@@ -904,7 +840,7 @@ function generateUserCode() {
                                                 product_id: product.id,
                                                 product_name: product.name,
                                                 key: newKey,
-                                                user_code: newUserCode, // Sin prefijo
+                                                user_code: newUserCode,
                                                 type: "product",
                                                 created_at: firebase.firestore.FieldValue.serverTimestamp(),
                                                 status: 'active'
@@ -1039,8 +975,6 @@ function generateUserCode() {
                     created_at: firebase.firestore.FieldValue.serverTimestamp(),
                     visible_to: 'admin'
                 });
-                
-                await sendReviewToWebhook(productName, reviewText, selectedRating, productImage);
 
                 const reviewBtn = document.querySelector(`button[onclick*="openReviewModal"][onclick*="'${currentReviewProduct}'"]`);
                 if (reviewBtn) {
@@ -1054,37 +988,6 @@ function generateUserCode() {
                 console.error("Error al enviar reseña:", error);
                 showToast('Error al enviar la reseña', 'error');
             }
-        }
-
-        async function sendReviewToWebhook(productName, reviewText, rating, imageUrl) {
-            try {
-                const safeReviewText = reviewText.replace(/"/g, "'").replace(/\\/g, "");
-                const safeProductName = productName.replace(/"/g, "'").replace(/\\/g, "");
-                const starsString = "★".repeat(rating) + "☆".repeat(5 - rating);
-                
-                const payload = {
-                    username: "Papeleta Store",
-                    avatar_url: "https://papeleta-script-github-io.vercel.app/files/999.png",
-                    embeds: [{
-                        title: "✨ Nueva Valoración Recibida",
-                        description: `**Opinión del cliente:**\n> "${safeReviewText}"`,
-                        color: 16711680,
-                        fields: [
-                            { name: " Producto", value: `\`${safeProductName}\``, inline: true },
-                            { name: "⭐ Calificación", value: `${starsString} (${rating}/5)`, inline: true },
-                            { name: " Cliente", value: `<@${currentUser.id}> (${currentUser.username})`, inline: false }
-                        ],
-                        footer: { text: "Papeleta Store", icon_url: "https://papeleta-script-github-io.vercel.app/favicon.ico" },
-                        timestamp: new Date().toISOString()
-                    }]
-                };
-
-                if (imageUrl && typeof imageUrl === 'string' && imageUrl.startsWith('http')) {
-                    payload.embeds[0].image = { url: imageUrl };
-                }
-
-                await fetch(REVIEW_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            } catch (err) { console.error("Error en webhook:", err); }
         }
 
         async function loadMyReviews() {
@@ -1134,182 +1037,6 @@ function generateUserCode() {
                 loadMyReviews();
             } catch (error) {
                 showToast('Error al eliminar', 'error');
-            }
-        }
-
-        function initSupportListener() {
-            if (!currentUser) return;
-            if (supportUnsubscribe) supportUnsubscribe();
-
-            supportUnsubscribe = db.collection("Tickets")
-                .where("discord_id", "==", currentUser.id)
-                .where("status", "==", "open")
-                .limit(1)
-                .onSnapshot((snapshot) => {
-                    if (!snapshot.empty) {
-                        const ticketDoc = snapshot.docs[0];
-                        currentTicketId = ticketDoc.id;
-                        currentTicketData = ticketDoc.data();
-                        
-                        // Nota: Como hemos ocultado la interfaz visualmente en HTML, 
-                        // esto actualizará los datos en segundo plano pero el usuario verá el mensaje de mantenimiento.
-                        document.getElementById('no-ticket-message').classList.add('hidden');
-                        document.getElementById('chat-interface').classList.remove('hidden');
-                        document.getElementById('btn-create-ticket').classList.add('hidden');
-                        document.getElementById('btn-close-ticket').classList.remove('hidden');
-                        
-                        const statusEl = document.getElementById('current-ticket-status');
-                        const assignedTo = currentTicketData.assigned_to_name || 'Sin asignar';
-                        const isAssignedToMe = currentTicketData.assigned_to === currentUser.id;
-                        
-                        if (isSupportStaff() && !isAssignedToMe) {
-                            statusEl.innerHTML = `<div class="flex flex-col gap-1"><span class="ticket-status-badge status-assigned">Asignado</span><span class="text-xs text-blue-400">Ticket de: <strong>${assignedTo}</strong></span></div>`;
-                        } else {
-                            statusEl.innerHTML = `<span class="ticket-status-badge status-open">Ticket Abierto #${ticketDoc.id.substr(-4)}</span>`;
-                        }
-                        
-                        renderChatMessages(currentTicketData.messages || []);
-                        
-                        const input = document.getElementById('support-message-input');
-                        const canRespond = isAdmin() || isAssignedToMe;
-                        
-                        if (canRespond) {
-                            input.placeholder = isSupportStaff() ? "Responder como Soporte..." : "Escribe tu mensaje...";
-                            input.disabled = false;
-                        } else {
-                            input.placeholder = "Este ticket está siendo atendido por otro soporte";
-                            input.disabled = true;
-                        }
-                    } else {
-                        currentTicketId = null;
-                        currentTicketData = null;
-                        document.getElementById('no-ticket-message').classList.remove('hidden');
-                        document.getElementById('chat-interface').classList.add('hidden');
-                        document.getElementById('btn-create-ticket').classList.remove('hidden');
-                        document.getElementById('btn-close-ticket').classList.add('hidden');
-                        document.getElementById('current-ticket-status').textContent = "Sin ticket activo";
-                    }
-                });
-        }
-
-        function loadSupportInterface() { if (currentUser) initSupportListener(); }
-        function openCreateTicketModal() {
-            document.getElementById('ticket-subject').value = '';
-            document.getElementById('ticket-description').value = '';
-            document.getElementById('create-ticket-modal').classList.add('active');
-        }
-
-        async function createNewTicket() {
-            const subject = document.getElementById('ticket-subject').value.trim();
-            const description = document.getElementById('ticket-description').value.trim();
-            if (!subject || !description) { showToast('Completa todos los campos', 'warning'); return; }
-
-            try {
-                const isStaff = isSupportStaff();
-                const newTicketRef = await db.collection("Tickets").add({
-                    discord_id: currentUser.id,
-                    username: currentUser.username,
-                    subject: subject,
-                    status: 'open',
-                    assigned_to: isStaff ? currentUser.id : null,
-                    assigned_to_name: isStaff ? currentUser.username : null,
-                    created_at: firebase.firestore.FieldValue.serverTimestamp(),
-                    messages: [{ sender: currentUser.username, sender_id: currentUser.id, text: description, timestamp: new Date().toISOString(), is_support: isStaff }]
-                });
-
-                await sendTicketWebhook(subject, description, newTicketRef.id, isStaff);
-                showToast('Ticket creado', 'success');
-                document.getElementById('create-ticket-modal').classList.remove('active');
-            } catch (error) {
-                showToast('Error al crear ticket', 'error');
-            }
-        }
-
-        async function sendTicketWebhook(subject, description, ticketId, isStaff) {
-            const assignedText = isStaff ? `**Asignado a:** <@${currentUser.id}>` : '**Esperando asignación**';
-            const payload = {
-                username: "Sistema de Soporte",
-                avatar_url: "https://papeleta-script-github-io.vercel.app/files/999.png",
-                embeds: [{
-                    title: "🎫 Nuevo Ticket de Soporte",
-                    description: `**Asunto:** ${subject}\n**Descripción:** ${description}`,
-                    color: 16711680,
-                    fields: [
-                        { name: "👤 Usuario", value: `<@${currentUser.id}> (${currentUser.username})`, inline: true },
-                        { name: "🆔 ID Ticket", value: `\`${ticketId}\``, inline: true },
-                        { name: "👨‍💻 Soporte", value: assignedText, inline: false }
-                    ],
-                    footer: { text: "Papeleta Store Support" },
-                    timestamp: new Date().toISOString()
-                }]
-            };
-            await fetch(TICKET_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-        }
-
-        function renderChatMessages(messages) {
-            const container = document.getElementById('chat-messages');
-            container.innerHTML = '';
-            messages.forEach(msg => {
-                const isMe = msg.sender_id === currentUser.id;
-                const bubbleClass = isMe ? 'message-user' : 'message-support';
-                const date = new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                container.innerHTML += `<div class="message-bubble ${bubbleClass}"><div class="font-bold text-xs mb-1 opacity-80">${msg.is_support ? 'Soporte' : msg.sender}</div><div>${msg.text}</div><div class="message-meta">${date}</div></div>`;
-            });
-            container.scrollTop = container.scrollHeight;
-        }
-
-        async function sendSupportMessage() {
-            const input = document.getElementById('support-message-input');
-            const text = input.value.trim();
-            if (!text || !currentTicketId) return;
-
-            const isStaff = isAdmin() || isSupportStaff();
-            try {
-                await db.collection("Tickets").doc(currentTicketId).update({
-                    messages: firebase.firestore.FieldValue.arrayUnion({
-                        sender: isStaff ? 'Soporte' : currentUser.username,
-                        sender_id: currentUser.id,
-                        text: text,
-                        timestamp: new Date().toISOString(),
-                        is_support: isStaff
-                    })
-                });
-                input.value = '';
-            } catch (error) {
-                showToast('Error al enviar mensaje', 'error');
-            }
-        }
-
-        function openCloseTicketModal() { document.getElementById('close-ticket-modal').classList.add('active'); }
-        function closeCloseTicketModal() { document.getElementById('close-ticket-modal').classList.remove('active'); }
-
-        async function confirmCloseTicket() {
-            closeCloseTicketModal();
-            if (!currentTicketId) return;
-            try {
-                await db.collection("Tickets").doc(currentTicketId).update({
-                    status: 'closed',
-                    closed_at: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                await fetch(TICKET_WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        username: "Sistema de Soporte",
-                        avatar_url: "https://papeleta-script-github-io.vercel.app/files/999.png",
-                        embeds: [{
-                            title: "🔒 Ticket Cerrado",
-                            description: `El ticket \`${currentTicketId}\` ha sido cerrado.`,
-                            color: 65280,
-                            footer: { text: "Papeleta Store Support" },
-                            timestamp: new Date().toISOString()
-                        }]
-                    })
-                });
-                showToast('Ticket cerrado', 'success');
-            } catch (error) {
-                showToast('Error al cerrar ticket', 'error');
             }
         }
     </script>
