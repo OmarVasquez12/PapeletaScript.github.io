@@ -285,9 +285,13 @@
                 <button id="login-btn" onclick="window.location.href='Login.html'" class="bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-2 px-5 rounded-lg flex items-center gap-2 transition-all text-sm shadow-lg shadow-blue-900/20">
                     <i class="fab fa-discord"></i> Acceder
                 </button>
-                <div id="user-section" class="hidden flex items-center gap-3 bg-[#150a0a] px-3 py-1.5 rounded-full border border-red-900/50">
-                    <img id="user-avatar" src="" alt="Avatar" class="w-8 h-8 rounded-full border border-red-500">
-                    <span id="user-name" class="text-white font-semibold text-sm">...</span>
+                <div id="user-section" class="hidden flex items-center gap-3 bg-[#150a0a] px-3 py-1.5 rounded-full border border-red-900/50 cursor-pointer hover:border-red-600 transition-all group" onclick="toggleUserPanel()">
+                    <img id="user-avatar" src="" alt="Avatar" class="w-8 h-8 rounded-full border border-red-500 group-hover:border-red-400 transition-colors">
+                    <div class="flex flex-col items-start leading-none">
+                        <span id="user-name" class="text-white font-semibold text-sm pr-2 group-hover:text-red-300 transition-colors">...</span>
+                        <span id="user-role-badge" class="text-[10px] text-green-400 font-bold uppercase tracking-wider">Cliente</span>
+                    </div>
+                    <i class="fas fa-external-link-alt text-gray-500 text-xs group-hover:text-red-400 transition-colors"></i>
                 </div>
             </div>
         </header>
@@ -331,6 +335,7 @@
 
         let allProducts = [];
         let currentUser = null;
+        let currentUserRole = 'user';
         let myAssignedProductIds = new Set();
         let currentDetailProduct = null;
         let currentImageIndex = 0;
@@ -633,6 +638,15 @@
             }
         }
 
+        function toggleUserPanel() {
+            if (!currentUser) { 
+                window.location.href = 'Login.html';
+                return; 
+            }
+            // Aquí podrías abrir un panel lateral si lo necesitas
+            // Por ahora solo es un placeholder
+        }
+
         function checkDiscordAuth() {
             const fragment = new URLSearchParams(window.location.hash.slice(1));
             const accessToken = fragment.get('access_token');
@@ -656,6 +670,25 @@
                 if (user.avatar) {
                     document.getElementById('user-avatar').src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
                 }
+                
+                // Determinar rol
+                if (isAdmin(user)) {
+                    currentUserRole = 'admin';
+                    document.getElementById('user-role-badge').textContent = 'ADMIN';
+                    document.getElementById('user-role-badge').className = 'text-[10px] text-red-400 font-bold uppercase tracking-wider';
+                } else {
+                    const savedData = JSON.parse(localStorage.getItem('papeleta_user_' + user.id) || '{}');
+                    if(savedData.role && ['mod', 'staff', 'developer'].includes(savedData.role.toLowerCase())) {
+                        currentUserRole = savedData.role;
+                        document.getElementById('user-role-badge').textContent = savedData.role.toUpperCase();
+                        document.getElementById('user-role-badge').className = 'text-[10px] text-red-400 font-bold uppercase tracking-wider';
+                    } else {
+                        currentUserRole = 'cliente';
+                        document.getElementById('user-role-badge').textContent = 'Cliente';
+                        document.getElementById('user-role-badge').className = 'text-[10px] text-green-400 font-bold uppercase tracking-wider';
+                    }
+                }
+                
                 document.getElementById('login-btn').classList.add('hidden');
                 document.getElementById('user-section').classList.remove('hidden');
                 loadMyAssignments().then(() => loadProducts());
@@ -692,6 +725,7 @@
         function logout() {
             localStorage.removeItem('dc_access_token');
             currentUser = null;
+            currentUserRole = 'user';
             updateAuthUI();
             loadProducts();
         }
