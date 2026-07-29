@@ -633,10 +633,18 @@
       .then(snapshot => {
           if (!snapshot.empty) {
               const license = snapshot.docs[0].data();
-              // ✅ FORMATO CORRECTO EN UNA SOLA LÍNEA PARA LUA
-              codeBlock.textContent = `configLicense = { ["User"] = "PAPELETA [${license.user_code || ''}]", ["Key"] = "PAPELETA [${license.key || ''}"] }`;
+              // ✅ NUEVO FORMATO CON PARÉNTESIS: PAPELETA (CODIGO)
+              codeBlock.textContent = 
+                  'configLicense = {\n' +
+                  '    ["User"] = "PAPELETA (' + (license.user_code || '') + ')",\n' +
+                  '    ["Key"] = "PAPELETA (' + (license.key || '') + ')"\n' +
+                  '}';
           } else {
-              codeBlock.textContent = `configLicense = { ["User"] = "PAPELETA [PENDIENTE]", ["Key"] = "PAPELETA [PENDIENTE]" }`;
+              codeBlock.textContent = 
+                  'configLicense = {\n' +
+                  '    ["User"] = "PAPELETA (PENDIENTE)",\n' +
+                  '    ["Key"] = "PAPELETA (PENDIENTE)"\n' +
+                  '}';
           }
       });
 }
