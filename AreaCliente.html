@@ -622,24 +622,24 @@
         }
 
         function updateLicenseDisplay() {
-            const codeBlock = document.getElementById('license-code');
-            if (!currentUser || !codeBlock) return;
+    const codeBlock = document.getElementById('license-code');
+    if (!currentUser || !codeBlock) return;
 
-            db.collection("Licencias")
-              .where("discord_id", "==", currentUser.id)
-              .where("type", "==", "general")
-              .limit(1)
-              .get()
-              .then(snapshot => {
-                  if (!snapshot.empty) {
-                      const license = snapshot.docs[0].data();
-                      // ✅ FORMATO CORRECTO: User sin prefijo, Key larga
-                      codeBlock.textContent = `configLicense = {\n    ["User"] = "PAPELETA [${license.user_code || ''}]", \n    ["Key"] = "PAPELETA [${license.key || ''}"]\n}`;
-                  } else {
-                      codeBlock.textContent = `configLicense = {\n    ["User"] = "PAPELETA [PENDIENTE]", \n    ["Key"] = "PAPELETA [PENDIENTE]"\n}`;
-                  }
-              });
-        }
+    db.collection("Licencias")
+      .where("discord_id", "==", currentUser.id)
+      .where("type", "==", "general")
+      .limit(1)
+      .get()
+      .then(snapshot => {
+          if (!snapshot.empty) {
+              const license = snapshot.docs[0].data();
+              // ✅ FORMATO CORRECTO EN UNA SOLA LÍNEA PARA LUA
+              codeBlock.textContent = `configLicense = { ["User"] = "PAPELETA [${license.user_code || ''}]", ["Key"] = "PAPELETA [${license.key || ''}"] }`;
+          } else {
+              codeBlock.textContent = `configLicense = { ["User"] = "PAPELETA [PENDIENTE]", ["Key"] = "PAPELETA [PENDIENTE]" }`;
+          }
+      });
+}
 
         async function saveServerConfig(event) {
             const ipInput = document.getElementById('server-ip');
