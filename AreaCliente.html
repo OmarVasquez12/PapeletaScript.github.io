@@ -107,65 +107,82 @@
         .message-meta { font-size: 10px; opacity: 0.7; margin-top: 4px; text-align: right; }
         .support-input-area { display: flex; gap: 10px; }
         
-        /* NUEVO ESTILO DE TICKET CARD */
-        .ticket-active-card {
+        /* TARJETA DE TICKET EN LISTA */
+        .ticket-list-item {
             background: linear-gradient(135deg, rgba(21, 10, 10, 0.9) 0%, rgba(13, 5, 5, 0.9) 100%);
             border: 1px solid rgba(255, 26, 26, 0.3);
             border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 24px;
+            padding: 20px;
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
             gap: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            animation: slideUp 0.4s ease;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
+        .ticket-list-item:hover {
+            border-color: #ff1a1a;
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(220, 38, 38, 0.2);
+        }
+        .ticket-list-item.active-ticket {
+            border-color: #10b981;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(13, 5, 5, 0.9) 100%);
+        }
+        
         .ticket-avatar-wrapper {
             position: relative;
         }
         .ticket-avatar {
-            width: 64px;
-            height: 64px;
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
-            border: 3px solid #dc2626;
+            border: 2px solid #dc2626;
             object-fit: cover;
-            box-shadow: 0 0 15px rgba(220, 38, 38, 0.4);
         }
-        .ticket-number-badge {
+        .ticket-notification-badge {
             position: absolute;
-            top: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #dc2626;
+            top: -5px;
+            right: -5px;
+            background: #ef4444;
             color: white;
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 800;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+        .ticket-info h3 { font-size: 16px; font-weight: 700; color: white; margin-bottom: 4px; }
+        .ticket-info p { font-size: 13px; color: #9ca3af; }
+        
+        .ticket-status-pill {
             padding: 4px 10px;
             border-radius: 20px;
-            white-space: nowrap;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        .ticket-info h3 {
-            font-size: 18px;
+            font-size: 11px;
             font-weight: 700;
-            color: white;
-            margin-bottom: 4px;
+            text-transform: uppercase;
         }
-        .ticket-status-pill {
-            display: inline-flex;
+        .status-open { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .status-closed { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+        /* VISTA ACTIVA DETALLADA */
+        .ticket-active-header {
+            background: rgba(13, 5, 5, 0.8);
+            border-bottom: 1px solid rgba(255, 26, 26, 0.2);
+            padding: 20px;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 6px;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            background: rgba(16, 185, 129, 0.15);
-            color: #10b981;
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-        .ticket-actions {
-            margin-left: auto;
         }
 
         /* MODAL PERSONALIZADO */
@@ -361,41 +378,37 @@
                     <div class="flex items-center gap-3 mb-6">
                         <div class="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center"><i class="fas fa-headset text-blue-400"></i></div>
                         <h2 class="text-lg font-bold text-white">Centro de Soporte</h2>
+                        <button onclick="openCreateTicketModal()" class="ml-auto btn-primary px-4 py-2 rounded-lg text-white text-sm font-bold"><i class="fas fa-plus mr-2"></i> Nuevo Ticket</button>
                     </div>
                     
-                    <!-- VISTA INICIAL: SOLO BOTÓN CREAR -->
-                    <div id="support-initial-view" class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5">
-                        <i class="fas fa-life-ring text-gray-600 text-5xl mb-4"></i>
-                        <p class="text-gray-400 text-lg">No tienes ningún ticket de soporte abierto.</p>
-                        <p class="text-gray-500 text-sm mt-2 mb-6">Si necesitas ayuda, crea un nuevo ticket.</p>
-                        <button onclick="openCreateTicketModal()" class="btn-primary px-8 py-3 rounded-lg text-white font-bold shadow-lg shadow-red-900/20 inline-flex items-center gap-2">
-                            <i class="fas fa-plus-circle"></i> Crear Nuevo Ticket
-                        </button>
-                    </div>
-
-                    <!-- VISTA ACTIVA: TARJETA DE TICKET + CHAT -->
-                    <div id="support-active-view" class="hidden">
-                        
-                        <!-- NUEVA TARJETA DE TICKET CON FOTO Y NUMERO -->
-                        <div class="ticket-active-card">
-                            <div class="ticket-avatar-wrapper">
-                                <div class="ticket-number-badge" id="ticket-display-number">Ticket #0</div>
-                                <img id="ticket-user-avatar" src="" alt="User" class="ticket-avatar">
-                            </div>
-                            <div class="ticket-info">
-                                <h3 id="ticket-subject-display">Asunto del Ticket</h3>
-                                <div class="ticket-status-pill">
-                                    <i class="fas fa-circle text-[8px]"></i> Abierto
-                                </div>
-                            </div>
-                            <div class="ticket-actions">
-                                <button onclick="openCloseTicketModal()" class="px-4 py-2 rounded-lg bg-red-900/20 border border-red-600/50 text-red-400 hover:bg-red-900/40 font-bold text-sm transition-all">
-                                    <i class="fas fa-times-circle mr-2"></i> Cerrar
-                                </button>
+                    <!-- VISTA DE LISTA DE TICKETS -->
+                    <div id="support-list-view">
+                        <div id="tickets-container" class="space-y-4">
+                            <!-- Aquí se inyectan los tickets dinámicamente -->
+                            <div class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5">
+                                <i class="fas fa-life-ring text-gray-600 text-5xl mb-4"></i>
+                                <p class="text-gray-400 text-lg">No tienes tickets creados.</p>
                             </div>
                         </div>
+                    </div>
 
-                        <div id="chat-interface" class="chat-container">
+                    <!-- VISTA DE CHAT ACTIVO (Oculta por defecto) -->
+                    <div id="support-chat-view" class="hidden">
+                        <div class="ticket-active-header mb-4">
+                            <div class="flex items-center gap-4">
+                                <button onclick="closeChatView()" class="text-gray-400 hover:text-white"><i class="fas fa-arrow-left"></i> Volver</button>
+                                <div>
+                                    <h3 id="active-ticket-subject" class="text-white font-bold text-lg">Asunto</h3>
+                                    <span id="active-ticket-status" class="ticket-status-pill status-open">Abierto</span>
+                                </div>
+                            </div>
+                            <!-- Botón solo para Staff -->
+                            <button id="btn-close-ticket-staff" onclick="openCloseTicketModal()" class="hidden px-4 py-2 rounded-lg bg-red-900/20 border border-red-600/50 text-red-400 hover:bg-red-900/40 font-bold text-sm transition-all">
+                                <i class="fas fa-times-circle mr-2"></i> Cerrar Ticket
+                            </button>
+                        </div>
+
+                        <div class="chat-container">
                             <div id="chat-messages" class="chat-messages"></div>
                             <div class="support-input-area">
                                 <input type="text" id="support-message-input" class="input-field flex-1 px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none" placeholder="Escribe tu mensaje...">
@@ -467,10 +480,10 @@
                     <p class="text-gray-400 text-sm">¿Estás seguro de cerrar este ticket?</p>
                 </div>
             </div>
-            <p class="text-gray-300 text-sm mb-6">Se eliminará el acceso al chat y se notificará a Discord.</p>
+            <p class="text-gray-300 text-sm mb-6">Se enviará una transcripción completa a Discord y se archivará el chat.</p>
             <div class="custom-modal-buttons">
                 <button class="btn-modal-cancel" onclick="closeCloseTicketModal()">Cancelar</button>
-                <button class="btn-modal-confirm" onclick="confirmCloseTicket()"><i class="fas fa-check mr-2"></i> Sí, cerrar ticket</button>
+                <button class="btn-modal-confirm" onclick="confirmCloseTicket()"><i class="fas fa-check mr-2"></i> Sí, cerrar</button>
             </div>
         </div>
     </div>
@@ -509,12 +522,14 @@
         let currentTicketId = null;
         let currentTicketData = null;
         let supportUnsubscribe = null;
+        let localReadCount = 0; // Para contar mensajes leídos localmente
 
         const CLIENT_ID = '1213866547181780992'; 
         const REDIRECT_URI = window.location.href.split('#')[0]; 
         const ADMIN_DISCORD_IDS = ['890526767608127489']; 
         const TICKET_WEBHOOK_URL = "https://discord.com/api/webhooks/1530747464569716756/LLK7Msvn-NNXbrP5bN8lYBzkjCR7G6D1CE63w41AozCfN2mVxRxiMQUoWpHK2g6ahHg7";
         const REVIEW_WEBHOOK_URL = "https://discord.com/api/webhooks/1530350855100956853/mqzdvlTBOx2JZ3wlumx-LdLAus3sZyg610PeoxK9ds4jpqxMK9t0sBT_2Lo-U-TDutRF";
+        const TRANSCRIPT_WEBHOOK_URL = "https://discord.com/api/webhooks/1532131617668333678/jAW1VAbwATzxQrVC9T1gjMDRh9yqBqzean6UGB0gLjjj6BcQoL5lL0koh5BoSshH3kOc";
 
         function showToast(message, type = 'success', title = '') {
             const container = document.getElementById('toast-container');
@@ -600,7 +615,10 @@
                 event.currentTarget.classList.add('active');
             }
             if (section === 'reviews') loadMyReviews();
-            if (section === 'support') loadSupportInterface();
+            if (section === 'support') {
+                loadSupportInterface();
+                closeChatView(); // Asegurar que empieza en la lista
+            }
         }
 
         function openReviewModal(productId, productName) {
@@ -1188,55 +1206,74 @@
             }
         }
 
+        // =============================================
+        //          LÓGICA DE SOPORTE MEJORADA
+        // =============================================
+
         function initSupportListener() {
             if (!currentUser) return;
             if (supportUnsubscribe) supportUnsubscribe();
 
+            // Escuchar TODOS los tickets del usuario (abiertos y cerrados) para la lista
             supportUnsubscribe = db.collection("Tickets")
                 .where("discord_id", "==", currentUser.id)
-                .where("status", "==", "open")
-                .limit(1)
+                .orderBy("created_at", "desc")
                 .onSnapshot((snapshot) => {
-                    if (!snapshot.empty) {
-                        const ticketDoc = snapshot.docs[0];
-                        currentTicketId = ticketDoc.id;
-                        currentTicketData = ticketDoc.data();
-                        
-                        // CAMBIOS VISUALES AQUÍ
-                        document.getElementById('support-initial-view').classList.add('hidden');
-                        document.getElementById('support-active-view').classList.remove('hidden');
-                        
-                        // Actualizar datos de la tarjeta
-                        const avatarUrl = currentUser.avatar ? `https://cdn.discordapp.com/avatars/${currentUser.id}/${currentUser.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png';
-                        document.getElementById('ticket-user-avatar').src = avatarUrl;
-                        document.getElementById('ticket-subject-display').textContent = currentTicketData.subject || 'Ticket de Soporte';
-                        
-                        // Generar número de ticket basado en ID corto o fecha
-                        const shortId = ticketDoc.id.substring(ticketDoc.id.length - 4).toUpperCase();
-                        document.getElementById('ticket-display-number').textContent = `Ticket #${shortId}`;
-                        
+                    renderTicketList(snapshot);
+                    
+                    // Si hay un ticket abierto, actualizar su vista si está activa
+                    const openTicket = snapshot.docs.find(d => d.data().status === 'open');
+                    if (openTicket && currentTicketId === openTicket.id) {
+                        currentTicketData = openTicket.data();
                         renderChatMessages(currentTicketData.messages || []);
-                        
-                        const input = document.getElementById('support-message-input');
-                        const canRespond = isAdmin() || (currentTicketData.assigned_to === currentUser.id);
-                        
-                        if (canRespond) {
-                            input.placeholder = isAdmin() ? "Responder como Soporte..." : "Escribe tu mensaje...";
-                            input.disabled = false;
-                        } else {
-                            input.placeholder = "Este ticket está siendo atendido por otro soporte";
-                            input.disabled = true;
-                        }
-                    } else {
-                        currentTicketId = null;
-                        currentTicketData = null;
-                        document.getElementById('support-initial-view').classList.remove('hidden');
-                        document.getElementById('support-active-view').classList.add('hidden');
                     }
                 });
         }
 
-        function loadSupportInterface() { if (currentUser) initSupportListener(); }
+        function loadSupportInterface() { 
+            if (currentUser) initSupportListener(); 
+        }
+
+        function renderTicketList(snapshot) {
+            const container = document.getElementById('tickets-container');
+            if (snapshot.empty) {
+                container.innerHTML = `
+                    <div class="text-center py-12 border-2 border-dashed border-red-900/30 rounded-xl bg-red-900/5">
+                        <i class="fas fa-life-ring text-gray-600 text-5xl mb-4"></i>
+                        <p class="text-gray-400 text-lg">No tienes tickets creados.</p>
+                        <button onclick="openCreateTicketModal()" class="mt-4 btn-primary px-6 py-2 rounded-lg text-white font-bold">Crear mi primer ticket</button>
+                    </div>`;
+                return;
+            }
+
+            let html = '';
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const shortId = doc.id.substring(doc.id.length - 4).toUpperCase();
+                const statusClass = data.status === 'open' ? 'status-open' : 'status-closed';
+                const statusText = data.status === 'open' ? 'Abierto' : 'Cerrado';
+                
+                // Calcular mensajes no leídos (simulado con localReadCount)
+                const totalMessages = data.messages ? data.messages.length : 0;
+                const unread = Math.max(0, totalMessages - localReadCount);
+                const badgeHtml = (data.status === 'open' && unread > 0) ? `<div class="ticket-notification-badge">+${unread}</div>` : '';
+
+                html += `
+                <div class="ticket-list-item ${data.status === 'open' ? 'active-ticket' : ''}" onclick="openTicketChat('${doc.id}')">
+                    <div class="ticket-avatar-wrapper">
+                        <img src="${currentUser.avatar ? `https://cdn.discordapp.com/avatars/${currentUser.id}/${currentUser.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png'}" class="ticket-avatar">
+                        ${badgeHtml}
+                    </div>
+                    <div class="ticket-info flex-1">
+                        <h3>${data.subject || 'Sin asunto'} <span class="text-xs text-gray-500 font-normal">#${shortId}</span></h3>
+                        <p>${data.status === 'open' ? 'Haz clic para continuar la conversación...' : 'Este ticket ha sido cerrado.'}</p>
+                    </div>
+                    <div class="ticket-status-pill ${statusClass}">${statusText}</div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
         function openCreateTicketModal() {
             document.getElementById('ticket-subject').value = '';
             document.getElementById('ticket-description').value = '';
@@ -1264,8 +1301,51 @@
                 await sendTicketWebhook(subject, description, newTicketRef.id, isStaff);
                 showToast('Ticket creado', 'success');
                 document.getElementById('create-ticket-modal').classList.remove('active');
+                // No abrimos el chat automáticamente, nos quedamos en la lista
             } catch (error) {
                 showToast('Error al crear ticket', 'error');
+            }
+        }
+
+        function openTicketChat(ticketId) {
+            currentTicketId = ticketId;
+            // Resetear contador local al abrir
+            localReadCount = 9999; 
+            
+            document.getElementById('support-list-view').classList.add('hidden');
+            document.getElementById('support-chat-view').classList.remove('hidden');
+
+            // Obtener datos frescos para mostrar en el header
+            db.collection("Tickets").doc(ticketId).get().then(doc => {
+                if (doc.exists) {
+                    currentTicketData = doc.data();
+                    document.getElementById('active-ticket-subject').textContent = currentTicketData.subject;
+                    
+                    const statusEl = document.getElementById('active-ticket-status');
+                    statusEl.textContent = currentTicketData.status === 'open' ? 'Abierto' : 'Cerrado';
+                    statusEl.className = `ticket-status-pill ${currentTicketData.status === 'open' ? 'status-open' : 'status-closed'}`;
+
+                    // Mostrar botón de cerrar SOLO si es staff y está abierto
+                    const closeBtn = document.getElementById('btn-close-ticket-staff');
+                    if (isSupportStaff() && currentTicketData.status === 'open') {
+                        closeBtn.classList.remove('hidden');
+                    } else {
+                        closeBtn.classList.add('hidden');
+                    }
+
+                    renderChatMessages(currentTicketData.messages || []);
+                }
+            });
+        }
+
+        function closeChatView() {
+            document.getElementById('support-chat-view').classList.add('hidden');
+            document.getElementById('support-list-view').classList.remove('hidden');
+            currentTicketId = null;
+            // Actualizar la lista para quitar badges
+            if (supportUnsubscribe) {
+                // Forzar re-renderizado de lista
+                db.collection("Tickets").where("discord_id", "==", currentUser.id).limit(1).get(); 
             }
         }
 
@@ -1300,6 +1380,8 @@
                 container.innerHTML += `<div class="message-bubble ${bubbleClass}"><div class="font-bold text-xs mb-1 opacity-80">${msg.is_support ? 'Soporte' : msg.sender}</div><div>${msg.text}</div><div class="message-meta">${date}</div></div>`;
             });
             container.scrollTop = container.scrollHeight;
+            // Actualizar contador local
+            localReadCount = messages.length;
         }
 
         async function sendSupportMessage() {
@@ -1329,30 +1411,56 @@
 
         async function confirmCloseTicket() {
             closeCloseTicketModal();
-            if (!currentTicketId) return;
+            if (!currentTicketId || !currentTicketData) return;
+            
             try {
+                // 1. Generar Transcripción
+                let transcript = `=== TRANSCRIPCIÓN DEL TICKET #${currentTicketId} ===\n`;
+                transcript += `Asunto: ${currentTicketData.subject}\n`;
+                transcript += `Usuario: ${currentTicketData.username}\n`;
+                transcript += `Fecha de cierre: ${new Date().toLocaleString()}\n`;
+                transcript += `=========================================\n\n`;
+
+                if (currentTicketData.messages) {
+                    currentTicketData.messages.forEach(msg => {
+                        const date = new Date(msg.timestamp).toLocaleString();
+                        const role = msg.is_support ? '[SOPORTE]' : '[CLIENTE]';
+                        transcript += `[${date}] ${role} ${msg.sender}: ${msg.text}\n`;
+                    });
+                }
+                transcript += `\n=========================================\nTICKET CERRADO POR: ${currentUser.username}`;
+
+                // 2. Enviar a Discord (Webhook de Transcripción)
+                const payload = {
+                    username: "Archivador de Tickets",
+                    avatar_url: "https://papeleta-script-github-io.vercel.app/files/999.png",
+                    content: `🔒 **Ticket Cerrado:** \`${currentTicketId}\`\n👤 **Usuario:** <@${currentTicketData.discord_id}>`,
+                    embeds: [{
+                        title: "📄 Transcripción Completa",
+                        description: "```txt\n" + transcript.substring(0, 1900) + (transcript.length > 1900 ? "..." : "") + "\n```",
+                        color: 16711680,
+                        footer: { text: "Papeleta Store Archive" },
+                        timestamp: new Date().toISOString()
+                    }]
+                };
+
+                await fetch(TRANSCRIPT_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                // 3. Cerrar en Firebase
                 await db.collection("Tickets").doc(currentTicketId).update({
                     status: 'closed',
                     closed_at: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                await fetch(TICKET_WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        username: "Sistema de Soporte",
-                        avatar_url: "https://papeleta-script-github-io.vercel.app/files/999.png",
-                        embeds: [{
-                            title: "🔒 Ticket Cerrado",
-                            description: `El ticket \`${currentTicketId}\` ha sido cerrado.`,
-                            color: 65280,
-                            footer: { text: "Papeleta Store Support" },
-                            timestamp: new Date().toISOString()
-                        }]
-                    })
-                });
-                showToast('Ticket cerrado', 'success');
+                showToast('Ticket cerrado y transcripción enviada', 'success');
+                closeChatView(); // Volver a la lista
+
             } catch (error) {
+                console.error(error);
                 showToast('Error al cerrar ticket', 'error');
             }
         }
