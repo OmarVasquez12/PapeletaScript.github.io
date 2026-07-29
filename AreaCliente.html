@@ -1215,6 +1215,7 @@
             if (supportUnsubscribe) supportUnsubscribe();
 
             // Escuchar TODOS los tickets del usuario (abiertos y cerrados) para la lista
+            // IMPORTANTE: Asegúrate de tener el índice compuesto en Firebase si da error
             supportUnsubscribe = db.collection("Tickets")
                 .where("discord_id", "==", currentUser.id)
                 .orderBy("created_at", "desc")
