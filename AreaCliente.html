@@ -579,67 +579,68 @@
         // =============================================
 
         function generateUniqueKey() {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; 
-    let code = '';
-    for (let i = 0; i < 24; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
-    return code; 
-}
-
-function generateUserCode() {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; 
-    let code = '';
-    for (let i = 0; i < 8; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
-    return code;
-}
-
-async function ensureFixedLicense() {
-    if (!currentUser) return;
-    try {
-        const snapshot = await db.collection("Licencias")
-            .where("discord_id", "==", currentUser.id)
-            .where("type", "==", "general")
-            .limit(1).get();
-
-        if (!snapshot.empty) {
-            userFixedLicenseKey = snapshot.docs[0].data().key;
-        } else {
-            const newKey = generateUniqueKey(); // 24 caracteres
-            const newUser = generateUserCode(); // 8 caracteres SIN prefijo
-            
-            await db.collection("Licencias").add({
-                discord_id: currentUser.id, 
-                username: currentUser.username, 
-                key: newKey,
-                user_code: newUser, // Solo el código, sin "USER_"
-                type: "general",
-                created_at: firebase.firestore.FieldValue.serverTimestamp(), 
-                status: 'active'
-            });
-            userFixedLicenseKey = newKey;
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; 
+            let code = '';
+            for (let i = 0; i < 24; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+            return code; 
         }
-        updateLicenseDisplay();
-    } catch (error) { console.error("Error gestionando licencia fija:", error); }
-}
 
-function updateLicenseDisplay() {
-    const codeBlock = document.getElementById('license-code');
-    if (!currentUser || !codeBlock) return;
+        function generateUserCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; 
+            let code = '';
+            for (let i = 0; i < 8; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+            return code;
+        }
 
-    db.collection("Licencias")
-      .where("discord_id", "==", currentUser.id)
-      .where("type", "==", "general")
-      .limit(1)
-      .get()
-      .then(snapshot => {
-          if (!snapshot.empty) {
-              const license = snapshot.docs[0].data();
-              // ✅ FORMATO CORRECTO: User sin prefijo, Key larga
-              codeBlock.textContent = `configLicense = {\n    ["User"] = "PAPELETA [${license.user_code || ''}]", \n    ["Key"] = "PAPELETA [${license.key || ''}"]\n}`;
-          } else {
-              codeBlock.textContent = `configLicense = {\n    ["User"] = "PAPELETA [PENDIENTE]", \n    ["Key"] = "PAPELETA [PENDIENTE]"\n}`;
-          }
-      });
-}
+        async function ensureFixedLicense() {
+            if (!currentUser) return;
+            try {
+                const snapshot = await db.collection("Licencias")
+                    .where("discord_id", "==", currentUser.id)
+                    .where("type", "==", "general")
+                    .limit(1).get();
+
+                if (!snapshot.empty) {
+                    userFixedLicenseKey = snapshot.docs[0].data().key;
+                } else {
+                    const newKey = generateUniqueKey(); // 24 caracteres
+                    const newUser = generateUserCode(); // 8 caracteres SIN prefijo
+                    
+                    await db.collection("Licencias").add({
+                        discord_id: currentUser.id, 
+                        username: currentUser.username, 
+                        key: newKey,
+                        user_code: newUser, // Solo el código, sin "USER_"
+                        type: "general",
+                        created_at: firebase.firestore.FieldValue.serverTimestamp(), 
+                        status: 'active'
+                    });
+                    userFixedLicenseKey = newKey;
+                }
+                updateLicenseDisplay();
+            } catch (error) { console.error("Error gestionando licencia fija:", error); }
+        }
+
+        function updateLicenseDisplay() {
+            const codeBlock = document.getElementById('license-code');
+            if (!currentUser || !codeBlock) return;
+
+            db.collection("Licencias")
+              .where("discord_id", "==", currentUser.id)
+              .where("type", "==", "general")
+              .limit(1)
+              .get()
+              .then(snapshot => {
+                  if (!snapshot.empty) {
+                      const license = snapshot.docs[0].data();
+                      // ✅ FORMATO CORRECTO: User sin prefijo, Key larga
+                      codeBlock.textContent = `configLicense = {\n    ["User"] = "PAPELETA [${license.user_code || ''}]", \n    ["Key"] = "PAPELETA [${license.key || ''}"]\n}`;
+                  } else {
+                      codeBlock.textContent = `configLicense = {\n    ["User"] = "PAPELETA [PENDIENTE]", \n    ["Key"] = "PAPELETA [PENDIENTE]"\n}`;
+                  }
+              });
+        }
+
         async function saveServerConfig(event) {
             const ipInput = document.getElementById('server-ip');
             const portInput = document.getElementById('server-port');
@@ -847,61 +848,61 @@ function updateLicenseDisplay() {
         }
 
         function listenForApprovedOrders() {
-    if (!currentUser) return;
-    db.collection("Compra")
-        .where("discord_id", "==", currentUser.id)
-        .onSnapshot(async (snapshot) => {
-            snapshot.docChanges().forEach(async (change) => {
-                if (change.type === "modified") {
-                    const data = change.doc.data();
-                    if (data.status === "approved" || data.status === "aprobado" || data.status === "completed") {
-                        if (data.status === "completed") return;
+            if (!currentUser) return;
+            db.collection("Compra")
+                .where("discord_id", "==", currentUser.id)
+                .onSnapshot(async (snapshot) => {
+                    snapshot.docChanges().forEach(async (change) => {
+                        if (change.type === "modified") {
+                            const data = change.doc.data();
+                            if (data.status === "approved" || data.status === "aprobado" || data.status === "completed") {
+                                if (data.status === "completed") return;
 
-                        if (data.products && Array.isArray(data.products)) {
-                            for (const product of data.products) {
-                                const existingLicense = await db.collection("Licencias")
-                                    .where("discord_id", "==", currentUser.id)
-                                    .where("product_id", "==", product.id)
-                                    .where("status", "==", "active")
-                                    .limit(1).get();
+                                if (data.products && Array.isArray(data.products)) {
+                                    for (const product of data.products) {
+                                        const existingLicense = await db.collection("Licencias")
+                                            .where("discord_id", "==", currentUser.id)
+                                            .where("product_id", "==", product.id)
+                                            .where("status", "==", "active")
+                                            .limit(1).get();
 
-                                if (existingLicense.empty) {
-                                    const newKey = generateUniqueKey(); // 24 chars
-                                    const newUserCode = generateUserCode(); // 8 chars
+                                        if (existingLicense.empty) {
+                                            const newKey = generateUniqueKey(); // 24 chars
+                                            const newUserCode = generateUserCode(); // 8 chars
 
-                                    await db.collection("Licencias").add({
-                                        discord_id: currentUser.id,
-                                        username: currentUser.username,
-                                        product_id: product.id,
-                                        product_name: product.name,
-                                        key: newKey,
-                                        user_code: newUserCode, // Sin prefijo
-                                        type: "product",
-                                        created_at: firebase.firestore.FieldValue.serverTimestamp(),
-                                        status: 'active'
-                                    });
+                                            await db.collection("Licencias").add({
+                                                discord_id: currentUser.id,
+                                                username: currentUser.username,
+                                                product_id: product.id,
+                                                product_name: product.name,
+                                                key: newKey,
+                                                user_code: newUserCode, // Sin prefijo
+                                                type: "product",
+                                                created_at: firebase.firestore.FieldValue.serverTimestamp(),
+                                                status: 'active'
+                                            });
 
-                                    await db.collection("Clientes").add({
-                                        discord_id: currentUser.id,
-                                        username: currentUser.username,
-                                        products: [{ id: product.id, name: product.name, price: product.price }],
-                                        total_price: data.total_amount,
-                                        date: firebase.firestore.FieldValue.serverTimestamp(),
-                                        status: "Entregado por Aprobación"
-                                    });
+                                            await db.collection("Clientes").add({
+                                                discord_id: currentUser.id,
+                                                username: currentUser.username,
+                                                products: [{ id: product.id, name: product.name, price: product.price }],
+                                                total_price: data.total_amount,
+                                                date: firebase.firestore.FieldValue.serverTimestamp(),
+                                                status: "Entregado por Aprobación"
+                                            });
+                                        }
+                                    }
                                 }
+
+                                await change.doc.ref.update({ status: "completed" });
+                                localStorage.removeItem('papeleta_cart');
+                                showToast('¡Solicitud aprobada! Producto otorgado.', 'success');
+                                loadDashboardData();
                             }
                         }
-
-                        await change.doc.ref.update({ status: "completed" });
-                        localStorage.removeItem('papeleta_cart');
-                        showToast('¡Solicitud aprobada! Producto otorgado.', 'success');
-                        loadDashboardData();
-                    }
-                }
-            });
-        });
-}
+                    });
+                });
+        }
 
         async function loadDashboardData() {
             if (!currentUser) return;
@@ -1041,9 +1042,9 @@ function updateLicenseDisplay() {
                         description: `**Opinión del cliente:**\n> "${safeReviewText}"`,
                         color: 16711680,
                         fields: [
-                            { name: "📦 Producto", value: `\`${safeProductName}\``, inline: true },
+                            { name: " Producto", value: `\`${safeProductName}\``, inline: true },
                             { name: "⭐ Calificación", value: `${starsString} (${rating}/5)`, inline: true },
-                            { name: "👤 Cliente", value: `<@${currentUser.id}> (${currentUser.username})`, inline: false }
+                            { name: " Cliente", value: `<@${currentUser.id}> (${currentUser.username})`, inline: false }
                         ],
                         footer: { text: "Papeleta Store", icon_url: "https://papeleta-script-github-io.vercel.app/favicon.ico" },
                         timestamp: new Date().toISOString()
