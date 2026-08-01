@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Server Control</title>
+    <title>Admin Panel </title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff1a1a'/%3E%3Cstop offset='1' stop-color='%23cc1b1b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Ctext x='50' y='70' font-family='Arial, sans-serif' font-size='58' font-weight='900' fill='white' text-anchor='middle'%3EP%3C/text%3E%3C/svg%3E">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -1176,21 +1176,22 @@
 
         <!-- SECCIÓN 7: SERVER.LUA -->
         <section id="section-serverlua" class="section-content fade-in">
-            <div class="card rounded-xl overflow-hidden">
-                <div class="p-4 border-b border-red-900/30 bg-red-900/10 flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <i class="fas fa-file-code text-red-500 text-xl"></i>
-                        <div>
-                            <h3 class="text-white font-bold">Server.lua</h3>
-                            <p class="text-xs text-gray-400">Código de validación de licencia</p>
-                        </div>
-                    </div>
-                    <button onclick="copyServerLua()" class="btn-primary px-4 py-2 rounded-lg text-white text-sm font-bold flex items-center gap-2">
-                        <i class="fas fa-copy"></i> Copiar Código
-                    </button>
+    <div class="card rounded-xl overflow-hidden">
+        <div class="p-4 border-b border-red-900/30 bg-red-900/10 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <i class="fas fa-file-code text-red-500 text-xl"></i>
+                <div>
+                    <h3 class="text-white font-bold">Server.lua</h3>
+                    <p class="text-xs text-gray-400">Codigo de validación de licencia</p>
                 </div>
-                <div class="p-0">
-                    <textarea id="server-lua-code" class="w-full h-[600px] bg-[#050507] text-gray-300 font-mono text-sm p-6 focus:outline-none resize-none" spellcheck="false">
+            </div>
+            <button onclick="copyServerLua()" class="btn-primary px-4 py-2 rounded-lg text-white text-sm font-bold flex items-center gap-2">
+                <i class="fas fa-copy"></i> Copiar Codigo
+            </button>
+        </div>
+        <div class="p-0">
+            <textarea id="server-lua-code" class="w-full h-[600px] bg-[#050507] text-white font-mono text-sm p-6 focus:outline-none resize-none" spellcheck="false">
+
 local function clean(s)
     if not s then return "" end
     return tostring(s):gsub("%s+", ""):upper()
@@ -1199,9 +1200,9 @@ end
 local function tienePermisoACL()
     local resourceName = getResourceName(getThisResource())
     local resObj = "resource." .. resourceName
-    
+
     if not isObjectInACLGroup(resObj, aclGetGroup("Admin")) then
-        outputDebugString("[Papeleta Progamador] El resource '"..resourceName.."' NO tiene permiso en ACL 'Admin'", 1)
+        outputDebugString("[Papeleta]  El resource '"..resourceName.."' NO tiene permiso en ACL 'Admin'", 1)
         return false
     end
     return true
@@ -1210,77 +1211,101 @@ end
 local function cargarScriptPrincipal()
     if _G["ScriptYaCargado"] then return end
     _G["ScriptYaCargado"] = true
+    outputDebugString("[Papeleta] Script principal cargado correctamente", 3)
+    -- Aquí inicia tu script real
+    -- iniciarSistema()
 end
 
 local function validarLicencia()
+
     if not configLicense or not configLicense["User"] or not configLicense["Key"] then
-        outputDebugString("[Papeleta Progamador] Faltan credenciales en config", 1)
+        outputDebugString("[Papeleta] manito dime te lo va a robar", 1)
         stopResource(getThisResource())
         return
     end
 
     local userLocal = clean(configLicense["User"])
-    local keyLocal = clean(configLicense["Key"])
+    local keyLocal  = clean(configLicense["Key"])
     local resourceName = clean(getResourceName(getThisResource()))
     local portActual = tostring(getServerPort() or 22003)
-    
+
     fetchRemote("https://api.ipify.org?format=json", function(ipData, ipErr)
         local ipActual = ""
-        if ipErr == 0 then
+
+        if ipErr == 0 and ipData then
             local ipTable = fromJSON(ipData)
             if ipTable and ipTable.ip then
                 ipActual = clean(ipTable.ip)
             end
         end
-        
+
         if ipActual == "" or ipActual == "0.0.0.0" then
-            ipActual = clean(getServerConfigSetting("serverip") or "")
-            if ipActual == "auto" or ipActual == "" then
-                outputDebugString("[Papeleta Progamador] ADVERTENCIA: No se pudo detectar IP automáticamente", 2)
+            local configIP = getServerConfigSetting("serverip") or ""
+            if configIP ~= "" and configIP ~= "auto" then
+                ipActual = clean(configIP)
             end
         end
-        
+
         local ipPortCompleto = ipActual .. ":" .. portActual
         validarConFirebase(ipPortCompleto, userLocal, keyLocal, resourceName)
     end)
 end
 
 function validarConFirebase(ipPortCompleto, userLocal, keyLocal, resourceName)
-    local urlBase = "https://firestore.googleapis.com/v1/projects/licenciapapeleta12/databases/(default)/documents/licencias"
-    
+    local urlBase = "https://firestore.googleapis.com/v1/projects/papeletalicencia/databases/(default)/documents/Licencias"
+
     fetchRemote(urlBase, function(data, err)
-        if err ~= 0 then
-            outputDebugString("[Papeleta Progamador] Fallo de conexión a Firestore", 1)
+        if err ~= 0 or not data then
+            outputDebugString("[Papeleta] LICENCIA DENEGADA", 1)
             stopResource(getThisResource())
             return
         end
 
         local db = fromJSON(data)
         local autorizado = false
-        local keyEncontradaPeroMalSistema = false
 
         if db and db.documents then
             for _, doc in ipairs(db.documents) do
                 local f = doc.fields
-                if f and f.user and f.key and f.ip and f.port and f.active and f.resource then
-                    local fireUser = clean(f.user.stringValue)
-                    local fireKey = clean(f.key.stringValue)
-                    local fireIp   = clean(f.ip.stringValue)
-                    local firePort = clean(f.port.stringValue)
-                    local fireResource = clean(f.resource.stringValue)
-                    local fireIpPort = fireIp .. ":" .. firePort
-                    local fireStatus = f.active.booleanValue
+                if f then
+                    local fireUser = clean(
+                        (f.user_code and f.user_code.stringValue) or
+                        (f.user and f.user.stringValue) or ""
+                    )
+                    local fireKey = clean(f.key and f.key.stringValue or "")
+
+                    local fireStatus = ""
+                    if f.status and f.status.stringValue then
+                        fireStatus = clean(f.status.stringValue)
+                    elseif f.active and f.active.booleanValue ~= nil then
+                        fireStatus = f.active.booleanValue and "ACTIVE" or "INACTIVE"
+                    end
+
+                    local fireIp     = clean(f.ip and f.ip.stringValue or "")
+                    local firePort   = clean(f.port and f.port.stringValue or "")
+                    local fireResource = clean(f.resource and f.resource.stringValue or "")
 
                     if fireKey == keyLocal then
-                        if fireResource == resourceName then
-                            if fireUser == userLocal and fireIpPort == ipPortCompleto and fireStatus == true then
-                                autorizado = true
-                            end
-                        else
-                            keyEncontradaPeroMalSistema = true
-                            outputDebugString("[Papeleta Progamador] ERROR: Key válida pero pertenece al sistema '" .. fireResource .. "'", 1)
-                            outputDebugString("[Papeleta Progamador] Este sistema es '" .. resourceName .. "'. Licencia denegada.", 1)
+                        if fireStatus ~= "ACTIVE" then
+                            break
                         end
+
+                        if fireUser ~= "" and fireUser ~= userLocal then
+                            break
+                        end
+
+                        if fireIp ~= "" and firePort ~= "" then
+                            local fireIpPort = fireIp .. ":" .. firePort
+                            if fireIpPort ~= ipPortCompleto then
+                                break
+                            end
+                        end
+
+                        if fireResource ~= "" and fireResource ~= resourceName then
+                            break
+                        end
+
+                        autorizado = true
                         break
                     end
                 end
@@ -1289,15 +1314,11 @@ function validarConFirebase(ipPortCompleto, userLocal, keyLocal, resourceName)
 
         if autorizado then
             if not _G["ScriptYaCargado"] then
-                outputDebugString("[Papeleta Progamador] LICENCIA VERIFICADA EXITOSAMENTE", 3)
+                outputDebugString("[Papeleta] LICENCIA VERIFICADA CORRECTAMENTE", 3)
                 cargarScriptPrincipal()
             end
         else
-            if keyEncontradaPeroMalSistema then
-                outputDebugString("[Papeleta Progamador] LICENCIA DENEGADA: Key incorrecta para este sistema", 1)
-            else
-                outputDebugString("[Papeleta Progamador] LICENCIA NO VERIFICADA (Key inválida o expirada)", 1)
-            end
+            outputDebugString("[Papeleta] LICENCIA DENEGADA", 1)
             stopResource(getThisResource())
         end
     end)
@@ -1309,10 +1330,13 @@ addEventHandler("onResourceStart", resourceRoot, function()
         setTimer(function() stopResource(getThisResource()) end, 50, 1)
         return
     end
-    outputDebugString("[Papeleta Progamador] INICIANDO VERIFICACIÓN DE LICENCIA...", 3)
+
+    outputDebugString("[Papeleta] INICIANDO VERIFICACION DE LICENCIA...", 3)
     validarLicencia()
-    setTimer(validarLicencia, 8996400000, 0)
+    
+    setTimer(validarLicencia, 21600000, 0)
 end, true, "high")
+
                     </textarea>
                 </div>
             </div>
@@ -2689,7 +2713,7 @@ end, true, "high")
         function copyServerLua() {
             const code = document.getElementById('server-lua-code').value;
             navigator.clipboard.writeText(code).then(() => {
-                showToast('Código Server.lua copiado al portapapeles', 'success');
+                showToast('Codigo Server.lua copiado al portapapeles', 'success');
             }).catch(err => {
                 console.error('Error al copiar:', err);
                 showToast('Error al copiar el código', 'error');
@@ -3223,16 +3247,15 @@ document.getElementById('btn-confirm-create-discount').addEventListener('click',
             created_by: currentUser ? currentUser.id : 'system'
         });
 
-        showToast(`Código "${code}" creado con ${perc}% de descuento`, 'success');
+        showToast(`Codigo "${code}" creado con ${perc}% de descuento`, 'success');
         document.getElementById('discount-creator-panel').classList.add('hidden');
         document.getElementById('discount-preview').classList.add('hidden');
-        
-        // Limpiar inputs
+
         document.getElementById('discount-code-input').value = '';
         document.getElementById('discount-percentage-input').value = '25';
     } catch (e) {
         console.error(e);
-        showToast('Error al crear el código', 'error');
+        showToast('Error al crear el codigo', 'error');
     }
 });
 
