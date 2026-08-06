@@ -2002,7 +2002,106 @@ end, true, "high")
             });
         }
 
-        // ========== FUNCIONES DE GESTIÓN DE USUARIOS ==========
+        // ========== GESTIÓN DE LICENCIAS (EDITAR / TOGGLE) ==========
+
+async function toggleLicenseStatus(discordId, newState) {
+    try {
+        // Buscar la licencia en la colección Licencias
+        const licenseRef = allLicencias.find(l => l.discord_id === discordId);
+        
+        if (licenseRef) {
+            // Actualizar en colección Licencias
+            await db.collection("Licencias").doc(licenseRef.id).update({
+                active: newState,
+                status: newState ? "ACTIVE" : "INACTIVE",
+                updated_at: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            showToast(`Licencia ${newState ? 'ACTIVADA' : 'DESACTIVADA'} correctamente`, newState ? 'success' : 'warning');
+        } else {
+            // Si no existe documento en Licencias pero sí en Clientes, crearlo o actualizar estado local
+            showToast('No se encontró documento de licencia para actualizar', 'error');
+            return;
+        }
+        
+        // Recargar datos para reflejar cambios
+        await loadLicenciasData();
+    } catch (error) {
+        console.error("Error toggling license:", error);
+        showToast('Error al cambiar estado: ' + error.message, 'error');
+    }
+}
+
+async function updateLicenseKey(discordId) {
+    const input = document.getElementById(`edit-key-${discordId}`);
+    if (!input) return;
+    
+    const newKey = input.value.trim();
+    if (!newKey) {
+        showToast('La clave no puede estar vacía', 'warning');
+        return;
+    }
+
+    try {
+        const licenseRef = allLicencias.find(l => l.discord_id === discordId);
+        if (licenseRef) {
+            await db.collection("Licencias").doc(licenseRef.id).update({
+                key: newKey,
+                updated_at: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            showToast('Clave de licencia actualizada', 'success');
+            await loadLicenciasData();
+        } else {
+            showToast('Licencia no encontrada en base de datos', 'error');
+        }
+    } catch (error) {
+        console.error("Error updating key:", error);
+        showToast('Error al guardar: ' + error.message, 'error');
+    }
+}
+
+async function regenerateLicenseKey(discordId) {
+    showConfirmModal(
+        'REGENERAR LICENCIA',
+        '¿Estás seguro? La clave anterior dejará de funcionar inmediatamente.',
+        async () => {
+            try {
+                const newKey = generateUniqueKey();
+                const licenseRef = allLicencias.find(l => l.discord_id === discordId);
+                
+                if (licenseRef) {
+                    await db.collection("Licencias").doc(licenseRef.id).update({
+                        key: newKey,
+                        updated_at: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    showToast('Nueva clave generada exitosamente', 'success');
+                    await loadLicenciasData();
+                }
+            } catch (error) {
+                showToast('Error al regenerar: ' + error.message, 'error');
+            }
+        }
+    );
+}
+
+async function generateLicenseForUser(discordId, username) {
+    try {
+        const newKey = generateUniqueKey();
+        await db.collection("Licencias").add({
+            discord_id: discordId,
+            username: username,
+            key: newKey,
+            active: true,
+            status: "ACTIVE",
+            created_at: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        showToast('Licencia generada correctamente', 'success');
+        await loadLicenciasData();
+    } catch (error) {
+        showToast('Error al generar licencia: ' + error.message, 'error');
+    }
+}
+
+        
         async function loadUsers() {
             try {
                 const savedRoles = localStorage.getItem('papeleta_custom_roles');
