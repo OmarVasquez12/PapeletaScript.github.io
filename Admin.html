@@ -1888,15 +1888,18 @@ end, true, "high")
     }
 
     container.innerHTML = filteredClientes.map(cliente => {
-        // Buscar la licencia asociada al cliente
         const userLicense = allLicencias.find(l => l.discord_id === cliente.discord_id);
         const isGratis = cliente.total_price === 'Gratis' || cliente.total_price === 'GRATIS';
         
-        // Determinar estado activo/inactivo basado en la licencia o el cliente
-        // Prioridad: campo 'active' de la licencia > status del cliente
+        // Lógica de estado activo/inactivo compatible con Server.lua
         let isActive = true;
         if (userLicense) {
-            isActive = userLicense.active !== undefined ? userLicense.active : (userLicense.status === 'ACTIVE' || userLicense.status === 'active');
+            // Prioridad al booleano 'active', fallback a string 'status'
+            if (userLicense.active !== undefined) {
+                isActive = userLicense.active;
+            } else {
+                isActive = (userLicense.status === 'ACTIVE' || userLicense.status === 'active');
+            }
         } else {
             isActive = (cliente.status === 'Pagado' || cliente.status === 'Reclamado Exitosamente');
         }
@@ -1940,6 +1943,7 @@ end, true, "high")
 
                     ${userLicense ? `
                     <div class="space-y-3">
+                        <!-- EDITOR DE CLAVE -->
                         <div class="flex gap-2">
                             <input type="text" id="edit-key-${cliente.discord_id}" value="${escapeHTML(userLicense.key)}" 
                                 class="license-key-unique flex-1 text-left focus:border-red-500 focus:bg-black/80 transition-all outline-none cursor-text"
@@ -2004,27 +2008,25 @@ end, true, "high")
 
         // ========== GESTIÓN DE LICENCIAS (EDITAR / TOGGLE) ==========
 
+// ========== GESTIÓN DE LICENCIAS (EDITAR / TOGGLE) ==========
+
 async function toggleLicenseStatus(discordId, newState) {
     try {
-        // Buscar la licencia en la colección Licencias
         const licenseRef = allLicencias.find(l => l.discord_id === discordId);
         
         if (licenseRef) {
-            // Actualizar en colección Licencias
+            // Actualizamos tanto 'active' (booleano) como 'status' (string) 
+            // para asegurar compatibilidad total con tu Server.lua
             await db.collection("Licencias").doc(licenseRef.id).update({
                 active: newState,
                 status: newState ? "ACTIVE" : "INACTIVE",
                 updated_at: firebase.firestore.FieldValue.serverTimestamp()
             });
             showToast(`Licencia ${newState ? 'ACTIVADA' : 'DESACTIVADA'} correctamente`, newState ? 'success' : 'warning');
+            await loadLicenciasData(); // Recargar para reflejar cambios visuales
         } else {
-            // Si no existe documento en Licencias pero sí en Clientes, crearlo o actualizar estado local
             showToast('No se encontró documento de licencia para actualizar', 'error');
-            return;
         }
-        
-        // Recargar datos para reflejar cambios
-        await loadLicenciasData();
     } catch (error) {
         console.error("Error toggling license:", error);
         showToast('Error al cambiar estado: ' + error.message, 'error');
@@ -2059,6 +2061,47 @@ async function updateLicenseKey(discordId) {
     }
 }
 
+async function regenerateLicenseKey(discordId) {
+    showConfirmModal(
+        'REGENERAR LICENCIA',
+        '¿Estás seguro? La clave anterior dejará de funcionar inmediatamente.',
+        async () => {
+            try {
+                const newKey = generateUniqueKey();
+                const licenseRef = allLicencias.find(l => l.discord_id === discordId);
+                
+                if (licenseRef) {
+                    await db.collection("Licencias").doc(licenseRef.id).update({
+                        key: newKey,
+                        updated_at: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    showToast('Nueva clave generada exitosamente', 'success');
+                    await loadLicenciasData();
+                }
+            } catch (error) {
+                showToast('Error al regenerar: ' + error.message, 'error');
+            }
+        }
+    );
+}
+
+async function generateLicenseForUser(discordId, username) {
+    try {
+        const newKey = generateUniqueKey();
+        await db.collection("Licencias").add({
+            discord_id: discordId,
+            username: username,
+            key: newKey,
+            active: true,
+            status: "ACTIVE",
+            created_at: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        showToast('Licencia generada correctamente', 'success');
+        await loadLicenciasData();
+    } catch (error) {
+        showToast('Error al generar licencia: ' + error.message, 'error');
+    }
+}
 async function regenerateLicenseKey(discordId) {
     showConfirmModal(
         'REGENERAR LICENCIA',
